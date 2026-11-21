@@ -1,0 +1,7 @@
+schema_version: "1.1"
+name: fishing-village-cn
+expected_outcome: |
+  One self-contained index.html of a hand-inked isometric fishing village (harbour with boats, a lighthouse, a small
+  market, a beach with people) that builds itself, tours the places with hard cuts including a close-up, fades, and
+  then hands over to explore mode. The film passes the determinism, cut and ending checks, explore inputs work, and
+  the people read as people at the close-up.

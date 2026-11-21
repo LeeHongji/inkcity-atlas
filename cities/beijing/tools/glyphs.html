@@ -1,0 +1,14 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#F0EEE4}</style></head><body><canvas id="c" width="1920" height="1080"></canvas>
+<script>function clamp(v,a,b){return Math.max(a,Math.min(b,v));}</script>
+<script src="../src/36_hanzi.js"></script>
+<script>
+const cv=document.getElementById('c'),x=cv.getContext('2d');x.lineCap='round';x.lineJoin='round';
+const chars=Object.keys(HZ),S=+(new URLSearchParams(location.search).get("S")||150),cols=Math.floor(1880/(S+8)),off=+(new URLSearchParams(location.search).get("o")||0);
+x.font='22px sans-serif';
+chars.slice(off).forEach((ch,i)=>{const cx=20+(i%cols)*(S+8),cy=20+Math.floor(i/cols)*(S+60);
+ x.strokeStyle='#ddd';x.lineWidth=1;x.strokeRect(cx,cy,S,S);
+ HZ[ch].forEach((s,k)=>{x.strokeStyle='hsl('+(k*47%360)+',60%,35%)';x.lineWidth=S*0.055;x.beginPath();for(let j=0;j<s.length;j+=2){const px=cx+s[j]/10*S,py=cy+s[j+1]/10*S;j?x.lineTo(px,py):x.moveTo(px,py);}x.stroke();
+  x.fillStyle=x.strokeStyle;x.font='11px sans-serif';x.fillText(k+1,cx+s[0]/10*S-4,cy+s[1]/10*S-3);});
+ x.fillStyle='#222';x.font='28px sans-serif';x.fillText(ch+' '+HZ[ch].length,cx+S*0.35,cy+S+30);});
+window.__ready=true;
+</script></body></html>

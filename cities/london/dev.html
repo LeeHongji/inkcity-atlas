@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>London (dev)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;height:100%;background:#F0EEE4;overflow:hidden}canvas{display:block;touch-action:none}</style><link rel="stylesheet" href="../../gallery/guide.css">
+</head>
+<body><canvas id="sf"></canvas>
+<a id="atlas" href="../../index.html" aria-label="Back to the inkcity Atlas" style="position:fixed;left:16px;top:14px;z-index:2;padding:6px 11px 7px;background:rgba(240,238,228,.92);border:1px solid #2A2622;border-radius:2px;color:#2A2622;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;letter-spacing:.06em;text-decoration:none">&larr; ATLAS</a>
+<script>if(/[?&](f|film)(=|&|$)/.test(location.search))document.getElementById('atlas').remove();</script>
+<script src="../../engine/00_core.js"></script>
+<script src="../../engine/10_pen.js"></script>
+<script src="../../engine/20_kit.js"></script>
+<script src="../../engine/30_world.js"></script>
+<script src="src/35_scene.js"></script>
+<script src="src/36_london.js"></script>
+<script src="src/37_timetable.js"></script>
+<script src="src/tiles/thames.js"></script>
+<script src="src/tiles/streets.js"></script>
+<script src="src/tiles/wbridge.js"></script>
+<script src="src/tiles/tbridge.js"></script>
+<script src="src/tiles/westminster.js"></script>
+<script src="src/tiles/tower.js"></script>
+<script src="src/tiles/katharine.js"></script>
+<script src="src/tiles/palace.js"></script>
+<script src="src/tiles/trafalgar.js"></script>
+<script src="src/tiles/city.js"></script>
+<script src="src/tiles/battersea.js"></script>
+<script src="src/tiles/southbank.js"></script>
+<script src="src/tiles/borough.js"></script>
+<script src="src/tiles/satellites.js"></script>
+<script src="src/guide.js"></script>
+<script src="../../engine/80_render.js"></script>
+<script src="../../engine/90_app.js"></script>
+<script>window.addEventListener('error',e=>{window.__err=(window.__err||'')+e.message+' @'+(e.filename||'').split('/').pop()+':'+e.lineno+'\n'});SF.boot();</script>
+<script defer src="../../gallery/guide.js"></script>
+</body></html>

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>people sheet</title>
+<style>html,body{margin:0;background:#F0EEE4}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script src="../src/00_core.js"></script>
+<script src="../src/10_pen.js"></script>
+<script src="../src/20_kit.js"></script>
+<script src="../src/35_scene.js"></script>
+<script>
+/* A sheet of figures for drawing people on their own. ?z=zoom &rows=poses &seeds=1,2,3 */
+const q = new URLSearchParams(location.search), Z = parseFloat(q.get('z') || '3.2');
+const POSES = (q.get('rows') || 'stand,walk:0,walk:0.25,walk:0.5,walk:0.75,cheer:0.2,wave:0.25,hold,sit').split(',');
+const SEEDS = (q.get('seeds') || '3').split(',').map(Number);
+const cols = [];
+const DIRS = (q.get('dirs') || '0,1,2,3').split(',').map(Number);
+for (const s of SEEDS) for (const d of DIRS) cols.push([s, d]);
+const cw = (parseFloat(q.get("cw") || "30")) * Z, ch = (parseFloat(q.get("ch") || "30")) * Z, cv = document.getElementById('c');
+cv.width = Math.ceil(cols.length * cw + 20); cv.height = Math.ceil(POSES.length * ch + 20);
+const ctx = cv.getContext('2d'); ctx.fillStyle = '#F0EEE4'; ctx.fillRect(0, 0, cv.width, cv.height);
+const hw = lineW(Z) / (2 * Z), O = prj(0, 0, 0);
+POSES.forEach((ps, r) => cols.forEach(([seed, dir], c) => {
+  const [pose, ph] = ps.split(':');
+  const g = new G(seed * 31 + dir);
+  const extra = q.get('o') ? JSON.parse(q.get('o')) : {};
+  if (pose === "bike") K.bike(g, [0, Math.PI / 2, Math.PI, -Math.PI / 2][dir], { seed });
+  else K.person(g, 0, 0, 0, K.who(seed, Object.assign({ dir, pose, ph: ph ? parseFloat(ph) : 0 }, extra)));
+  ctx.save(); ctx.translate(10 + c * cw + cw / 2, 10 + r * ch + ch * parseFloat(q.get('base') || '0.93')); ctx.scale(Z, Z); ctx.translate(-O[0], -O[1]);
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  replay(ctx, g.cmds, hw); ctx.restore();
+}));
+window.__ready = true;
+</script></body></html>

@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>venice kit sheet</title>
+<style>html,body{margin:0;background:#F0EEE4}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script src="../../../engine/00_core.js"></script>
+<script src="../../../engine/10_pen.js"></script>
+<script src="../../../engine/20_kit.js"></script>
+<script src="../src/36_venice.js"></script>
+<script src="../src/37_boats.js"></script>
+<script>
+/* Venice's kit on its own: ?z=zoom &items=a,b,c &cw=cell width u &ch=cell height u. Each item draws around (0,0,0). */
+const q = new URLSearchParams(location.search), Z = parseFloat(q.get('z') || '3');
+const water = (g, w, h) => { const P = K.rect(-w, -h, w, h, VN.WL); g.fill(P, VN.water); g.water(P, { dens: 0.6 }); };
+const ITEMS = {
+  winter: (g) => { for (let i = 0; i < 8; i++) VN.person(g, -10 + i * 3, 10 - i * 3, 0, VN.who(10 + i, { dir: i % 4, pose: i % 3 ? 'walk' : 'stand', ph: 0.25 })); },
+  carnival: (g) => { ['gown', 'bauta', 'medico', 'jester', 'cape', 'volto', 'gown', 'bauta'].forEach((kd, i) => VN.person(g, -10 + i * 3, 10 - i * 3, 0, VN.carnival(30 + i, kd, { dir: i % 2, pose: i > 5 ? 'walk' : 'stand', ph: 0.25 }))); },
+  wade: (g) => { for (let i = 0; i < 4; i++) VN.person(g, -4 + i * 3, 4 - i * 3, 0, VN.who(50 + i, { dir: i % 2, pose: 'walk', ph: 0.4, wade: 0.8 })); },
+  gondola: (g) => { water(g, 14, 10); for (const [x, y, a] of [[-6, -4, 0], [6, 4, Math.PI], [0, 0, Math.PI / 2]]) g.at(x, y, VN.WL, (g2) => VN.drawBoat(g2, 'gondola', a, -99, 99, { ph: 0.3, who: VN.who(5), riders: [VN.carnival(7, 'gown'), VN.carnival(8, 'bauta')] })); },
+  vaporetto: (g) => { water(g, 16, 10); g.at(0, -4, VN.WL, (g2) => VN.drawBoat(g2, 'vaporetto', 0, -99, 99, { line: 1, seed: 3 })); g.at(0, 6, VN.WL, (g2) => VN.drawBoat(g2, 'vaporetto', Math.PI, -99, 99, { line: 2, seed: 4 })); },
+  vapY: (g) => { water(g, 10, 16); g.at(-4, 0, VN.WL, (g2) => VN.drawBoat(g2, 'vaporetto', Math.PI / 2, -99, 99, { line: 1 })); g.at(5, 0, VN.WL, (g2) => VN.drawBoat(g2, 'vaporetto', -Math.PI / 2, -99, 99, { line: 2 })); },
+  work: (g) => { water(g, 16, 12); g.at(-8, -5, VN.WL, (g2) => VN.drawBoat(g2, 'topo', 0, -99, 99, {})); g.at(8, -5, VN.WL, (g2) => VN.drawBoat(g2, 'rifiuti', Math.PI, -99, 99, {})); g.at(-8, 5, VN.WL, (g2) => VN.drawBoat(g2, 'ambulanza', Math.PI / 2, -99, 99, { flash: 1, fast: 1 })); g.at(8, 5, VN.WL, (g2) => VN.drawBoat(g2, 'taxi', -Math.PI / 2, -99, 99, {})); },
+  sandolo: (g) => { water(g, 10, 8); g.at(-3, 0, VN.WL, (g2) => VN.drawBoat(g2, 'sandolo', 0, -99, 99, { ph: 0.2, riders: [VN.carnival(9, 'gown')] })); g.at(4, 3, VN.WL, (g2) => VN.drawBoat(g2, 'sandolo', Math.PI / 2, -99, 99, { ph: 0.6 })); },
+  house: (g) => { VN.house(g, { x0: -8, y0: -6, x1: 4, y1: 6, n: 3, col: VN.PLASTER[1], chim: [[-5, -3], [1, 2, 'square']], altana: [-2, 0, { wash: ['#F3F1EA', '#C9463E', '#5F8FC9'] }], shopL: [-6, -1, '#5E7F5E', 'BACARO'], doorR: [1, 3], balcony: ['R', -2, ['#C9463E', '#E6C24F']], archN: [1], arch: 'ogee' }); },
+  street: (g) => { VN.palina(g, -6, 0, {}); VN.palina(g, -3, 0, { c1: '#C9463E' }); VN.lamp(g, 0, 0, {}); VN.well(g, 6, 0); VN.chimney(g, 10, -4, 0); VN.pigeon(g, g.p(-8, 6, 0), 'peck', 0, 1); VN.pigeon(g, g.p(-6, 6, 0), 'stand', 0, -1); VN.pigeon(g, g.p(-4, 6, 3), 'fly', 0, 1); VN.pigeon(g, g.p(-2, 6, 3), 'fly', 2, -1); },
+};
+const names = (q.get('items') || Object.keys(ITEMS).join(',')).split(',');
+const cw = parseFloat(q.get('cw') || '50') * Z, ch = parseFloat(q.get('ch') || '40') * Z, cols = Math.min(names.length, parseInt(q.get('cols') || '3'));
+const cv = document.getElementById('c'); cv.width = Math.ceil(cols * cw); cv.height = Math.ceil(Math.ceil(names.length / cols) * ch);
+const ctx = cv.getContext('2d'); ctx.fillStyle = '#F0EEE4'; ctx.fillRect(0, 0, cv.width, cv.height);
+const hw = lineW(Z) / (2 * Z), O = prj(0, 0, 0);
+names.forEach((nm, i) => {
+  const g = new G(nm); try { ITEMS[nm](g); } catch (e) { window.__err = (window.__err || '') + nm + ': ' + e.message + ' ' + (e.stack || '').split('\n')[1] + '\n'; }
+  ctx.save(); ctx.translate((i % cols) * cw + cw / 2, Math.floor(i / cols) * ch + ch * 0.6); ctx.scale(Z, Z); ctx.translate(-O[0], -O[1]);
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; replay(ctx, g.cmds, hw); ctx.restore();
+  ctx.fillStyle = '#8C8576'; ctx.font = '12px sans-serif'; ctx.fillText(nm, (i % cols) * cw + 6, Math.floor(i / cols) * ch + 14);
+});
+window.__ready = true;
+</script></body></html>

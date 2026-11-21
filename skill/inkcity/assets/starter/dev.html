@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Town (dev)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;height:100%;background:#F0EEE4;overflow:hidden}canvas{display:block;touch-action:none}</style></head>
+<body><canvas id="sf"></canvas>
+<script src="src/00_core.js"></script>
+<script src="src/10_pen.js"></script>
+<script src="src/20_kit.js"></script>
+<script src="src/30_world.js"></script>
+<script src="src/35_scene.js"></script>
+<script src="src/tiles/streets.js"></script>
+<script src="src/tiles/plaza.js"></script>
+<script src="src/tiles/park.js"></script>
+<script src="src/80_render.js"></script>
+<script src="src/90_app.js"></script>
+<script>window.addEventListener('error',e=>{window.__err=(window.__err||'')+e.message+' @'+(e.filename||'').split('/').pop()+':'+e.lineno+'\n'});SF.boot();</script>
+</body></html>

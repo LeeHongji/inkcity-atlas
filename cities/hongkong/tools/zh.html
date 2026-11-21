@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>hong kong stroke table</title>
+<style>html,body{margin:0;background:#F0EEE4}canvas{display:block}</style></head>
+<body><canvas id="c" width="1920" height="1080"></canvas>
+<script src="../../../engine/00_core.js"></script>
+<script src="../../../engine/10_pen.js"></script>
+<script src="../../../engine/20_kit.js"></script>
+<script src="../src/36_zh.js"></script>
+<script>
+/* every glyph in the stroke table, drawn flat and large (stroke order numbered faintly), with the reference character
+   from the system font beside it in grey, so each one can be checked by eye. ?s=cell size */
+const q = new URLSearchParams(location.search), S = parseFloat(q.get('s') || '150');
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const chars = q.get('c') ? Array.from(q.get('c')) : Object.keys(HK.ZH), cols = Math.floor(1920 / (S * 1.9));
+cv.height = Math.ceil(chars.length / cols) * S * 1.15 + 20;
+ctx.fillStyle = '#F0EEE4'; ctx.fillRect(0, 0, cv.width, cv.height);
+chars.forEach((ch, i) => {
+  const x0 = (i % cols) * S * 1.9 + 10, y0 = Math.floor(i / cols) * S * 1.15 + 10, u = S / 20;
+  ctx.strokeStyle = '#DDD8CB'; ctx.lineWidth = 1; ctx.strokeRect(x0, y0, S, S);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.strokeStyle = '#2C271C'; ctx.lineWidth = S * 0.045;
+  HK.ZH[ch].forEach((st, k) => { ctx.beginPath(); ctx.moveTo(x0 + st[0] * u, y0 + st[1] * u); for (let j = 2; j < st.length; j += 2) ctx.lineTo(x0 + st[j] * u, y0 + st[j + 1] * u); ctx.stroke();
+    ctx.fillStyle = '#C9584B'; ctx.font = (S * 0.07) + 'px sans-serif'; ctx.fillText(String(k + 1), x0 + st[0] * u + 2, y0 + st[1] * u - 2); });
+  ctx.fillStyle = '#9A9488'; ctx.font = (S * 0.8) + 'px "PingFang HK", "PingFang TC", "Heiti TC", sans-serif'; ctx.fillText(ch, x0 + S * 1.05, y0 + S * 0.82);
+});
+window.__ready = true;
+</script></body></html>

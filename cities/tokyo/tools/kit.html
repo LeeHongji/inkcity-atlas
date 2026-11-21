@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>tokyo kit sheet</title>
+<style>html,body{margin:0;background:#F0EEE4}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script src="../../../engine/00_core.js"></script>
+<script src="../../../engine/10_pen.js"></script>
+<script src="../../../engine/20_kit.js"></script>
+<script src="../src/35_scene.js"></script>
+<script src="../src/36_tokyo.js"></script>
+<script>
+/* Tokyo's kit on its own: ?z=zoom &items=a,b,c &cw=cell width u &ch=cell height u. Each item draws around (0,0,0). */
+const q = new URLSearchParams(location.search), Z = parseFloat(q.get('z') || '3');
+const ITEMS = {
+  roof: (g) => { K.box(g, -6, -4, 6, 4, 0, 6, { t: '#E9E2CF', l: '#F3EFE3', r: '#DCD4C0' }); TK.roof(g, -6, -4, 6, 4, 6, 5, {}); },
+  temple: (g) => { K.box(g, -8, -5, 8, 5, 0, 7, { t: '#C9584B', l: '#D4553A', r: '#B9432C' }); TK.roof(g, -8, -5, 8, 5, 7, 8, { gable: 0.45, over: 3, lift: 1.6, end: '#6E5A44' }); },
+  shrine: (g) => { K.box(g, -5, -7, 5, 7, 0, 6, { t: '#F1EFE8', l: '#F3F1EA', r: '#E2DFD5' }); TK.roof(g, -5, -7, 5, 7, 6, 6, { gable: 0.4, col: '#6FA38E', over: 2.5, lift: 1.2, end: '#F1EFE8' }); },
+  torii: (g) => TK.torii(g, 0, 0, { w: 7, h: 9, axis: 'x' }),
+  toriiY: (g) => TK.torii(g, 0, 0, { w: 7, h: 9, axis: 'y', col: '#8A7A66', top: '#6E604E' }),
+  lantern: (g) => { const c = g.p(0, 0, 7); TK.lantern2(g, c, 6, '#C9463E', { glyph: 5 }); },
+  pole: (g) => { const a = TK.upole(g, -6, 0, {}), b = TK.upole(g, 6, 0, { band: true }); TK.wires(g, a, b); },
+  vend: (g) => { TK.vend(g, -2, 0, { face: 'L' }); TK.vend(g, 1, 0, { face: 'L', col: '#C9463E' }); TK.vend(g, 4, 0, { face: 'L', col: '#5F8FC9' }); },
+  sakura: (g) => TK.sakura(g, 0, 0, {}),
+  sign: (g) => { K.box(g, -4, -3, 4, 3, 0, 14, '#E7E2D6'); TK.sign(g, 'L', 3, -3, -1, 3, 13, '#C9463E', { seed: 2 }); TK.sign(g, 'R', 4, -2, 2, 9, 11, '#E6C24F', { seed: 3 }); TK.noren(g, 'L', 3, 0, 3, 2.4, 4.6, '#3F5F8F', { glyph: 4 }); TK.awning(g, 'R', 4, -3, 3, 5, 2, '#C9584B', { stripe: '#F3F1EA' }); },
+  people: (g) => { const ws = [TK.salary(1), TK.kimono(2, { dir: 1 }), TK.who(3, { dir: 0, phone: true, pose: 'hold' }), TK.who(4, { dir: 2, randoseru: '#C9463E', cap: '#E6C24F', k: 0.75 }), TK.who(5, { dir: 1, hood: true, dress: '#FBFAF6', top: '#FBFAF6', sleeve: '#FBFAF6' }), TK.who(6, { dir: 0, eboshi: true, top: '#F3F1EA', dress: '#BFD3DD' }), TK.who(7, { dir: 1, randoseru: '#2E2A26', cap: '#E6C24F', k: 0.75, pose: 'walk', ph: 0.25 })]; ws.forEach((w, i) => TK.person(g, -9 + i * 3, 9 - i * 3, 0, Object.assign({ dir: w.dir == null ? i % 4 : w.dir }, w))); },
+  taxi: (g) => { g.at(-6, 0, 0, (g2) => TK.taxi(g2, 0)); g.at(6, 0, 0, (g2) => TK.taxi(g2, Math.PI / 2, { col: '#E6C24F' })); },
+  kei: (g) => { g.at(-5, 0, 0, (g2) => TK.kei(g2, 0.3)); g.at(6, 0, 0, (g2) => TK.kei(g2, Math.PI)); },
+  train: (g) => { for (let i = 0; i < 3; i++) g.at(-10 + i * 9.4, 0, 0, (g2) => TK.trainCar(g2, 0, { cab: i === 2 ? 1 : 0, panto: i === 1 ? 1.5 : 0 })); },
+  trainY: (g) => { for (let i = 0; i < 3; i++) g.at(0, -10 + i * 9.4, 0, (g2) => TK.trainCar(g2, Math.PI / 2, { cab: i === 2 ? 1 : 0 })); },
+  shin: (g) => { for (let i = 0; i < 3; i++) g.at(-10 + i * 9.4, 0, 0, (g2) => TK.trainCar(g2, 0, { kind: 'shin', cab: i === 2 ? 1 : 0 })); },
+  shinB: (g) => { for (let i = 0; i < 3; i++) g.at(0, -10 + i * 9.4, 0, (g2) => TK.trainCar(g2, -Math.PI / 2, { kind: 'shin', cab: i === 0 ? 1 : 0 })); },
+  yakata: (g) => TK.yakata(g, 0.4),
+  rick: (g) => TK.rickshaw(g, Math.PI / 2, 0.25, TK.who(21, { top: '#2E2A26', bot: '#2E2A26', bare: true }), [TK.kimono(22), TK.kimono(23)]),
+  turret: (g) => TK.turret(g, 0.6, TK.who(31, { top: '#F3F1EA', cap: '#3B3F47' }), null),
+  sumo: (g) => { TK.rikishi(g, -2.6, 0, 0, { dir: 0, push: 0.5 }); TK.rikishi(g, 2.6, 0, 0, { dir: 2, push: 0.5, mawashi: '#7A3A6A', skin: '#D9A57B' }); },
+};
+const names = (q.get('items') || Object.keys(ITEMS).join(',')).split(',');
+const cw = parseFloat(q.get('cw') || '110') * Z, ch = parseFloat(q.get('ch') || '90') * Z, cols = Math.min(names.length, parseInt(q.get('cols') || '4'));
+const cv = document.getElementById('c'); cv.width = Math.ceil(cols * cw); cv.height = Math.ceil(Math.ceil(names.length / cols) * ch);
+const ctx = cv.getContext('2d'); ctx.fillStyle = '#F0EEE4'; ctx.fillRect(0, 0, cv.width, cv.height);
+const hw = lineW(Z) / (2 * Z), O = prj(0, 0, 0);
+names.forEach((nm, i) => {
+  const g = new G(nm); try { ITEMS[nm](g); } catch (e) { window.__err = (window.__err || '') + nm + ': ' + e.message + ' ' + (e.stack || '').split('\n')[1] + '\n'; }
+  ctx.save(); ctx.translate((i % cols) * cw + cw / 2, Math.floor(i / cols) * ch + ch * 0.7); ctx.scale(Z, Z); ctx.translate(-O[0], -O[1]);
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; replay(ctx, g.cmds, hw); ctx.restore();
+  ctx.fillStyle = '#8C8576'; ctx.font = '12px sans-serif'; ctx.fillText(nm, (i % cols) * cw + 6, Math.floor(i / cols) * ch + 14);
+});
+window.__ready = true;
+</script></body></html>

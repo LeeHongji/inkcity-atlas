@@ -1,0 +1,92 @@
+'use strict';
+/* Chongqing's guide: the words the page's guidebook shows (see gallery-src/src/guide/types.ts for the shape).
+   Points are world coordinates [x, y, z]: a tile's local point plus the tile's centre. East is +x +y here (the
+   peninsula's tip, near the viewer); the Jialing runs along +x, the Yangtze along +y. */
+window.GUIDE = {
+  city: 'Chongqing', local: '重庆', lang: 'zh-Hans',
+  intro: 'The name means "double celebration", given in 1189 when the prince of this prefecture became the Song emperor. The old city stands on a rocky peninsula where the Jialing meets the Yangtze, and it was China\'s wartime capital from 1937 to 1946. With no flat ground to spare, the city climbs: stairs, lifts and bridges join its levels.',
+  notes: [
+    { at: [-225, -48, 28], dx: 110, dy: -40, w: 220, text: 'The Three Natural Bridges of Wulong, part of the South China Karst World Heritage Site since 2007.' },
+    { at: [245, -30, 22], dx: 100, dy: -60, w: 230, text: 'The Grand Theatre across the Jialing, opened in 2009: a ship of stacked green glass.' },
+    { at: [-105, 245, 14], dx: 20, dy: 150, w: 220, text: 'Nan\'an, across the Yangtze, where the cableway lands.' },
+    { at: [172, 37.5, 30], dx: 120, dy: 175, w: 230, text: 'Qiansimen Bridge, opened in 2015, crosses the Jialing on one white pylon.' },
+    { at: [177, 177, -5], dx: 70, dy: 80, w: 240, text: 'At the tip the green Jialing meets the brown Yangtze, and the two colours run side by side.' },
+  ],
+  places: [
+    { shot: 'eling', title: 'Eling Park', local: '鹅岭公园',
+      story: 'Eling, "goose ridge", is named for the narrow neck of rock between the two rivers, the highest ground of the old city. In the early 1900s a rich salt merchant laid out a private garden up here; it is now a public park, and from the tiered pavilion on the summit you can see both rivers at once.\n\nMornings belong to the regulars: aunties square-dancing to a portable speaker, old men who hang their birdcages in a fig and play xiangqi beneath it, a calligrapher writing on the paving in water. The huangjue fig is Chongqing\'s city tree.',
+      look: [
+        { at: [-129.5, -129.5, 35], z: 4.5, r: 9, text: 'The tiered pavilion on the summit.' },
+        { at: [-96, -97, 11], z: 5.5, r: 9, text: 'Aunties square-dancing on the lower terrace.' },
+        { at: [-124, -90.2, 11], z: 6.5, r: 6, text: 'Xiangqi under a fig hung with birdcages.' },
+        { at: [-105, -86, 10.5], z: 7, r: 5, text: 'A calligrapher writing in water.' },
+      ] },
+    { shot: 'kuixing', title: 'The Kuixing Building', local: '魁星楼',
+      story: 'Chongqing has little flat ground, so its buildings lean on the slopes and many have more than one "ground floor". The Kuixing Building is the famous one: you can walk in from a street at its foot, and again from a road high up the hill. Places like it earned Chongqing its online nickname, the "8D magic city".\n\nHere a bridge from the upper road walks straight into the tower\'s 11th floor, and a public lift in a glass shaft carries people between the two streets. Down below, the market sells greens and oranges, and a bangbang porter loads up his pole.',
+      look: [
+        { at: [-10, -100.5, 29], z: 5.5, r: 7, text: 'The bridge from the upper road into the 11th floor.' },
+        { at: [-10.5, -85.5, 15], z: 5, r: 7, text: 'The public lift in its glass shaft.' },
+        { at: [17, -86, 2], z: 6, r: 9, text: 'The market on the lower street.' },
+        { at: [29, -75, 4], z: 7, r: 5, text: 'A bangbang porter loading up at the market.' },
+      ] },
+    { shot: 'liziba', title: 'Liziba Station', local: '李子坝站',
+      story: 'Line 2 opened in 2005 as mainland China\'s first monorail, its trains running on rubber tyres along concrete beams. At Liziba the hillside left no room, so station and housing were built as one 19-storey block: the 6th to the 8th floors are the station, with homes above.\n\nVisitors now crowd a viewing platform to watch the trains slide out of the building and dive into the hill, phones raised; the favourite photo makes it look as if you are swallowing the train. The rubber tyres keep it quiet enough for the families upstairs.',
+      look: [
+        { at: [136, -121, 18], z: 5, r: 10, text: 'The glazed station on the 6th to 8th floors.' },
+        { at: [131.25, -105, 15], z: 6, r: 6, text: 'The square opening the trains come out of.' },
+        { at: [105.8, -72.2, 2], z: 7, r: 6, text: 'Pretending to swallow the train.' },
+        { at: [127, -95.5, 2], z: 7, r: 5, text: 'A noodle stall under the beams.' },
+      ] },
+    { shot: 'huoguo', title: 'The Hotpot Street', local: '火锅街',
+      story: 'Chongqing hotpot is usually traced to the boatmen and porters of the river docks in the late Qing, who cooked cheap offal, above all beef tripe, in a broth of beef tallow, chillies and Sichuan pepper. The pepper numbs and the chilli burns: together they are called mala.\n\nFriends sit on low stools round the bubbling pot, dipping tripe and duck intestine for a few seconds each, with a bowl of sesame oil and garlic to cool every bite. The split pot, red on one side and clear on the other, is a yuanyang pot, named after the mandarin ducks that stand for a loving couple.',
+      look: [
+        { at: [-98, -8, 6], z: 5.5, r: 9, text: 'The big red signs of the hotpot restaurants.' },
+        { at: [-112, -2.5, 2], z: 7, r: 6, text: 'A table round a split pot, under a red umbrella.' },
+        { at: [-129, 33, 2], z: 7, r: 6, text: 'The xiaomian stall: Chongqing\'s breakfast noodles.' },
+        { at: [-101, -6.5, 1.5], z: 7.5, r: 4, text: 'Crates of beer stacked by a door.' },
+      ] },
+    { shot: 'jiefangbei', title: 'Jiefangbei', local: '解放碑',
+      story: 'The first monument here was a wooden tower of 1941, the "Spiritual Fortress", raised while Japanese bombers raided the wartime capital. In 1947 it was rebuilt in stone to mark the victory, and in 1950 it was renamed the Monument to the People\'s Liberation: an octagon 27.5 m tall, with clock faces near the top.\n\nRound it lies the busiest walking square in the city, ringed by department stores. Bangbang porters wait by the planters with their poles and ropes, a shoe-shiner works at his stool, a singer draws a small crowd, and sooner or later everyone crosses here.',
+      look: [
+        { at: [6, 8, 20], z: 4.8, r: 8, text: 'The monument\'s clock faces.' },
+        { at: [25.5, -11, 2], z: 7, r: 6, text: 'Bangbang porters waiting with their poles and ropes.' },
+        { at: [14, 26, 2], z: 7, r: 5, text: 'A shoe-shiner and his customer.' },
+        { at: [-8, -7, 17], z: 5, r: 8, text: 'The department store\'s big screen.' },
+      ] },
+    { shot: 'hongyadong', title: 'Hongyadong', local: '洪崖洞',
+      story: 'The name comes from Hongya Cave, a cave in the cliff by one of the old city gates. The complex you see was built in 2006 in the style of the diaojiaolou, the stilt houses that once clung to Chongqing\'s cliffs: eleven storeys stepped down the rock from Cangbai Road to the river, so the top floor is also a street entrance.\n\nAt night it is lit gold from end to end, and many visitors say it looks like the bathhouse in Spirited Away. Shops and tea rooms fill the floors, and on the roof terraces people photograph the Jialing and the bridge.',
+      look: [
+        { at: [102.5, 20, 18], z: 5, r: 10, text: 'The tiers stepping down the cliff.' },
+        { at: [128, 10, 2], z: 6, r: 8, text: 'The lowest tier on its timber stilts.' },
+        { at: [115.5, 4, 24], z: 6.5, r: 6, text: 'Visitors on a roof terrace.' },
+        { at: [116, 32.6, 2], z: 7, r: 6, text: 'A family on the riverside plaza.' },
+      ] },
+    { shot: 'suodao', title: 'The Yangtze Cableway', local: '长江索道',
+      story: 'When the Yangtze cableway opened in 1987, it carried commuters from Xinhua Road across to Nan\'an in a few minutes, at a time when the bridges were few and far away. Now most riders are visitors, and the queue at the ticket window can be long for the ride of just over a kilometre, high over the water.\n\nBelow the station the cliff is hung with diaojiaolou: timber houses standing on posts where the slope is too steep to build on, joined by zigzag stairs. A grandmother hangs washing from her balcony, and a man sits out on his doorstep.',
+      look: [
+        { at: [-105, 107, 27], z: 5, r: 9, text: 'The cableway station on the cliff top.' },
+        { at: [-92.2, 105.2, 17], z: 6.5, r: 6, text: 'The queue at the ticket window.' },
+        { at: [-127, 118, 7], z: 6, r: 8, text: 'Stilt houses on their posts down the cliff.' },
+        { at: [-83, 112.5, 17], z: 7, r: 5, text: 'A couple photographing from the cliff rail.' },
+      ] },
+    { shot: 'shibati', title: 'Shibati', local: '十八梯',
+      story: 'For centuries Shibati, the "Eighteen Steps", was the way between the upper town and the docks on the Yangtze below: a stone stairway of short, steep flights, lined with houses of timber and plaster on their own little terraces. After a long rebuilding it reopened in 2021 as a heritage quarter.\n\nThe bangbang porters belong here. With a bamboo pole and two ropes they carry anything up the stairs, from groceries to furniture, for a price agreed on the spot. Fewer work each year, but they still wait at the foot of the steps, and halfway up a noodle stall and a teahouse catch the climbers.',
+      look: [
+        { at: [0, 88, 26], z: 5.5, r: 8, text: 'The gate at the top of the steps.' },
+        { at: [8, 119, 6], z: 6.5, r: 6, text: 'A noodle stall on a landing.' },
+        { at: [-19, 96.5, 15], z: 6.5, r: 6, text: 'Mahjong on a terrace.' },
+        { at: [-28, 133, 2], z: 7, r: 5, text: 'A porter resting with his pole.' },
+      ] },
+    { shot: 'chaotianmen', title: 'Chaotianmen', local: '朝天门',
+      story: 'Chaotianmen, "the gate facing the court", was one of the old city gates, where envoys from the capital came ashore. Below it the green Jialing meets the brown Yangtze, and the two colours run side by side for a while before they mix.\n\nBehind the square, Raffles City opened in 2019: Moshe Safdie\'s glass towers, curved like sails, with the Crystal, a 300 m conservatory, laid across their tops. At the tip people lean on the rail to look at the two rivers, and cruise ships for the Three Gorges leave from the pontoons below.',
+      look: [
+        { at: [84.5, 110, 32], z: 4.5, r: 11, text: 'The Crystal laid across the towers\' tops.' },
+        { at: [143, 143, 9], z: 5, r: 10, text: 'The tip, where the two rivers meet.' },
+        { at: [160, 147, 0], z: 5.5, r: 9, text: 'The gate\'s name carved into the river wall.' },
+        { at: [142, 182.5, -3], z: 4.6, r: 11, text: 'A cruise ship moored at the pontoon.' },
+      ] },
+  ],
+  moment: { shot: 'liziba', title: 'The train through the building',
+    text: 'A train slides out of the square opening in the end wall of the block, runs over the viewing platform where the crowd holds up its phones, and dives into the tunnel under the hill, while the other train glides into the station inside.',
+    when: 'Every 34 seconds here: watch the end wall of the block.' },
+};

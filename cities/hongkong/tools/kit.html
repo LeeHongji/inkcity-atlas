@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>hong kong kit sheet</title>
+<style>html,body{margin:0;background:#F0EEE4}canvas{display:block}</style></head>
+<body><canvas id="c"></canvas>
+<script src="../../../engine/00_core.js"></script>
+<script src="../../../engine/10_pen.js"></script>
+<script src="../../../engine/20_kit.js"></script>
+<script src="../src/35_scene.js"></script>
+<script src="../src/36_zh.js"></script>
+<script src="../src/36_hongkong.js"></script>
+<script src="../src/37_timetable.js"></script>
+<script>
+/* Hong Kong's kit on its own: ?z=zoom &items=a,b,c &cw=cell width u &ch=cell height u. Each item draws around (0,0,0). */
+const q = new URLSearchParams(location.search), Z = parseFloat(q.get('z') || '3');
+const ITEMS = {
+  sit: (g) => { for (const [d, x] of [[0, -6], [1, -2], [2, 2], [3, 6]]) { K.box(g, x - 0.45, -0.45, x + 0.45, 0.45, 0, 1.3, '#C8372D', { w: 0.3 }); HK.person(g, x, 0, 0, HK.who(3 + d, { dir: d, pose: 'sit' })); } },
+  cross: (g) => { for (const [d, x] of [[0, -6], [1, -2], [2, 2], [3, 6]]) HK.person(g, x, 0, 0.4, HK.helper(13 + d, { dir: d, cross: true })); },
+  tram: (g) => { g.at(-8, 0, 0, (g2) => HK.tram(g2, 0, { zh: '香港電車' })); g.at(8, 0, 0, (g2) => HK.tram(g2, Math.PI, { col: '#8E2F2F', word: 'DING DING' })); },
+  cars: (g) => { g.at(-9, 0, 0, (g2) => HK.taxi(g2, 0)); g.at(0, 0, 0, (g2) => HK.minibus(g2, 0)); g.at(9, 0, 0, (g2) => HK.minibus(g2, Math.PI / 2, { red: true })); },
+  bus: (g) => { g.at(-7, 0, 0, (g2) => HK.bus(g2, 0, { livery: 'kmb', route: '1A' })); g.at(8, 0, 0, (g2) => HK.bus(g2, Math.PI, { livery: 'ctb', route: '6' })); },
+  ferry: (g) => HK.boatPart(g, HK.STARFERRY(0, 'MORNING STAR'), Math.PI / 2, -7.6, 7.6, 0),
+  junk: (g) => HK.boatPart(g, HK.JUNK, 0, -8, 8, 0),
+  people: (g) => { const ws = [HK.who(1, { rwb: true }), HK.helper(2), HK.elder(3, { cage: true }), HK.who(4, { scarf: '#C8372D' }), HK.who(5, { apron: '#3F5F8F' }), HK.who(6, { helmet: '#E6C24F' })]; ws.forEach((w, i) => HK.person(g, -9 + i * 3.4, 6 - i * 2.4, 0, Object.assign({ dir: i % 4, pose: i % 2 ? 'walk' : 'hold', ph: 0.25 }, w))); },
+  signs: (g) => { K.box(g, -6, -4, 6, 0, 0, 14, '#E7E2D6'); HK.blade(g, -3, 0, 'y', 4, 4, 12, '#2C2622', '酒家', { neon: HK.C.neon[0] }); HK.blade(g, 3, 0, 'y', 4, 4, 12, '#C8372D', '大押', {}); HK.board(g, 'L', 0, -5.6, 5.6, 0.4, 3, '#2E6B4E', '茶餐廳', { en: 'CAFE' }); },
+};
+const names = (q.get('items') || Object.keys(ITEMS).join(',')).split(',');
+const cw = parseFloat(q.get('cw') || '60') * Z, ch = parseFloat(q.get('ch') || '50') * Z, cols = Math.min(names.length, parseInt(q.get('cols') || '3'));
+const cv = document.getElementById('c'); cv.width = Math.ceil(cols * cw); cv.height = Math.ceil(Math.ceil(names.length / cols) * ch);
+const ctx = cv.getContext('2d'); ctx.fillStyle = '#F0EEE4'; ctx.fillRect(0, 0, cv.width, cv.height);
+const hw = lineW(Z) / (2 * Z), O = prj(0, 0, 0);
+names.forEach((nm, i) => {
+  const g = new G(nm); try { ITEMS[nm](g); } catch (e) { window.__err = (window.__err || '') + nm + ': ' + e.message + ' ' + (e.stack || '').split('\n')[1] + '\n'; }
+  ctx.save(); ctx.translate((i % cols) * cw + cw / 2, Math.floor(i / cols) * ch + ch * 0.7); ctx.scale(Z, Z); ctx.translate(-O[0], -O[1]);
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round'; replay(ctx, g.cmds, hw); ctx.restore();
+  ctx.fillStyle = '#8C8576'; ctx.font = '12px sans-serif'; ctx.fillText(nm, (i % cols) * cw + 6, Math.floor(i / cols) * ch + 14);
+});
+window.__ready = true;
+</script></body></html>

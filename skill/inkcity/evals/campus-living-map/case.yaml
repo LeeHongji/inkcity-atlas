@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: campus-living-map
+expected_outcome: |
+  One self-contained index.html of a hand-inked isometric campus (library, quad, sports field, dorms) that builds
+  itself, tours the places with hard cuts including a close-up, fades, then hands over to explore mode. The film passes
+  the determinism, cut and ending checks, explore inputs work, and the places are recognisable for what they are.

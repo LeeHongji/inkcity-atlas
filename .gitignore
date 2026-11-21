@@ -1,0 +1,11 @@
+# renders and probes made while drawing (large, regenerable)
+out/
+*.mp4
+thumbs/raw/
+# landmark lookups cached by skill/inkcity/scripts/landmark.py
+**/refs/.cache/
+# the gallery's build tooling
+gallery-src/node_modules/
+gallery-src/dist/
+gallery-src/dist-guide/
+.DS_Store
