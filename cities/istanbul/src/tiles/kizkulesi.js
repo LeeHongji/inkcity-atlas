@@ -23,7 +23,7 @@ SF.tile('kizkulesi', 100, 0, { rim: 30, shared: false }, function (T) {
   /* ---- the Maiden's Tower on its terrace ---- */
   T.obj([TX - 6.5, TY - 6, TX + 6.5, TY + 6], function (g) {
     g.boilP = 0.3;
-    const S = { t: '#E3DBC8', l: '#EDE6D6', r: '#D3CAB5' }, W = { t: '#EFEBE1', l: '#F7F4EC', r: '#E3DED2' };
+    const S = { t: '#E3DBC8', l: '#EDE6D6', r: '#D3CAB5' }, W = { t: '#EFEBE1', l: '#F7F4EC', r: '#E3DED2' }, i0 = g.cmds.length;
     K.box(g, TX - 6.5, TY - 5.5, TX + 6.5, TY + 5.5, WL + 0.6, 0.6, { t: '#D9D0BC', l: '#C9BFA9', r: '#B5AA93' }, { w: 0.8 });   // the terrace wall
     const rl = []; for (let x = TX - 6.3; x <= TX + 6.3; x += 0.9) { const a = g.p(x, TY + 5.5, 0.6), c = g.p(x, TY + 5.5, 1.6); rl.push(a[0], a[1], c[0], c[1]); } for (let y = TY - 5.3; y <= TY + 5.3; y += 0.9) { const a = g.p(TX + 6.5, y, 0.6), c = g.p(TX + 6.5, y, 1.6); rl.push(a[0], a[1], c[0], c[1]); }
     // the house on the east half of the terrace
@@ -39,7 +39,14 @@ SF.tile('kizkulesi', 100, 0, { rim: 30, shared: false }, function (T) {
     for (let k = 0; k < 4; k++) { const a = A_L + (A_R - A_L) * (k + 0.5) / 4, q = []; for (const [dz, da] of [[10.4, -0.16], [10.4, 0.16], [12.6, 0.16], [12.6, -0.16]]) q.push([TX - 2.4 + 1.92 * Math.cos(a + da), TY + 1.92 * Math.sin(a + da), dz]); g.fill(q, '#4E5866'); }
     K.cyl(g, TX - 2.4, TY, 2.5, 13.4, 13.8, { t: '#E3DED2', l: '#D3CAB5', r: '#BDB29A' }, { n: 14, w: 0.55 });
     IS.dome(g, TX - 2.4, TY, 1.8, 13.8, { drum: 0.4, win: 0, h: 1.7, ribs: 8 });
-    K.cyl(g, TX - 2.4, TY, 0.55, 15.9, 17.0, W, { n: 8, w: 0.45 }); K.cone(g, TX - 2.4, TY, 0.7, 17.0, 0.8, IS.C.lead);
+    const iL = g.cmds.length; K.cyl(g, TX - 2.4, TY, 0.55, 15.9, 17.0, W, { n: 8, w: 0.45 }); const iC = g.cmds.length; K.cone(g, TX - 2.4, TY, 0.7, 17.0, 0.8, IS.C.lead);
+    // at night (floodlit every night since it reopened in 2023): the stone and the white drum in a pale warm light, the
+    // windows of the house and the drum lit, the lantern on top bright; its light lies on the bay all round the rock
+    for (let i = iL; i < iC; i++) { const d = g.cmds[i]; if (d && d.k === K_FILL) d.nc = i === iL ? '#FFF2CC' : '#FFE1A0'; }
+    IS.warmWins(g, i0, 0.75, 5); IS.flood(g, i0, 0.86, IS.N.white);
+    g.glow2('lantern', g.p(TX - 2.4, TY, 16.4), g.p(TX + 6.1, TY + 8.5, WL), { r: 2.2, col: '#FFF0C8', pool: false });
+    g.glow2('lantern', g.p(TX - 2.4, TY, 8), g.p(TX + 7.4, TY + 9.8, WL), { r: 3.0, col: '#FFE2B4', pool: false });
+    IS.glowDry(g, 'lantern', TX + 3, TY + 4.6, 4, { r: 2.2, col: '#FFE2B4' });
   }, { name: "maiden's tower" });
   IS.flag(T, TX - 2.4, TY, 21.6, { L: 2.4, H: 1.6 }); T.obj([TX - 2.4, TY + 0.01], (g) => IS.pole(g, TX - 2.4, TY + 0.01, 17.8, 3.8), { on: true, name: 'flagpole' });
   // the landing on the rock and the launch tied up
@@ -54,8 +61,8 @@ SF.tile('kizkulesi', 100, 0, { rim: 30, shared: false }, function (T) {
   /* ---- life on the water ---- */
   // a rowing boat circling the tower
   { const who = IS.who(1720, { fcap: '#C8372D' }); T.actor({ grow: false, sample: 0.5, period: 48,
-    at(t) { const a = TAU * t / 48, x = TX + Math.cos(a) * 13, y = TY + Math.sin(a) * 10, q = Math.round((a + Math.PI / 2) / (TAU / 32)), ph = Math.floor(t * 2) % 4; return { x, y, z: WL, key: (((q % 32) + 32) % 32) + '.' + ph, ang: q * TAU / 32, ph: ph / 4 }; },
-    draw(g, st) { K.boat(g, st.ang, { kind: 'row', L: 2.8, W: 1.2, hull: '#3F7FA8', deck: '#B9976A', rower: who, ph: st.ph }); } }); }
+    at(t) { const a = TAU * t / 48, x = TX + Math.cos(a) * 13, y = TY + Math.sin(a) * 10, q = Math.round((a + Math.PI / 2) / (TAU / 32)), ph = Math.floor(t * 2) % 4, n = LOOK.night; return { x, y, z: WL, key: (((q % 32) + 32) % 32) + '.' + ph + (n ? 'n' : ''), ang: q * TAU / 32, ph: ph / 4, n }; },
+    draw(g, st) { K.boat(g, st.ang, { kind: 'row', L: 2.8, W: 1.2, hull: '#3F7FA8', deck: '#B9976A', rower: who, ph: st.ph }); if (st.n) IS.boatLamp(g, st.ang, 2.2, 1.45); } }); }   // a lamp at the bow at night
   // dolphins: every 13 s two arc out of the water off the tower
   for (let i = 0; i < 2; i++) T.actor({ grow: false, sample: 0.3, period: 13,
     at(t) { const u = ((t + i * 0.5) % 13 + 13) % 13; if (u > 1.6) return null; const f = u / 1.6, x = -14 + f * 9 + i * 2.5, y = -18 + i * 2, z = WL + Math.sin(Math.PI * f) * 3.2, k = Math.floor(f * 6); return { x, y, z, key: k, k }; },

@@ -132,6 +132,7 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     const f = g.p(x, y, 0), t = g.p(x, y, 11.2);
     g.fill2([[f[0] - 1.0, f[1]], [f[0] + 1.0, f[1]], [f[0] + 0.8, f[1] - 1.6], [f[0] - 0.8, f[1] - 1.6]], '#4A4744');
     g.fill2([[f[0] - 0.55, f[1] - 1.5], [f[0] + 0.55, f[1] - 1.5], [t[0] + 0.4, t[1]], [t[0] - 0.4, t[1]]], '#5A5650');
+    g.glow('lamp', x, y, 11.0, { r: 1.3 });                                         // the street light every signal pole carries (only at night)
     for (const [dx, dy, L] of arms) { const a = g.p(x, y, 10.6), b = g.p(x + dx * L, y + dy * L, 10.6), c = g.p(x, y, 8.6); g.line2([a, b], { w: 0.75, c: '#4A4744', boil: false, ext: 0 }); g.line2([c, g.p(x + dx * L * 0.35, y + dy * L * 0.35, 10.6)], { w: 0.45, c: '#4A4744', boil: false, ext: 0 }); }
     names.forEach(([word, ax], k) => {
       const z = 11.4 + k * 1.15, L = 2.6, P = ax === 'x' ? (s, zz) => [x + s, y + 0.05, zz] : (s, zz) => [x + 0.05, y - s, zz];
@@ -157,11 +158,11 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
         if (face) {
           g.fill2([[x0 - 1.1, y0 - 0.7], [x0 + 2 * w + 1.1, y0 - 0.7], [x0 + 2 * w + 1.1, y0 + h + 0.7], [x0 - 1.1, y0 + h + 0.7]], '#2A2622', true);
           g.fill2(box, '#4A4540', true);
-          [['#E0503E', 'R'], ['#F0B43C', 'A'], ['#62C47E', 'G']].forEach(([col, k], q) => g.disc2([x0 + w, y0 + 1.9 + q * 3.6], 1.45, st.l === k ? col : '#5E5850'));
-          const lit = st.l === 'R' ? 0 : st.l === 'A' ? 1 : 2; g.disc2([x0 + w, y0 + 1.9 + lit * 3.6], 2.5, st.l === 'R' ? 'rgba(224,80,62,0.3)' : st.l === 'A' ? 'rgba(240,180,60,0.3)' : 'rgba(98,196,126,0.3)');
+          [['#E0503E', 'R'], ['#F0B43C', 'A'], ['#62C47E', 'G']].forEach(([col, k], q) => { g.disc2([x0 + w, y0 + 1.9 + q * 3.6], 1.45, st.l === k ? col : '#5E5850'); if (st.l === k) g.mark({ nc: true, light: true }); });
+          const lit = st.l === 'R' ? 0 : st.l === 'A' ? 1 : 2; g.disc2([x0 + w, y0 + 1.9 + lit * 3.6], 2.5, st.l === 'R' ? 'rgba(224,80,62,0.3)' : st.l === 'A' ? 'rgba(240,180,60,0.3)' : 'rgba(98,196,126,0.3)'); g.mark({ nc: true });
         } else {
           g.fill2(box, '#3A3632', true);
-          const lit = st.l === 'R' ? 0 : st.l === 'A' ? 1 : 2; g.fill2([[x0 + 2 * w - 0.3, y0 + 0.5 + lit * 3.6], [x0 + 2 * w + 0.9, y0 + 0.7 + lit * 3.6], [x0 + 2 * w + 0.9, y0 + 3.1 + lit * 3.6], [x0 + 2 * w - 0.3, y0 + 3.3 + lit * 3.6]], st.l === 'R' ? '#E0503E' : st.l === 'A' ? '#F0B43C' : '#62C47E', true);
+          const lit = st.l === 'R' ? 0 : st.l === 'A' ? 1 : 2; g.fill2([[x0 + 2 * w - 0.3, y0 + 0.5 + lit * 3.6], [x0 + 2 * w + 0.9, y0 + 0.7 + lit * 3.6], [x0 + 2 * w + 0.9, y0 + 3.1 + lit * 3.6], [x0 + 2 * w - 0.3, y0 + 3.3 + lit * 3.6]], st.l === 'R' ? '#E0503E' : st.l === 'A' ? '#F0B43C' : '#62C47E', true); g.mark({ nc: true, light: true });   // its light spills past the back of the head
         }
       }
     };

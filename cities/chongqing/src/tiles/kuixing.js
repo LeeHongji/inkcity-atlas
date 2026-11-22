@@ -23,11 +23,12 @@ SF.tile('kuixing', 0, -100, { rim: 12 }, function (T) {
     g.fill(K.rect(-31, -37, -19, 37, ZU), '#C4BCAC');
     for (const x of [-25.4, -24.6]) g.line([[x, -37, ZU], [x, 37, ZU]], { c: '#E3B940', w: 0.5, boil: false });
     CQ.rail(g, 'R', -14.4, -36, 36.5, ZU, { h: 1.4 }); CQ.rail(g, 'L', 36.6, -36, -14.5, ZU, { h: 1.4 });
+    CQ.railLamps(g, [-14.4, -35, ZU + 1.5], [-14.4, 35, ZU + 1.5], 10, { base: ZU });       // street lamps on the road's railing (night)
     // a painted slogan band along the wall's face
     CQH.sign(g, 'R', -14, 16, 30, 10, 14, '#2F4A6B', '重庆', { ink: '#F4F1E6' });
   }, { name: 'upper road' });
   // the bus stop and a bus waiting at it
-  T.obj([-18.5, -30, -16, -22], (g) => { const z = ZU; for (const y of [-29.5, -22.5]) { const a = g.p(-17.2, y, z), b = g.p(-17.2, y, z + 5); g.segs2([a[0], a[1], b[0], b[1]], '#5A564E', 0.5); } K.box(g, -18.5, -30, -16, -22, z + 5, z + 5.5, '#3F6FA8', { w: 0.5 }); K.sign(g, 'R', -16, -29, -23, z + 3.4, z + 4.8, '#3F6FA8', '461'); }, { on: true, name: 'bus stop' });
+  T.obj([-18.5, -30, -16, -22], (g) => { const z = ZU; for (const y of [-29.5, -22.5]) { const a = g.p(-17.2, y, z), b = g.p(-17.2, y, z + 5); g.segs2([a[0], a[1], b[0], b[1]], '#5A564E', 0.5); } K.box(g, -18.5, -30, -16, -22, z + 5, z + 5.5, '#3F6FA8', { w: 0.5 }); const iS = g.cmds.length; K.sign(g, 'R', -16, -29, -23, z + 3.4, z + 4.8, '#3F6FA8', '461'); CQ.nmark(g, iS, null, { nc: true }); CQ.nmark(g, iS, '#FBF8EE', { nc: true }, true); g.glow('neon', -15.9, -26, z + 4.1, { r: 3, col: '#9FC4F0' }); g.glow('lamp', -17.2, -26, z + 4.8, { r: 1.0, base: z }); }, { on: true, name: 'bus stop' });   // the lit stop board and shelter light (night)
   T.obj([-25.3, -33.3, -19.7, -18.7], (g) => g.at(-22.5, -26, ZU, (g2) => CQ.bus(g2, Math.PI / 2, { band: '#2F8F5A' })), { on: true, name: 'bus' });
   for (let i = 0; i < 5; i++) T.cast([-15.6, -28 + i * 1.7], (g) => CQ.person(g, -15.6, -28 + i * 1.7, ZU, CQ.who(1500 + i, { dir: 2, pose: i % 2 ? 'hold' : 'stand', phone: i % 2 === 1 })), { on: true, name: 'queue' });
 
@@ -47,8 +48,9 @@ SF.tile('kuixing', 0, -100, { rim: 12 }, function (T) {
     for (const [f, p, a, z] of W) { g.fill(K.on(f, p + 0.03, a - 0.6, a + 0.6, z + 0.7, z + 2.2), '#56606A'); if (R() < 0.3) { const q = K.on(f, p + 0.45, a - 0.75, a + 0.75, z + 0.55, z + 2.35); g.fill(q, 'rgba(120,124,124,0.35)'); const P = g.P(q); for (let s = 0; s <= 4; s++) cs.push(lerp(P[0][0], P[1][0], s / 4), lerp(P[0][1], P[1][1], s / 4), lerp(P[3][0], P[2][0], s / 4), lerp(P[3][1], P[2][1], s / 4)); } else if (R() < 0.25) for (let j = 0; j < 3; j++) g.fill(K.on(f, p + 0.6, a - 0.6 + j * 0.45, a - 0.3 + j * 0.45, z + 0.3, z + 1.4), R.pick(['#E2725B', '#F4F1E8', '#6E9BC8', '#E6C24F', '#9FC07A'])); }
     g.segs2(cs, '#6F6E68', 0.22);
     // the 11th floor, where the bridge comes in: a lit lobby band round the tower and its number
-    for (const [f, p, a0, a1] of [['L', TY1, TX0, TX1], ['R', TX1, TY0, TY1]]) { g.fill(K.on(f, p + 0.04, a0 + 0.3, a1 - 0.3, 10 * ST + 0.3, 11 * ST - 0.2), '#F2CF7E'); const m = []; for (let a = a0 + 1.5; a < a1; a += 1.5) { const q0 = g.p.apply(g, K.pt(f, p + 0.05, a, 10 * ST + 0.3)), q1 = g.p.apply(g, K.pt(f, p + 0.05, a, 11 * ST - 0.2)); m.push(q0[0], q0[1], q1[0], q1[1]); } g.segs2(m, '#8A6A3A', 0.3); }
-    g.fill(K.on('L', TY1 + 0.06, TX0 + 0.6, TX0 + 4.6, 11 * ST, 11 * ST + 2.2), '#C8392E'); K.text(g, 'L', TY1 + 0.08, TX0 + 2.6, 11 * ST + 0.45, 1.3, '11F', '#FBF4E2', { center: true });
+    for (const [f, p, a0, a1] of [['L', TY1, TX0, TX1], ['R', TX1, TY0, TY1]]) { g.fill(K.on(f, p + 0.04, a0 + 0.3, a1 - 0.3, 10 * ST + 0.3, 11 * ST - 0.2), '#F2CF7E'); g.mark({ nc: '#FFE2A0' }); const m = []; for (let a = a0 + 1.5; a < a1; a += 1.5) { const q0 = g.p.apply(g, K.pt(f, p + 0.05, a, 10 * ST + 0.3)), q1 = g.p.apply(g, K.pt(f, p + 0.05, a, 11 * ST - 0.2)); m.push(q0[0], q0[1], q1[0], q1[1]); } g.segs2(m, '#8A6A3A', 0.3); }
+    g.fill(K.on('L', TY1 + 0.06, TX0 + 0.6, TX0 + 4.6, 11 * ST, 11 * ST + 2.2), '#C8392E'); g.mark({ nc: true }); const iT = g.cmds.length; K.text(g, 'L', TY1 + 0.08, TX0 + 2.6, 11 * ST + 0.45, 1.3, '11F', '#FBF4E2', { center: true }); CQ.nmark(g, iT, null, { nc: '#FBF4E2' }, true);
+    for (const [x, y] of [[TX0 + 3, TY1 + 0.3], [TX1 - 4, TY1 + 0.3], [TX1 + 0.3, TY0 + 6], [TX1 + 0.3, TY1 - 6]]) g.glow('lantern', x, y, 10.5 * ST, { r: 2.4, col: '#FFD58A' });   // the 11th-floor lobby glows (night)
     // the ground floor's lobby: glass doors and the name board
     g.fill(K.on('R', TX1 + 0.03, TY0 + 2, TY1 - 2, 0, 3.4), '#4E555B');
     CQH.sign(g, 'R', TX1 + 0.05, TY0 + 4, TY1 - 4, 3.6, 5.0, '#C8392E', '出口');
@@ -80,11 +82,11 @@ SF.tile('kuixing', 0, -100, { rim: 12 }, function (T) {
   }, { under: 99, name: 'lift shaft' });
   T.actor({ grow: false, sample: 0.3, period: 24,
     at(t) { const c = t % 24, u = c < 5 ? 0 : c < 12 ? smooth((c - 5) / 7) : c < 17 ? 1 : 1 - smooth((c - 17) / 7); return { x: (LX0 + LX1) / 2, y: (LY0 + LY1) / 2, z: 0.2 + u * (ZU - 0.2), key: 'lift' }; },
-    draw(g) { const B = K.rbox(g, 0, 0, 1.7, 2.2, 0, 0, 4.2, { t: '#D9DCDA', l: '#E9C04A', r: '#C9A03A' }, { w: 0.6 }); K.rwin(g, B, 'pv', -0.7, 0.7, 1.0, 3.6, { col: '#CFE0EA' }); K.person(g, 0.2, 0.6, 0, CQ.who(1520, { dir: 1, k: 0.85 })); K.rwin(g, B, 'pv', -0.7, 0.7, 1.0, 3.6, { col: 'rgba(207,224,234,0.4)', glint: true }); } });
+    draw(g) { const B = K.rbox(g, 0, 0, 1.7, 2.2, 0, 0, 4.2, { t: '#D9DCDA', l: '#E9C04A', r: '#C9A03A' }, { w: 0.6 }); g.lit({ nc: CQ.LIT, light: true }, () => K.rwin(g, B, 'pv', -0.7, 0.7, 1.0, 3.6, { col: '#CFE0EA' })); K.person(g, 0.2, 0.6, 0, CQ.who(1520, { dir: 1, k: 0.85 })); g.lit({ nc: 'rgba(255,227,166,0.3)' }, () => K.rwin(g, B, 'pv', -0.7, 0.7, 1.0, 3.6, { col: 'rgba(207,224,234,0.4)', glint: true })); } });   // a lit cabin at night
 
   /* ---- the market on the lower street ---- */
   const goods = (cols) => (g2, D, L) => { for (let i = 0; i < 10; i++) g2.disc2(g2.p(-D * 0.4 + (i % 2) * 0.8, -L + 0.5 + i * 0.45, 2.9), 0.8, cols[i % cols.length]); };
-  for (const [x, y, a, cols] of [[2, 14, '#3F7F4F', ['#8FBF73', '#5E8F4A', '#B5CF84']], [12, 14, '#C8392E', ['#E08A3C', '#E6C24F', '#C8392E']], [22, 14, '#3F6FA8', ['#E9E2CF', '#C9B48A', '#8FBF73']], [32, 14, '#C8392E', ['#C8392E', '#7A1E18', '#E6C24F']]]) T.obj([x, y], (g) => K.stall(g, x, y, { face: 'L', L: 3.2, D: 1.6, a, b: '#F3F1EA', goods: goods(cols) }), { name: 'market' });
+  for (const [x, y, a, cols] of [[2, 14, '#3F7F4F', ['#8FBF73', '#5E8F4A', '#B5CF84']], [12, 14, '#C8392E', ['#E08A3C', '#E6C24F', '#C8392E']], [22, 14, '#3F6FA8', ['#E9E2CF', '#C9B48A', '#8FBF73']], [32, 14, '#C8392E', ['#C8392E', '#7A1E18', '#E6C24F']]]) T.obj([x, y], (g) => { K.stall(g, x, y, { face: 'L', L: 3.2, D: 1.6, a, b: '#F3F1EA', goods: goods(cols) }); g.glow('lamp', x, y, 5.8, { r: 1.0 }); }, { name: 'market' });   // a bulb under each canopy (night)
   for (let i = 0; i < 6; i++) { const x = 1 + i * 5.6, y = 18.5 + (i % 2) * 1.5; T.cast([x, y], (g) => CQ.person(g, x, y, 0, (i % 3 ? CQ.who : CQ.elder)(1530 + i, { dir: 3, pose: 'hold', bowl: false })), { name: 'shopper' }); }
   T.cast([30, 26], (g) => CQ.porter(g, 30, 26, 0, CQ.bangWho(1540, { dir: 1, pose: 'stand' }), { load: ['#8FBF73', '#E08A3C'] }), { name: 'porter' });
   for (const [x, y] of [[26, 32], [-6, 32]]) T.obj([x, y], (g) => CQ.fig(g, x, y, { r: 5.6, h: 4.2 }), { name: 'fig' });

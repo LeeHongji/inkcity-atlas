@@ -13,6 +13,7 @@ const VN = {
   paveC: '#D4CFC4', paveD: '#C3BDB0', paveJ: '#BCB5A8', paveL: '#E2DED5',
   istria: '#F3F0E8', istriaD: '#DCD7CB',
   water: '#8DB2A2', waterD: '#759D8E', waterL: '#B7D1C4', lagoon: '#A6C2BA', lagoonL: '#C3D8D1',
+  WMASK: 'rgba(166,194,186,0)',   // a clear fill over open water: where lights reflect at night (SCENE.night.water)
   brick: '#B9674B', brickD: '#985039', roof: '#C66B4D', roofD: '#A4553B',
   shutter: '#5C7D5E', shutterB: '#7A5A3C', flood: '#A3BDB6', floodD: '#8DAAA3', floodL: '#C4D6D0',
   PLASTER: ['#E3B36C', '#DD917F', '#CB7552', '#EBC9A7', '#DCA27A', '#C95E4C', '#EDDDB9', '#E6A98E', '#D7B386', '#C98B5E'],
@@ -98,7 +99,7 @@ VN.win = function (g, face, p, a0, a1, z0, z1, o) {
     VN.hatch(g, Q.slice(0, 2).concat([Q[2], Q[3]]).map((q) => q), 6, shade(o.sh || VN.shutter, 0.28), 0.3);
     const ml = g.P([K.pt(face, p, m, z0), K.pt(face, p, m, z1 - (o.arch ? w * 0.3 : 0))]); g.segs2([ml[0][0], ml[0][1], ml[1][0], ml[1][1]], shade(o.sh || VN.shutter, 0.4), 0.35);
   } else {
-    g.fill(hole, o.glass ? C.glass : (o.pane || '#4F5963'));
+    g.fill(hole, o.glass ? C.glass : (o.pane || '#4F5963')); if (o.lit !== false) g.mark({ win: o.lit == null ? true : o.lit });   // at night most panes are lit
     const P = g.P(hole); let cx = 0, cy = 0; for (const q of P) { cx += q[0]; cy += q[1]; } cx /= P.length; cy /= P.length;
     if (o.glass) g.segs2([cx - 0.5, cy + 1.2, cx + 0.8, cy - 1.2], C.white, 0.5);
     else g.segs2([cx - 0.7, cy + 1.3, cx + 0.4, cy - 0.5], '#7E8C96', 0.45);
@@ -122,6 +123,28 @@ VN.door = function (g, face, p, a0, a1, z1, o) {
   g.fill(d, o.col || '#5A3E2E'); g.outline(d, { w: 0.45, boil: false, c: '#2E2620' });
   const k = g.p.apply(g, K.pt(face, p, a1 - (a1 - a0) * 0.25, z0 + (z1 - z0) * 0.45)); g.disc2(k, 0.3, C.gold || '#C9A44A');
 };
+/* floodlit stone at night: a pale fill's colour warmed and kept bright (dark openings and ink: undefined, graded as
+   usual). k: how strongly lit (default 1) */
+VN.litStone = function (k) {
+  k = k == null ? 1 : k;
+  return (c) => {
+    if (typeof c !== 'string' || c[0] !== '#') return undefined;
+    const p = hex2rgb(c), y = (0.299 * p[0] + 0.587 * p[1] + 0.114 * p[2]) / 255;
+    if (y < 0.42) return undefined;
+    return mix(shade(c, 0.62 - 0.2 * k), '#F0A050', 0.22 + 0.14 * k);
+  };
+};
+/* a Venetian wall lantern on its bracket (at night only: nothing is drawn by day): a halo at height z on a face, a pool
+   of light on the ground at `base` (the paving, or the water it is reflected in) */
+VN.wallLamp = function (g, face, p, a, z, base, o) {
+  const q = K.pt(face, p + 0.6, a, z); o = o || {};
+  if (o.refl === false) VN.glowDry(g, 'lamp', q[0], q[1], q[2], Object.assign({ r: 1.3 }, o));
+  else g.glow('lamp', q[0], q[1], q[2], Object.assign({ r: 1.3, base: base || 0 }, o));
+};
+/* a light whose reflection would fall on something standing in front of the water (a bridge, a building on the near
+   bank): the engine lays a light's column on the first water below its foot, whatever stands over it, so this one is
+   given no foot at all (no pool, no column; its halo and its share of the city's glow stay) */
+VN.glowDry = function (g, kind, x, y, z, o) { const p = g.p(x, y, z); g.glow2(kind, p, [p[0], -1e6], Object.assign({}, o || {}, { pool: false })); };
 /* a "nizioleto": the white painted street name on a wall, black letters (real words) */
 VN.niz = function (g, face, p, a0, z0, word) {
   const h = 0.62, w = K.textW(word, h) + 0.8;
@@ -207,6 +230,7 @@ VN.house = function (g, d) {
   }
   const bays = (a0, a1, nb) => { const out = [], w = (a1 - a0) / nb; for (let i = 0; i < nb; i++) out.push(a0 + w * (i + 0.5)); return out; };
   const skip = (list, m) => list && list.some((s) => m > s[0] - 1 && m < s[1] + 1);
+  let lamps = 0;
   for (const face of ['L', 'R']) {
     const p = face === 'L' ? y1 : x1, a0 = face === 'L' ? x0 : y0, a1 = face === 'L' ? x1 : y1;
     const nb = d['win' + face] || Math.max(1, Math.round((a1 - a0) / 3.3));
@@ -229,21 +253,27 @@ VN.house = function (g, d) {
         }
       }
     }
-    if (door) VN.door(g, face, p, door[0], door[1], 3.4, { col: door[2], arch: door[3] });
+    const wl = d.dry ? { refl: false } : undefined;
+    if (door) { VN.door(g, face, p, door[0], door[1], 3.4, { col: door[2], arch: door[3] }); VN.wallLamp(g, face, p, (door[0] + door[1]) / 2, 4.3, z0 < 0 ? 0 : z0, wl); lamps++; }
     if (wg) {   // a water gate: an arched opening down to the water with a mooring step
       VN.door(g, face, p, wg[0], wg[1], 2.6, { z0: z0, arch: 'round', col: '#3A3832' });
       g.fill(K.on(face, p + 0.02, wg[0], wg[1], z0, z0 + 0.6), '#5F7A6E');
+      VN.wallLamp(g, face, p, wg[1] + 0.9, 3.2, z0, wl); lamps++;
     }
     if (shop) {
       const [s0, s1, sc, word] = shop, q = K.on(face, p + 0.02, s0, s1, 0.25, 3.2);
       g.fill(K.on(face, p + 0.01, s0 - 0.35, s1 + 0.35, 0, 3.6), sc);
-      g.fill(q, '#E9DFC2');
+      g.fill(q, '#E9DFC2'); g.mark({ win: 1, spill: true });                       // at night the shop is lit and throws light on the paving
       const Pq = g.P(q), mull = []; for (let j = 1; j < 3; j++) { const t = j / 3; mull.push(lerp(Pq[0][0], Pq[1][0], t), lerp(Pq[0][1], Pq[1][1], t), lerp(Pq[3][0], Pq[2][0], t), lerp(Pq[3][1], Pq[2][1], t)); }
       g.segs2(mull, sc, 0.6); g.outline2(Pq, { w: 0.45, boil: false, c: '#2E2A26' });
-      if (d.goods) d.goods(g, face, p, s0, s1);
-      if (word) K.sign(g, face, p + 0.04, s0 - 0.2, s1 + 0.2, 3.65, 4.55, shade(sc, 0.15), word, { ink: '#F6F1E4' });
+      if (d.goods) { const i0 = g.cmds.length; d.goods(g, face, p, s0, s1); g.mark({ nc: true }, i0); }   // the goods in the window, lit
+      if (word) { const i0 = g.cmds.length; K.sign(g, face, p + 0.04, s0 - 0.2, s1 + 0.2, 3.65, 4.55, shade(sc, 0.15), word, { ink: '#F6F1E4' }); g.mark({ nc: true }, i0); }
+      VN.wallLamp(g, face, p, (s0 + s1) / 2, 5.0, 0, wl); lamps++;
     }
   }
+  // no door or shop: a lantern on a bracket at the near corner, over the calle (or the water)
+  if (!lamps && d.lamp !== false) { if (d.dry) VN.glowDry(g, 'lamp', x1 + 0.5, y1 + 0.5, SH + 0.3, { r: 1.3 }); else g.glow('lamp', x1 + 0.5, y1 + 0.5, SH + 0.3, { r: 1.3, base: z0 < 0 ? z0 : 0 }); }
+  // (d.dry: on screen something stands over the water in front of this house, so its lamps lay no reflection on it)
   // a balcony with balusters (and flowers)
   if (d.balcony) {
     const [face, m, fl] = d.balcony, p = face === 'L' ? y1 : x1, z = SH + 0.2;
@@ -295,6 +325,7 @@ VN.lamp = function (g, x, y, o) {
   g.fill2([[t[0] - 1.3, t[1]], [t[0] + 1.3, t[1]], [t[0] + 1.6, t[1] - 3.2], [t[0] - 1.6, t[1] - 3.2]], '#F2E3A6', true);
   g.fill2([[t[0] - 1.9, t[1] - 3.2], [t[0] + 1.9, t[1] - 3.2], [t[0], t[1] - 4.8]], '#2E3532', true);
   g.outline2([[t[0] - 1.3, t[1]], [t[0] + 1.3, t[1]], [t[0] + 1.6, t[1] - 3.2], [t[0] - 1.6, t[1] - 3.2]], { w: 0.35, c: '#2E3532', boil: false, ext: 0 });
+  g.glow2('lamp', [t[0], t[1] - 1.6], o.dry ? [b[0], -1e6] : b, { r: 1.8, pool: !o.dry });   // at night: lit (o.dry: no reflection, see VN.glowDry)
 };
 /* a vera da pozzo: the carved stone well-head of a campo, an iron lid, a step round it */
 VN.well = function (g, x, y, o) {
@@ -453,6 +484,8 @@ VN.walker = function (T, who, pts, speed, o) {
   o = o || {}; const seg = [], L = [0];
   for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; seg.push([a, b]); L.push(L[i] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
   const total = L[L.length - 1], per = total / speed;
+  // at night, most masked revellers carry a lantern (their night pose; the day's drawing is untouched)
+  const lant = o.lantern != null ? o.lantern : !!(who.gown || who.cape || who.bauta || who.medico || who.jester || who.plume) && h1(Math.round(pts[0][0] * 7 + pts[0][1] * 13 + speed * 100 + (o.phase || 0) * 50)) < 0.75;
   return T.actor({ sample: o.sample || 0.25, period: per, cast: o.cast,
     at(t) {
       let d = (((t * speed + (o.phase || 0) * total) % total) + total) % total, i = 0;
@@ -460,9 +493,20 @@ VN.walker = function (T, who, pts, speed, o) {
       const [a, b] = seg[i], u = (d - L[i]) / ((L[i + 1] - L[i]) || 1), dx = b[0] - a[0], dy = b[1] - a[1];
       const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 0 : 2) : (dy > 0 ? 1 : 3), ph = Math.floor((d / 2.4) % 1 * 8);
       const x = a[0] + dx * u, y = a[1] + dy * u, z = typeof o.z === 'function' ? o.z(x, y) : (o.z || 0);
-      return { x, y, z, key: dir + '.' + ph, dir, ph: ph / 8 };
+      const n = lant && LOOK.night;
+      return { x, y, z, key: dir + '.' + ph + (n ? 'n' : ''), dir, ph: ph / 8, n };
     },
-    draw(g, st) { VN.person(g, 0, 0, 0, Object.assign({}, who, { dir: st.dir, pose: 'walk', ph: st.ph })); if (o.extra) o.extra(g, st); } });
+    draw(g, st) { const r = VN.person(g, 0, 0, 0, Object.assign({}, who, { dir: st.dir, pose: 'walk', ph: st.ph })); if (st.n) VN.handLantern(g, r, who.k || 1); if (o.extra) o.extra(g, st); } });
+};
+/* a lantern carried in the hand (drawn only in night poses): a little glazed box on a short bail, lit */
+VN.handLantern = function (g, r, k) {
+  const hs = r && r.hands; if (!hs) return;
+  const h = hs[0], c = [h[0], h[1] + 2.4 * k];                          // the near hand
+  g.line2([h, [c[0], c[1] - 1.1 * k]], { w: 0.25, c: '#2A2622', boil: false, ext: 0 });
+  const q = [[c[0] - 0.75 * k, c[1] - 1.0 * k], [c[0] + 0.75 * k, c[1] - 1.0 * k], [c[0] + 0.65 * k, c[1] + 1.0 * k], [c[0] - 0.65 * k, c[1] + 1.0 * k]];
+  g.fill2(q, '#FFD27A', true); g.mark({ nc: true, light: true });
+  g.fill2([[c[0] - 0.95 * k, c[1] - 1.0 * k], [c[0] + 0.95 * k, c[1] - 1.0 * k], [c[0], c[1] - 1.8 * k]], '#2A2622', true);
+  g.line2(q, { w: 0.22, c: '#2A2622', boil: false, close: true });
 };
 /* a pigeon (wide px, feet at p): pose 'peck' | 'stand' | 'fly' (wing phase f 0..3), fl: +1 faces right */
 VN.pigeon = function (g, p, pose, f, fl) {

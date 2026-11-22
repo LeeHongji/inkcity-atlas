@@ -16,7 +16,7 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     g.boilP = 0.12;
     /* the river: water, its crests, the quay wall above it, the cut sections at the map's near edges */
     const W = [[-S.rx, S.edge, S.wz], [S.rx, S.edge, S.wz], [S.rx, S.riv, S.wz], [-S.rx, S.riv, S.wz]];
-    g.fill(W, LC.water);
+    g.fill(W, LC.water); g.mark({ nc: (c) => mix(nightColour(c), '#142036', 0.5) });   // at night: dark, for the lights laid on it
     for (let k = 0; k < 6; k++) { const y0 = S.edge + 4 + k * 12; g.water([[-S.rx, y0, S.wz], [S.rx, y0, S.wz], [S.rx, y0 + 10, S.wz], [-S.rx, y0 + 10, S.wz]], { dens: 0.5 }); }
     g.fill([[-S.rx, S.riv, S.wz], [S.rx, S.riv, S.wz], [S.rx, S.riv, S.wz - 2.2], [-S.rx, S.riv, S.wz - 2.2]], '#5E8F98');
     g.fill([[S.rx, S.edge, S.wz], [S.rx, S.riv, S.wz], [S.rx, S.riv, S.wz - 2.2], [S.rx, S.edge, S.wz - 2.2]], '#4E7F88');
@@ -102,8 +102,8 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     car: (g, a, i) => K.car(g, a, { col: ['#C9584B', '#7FA7CF', '#F1EFE8', '#3F5F8F', '#A4C66B', '#8E8A84'][i % 6], L: 5.2, W: 2.4 }),
     taxi: (g, a) => LX.taxi(g, a), taxiO: (g, a) => LX.taxi(g, a, { old: true }),
     van: (g, a) => K.bus(g, a, { L: 5.0, W: 2.3, h: 5.0, n: 2, band: '#C9584B' }),
-    bus: (g, a) => K.bus(g, a, { col: '#F1CC48', band: '#E9E2D0', L: 7.0, W: 2.6, h: 6.2, n: 5 }),
-    tuk: (g, a, i) => LX.tuk(g, a, { col: ['#3E9A6A', '#C9463E', '#3F7FC2', '#E8A93A'][i % 4], roof: i % 2 ? { t: '#2E2A26', l: '#3A3530', r: '#2E2A26' } : null, driver: LX.who(4200 + i), riders: [LX.who(4210 + i * 3), LX.who(4211 + i * 3), LX.who(4212 + i * 3, { hat: '#E9D8A6' })] }),
+    bus: (g, a) => { const i0 = g.cmds.length; K.bus(g, a, { col: '#F1CC48', band: '#E9E2D0', L: 7.0, W: 2.6, h: 6.2, n: 5 }); g.mark({ nc: (c) => (c === C.glass ? '#FFEFC4' : undefined) }, i0); },   // (lit inside at night)
+    tuk: (g, a, i) => LX.tuk(g, a, { lights: true, col: ['#3E9A6A', '#C9463E', '#3F7FC2', '#E8A93A'][i % 4], roof: i % 2 ? { t: '#2E2A26', l: '#3A3530', r: '#2E2A26' } : null, driver: LX.who(4200 + i), riders: [LX.who(4210 + i * 3), LX.who(4211 + i * 3), LX.who(4212 + i * 3, { hat: '#E9D8A6' })] }),
   };
   LXT.LANES.forEach((L, li) => {
     for (let k = 0; k < LXT.NV; k++) {
@@ -143,14 +143,16 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   T.obj([18, S.edge, 34, S.edge + 3], function (g) {
     K.box(g, 18, S.edge, 34, S.edge + 3, S.wz, S.wz + 1.2, { t: '#B9B4A8', l: '#8A8478', r: '#77716A' }, { w: 0.6 });
     K.box(g, 19, S.edge + 0.4, 23, S.edge + 2.6, S.wz + 1.2, S.wz + 4.6, { t: '#5E7E9A', l: '#E9E4D8', r: '#D3CCBE' }, { w: 0.5 });
+    // night: the waiting room's lamp and a lamp at the pontoon's end, both doubled in the river
+    g.glow('lamp', 23.6, S.edge + 1.5, S.wz + 3.8, { r: 1.3, base: S.wz + 1.2 }); g.glow('lamp', 33.4, S.edge + 2.6, S.wz + 1.7, { r: 1.0, base: S.wz + 1.2 });
   }, { name: 'pier' });
   // a fragata (ochre sail) and a white yacht along the river, under the bridge
   const sailer = (i, y, per, ph, dirx, kind) => T.actor({ cast: false, sample: 0.3, period: per, grow: false,
     at(t) { const u = (((t + ph) / per) % 1 + 1) % 1, x = dirx > 0 ? lerp(-S.rx - 10, S.rx + 10, u) : lerp(S.rx + 10, -S.rx - 10, u), a = clamp((S.rx + 4 - Math.abs(x)) / 10, 0, 1); if (a <= 0) return null; return { x: x + (dirx > 0 ? 8 : 0), y, z: S.wz, key: kind, alpha: a < 1 ? Math.max(0.02, a) : null }; },
     draw(g, st) {
       g.at(dirx > 0 ? -8 : 0, 0, 0, (g2) => {
-        if (kind === 'frag') { K.boat(g2, dirx > 0 ? 0 : Math.PI, { kind: 'bare', L: 5.5, W: 1.9, hull: '#2F3A4F', stripe: '#C9463E', deck: '#B9A27D' }); const m0 = g2.p(0, 0, 1.4), m1 = g2.p(0, 0, 10.5); g2.line2([m0, m1], { w: 0.6, c: '#4A3A2C', boil: false }); const s = dirx > 0 ? 1 : -1, sail = [[m1[0] + 0.3 * s, m1[1] + 0.4], [m1[0] + 11 * s, m1[1] + 9], [m0[0] + 7 * s, m0[1] - 2.5], [m0[0] + 0.3 * s, m0[1] - 2.2]]; g2.fill2(sail, '#D99A3E', true); g2.outline2(sail, { w: 0.5, c: '#8A5A1E', boil: false }); }
-        else K.boat(g2, dirx > 0 ? 0 : Math.PI, { kind: 'motor', L: 5.2, W: 1.8, hull: '#F3F1EA', stripe: '#3F5F8F' });
+        if (kind === 'frag') { K.boat(g2, dirx > 0 ? 0 : Math.PI, { kind: 'bare', L: 5.5, W: 1.9, hull: '#2F3A4F', stripe: '#C9463E', deck: '#B9A27D' }); const m0 = g2.p(0, 0, 1.4), m1 = g2.p(0, 0, 10.5); g2.line2([m0, m1], { w: 0.6, c: '#4A3A2C', boil: false }); LX.bulb2(g2, g2.p(0, 0, 9.9), 0.4, '#FFF2D0'); const s = dirx > 0 ? 1 : -1, sail = [[m1[0] + 0.3 * s, m1[1] + 0.4], [m1[0] + 11 * s, m1[1] + 9], [m0[0] + 7 * s, m0[1] - 2.5], [m0[0] + 0.3 * s, m0[1] - 2.2]]; g2.fill2(sail, '#D99A3E', true); g2.outline2(sail, { w: 0.5, c: '#8A5A1E', boil: false }); }
+        else { const i0 = g2.cmds.length; K.boat(g2, dirx > 0 ? 0 : Math.PI, { kind: 'motor', L: 5.2, W: 1.8, hull: '#F3F1EA', stripe: '#3F5F8F' }); g2.mark({ nc: (c) => (c === C.navy ? '#FFE3A6' : undefined) }, i0); LX.bulb2(g2, g2.p(-0.6, 0, 2.6), 0.4, '#FFF6E0'); }   // (cabin lit, a white light, at night)
       });
     } });
   sailer(0, 196, 70, 0, 1, 'frag');

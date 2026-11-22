@@ -23,6 +23,7 @@ SF.boot = function () {
   // moves it from GPU to CPU halfway through, which would change how one frame rasterises
   const cv = document.getElementById('sf'), ctx = cv.getContext('2d', { alpha: false, willReadFrequently: q.has('f') });
   APP.cv = cv; APP.ctx = ctx; APP.q = q;
+  if (q.has('night')) LOOK.night = true;                     // ?night: the page opens at night (and records at night)
   APP.rec = q.has('film'); SF.noBoil = q.has('noboil'); SF.noActors = q.has('noactors'); SF.noBlit = q.has('noblit'); SF.noAtlas = q.has('noatlas'); APP.frozen = q.has('f') ? parseFloat(q.get('f')) : null;
   mkTextures();
   SF.initWorld(q.get('only') ? q.get('only').split(',') : null);
@@ -153,7 +154,8 @@ function tick() {
       if (R.jobs.length) runJobs(clamp(12 - (APP.drawMs || 6), 2, 7));
     }
     const w1 = performance.now();
-    SF.draw(ctx, v, Math.min(t, filmT(n)), { n: Math.min(n, HOLD), phase: boilPhase(si), fade: fadeAt(n) });
+    SF.draw(ctx, v, Math.min(t, filmT(n)), { n: Math.min(n, HOLD), phase: boilPhase(si), fade: fadeAt(n), lightT: lightT() });
+    if (APP.swap) drawSwap(ctx, cam);
     const w2 = performance.now(); APP.drawMs = w2 - w1;
     if (APP.q.has('log')) {
       if (APP.lastT != null) APP.stats.push(w2 - APP.lastT); APP.lastT = w2; window.__stats = APP.stats;
@@ -174,9 +176,39 @@ function tick() {
   let fade = 0;
   if (APP.fadeUp > 0) { const k = (performance.now() - APP.fadeUp) / 1000; fade = k >= 1 ? 0 : (23 / 24) * (1 - smooth(k)); if (k >= 1) APP.fadeUp = 0; }
   const d0 = performance.now();
-  SF.draw(ctx, v, t, { allLive: true, phase: APP.phase | 0, fade });
+  SF.draw(ctx, v, t, { allLive: true, phase: APP.phase | 0, fade, lightT: lightT() });
+  if (APP.swap) drawSwap(ctx, APP.cam);
   APP.drawMs = performance.now() - d0;
   drawUI(ctx, cv);
+}
+/* ---------- day and night ----------
+   SF.setLook({ night }) changes the look of the city. Every cached picture is drawn again in the new look (the wide view
+   at once, the rest as it comes into view, the same path as after a GPU reset); meanwhile the last frame of the old look
+   stays on screen, follows the camera, and fades away over a second. At nightfall the lamps come on in a wave. */
+const lightT = () => (LOOK.since > 0 ? (performance.now() - LOOK.since) / 1000 : null);
+SF.setLook = function (o) {
+  const night = o.night == null ? LOOK.night : !!o.night;
+  if (night === LOOK.night) return;
+  const cv = APP.cv;
+  if (APP.frozen == null && APP.started) {
+    const snap = mkCanvas(cv.width, cv.height); snap.getContext('2d').drawImage(cv, 0, 0);
+    const cam = APP.mode === 'explore' ? APP.cam : (APP.filmCam || WIDE);
+    if (APP.swap) APP.swap.cv.width = 0;
+    APP.swap = { cv: snap, cam: { z: cam.z, cx: cam.cx, cy: cam.cy }, t0: performance.now() };
+  }
+  LOOK.night = night; LOOK.since = night && APP.frozen == null ? performance.now() : -1e9;
+  if (APP.frozen != null) gpuReset();                         // a seeked page draws every frame from nothing anyway
+  else APP.recover();
+  emit('look', { night });
+};
+/* the old look's last frame over the new one, moved with the camera, fading out */
+function drawSwap(ctx, cam) {
+  const S = APP.swap, k = (performance.now() - S.t0) / 1000, a = 1 - smooth((k - 0.12) / 0.95);
+  if (a <= 0) { S.cv.width = 0; APP.swap = null; return; }
+  const cv = APP.cv, s = Math.min(cv.width / 1920, cv.height / 1080), pz = cam.z * s, pz0 = S.cam.z * s, f = pz / pz0;
+  ctx.save(); ctx.globalAlpha = a; ctx.globalCompositeOperation = 'source-over';
+  ctx.setTransform(f, 0, 0, f, cv.width / 2 * (1 - f) + (S.cam.cx - cam.cx) * pz, cv.height / 2 * (1 - f) + (S.cam.cy - cam.cy) * pz);
+  ctx.drawImage(S.cv, 0, 0); ctx.restore();
 }
 function exploreBakes(v) {
   // drop bakes queued for views we have left (another zoom, a tile no longer on screen): they only cost time and GPU
@@ -274,6 +306,7 @@ function bindInput() {
     if (k === 'r' || k === 'R') { replay_(); return; }
     touch();
     if (k === ' ') { e.preventDefault(); togglePause(); }
+    else if (k === 'n' || k === 'N') SF.setLook({ night: !LOOK.night });
     else if (k === '0' || k === 'Escape') { if (SF.home) SF.glideTo(SF.home()); else cutTo(WIDE); }   // the page's guide may frame the city beside its panel
     else if (k >= '1' && k <= '9' && VISIT[+k - 1]) cutTo(shotByName(VISIT[+k - 1]));
   });
@@ -313,7 +346,7 @@ function drawUI(ctx, cv) {
   ctx.globalAlpha = 0.8 * a;
   for (const [dl, pos] of [[ic.replay, p.a], [APP.paused ? ic.play : ic.pause, p.b]]) {
     ctx.setTransform(s, 0, 0, s, pos[0], pos[1]);
-    for (const g of compiled(dl, 0.75)) { if (g.m === 0) { ctx.fillStyle = g.col; ctx.fill(g.p); } else { ctx.strokeStyle = g.col; ctx.lineWidth = g.lw; ctx.stroke(g.p); } }
+    for (const g of compiled(dl, 0.75, true)) { const c = LOOK.night ? '#E9E2D2' : g.col; if (g.m === 0) { ctx.fillStyle = c; ctx.fill(g.p); } else { ctx.strokeStyle = c; ctx.lineWidth = g.lw; ctx.stroke(g.p); } }
   }
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1;
 }
@@ -355,6 +388,7 @@ function stepGlide() {
   APP.dirtyZoom = performance.now(); APP.lastInput = performance.now();
   if (t >= 1) { APP.cam = Object.assign({}, g.b); APP.glide = null; APP.phase = (APP.phase + 1) % 6; emit('arrive', Object.assign({}, g.b)); }
 }
+SF.paper = () => (LOOK.night ? NIGHT.paper : [240, 238, 228]);     // the colour of the bare paper (the guide finds room for its notes)
 SF.pause = () => { if (!APP.paused) togglePause(); };
 SF.resume = () => { if (APP.paused) togglePause(); };
 SF.togglePause = () => togglePause();

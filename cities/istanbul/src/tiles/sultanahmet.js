@@ -17,10 +17,13 @@ SF.tile('sultanahmet', 0, 100, { rim: 36 }, function (T) {
     IS.paving(g, -H, -H, 28, H, { len: 2.4 });
     // the park: lawns quartered by paths, the fountain plaza
     for (const [x0, y0, x1, y1] of [[-9, -6, 3, 8], [9, -6, 22, 8], [-9, 16, 3, 33], [9, 16, 22, 33]]) K.lawn(g, x0, y0, x1, y1, { col: '#B5D08C', dens: 0.7 });
+    IS.quayLights(g, [[27.4, -30], [27.4, -18], [27.4, -4], [27.4, 10], [27.4, 24]]);   // at night low lights along the Bosphorus quay
     const ring = []; for (let i = 0; i < 28; i++) { const a = TAU * i / 28; ring.push([FX + Math.cos(a) * 6.8, FY + Math.sin(a) * 6.8, 0.01]); } g.fill(ring, '#DCD2BE'); g.outline(ring, { w: 0.45, c: '#B5A68A', boil: false });
     // the fountain's basin: water inside a marble rim
     const rim = [], wat = []; for (let i = 0; i < 28; i++) { const a = TAU * i / 28; rim.push([FX + Math.cos(a) * 4.4, FY + Math.sin(a) * 4.4, 0.02]); wat.push([FX + Math.cos(a) * 3.7, FY + Math.sin(a) * 3.7, 0.03]); }
     g.fill(rim, '#F0EBE0'); g.fill(wat, '#9CCFD0'); g.water(wat, { dens: 1.2, c: '#6FA9AE' }); g.outline(rim, { w: 0.7, boil: false }); g.outline(wat, { w: 0.45, c: '#6FA9AE', boil: false });
+    // at night lights under the water light the jets from below; their light lies on the basin
+    for (const a of [0.6, 2.2, 3.8, 5.4]) { const p = g.p(FX + Math.cos(a) * 2.2, FY + Math.sin(a) * 2.2, 0.1); g.glow2('lantern', [p[0], p[1] - 1.2], p, { r: 1.6, col: '#D6F0FF', pool: false }); }
   }, { rim: true });
 
   /* ---- the Blue Mosque: courtyard behind, hall in front, six minarets ---- */
@@ -31,12 +34,12 @@ SF.tile('sultanahmet', 0, 100, { rim: 36 }, function (T) {
   /* ---- Hagia Sophia ---- */
   const HS = { t: '#D9A985', l: '#E5B993', r: '#C99A72' };
   T.obj([2, -35, 25, -11.5], (g) => {
-    IS.mosque(g, { cx: 13.5, cy: -23.2, s: 11, H: 10.4, R: 6.8, semis: ['x-', 'x+'], towers: false, domeH: 0.68, drumZ: 4.6, col: HS, rows: [[2.0, 4.6], [5.8, 8.6]] });
+    IS.mosque(g, { cx: 13.5, cy: -23.2, s: 11, H: 10.4, R: 6.8, semis: ['x-', 'x+'], towers: false, domeH: 0.68, drumZ: 4.6, col: HS, rows: [[2.0, 4.6], [5.8, 8.6]], k: 0.84, light: '#FFDDB0' });
   }, { name: 'hagia sophia' });
   // the stepped buttresses along the visible sides
-  for (const y of [-31, -23.5, -15.6]) T.obj([24.5, y - 1.4, 27, y + 1.4], (g) => { K.box(g, 24.5, y - 1.3, 26.8, y + 1.3, 0, 8.4, HS, { w: 0.65 }); K.box(g, 24.5, y - 1.0, 25.8, y + 1.0, 8.4, 11.6, HS, { w: 0.55 }); }, { name: 'buttress' });
-  for (const x of [4.6, 13.5, 22.2]) T.obj([x - 1.4, -12.4, x + 1.4, -10.2], (g) => { K.box(g, x - 1.3, -12.3, x + 1.3, -10.3, 0, 8.0, HS, { w: 0.65 }); K.box(g, x - 1.0, -12.3, x + 1.0, -11.2, 8.0, 11.4, HS, { w: 0.55 }); }, { name: 'buttress' });
-  for (const [x, y, h, col, r] of [[1.2, -36, 28, '#C47E5E', 1.15], [26.2, -36, 26, '#EFECE5', 0.75], [1.2, -10.4, 27, '#EFECE5', 0.75], [26.2, -10.4, 25, '#C47E5E', 1.15]]) T.obj([x, y], (g) => IS.minaret(g, x, y, h, { r, col, bal: [h * 0.66] }), { name: 'minaret' });
+  for (const y of [-31, -23.5, -15.6]) T.obj([24.5, y - 1.4, 27, y + 1.4], (g) => IS.floodlit(g, 0.84, '#FFDDB0', () => { K.box(g, 24.5, y - 1.3, 26.8, y + 1.3, 0, 8.4, HS, { w: 0.65 }); K.box(g, 24.5, y - 1.0, 25.8, y + 1.0, 8.4, 11.6, HS, { w: 0.55 }); }), { name: 'buttress' });
+  for (const x of [4.6, 13.5, 22.2]) T.obj([x - 1.4, -12.4, x + 1.4, -10.2], (g) => IS.floodlit(g, 0.84, '#FFDDB0', () => { K.box(g, x - 1.3, -12.3, x + 1.3, -10.3, 0, 8.0, HS, { w: 0.65 }); K.box(g, x - 1.0, -12.3, x + 1.0, -11.2, 8.0, 11.4, HS, { w: 0.55 }); }), { name: 'buttress' });
+  for (const [x, y, h, col, r] of [[1.2, -36, 28, '#C47E5E', 1.15], [26.2, -36, 26, '#EFECE5', 0.75], [1.2, -10.4, 27, '#EFECE5', 0.75], [26.2, -10.4, 25, '#C47E5E', 1.15]]) T.obj([x, y], (g) => IS.minaret(g, x, y, h, { r, col, bal: [h * 0.66], light: '#FFDDB0', k: 0.84 }), { name: 'minaret' });
 
   /* ---- the park ---- */
   for (const [x0, y0, x1, y1, k] of [[-8, 9.4, 2, 10.6, 0], [10, 9.4, 21, 10.6, 1], [-8, 13.4, 2, 14.6, 2], [10, 13.4, 21, 14.6, 3], [0.6, -5, 1.8, 7, 4], [10.2, -5, 11.4, 7, 5], [0.6, 17, 1.8, 32, 0], [10.2, 17, 11.4, 32, 1]]) {
@@ -50,11 +53,12 @@ SF.tile('sultanahmet', 0, 100, { rim: 36 }, function (T) {
   T.actor({ sample: 5, period: 8, at(t) { const f = Math.floor(((t * 1.5) % 6 + 6) % 6); return { x: FX, y: FY, key: f, f }; },
     draw(g, st) { const h = [3.2, 4.2, 5.0, 5.4, 5.0, 4.2][st.f], c = g.p(0, 0, 0), top = g.p(0, 0, h), J = '#E3F1F1';
       for (let i = 0; i < 10; i++) { const a = TAU * i / 10, s0 = g.p(Math.cos(a) * 1.2, Math.sin(a) * 1.2, 0.4), e = g.p(Math.cos(a) * 3.2, Math.sin(a) * 3.2, 0.1), m = g.p(Math.cos(a) * 2.2, Math.sin(a) * 2.2, 1.6 + h * 0.15); g.line2([s0, m, e], { w: 0.55, c: J, boil: false, wob: 0.2 }); }
-      g.line2([c, top], { w: 1.4, c: J, boil: false, ext: 0 }); for (const dx of [-1.6, 1.6]) g.line2([top, [top[0] + dx * 1.4, top[1] + 3], [top[0] + dx * 2.2, c[1] - 1]], { w: 0.5, c: J, boil: false, wob: 0.2 }); g.disc2([top[0], top[1] - 0.5], 0.9, '#F6FBFB'); } });
+      g.line2([c, top], { w: 1.4, c: J, boil: false, ext: 0 }); for (const dx of [-1.6, 1.6]) g.line2([top, [top[0] + dx * 1.4, top[1] + 3], [top[0] + dx * 2.2, c[1] - 1]], { w: 0.5, c: J, boil: false, wob: 0.2 }); g.disc2([top[0], top[1] - 0.5], 0.9, '#F6FBFB'); g.mark({ nc: '#F2FBFF', light: true });
+      for (const d of g.cmds) if (d.k === K_RIB || d.k === K_STROKE) d.nc = '#DDF2FF'; } });   // at night the jets shine in the lights under the water
   // the German Fountain: an octagon of green porphyry columns under a bronze dome
-  T.obj([20, -6, 26, 0], (g) => { const x = 23, y = -3; K.cyl(g, x, y, 2.8, 0, 0.8, { t: '#E9E3D3', l: '#DCD4C2', r: '#C9C0AC' }, { n: 8, w: 0.6 }); const cs = []; for (let i = 0; i < 8; i++) { const a = TAU * i / 8 + 0.2; if (Math.cos(a) + Math.sin(a) < -0.4) continue; const p0 = g.p(x + Math.cos(a) * 2.5, y + Math.sin(a) * 2.5, 0.8), p1 = g.p(x + Math.cos(a) * 2.5, y + Math.sin(a) * 2.5, 4.8); cs.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(cs, '#4F7F5E', 0.8); K.cyl(g, x, y, 2.9, 4.8, 5.6, { t: '#E9E3D3', l: '#DCD4C2', r: '#C9C0AC' }, { n: 8, w: 0.55 }); IS.dome(g, x, y, 2.6, 5.6, { drum: 0, h: 2.4, ribs: 8, col: '#7FA58E', w: 0.6 }); }, { name: 'german fountain' });
+  T.obj([20, -6, 26, 0], (g) => IS.floodlit(g, 0.66, null, () => { const x = 23, y = -3; K.cyl(g, x, y, 2.8, 0, 0.8, { t: '#E9E3D3', l: '#DCD4C2', r: '#C9C0AC' }, { n: 8, w: 0.6 }); const cs = []; for (let i = 0; i < 8; i++) { const a = TAU * i / 8 + 0.2; if (Math.cos(a) + Math.sin(a) < -0.4) continue; const p0 = g.p(x + Math.cos(a) * 2.5, y + Math.sin(a) * 2.5, 0.8), p1 = g.p(x + Math.cos(a) * 2.5, y + Math.sin(a) * 2.5, 4.8); cs.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(cs, '#4F7F5E', 0.8); K.cyl(g, x, y, 2.9, 4.8, 5.6, { t: '#E9E3D3', l: '#DCD4C2', r: '#C9C0AC' }, { n: 8, w: 0.55 }); IS.dome(g, x, y, 2.6, 5.6, { drum: 0, h: 2.4, ribs: 8, col: '#7FA58E', w: 0.6 }); g.glow('lamp', x, y, 4.2, { r: 1.2 }); }), { name: 'german fountain' });   // at night lit, a lamp under its dome
   // the Egyptian obelisk on its marble base
-  T.obj([-30, 29, -26, 33], (g) => { K.box(g, -30, 29, -26, 33, 0, 1.0, { t: '#E9E3D3', l: '#DCD4C2', r: '#C9C0AC' }, { w: 0.6 }); K.box(g, -29.3, 29.7, -26.7, 32.3, 1.0, 4.2, { t: '#E3DCCB', l: '#EFE9DC', r: '#D9D0BC' }, { w: 0.6 }); const p = (x, y, z) => [x, y, z]; const b = 1.0; const pts = [p(-28 - b, 31 + b, 4.2), p(-28 + b, 31 + b, 4.2), p(-28 + 0.6, 31 + 0.6, 21), p(-28 - 0.6, 31 + 0.6, 21)]; g.fill(pts, '#C9A08A'); g.fill([p(-28 + b, 31 + b, 4.2), p(-28 + b, 31 - b, 4.2), p(-28 + 0.6, 31 - 0.6, 21), p(-28 + 0.6, 31 + 0.6, 21)], '#B48A74'); g.fill([p(-28 - 0.6, 31 + 0.6, 21), p(-28 + 0.6, 31 + 0.6, 21), p(-28 + 0.6, 31 - 0.6, 21), p(-28, 31, 22.6)], '#D9B49E'); g.outline(pts, { w: 0.7, boil: false }); const gl = []; for (let z = 6; z < 20; z += 1.4) { const a = g.p(-28 - 0.3, 31 + 0.82, z), c = g.p(-28 + 0.2, 31 + 0.82, z + 0.5); gl.push(a[0], a[1], c[0], c[1]); } g.segs2(gl, '#7E5A48', 0.3); }, { name: 'obelisk' });
+  T.obj([-30, 29, -26, 33], (g) => IS.floodlit(g, 0.84, '#FFCB8E', () => { K.box(g, -30, 29, -26, 33, 0, 1.0, { t: '#E9E3D3', l: '#DCD4C2', r: '#C9C0AC' }, { w: 0.6 }); K.box(g, -29.3, 29.7, -26.7, 32.3, 1.0, 4.2, { t: '#E3DCCB', l: '#EFE9DC', r: '#D9D0BC' }, { w: 0.6 }); const p = (x, y, z) => [x, y, z]; const b = 1.0; const pts = [p(-28 - b, 31 + b, 4.2), p(-28 + b, 31 + b, 4.2), p(-28 + 0.6, 31 + 0.6, 21), p(-28 - 0.6, 31 + 0.6, 21)]; g.fill(pts, '#C9A08A'); g.fill([p(-28 + b, 31 + b, 4.2), p(-28 + b, 31 - b, 4.2), p(-28 + 0.6, 31 - 0.6, 21), p(-28 + 0.6, 31 + 0.6, 21)], '#B48A74'); g.fill([p(-28 - 0.6, 31 + 0.6, 21), p(-28 + 0.6, 31 + 0.6, 21), p(-28 + 0.6, 31 - 0.6, 21), p(-28, 31, 22.6)], '#D9B49E'); g.outline(pts, { w: 0.7, boil: false }); const gl = []; for (let z = 6; z < 20; z += 1.4) { const a = g.p(-28 - 0.3, 31 + 0.82, z), c = g.p(-28 + 0.2, 31 + 0.82, z + 0.5); gl.push(a[0], a[1], c[0], c[1]); } g.segs2(gl, '#7E5A48', 0.3); IS.glowDry(g, 'lantern', -26.4, 32.6, 1.4, { r: 2.2, col: '#FFC98A' }); }), { name: 'obelisk' });   // floodlit at night
   T.obj([18, 31], (g) => IS.simitCart(g, 18, 31, { face: 'L' }), { name: 'simit cart' });
   T.obj([-2, -9], (g) => { IS.simitCart(g, -2, -9, { face: 'R' }); }, { name: 'corn cart' });
 

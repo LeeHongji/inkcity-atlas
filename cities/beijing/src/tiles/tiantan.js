@@ -28,7 +28,7 @@ SF.tile('tiantan', 100, 100, { rim: 52 }, function (T) {
 
   /* ---------------- the Hall of Prayer for Good Harvests ---------------- */
   T.obj([CX - 15.5, CY - 15.5, CX + 15.5, CY + 15.5], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     const tiers = [[15, 0, 1.5], [12.6, 1.5, 3.0], [10.2, 3.0, 4.5]];
     for (const [r, z0, z1] of tiers) {
       K.cyl(g, CX, CY, r, z0, z1, { t: BC.marbleS, l: BC.marble, r: BC.marbleD }, { w: 0.8, n: 28 });
@@ -42,6 +42,11 @@ SF.tile('tiantan', 100, 100, { rim: 52 }, function (T) {
     BJ.roundBody(g, CX, CY, 4.6, z, z + 2.6, { doors: false, n: 8 });
     z = BJ.roundRoof(g, CX, CY, 6.2, z + 2.6, 6.0, { col: '#3F64A8' });
     const f = g.p(CX, CY, z); g.fill2([[f[0] - 1.0, f[1] + 0.4], [f[0] + 1.0, f[1] + 0.4], [f[0] + 0.5, f[1] - 2.4], [f[0] - 0.5, f[1] - 2.4]], BC.gold); g.disc2([f[0], f[1] - 3.2], 1.2, BC.gold); g.ring2([f[0], f[1] - 3.2], 1.2, { w: 0.35, c: '#7A5A20' });
+    // at night the Hall of Prayer is floodlit: the three blue roofs glow over the red drum, the white terraces lit,
+    // the gold finial shining
+    BN.flood(g, i0, 0.84, BN.WHITE, { lines: 0.25 });
+    for (const [dx, dy, zz, r] of [[7.6, 7.6, 2.4, 3.0], [0, 10.6, 2.4, 2.6], [10.6, 0, 2.4, 2.6], [5.4, 5.4, 6.5, 2.4]]) g.glow('lantern', CX + dx, CY + dy, zz, { r, col: '#FFE2B8' });
+    g.glow2('lantern', [f[0], f[1] - 3.2], [f[0], f[1] - 3.2], { r: 1.2, col: '#FFD870' });
   }, { name: 'hall of prayer' });
   // the signboard by the way
   T.obj([-29.5, 4.4, -20.5, 5.4], function (g) {
@@ -133,7 +138,7 @@ SF.tile('tiantan', 100, 100, { rim: 52 }, function (T) {
   T.cast([17.6, 31.4], (g) => {
     K.box(g, 16.6, 30.6, 18.6, 32.2, 0.6, 1.0, '#5A5E66', { w: 0.4, boil: false });
     K.box(g, 16.9, 30.8, 18.3, 32.0, 1.0, 3.6, { t: '#3A3E46', l: '#4A4E56', r: '#2E3238' }, { w: 0.5 });
-    for (const z of [1.8, 2.9]) { const c = g.p(18.3, 31.4, z); g.disc2([c[0], c[1]], 1.3, '#2A2622'); g.disc2([c[0], c[1]], 0.6, '#6A6E75'); }
+    for (const z of [1.8, 2.9]) { const c = g.p(18.3, 31.4, z); g.disc2([c[0], c[1]], 1.3, '#2A2622'); g.disc2([c[0], c[1]], 0.6, '#6A6E75'); g.mark({ nc: z < 2 ? '#7FE0FF' : '#FF7FD0' }); g.glow2('lantern', c, g.p(18.3, 31.4, 0), { r: 0.9, col: z < 2 ? '#7FE0FF' : '#FF7FD0' }); }   // (night: the speaker's LED rings)
     for (const dx of [-0.6, 0.6]) { const w = g.p(17.6 + dx, 32.2, 0.5); g.ring2(w, 1.6, { w: 0.4, c: '#2A2622' }); }
   }, { on: false });
   T.actor({ layer: 'top', sample: 5, period: 3, grow: false,

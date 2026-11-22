@@ -46,6 +46,7 @@
     T.obj([-22, -6, 6, 4], (g) => { K.box(g, -22, -5, 6, 3, 0, 5.5, { t: '#E9E6DE', l: '#F1EFE8', r: '#DCD8CE' }, { w: 0.85 }); K.win(g, 'L', 3, -21, 5, 1, 4.4, { style: 'glass' }); }, { name: 'solamachi' });
     T.obj([4, -14, 14, -4], function (g) {
       g.boilP = 0.25;
+      const i0 = g.cmds.length;
       const cx = 9, cy = -9, TOP = 88, w = (z) => z < 60 ? lerp(4.6, 1.7, Math.pow(z / 60, 0.8)) : lerp(1.6, 0.5, (z - 60) / (TOP - 60));
       const L = [], Rr = []; for (let z = 0; z <= 80; z += 2) { const p = g.p(cx, cy, z), ww = w(z) * 4.13 / 2 * 1.1; L.push([p[0] - ww, p[1]]); Rr.push([p[0] + ww, p[1]]); }
       g.fill2(L.concat(Rr.slice().reverse()), '#E9EEF1'); g.fill2(Rr.map((p, i) => [lerp(L[i][0], p[0], 0.55), p[1]]).concat(Rr.slice().reverse()), '#D3DCE2');
@@ -53,6 +54,11 @@
       g.line2(L, { w: 0.8, c: '#6E7E8C', boil: false }); g.line2(Rr, { w: 0.8, c: '#6E7E8C', boil: false });
       for (const [z, r, h] of [[48, 3.6, 3.0], [62, 2.6, 1.8]]) { K.cyl(g, cx, cy, r, z, z + h, { t: '#E9EEF1', l: '#C3D6E0', r: '#A8BECB' }, { w: 0.7, n: 14 }); K.cyl(g, cx, cy, r + 0.3, z + h, z + h + 0.4, '#E9EEF1', { w: 0.5, n: 14 }); }
       const a = g.p(cx, cy, 80), t = g.p(cx, cy, TOP); g.line2([a, t], { w: 0.9, c: '#6E7E8C', boil: false }); g.disc2(t, 0.5, '#E0503E');
+      // at night the tower is lit pale blue (its 'Iki' lighting); the beacon on top blinks red
+      const SKY = { '#E9EEF1': '#A6DAF5', '#D3DCE2': '#79B4DA', '#C3D6E0': '#8EC6E8', '#A8BECB': '#6CA3C9' };
+      g.mark({ nc: (c) => SKY[c] || (c === '#E0503E' ? c : undefined) }, i0);
+      for (const z of [8, 20, 32, 44, 50, 63, 74]) g.glow('lantern', cx, cy, z, { r: z < 45 ? 3.4 : 2.4, col: '#8FD3FF' });
+      g.glow('lantern', cx, cy, TOP, { r: 0.8, col: '#FF5A48' });
     }, { name: 'skytree' });
     T.cast([-4, 6.4], (g) => { TK.person(g, -4, 6.4, 0, TK.who(6001, { dir: 2, pose: 'hold', phone: true })); TK.person(g, -2.4, 7.0, 0, TK.who(6002, { dir: 3 })); }, { on: true });
   });

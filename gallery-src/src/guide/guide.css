@@ -4,3 +4,9 @@ html, body { background: #F0EEE4 !important; }
 .ll-guide-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ll-guide-draw 0.7s cubic-bezier(.3,.7,.2,1) forwards; }
 @keyframes ll-guide-draw { to { stroke-dashoffset: 0; } }
 @media (prefers-reduced-motion: reduce) { .ll-guide-draw { animation: none; stroke-dashoffset: 0; } }
+
+/* at night the words written on the map are pale ink with a dark halo (the guidebook and buttons stay paper) */
+.ll-guide[data-night="true"] .on-map { color: #ECE5D5 !important; text-shadow: 0 0 2px #181c2e, 0 0 4px #181c2e, 0 0 7px #181c2e, 0 0 12px #181c2e !important; }
+.ll-guide[data-night="true"] .on-map .text-pencil-text { color: #BDB6A6 !important; }
+.ll-guide[data-night="true"] svg.on-map { stroke: #CFC7B5; }
+.ll-guide[data-night="true"] #ink-guide-controls label { color: #ECE5D5; text-shadow: 0 0 2px #181c2e, 0 0 5px #181c2e; }

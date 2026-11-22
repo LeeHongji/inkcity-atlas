@@ -29,7 +29,7 @@
     // the star fort, the pedestal, the statue
     T.obj([IX - 7, IY - 7, IX + 7, IY + 7], function (g) {
       g.boilP = 0.3;
-      const GR = '#CFC8B8', star = [];
+      const GR = '#CFC8B8', star = [], i0 = g.cmds.length;
       for (let i = 0; i < 22; i++) { const a = -Math.PI / 2 + TAU * i / 22, r = i % 2 ? 4.4 : 6.8; star.push([IX + Math.cos(a) * r, IY + Math.sin(a) * r]); }
       const Z = 2.2, sides = [];
       for (let i = 0; i < 22; i++) { const a = star[i], b = star[(i + 1) % 22], nx = b[1] - a[1], ny = -(b[0] - a[0]); if (nx + ny <= 0) continue; sides.push({ q: [[a[0], a[1], 0], [b[0], b[1], 0], [b[0], b[1], Z], [a[0], a[1], Z]], d: a[0] + a[1] + b[0] + b[1], t: clamp(0.5 + 0.5 * (nx - ny) / Math.hypot(nx, ny), 0, 1) }); }
@@ -58,13 +58,21 @@
       for (let k = 0; k < 7; k++) { const a = -Math.PI * 0.95 + Math.PI * 0.9 * k / 6, r0 = 2.8, r1 = 5.6; g.fill2([[c[0] + 0.2 + Math.cos(a - 0.12) * r0, c[1] - 47.4 + Math.sin(a - 0.12) * r0], [c[0] + 0.2 + Math.cos(a) * r1, c[1] - 47.4 + Math.sin(a) * r1], [c[0] + 0.2 + Math.cos(a + 0.12) * r0, c[1] - 47.4 + Math.sin(a + 0.12) * r0]], CU, true); }
       g.line2(robe.concat([robe[0]]), { w: 0.6, c: INK, boil: false, wob: 0.3 });
       g.disc2(s(-0.5, -46.4), 0.3, INK); g.disc2(s(1.1, -46.4), 0.3, INK);
+      // at night: floodlit from the star fort, the copper pale green, the torch's flame lit gold
+      g.mark({ nc: (cc) => ({ [CU]: '#A8E6CE', [CD]: '#78BFA4', '#E8B33C': '#FFC94A', '#F6E3A0': '#FFF3C4', '#7FB8A4': '#9AD8C0' })[cc] }, i0);
+      NK.floodMark(g, i0, 0.7, '#FFF0D6');
+      const shore = g.p(IX + 11.6, IY + 11.6, 0), fl = s(-5.2, -64);                // the reflections start at the near shore, on the water
+      g.glow2('lantern', fl, shore, { r: 2.6, col: '#FFC94A' });
+      for (const [v, r] of [[-46, 3.4], [-30, 4.4], [-14, 4.8]]) g.glow2('lantern', s(0.6, v), shore, { r, col: '#D8FFF0' });
+      g.glow2('lantern', g.p(IX, IY, 8), shore, { r: 4.6, col: '#FFE6B8' });
+      for (const [dx, dy] of [[6.4, 1.5], [1.5, 6.4], [4.8, 4.8]]) g.glow2('lantern', g.p(IX + dx, IY + dy, 2.4), shore, { r: 1.8, col: '#FFE0A8' });
     }, { name: 'statue' });
     // a flagpole on the walk, visitors strolling round the island, a group taking a photo
     T.obj([IX + 9.4, IY + 3], (g) => { const b = g.p(IX + 9.4, IY + 3, 0), t = g.p(IX + 9.4, IY + 3, 11); g.line2([b, t], { w: 0.55, c: '#5E5A52', boil: false }); g.disc2(t, 0.5, C.gold); }, { name: 'flagpole' });
     NK.flagActor(T, IX + 9.4, IY + 3, 10.6, { w: 4, h: 2.6, dir: 'x' });
     const ring = [[IX - 9.2, IY], [IX - 5.6, IY - 8.2], [IX + 4, IY - 9], [IX + 9.4, IY - 3], [IX + 8.4, IY + 5.6], [IX + 1, IY + 9.2], [IX - 7.4, IY + 6.4]];
     for (let k = 0; k < 4; k++) NK.walker(T, k % 2 ? NK.tourist(2100 + k) : NK.who(2100 + k), ring, 2.4, { phase: k / 4 });
-    T.cast([IX + 5, IY + 9], (g) => { NK.person(g, IX + 5.6, IY + 9.4, 0, NK.tourist(2110, { dir: 3, pose: 'hold', phone: true })); NK.person(g, IX + 3.6, IY + 8.4, 0, NK.who(2111, { dir: 1, pose: 'wave', ph: 0.2 })); NK.person(g, IX + 2.4, IY + 9.2, 0, NK.tourist(2112, { dir: 1, k: 0.75 })); }, { name: 'photo' });
+    T.cast([IX + 5, IY + 9], (g) => { NK.person(g, IX + 5.6, IY + 9.4, 0, NK.tourist(2110, { dir: 3, pose: 'hold', phone: true, phoneGlow: false })); NK.person(g, IX + 3.6, IY + 8.4, 0, NK.who(2111, { dir: 1, pose: 'wave', ph: 0.2 })); NK.person(g, IX + 2.4, IY + 9.2, 0, NK.tourist(2112, { dir: 1, k: 0.75 })); }, { name: 'photo' });
     // the Staten Island ferry: a long orange double-ender, three decks, a pilot house at each end
     T.actor({ sample: 0.3, period: 28, grow: false,
       at(t) { const u = (t / 28) % 1, x = lerp(-34, 34, u), a = Math.min(1, (x + 30) / 8, (24 - x) / 6); if (a <= 0.02) return null; return { x, y: 15, z: 0, key: 0, alpha: a < 1 ? a : null }; },
@@ -73,9 +81,9 @@
         g.fill(K.rect(-9.5, -3.2, 9.5, 3.2, 0), '#DCEAF3');
         const hull = K.rbox(g, 0, 0, 8.6, 2.6, 0, 0, 1.6, ORT, { w: 0.8 });
         const d2 = K.rbox(g, 0, 0, 7.6, 2.3, 0, 1.6, 3.4, ORT, { w: 0.7, nb: true });
-        for (const f of ['pv']) for (let i = 0; i < 10; i++) K.rwin(g, d2, f, -0.92 + i * 0.185, -0.92 + i * 0.185 + 0.13, 2.2, 3.0, { glint: false, col: '#3F4D5C' });
+        for (const f of ['pv']) for (let i = 0; i < 10; i++) g.lit({ nc: NK.LIT, light: i % 3 === 1 }, () => K.rwin(g, d2, f, -0.92 + i * 0.185, -0.92 + i * 0.185 + 0.13, 2.2, 3.0, { glint: false, col: '#3F4D5C' }));   // lit at night
         const d3 = K.rbox(g, 0, 0, 5.2, 1.9, 0, 3.4, 4.9, { t: '#F6F2E8', l: '#F3F1EA', r: '#DAD6CC' }, { w: 0.6, nb: true });
-        for (let i = 0; i < 7; i++) K.rwin(g, d3, 'pv', -0.9 + i * 0.26, -0.9 + i * 0.26 + 0.18, 3.8, 4.5, { glint: false, col: '#3F4D5C' });
+        for (let i = 0; i < 7; i++) g.lit({ nc: NK.LIT }, () => K.rwin(g, d3, 'pv', -0.9 + i * 0.26, -0.9 + i * 0.26 + 0.18, 3.8, 4.5, { glint: false, col: '#3F4D5C' }));
         for (const u of [-4.2, 4.2]) K.rbox(g, u, 0, 0.9, 1.2, 0, 4.9, 6.1, { t: '#F6F2E8', l: '#F3F1EA', r: '#DAD6CC' }, { w: 0.5 });
         const m = g.p(0, 0, 4.9), mt = g.p(0, 0, 9); g.line2([m, mt], { w: 0.5, boil: false });
         NK.text(g, 'L', 2.32, -5.6, 2.2, 0.8, 'STATEN ISLAND', '#F6F2E8', { w: 0.35 });
@@ -85,7 +93,7 @@
     // a Circle Line boat heading up the harbour
     T.actor({ sample: 0.3, period: 28, grow: false,
       at(t) { const u = ((t + 14) / 28) % 1, y = lerp(30, -30, u), a = Math.min(1, (y + 28) / 6, (28 - y) / 6); if (a <= 0.02) return null; return { x: -18, y, z: 0, key: 0, alpha: a < 1 ? a : null }; },
-      draw(g) { K.boat(g, -Math.PI / 2, { kind: 'steamer', L: 4.2, W: 1.7, hull: '#F3F1EA', stripe: '#2F5E9A', stackCol: { t: '#2F4A7A', l: '#2F5E9A', r: '#244E84' } }); } });
+      draw(g) { K.boat(g, -Math.PI / 2, { kind: 'steamer', L: 4.2, W: 1.7, hull: '#F3F1EA', stripe: '#2F5E9A', stackCol: { t: '#2F4A7A', l: '#2F5E9A', r: '#244E84' } }); NK.nmark(g, 0, { nc: NK.LIT, light: true }, false, C.navy); } });
   });
 
   /* ======================= the Brooklyn Bridge ======================= */
@@ -109,15 +117,15 @@
       const h = NK.walkup(g, -31, 11, -19, 27, 3, { face: 'R', col: '#B9654C', fh: 3.8, fire: false, tank: false, shop: { col: '#6E5A44', word: 'CAFE', awning: '#C9584B', stripe: '#F6F2E8' } });
       // the clock tower on its roof
       K.box(g, -27.5, 13, -22.5, 18, h + 0.5, h + 7, { t: '#C9BFA9', l: '#B9654C', r: '#9A4F3B' }, { w: 0.7 });
-      for (const [f, pl, c] of [['L', 18, -25], ['R', -22.5, 15.5]]) { const p = g.p.apply(g, K.pt(f, pl + 0.05, c, h + 4.4)); g.disc2(p, 4.2, '#F6F1E2'); g.ring2(p, 4.2, { w: 0.5, c: '#3A3128' }); g.segs2([p[0], p[1], p[0], p[1] - 2.8, p[0], p[1], p[0] + 1.8, p[1] + 0.6], '#3A3128', 0.4); }
+      for (const [f, pl, c] of [['L', 18, -25], ['R', -22.5, 15.5]]) { const p = g.p.apply(g, K.pt(f, pl + 0.05, c, h + 4.4)); g.disc2(p, 4.2, '#F6F1E2'); g.mark({ nc: '#FFF0CC' }); g.glow2('lantern', p, p, { r: 3.0, col: '#FFE6B0' }); g.ring2(p, 4.2, { w: 0.5, c: '#3A3128' }); g.segs2([p[0], p[1], p[0], p[1] - 2.8, p[0], p[1], p[0] + 1.8, p[1] + 0.6], '#3A3128', 0.4); }
       K.hip(g, -27.8, 12.7, -22.2, 18.3, h + 7, 2.6, '#6E7A86', {});
     }, { name: 'dumbo clock' });
     // the approach viaducts: granite piers with arches, under the deck
     for (const [x0, x1] of [[-30, -RX - 1.5], [RX + 1.5, 30]]) T.obj([x0, -4.4, x1, 4.4], (g) => {
       K.box(g, x0, -4.2, x1, 4.2, 0, DZ - 0.6, GR, { w: 0.85 });
       const n = Math.round((x1 - x0) / 6);
-      for (let i = 0; i < n; i++) { const a0 = x0 + (x1 - x0) * i / n + 1.1, a1 = x0 + (x1 - x0) * (i + 1) / n - 1.1; K.win(g, 'L', 4.22, a0, a1, 0, DZ - 1.8, { style: 'dark', arch: true, w: 0.5, col: '#5A524A' }); }
-      if (x0 > 0) K.win(g, 'R', x1 + 0.02, -2.8, 2.8, 0, DZ - 1.8, { style: 'dark', arch: true, w: 0.5, col: '#5A524A' });
+      for (let i = 0; i < n; i++) { const a0 = x0 + (x1 - x0) * i / n + 1.1, a1 = x0 + (x1 - x0) * (i + 1) / n - 1.1; g.lit({ win: null }, () => K.win(g, 'L', 4.22, a0, a1, 0, DZ - 1.8, { style: 'dark', arch: true, w: 0.5, col: '#5A524A' })); }   // open arches, not windows: dark at night
+      if (x0 > 0) g.lit({ win: null }, () => K.win(g, 'R', x1 + 0.02, -2.8, 2.8, 0, DZ - 1.8, { style: 'dark', arch: true, w: 0.5, col: '#5A524A' }));
     }, { name: 'approach' });
     // the two cable planes' curve: tower top -> mid-span -> anchorages
     const cableZ = (x) => { const ax = Math.abs(x); return ax <= TX ? PZ + 1.6 + (TOP - 1 - PZ - 1.6) * Math.pow(ax / TX, 2) : TOP - 1 - (TOP - 1 - DZ - 1) * Math.min(1, Math.pow((ax - TX) / (28 - TX), 0.8)); };
@@ -131,6 +139,7 @@
         g.line([[-30, yy, z - 1.4], [30, yy, z - 1.4]], { w: 0.6, boil: false });
       }
       g.fill(K.rect(-30, y0, 30, y1, z), inner ? '#C9B48E' : '#BDB7A8');
+      if (inner) for (let x = -27, i = 0; x < 28; x += 4.5, i++) if (Math.abs(Math.abs(x) - TX) > 2.2) g.glow('lamp', x, i % 2 ? y1 : y0, z + 2.2, { r: 0.7, base: z });   // the promenade's lamps at night
       if (inner) { const pl = []; for (let x = -29.5; x < 30; x += 0.9) { const a = g.p(x, y0, z + 0.02), b = g.p(x, y1, z + 0.02); pl.push(a[0], a[1], b[0], b[1]); } g.segs2(pl, '#A8936C', 0.3); const posts = []; for (let x = -30; x <= 30; x += 3) for (const yy of [y0, y1]) { const a = g.p(x, yy, z - 3.6), b = g.p(x, yy, z); posts.push(a[0], a[1], b[0], b[1]); } g.segs2(posts, '#6E665C', 0.45); }
       for (const yy of (inner ? [y0, y1] : [y1])) g.fine([[-30, yy, z + 1.1], [30, yy, z + 1.1]], { w: 0.4, c: '#6E665C' });
       // the main cable on this plane, its suspenders and the diagonal stays fanning from the tower tops
@@ -141,6 +150,8 @@
         const sus = []; for (let x = -27; x < 28; x += 1.2) { if (Math.abs(Math.abs(x) - TX) < 1.6) continue; const a = g.p(x, cyc, cableZ(x)), b = g.p(x, cyc, cz + (inner ? 0.2 : 1.1)); sus.push(a[0], a[1], b[0], b[1]); } g.segs2(sus, '#7E776A', 0.28);
         const st = []; for (const sx of [-1, 1]) for (let k = 1; k <= 7; k++) for (const dir of [-1, 1]) { const x = sx * TX + dir * k * 2.4; if (Math.abs(x) > 28) continue; const a = g.p(sx * TX, cyc, TOP - 1.5), b = g.p(x, cyc, cz + 1.0); st.push(a[0], a[1], b[0], b[1]); } g.segs2(st, '#7E776A', 0.3);
         g.line(pts, { w: 1.0, c: '#5E574C', boil: false, ext: 0 });
+        // at night: the necklace lights strung along the main cable
+        for (let x = -26; x <= 26; x += 3.25) if (Math.abs(Math.abs(x) - TX) > 1.4) g.glow('lantern', x, cyc, cableZ(x), { r: 0.75, col: '#FFC86A', base: 0 });
       }
     }, { name: name, under: inner ? PZ - 1 : DZ - 1 });
     deck(-4.4, -1.4, DZ, false, 'roadway far');
@@ -163,6 +174,10 @@
         g.line([[x0, y1, 2.2], [x0, y1, TOP]], { w: 0.85, boil: false }); g.line([[x1, y1, 2.2], [x1, y1, TOP]], { w: 0.7, boil: false }); g.line([[x1, y0, 2.2], [x1, y0, TOP]], { w: 0.85, boil: false });
         K.box(g, x0 - 0.3, y0 - 0.3, x1 + 0.3, y1 + 0.3, TOP, TOP + 0.8, GR, { w: 0.7, boil: false });
         K.box(g, x0 + 0.2, y0 + 0.2, x1 - 0.2, y1 - 0.2, TOP + 0.8, TOP + 1.6, GR, { w: 0.6, boil: false });
+        // at night the towers are floodlit from below, the arches glowing
+        NK.floodMark(g, 0, 0.78, '#FFE6B8');
+        for (const a of [-2.2, 2.2]) g.glow('lantern', x1 + 0.3, a, 6, { r: 3.2, col: '#FFE0A8', base: 0 });
+        g.glow('lantern', x1 + 0.3, 0, TOP - 2, { r: 2.8, col: '#FFE6B8', base: 0 });
       }, { name: 'tower', under: 18.4 });
     }
     // cars both ways on the roadways
@@ -186,7 +201,7 @@
     // a NYC Ferry passing under the bridge
     T.actor({ sample: 0.3, period: 22, grow: false,
       at(t) { const u = (t / 22) % 1, y = lerp(32, -32, u), a = Math.min(1, (30 - Math.abs(y)) / 5); if (a <= 0.02) return null; return { x: -2.5, y, z: 0, key: 0, alpha: a < 1 ? a : null }; },
-      draw(g) { K.boat(g, -Math.PI / 2, { kind: 'ferry', L: 4.6, W: 1.9, hull: '#F3F1EA', stripe: '#2F5E9A', stackCol: { t: '#2F4A7A', l: '#2F5E9A', r: '#244E84' } }); } });
+      draw(g) { K.boat(g, -Math.PI / 2, { kind: 'ferry', L: 4.6, W: 1.9, hull: '#F3F1EA', stripe: '#2F5E9A', stackCol: { t: '#2F4A7A', l: '#2F5E9A', r: '#244E84' } }); NK.nmark(g, 0, { nc: NK.LIT, light: true }, false, C.navy); } });
     // the pebble beach: people sitting looking at the view; photographers on the Manhattan side
     T.cast([-14.5, 12], (g) => { NK.person(g, -14.6, 11, 0, NK.who(2250, { dir: 0, pose: 'sit' })); NK.person(g, -15, 13.2, 0, NK.who(2251, { dir: 0, pose: 'sit', dress: '#D98AA4' })); }, { name: 'beach' });
     T.cast([-14.2, 18], (g) => NK.person(g, -14.2, 18, 0, NK.tourist(2252, { dir: 0, pose: 'hold', phone: true })), { name: 'beach' });
@@ -219,6 +234,9 @@
       const track = []; for (let i = 0; i <= 24; i++) track.push([...at(FR, (Math.PI / 2) * i / 24), 0]); g.line(track, { w: 2.2, c: '#D9B98A', boil: false, ext: 0 });
       g.fill(K.rect(-25, -25, HX + FR + 1, HY - 1.5), '#93C267'); g.fill(K.rect(-25, -25, HX - 1.5, HY + FR + 1), '#93C267');
       g.fill(K.arc(HX, HY, 0, 2.2, 0, TAU, 14), '#D9B98A');
+      // a night game: the field bright under the lights
+      const FLD = { '#93C267': '#7FC65A', '#D9B98A': '#D8AE78', '#FBF8EE': '#FFFFFF', '#A2CC78': '#90D266', '#88B85C': '#6FB04A' };
+      g.mark({ nc: (c) => FLD[c] }, 1); NK.nmark(g, 1, { nc: (c) => FLD[c] }, true);
     });
     // the grandstands along both foul lines: four lower rows, three upper rows, the roof and the white frieze
     const SEAT_COLS = ['#2F4A7A', '#3F5F8F'];
@@ -252,7 +270,7 @@
           }
         }
         // the roof over the upper deck and the white frieze along its front edge
-        const rz = 13.6;
+        const rz = 13.6, iR = g.cmds.length;
         g.fill([P(-29.8, A0, rz), P(-29.8, A1, rz), P(-24.6, A1, rz), P(-24.6, A0, rz)], '#8E949C');
         const fr = [P(-24.6, A0, rz), P(-24.6, A1, rz), P(-24.6, A1, rz - 1.6), P(-24.6, A0, rz - 1.6)];
         g.fill(fr, '#F6F3EA');
@@ -260,6 +278,10 @@
         for (const pts of sc) g.fine2(pts, { w: 0.35, c: '#9AA0A8' });
         g.line([fr[2], fr[3]], { w: 0.6, c: '#6E7A86', boil: false }); g.line([fr[0], fr[1]], { w: 0.6, c: '#6E7A86', boil: false });
         const posts = []; for (let a = A0 + 2; a < A1; a += 6) { const p0 = g.p.apply(g, P(-24.8, a, 9.8)), p1 = g.p.apply(g, P(-24.8, a, rz - 1.6)); posts.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(posts, '#6E7A86', 0.5);
+        // the light banks along the roof's frieze, the frieze lit
+        g.mark({ nc: (c) => (c === '#F6F3EA' ? '#FFFFFF' : undefined) }, iR);
+        for (let a = A0 + 3; a < A1; a += 5.5) { const q = P(-24.4, a, rz + 0.3); g.glow('lantern', q[0], q[1], q[2], { r: 2.2, col: '#F2F7FF' }); }
+        NK.floodMark(g, 0, 0.55, '#F2F7FF');                                               // the crowd in the light
         // the field-level wall in front of the first row
         g.fill([P(-18.5, lo, 0), P(-18.5, A1, 0), P(-18.5, A1, 1.0), P(-18.5, lo, 1.0)], '#2F4A7A');
         g.line([P(-18.5, lo, 1.0), P(-18.5, A1, 1.0)], { w: 0.55, boil: false });
@@ -284,21 +306,22 @@
         const outer = arc(FR + 6, 0, t0, t1).concat(arc(FR + 6, 3.9, t1, t0));
         g.fill(outer, '#D3C6A6'); g.fill(arc(FR + 6, 3.1, t0, t1).concat(arc(FR + 6, 3.9, t1, t0)), '#E6DCC2'); g.line(arc(FR + 6, 3.9, t0, t1), { w: 0.6, boil: false }); g.line(arc(FR + 6, 0, t0, t1), { w: 0.7, boil: false });
         const ar = []; for (let k = 0; k < 4; k++) { const th = lerp(t0, t1, (k + 0.5) / 4); const p0 = g.p(...at(FR + 6.02, th), 0), p1 = g.p(...at(FR + 6.02, th), 2.4); ar.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(ar, '#8E8068', 1.4);
-        if (i === 2 || i === 3) { const th = (t0 + t1) / 2; NK.textP(g, (a, z) => { const p = at(FR + 6.05, th - a / (FR + 6)); return [p[0], p[1], z]; }, 0, 2.3, 1.1, i === 2 ? 'STADIUM' : 'YANKEE', '#B8902A', { center: true, w: 0.5 }); }
+        if (i === 2 || i === 3) { const th = (t0 + t1) / 2; NK.textP(g, (a, z) => { const p = at(FR + 6.05, th - a / (FR + 6)); return [p[0], p[1], z]; }, 0, 2.3, 1.1, i === 2 ? 'STADIUM' : 'YANKEE', '#B8902A', { center: true, w: 0.5, nc: '#F2C24A' }); }
+        NK.floodMark(g, 0, 0.55, '#FFE6B8');                                               // the bleachers and the outer wall lit at night
       }, { name: 'bleachers' });
     }
     // the video board at the end of the first-base stand
-    T.obj([16, -29, 24, -24], (g) => { K.box(g, 17, -27.6, 23, -26.2, 0, 6, '#5A5650', { w: 0.6 }); const q = K.on('L', -26.15, 16, 24, 6, 12); g.fill(q, '#2A2F38'); g.outline(q, { w: 0.6, boil: false }); g.fill(K.on('L', -26.1, 16.6, 23.4, 6.6, 11.4), '#3F6FA8'); NK.text(g, 'L', -26.05, 20, 8.2, 1.4, 'NY', '#F6F3EA', { center: true, w: 0.6 }); }, { name: 'board' });
+    T.obj([16, -29, 24, -24], (g) => { K.box(g, 17, -27.6, 23, -26.2, 0, 6, '#5A5650', { w: 0.6 }); const q = K.on('L', -26.15, 16, 24, 6, 12); g.fill(q, '#2A2F38'); g.outline(q, { w: 0.6, boil: false }); g.fill(K.on('L', -26.1, 16.6, 23.4, 6.6, 11.4), '#3F6FA8'); g.mark({ nc: '#4C88D8' }); NK.text(g, 'L', -26.05, 20, 8.2, 1.4, 'NY', '#F6F3EA', { center: true, w: 0.6, nc: '#FFFFFF' }); g.glow('neon', 20, -25.8, 9, { r: 5, col: '#7FB0FF' }); }, { name: 'board' });
 
     /* ---------------- the game ---------------- */
     const CYC = 4.0;
     const fielders = [[at(12, 0.12), 0.3], [at(11.5, 0.55), -0.4], [at(11.5, 1.02), 0.2], [at(12, 1.45), -0.2], [at(20, 0.32), 0.1], [at(20.5, Math.PI / 4), -0.1], [at(20, 1.25), 0.2]];
-    fielders.forEach(([p, sw], k) => T.cast([p[0], p[1]], (g) => NK.person(g, p[0], p[1], 0, NK.who(2400 + k, Object.assign({}, PIN, { dir: 2, pose: 'crouch', sway: sw }))), { name: 'fielder' }));
-    T.cast([HX - 1.2, HY - 1.0], (g) => { NK.person(g, HX - 2.4, HY - 2.2, 0, NK.who(2410, { top: '#2F2C2A', bot: '#6E6A62', cap: '#2F2C2A', dir: 0, pose: 'crouch', bare: false })); NK.person(g, HX - 1.1, HY - 1.0, 0, NK.who(2411, Object.assign({}, PIN, { dir: 0, pose: 'crouch', glove: '#7A5A3C' }))); }, { name: 'catcher' });
+    fielders.forEach(([p, sw], k) => T.cast([p[0], p[1]], (g) => { NK.person(g, p[0], p[1], 0, NK.who(2400 + k, Object.assign({}, PIN, { dir: 2, pose: 'crouch', sway: sw }))); NK.floodMark(g, 0, 0.8, '#F2F7FF'); }, { name: 'fielder' }));   // lit by the floodlights at night
+    T.cast([HX - 1.2, HY - 1.0], (g) => { NK.person(g, HX - 2.4, HY - 2.2, 0, NK.who(2410, { top: '#2F2C2A', bot: '#6E6A62', cap: '#2F2C2A', dir: 0, pose: 'crouch', bare: false })); NK.person(g, HX - 1.1, HY - 1.0, 0, NK.who(2411, Object.assign({}, PIN, { dir: 0, pose: 'crouch', glove: '#7A5A3C' }))); NK.floodMark(g, 0, 0.8, '#F2F7FF'); }, { name: 'catcher' });
     // the pitcher: set, wind-up, throw
     T.actor({ sample: 5, period: 10,
       at(t) { const u = (t % CYC) / CYC, k = u < 0.35 ? 0 : u < 0.5 ? 1 : u < 0.62 ? 2 : 0; return { x: HX + 4.6, y: HY + 4.6, z: 0.3, key: k, k }; },
-      draw(g, st) { NK.person(g, 0, 0, 0, NK.who(2420, Object.assign({}, PIN, { dir: 2, pose: st.k === 0 ? 'hold' : st.k === 1 ? 'cheer' : 'wave', ph: st.k === 2 ? 0.7 : 0.1, glove: '#7A5A3C' }))); } });
+      draw(g, st) { NK.person(g, 0, 0, 0, NK.who(2420, Object.assign({}, PIN, { dir: 2, pose: st.k === 0 ? 'hold' : st.k === 1 ? 'cheer' : 'wave', ph: st.k === 2 ? 0.7 : 0.1, glove: '#7A5A3C' }))); NK.floodMark(g, 0, 0.8, '#F2F7FF'); } });
     // the batter in grey with a red helmet: waiting, then the swing; every other pitch is hit
     T.actor({ sample: 5, period: 10,
       at(t) { const u = (t % CYC) / CYC, n = Math.floor(t / CYC), k = u < 0.6 ? 0 : u < 0.75 ? 1 : 2, hit = n % 2 === 0; return { x: HX + 1.4, y: HY - 1.2, key: k + (hit ? 'h' : 'm'), k }; },
@@ -306,6 +329,7 @@
         const r = NK.person(g, 0, 0, 0, NK.who(2430, Object.assign({}, GREY, { dir: 1, pose: 'hold', cap: '#C9463E', reach: st.k === 0 ? [-2.6, -15.5] : [3.4, -11.5] })));
         const h = r.hands[0], tip = st.k === 0 ? [h[0] - 3.4, h[1] - 6.2] : st.k === 1 ? [h[0] + 7.4, h[1] - 0.6] : [h[0] + 3.0, h[1] - 6.8];
         g.line2([h, tip], { w: 1.0, c: '#C9A26B', boil: false, ext: 0 });
+        NK.floodMark(g, 0, 0.8, '#F2F7FF');
       } });
     T.actor({ sample: 0.1, period: 2 * CYC, grow: false,
       at(t) {
@@ -315,16 +339,16 @@
         if (!hit) return null;
         const f = Math.min(1, (u - 0.66) / 0.34), C2 = at(23, Math.PI / 4 + 0.15); return { x: lerp(B[0], C2[0], f), y: lerp(B[1], C2[1], f), z: 3 + Math.sin(f * Math.PI) * 14, key: 0 };
       },
-      draw(g) { const c = g.p(0, 0, 0); g.disc2(c, 0.7, '#FBF8EE'); g.ring2(c, 0.7, { w: 0.3, c: '#8C8576' }); } });
+      draw(g) { const c = g.p(0, 0, 0); g.disc2(c, 0.7, '#FBF8EE'); g.mark({ nc: '#FFFFFF' }); g.ring2(c, 0.7, { w: 0.3, c: '#8C8576' }); } });
     // the centre fielder running back for it, fans jumping up in the bleachers
     T.actor({ sample: 0.3, period: 2 * CYC,
       at(t) { const u = (t % CYC) / CYC, n = Math.floor(t / CYC), f = n % 2 === 0 && u > 0.66 ? Math.min(1, (u - 0.66) / 0.3) : 0, p0 = at(20.5, Math.PI / 4 + 0.05), p1 = at(22.6, Math.PI / 4 + 0.15), ph = Math.floor((t * 6) % 8); return { x: lerp(p0[0], p1[0], f), y: lerp(p0[1], p1[1], f), key: f > 0 && f < 1 ? 'r' + ph : 's', run: f > 0 && f < 1, ph: ph / 8 }; },
-      draw(g, st) { NK.person(g, 0, 0, 0, NK.who(2440, Object.assign({}, PIN, { dir: 0, pose: st.run ? 'walk' : 'crouch', ph: st.ph, glove: '#7A5A3C' }))); } });
+      draw(g, st) { NK.person(g, 0, 0, 0, NK.who(2440, Object.assign({}, PIN, { dir: 0, pose: st.run ? 'walk' : 'crouch', ph: st.ph, glove: '#7A5A3C' }))); NK.floodMark(g, 0, 0.8, '#F2F7FF'); } });
     for (let k = 0; k < 5; k++) {
       const th = 0.25 + k * 0.27, p = at(FR + 4.2, th), who = NK.who(2450 + k, { top: k % 2 ? '#F3F1EA' : '#2F3A55', cap: '#2F3A55' });
       T.actor({ sample: 5, period: 10,
         at(t) { const u = (t % (2 * CYC)) / (2 * CYC), up = u > 0.33 && u < 0.5; return { x: p[0], y: p[1], z: 2.1, key: up ? 'c' + (Math.floor(t * 6) % 2) : 's', up, ph: Math.floor(t * 6) % 2 ? 0.2 : 0.6 }; },
-        draw(g, st) { NK.person(g, 0, 0, 0, Object.assign({}, who, { dir: 2, pose: st.up ? 'cheer' : 'stand', ph: st.ph })); } });
+        draw(g, st) { NK.person(g, 0, 0, 0, Object.assign({}, who, { dir: 2, pose: st.up ? 'cheer' : 'stand', ph: st.ph })); NK.floodMark(g, 0, 0.55, '#FFE6B8'); } });
     }
   });
 })();

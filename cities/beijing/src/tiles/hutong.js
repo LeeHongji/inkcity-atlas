@@ -30,22 +30,26 @@ SF.tile('hutong', -100, 0, { rim: 10 }, function (T) {
   const NE = BJ.court(T, { x0: 6, y0: -33.4, x1: 33.4, y1: -6.4, gate: 'S', ga: 29.6, east: 'wing' });
   const SW = BJ.court(T, { x0: -35, y0: 6.4, x1: -6, y1: 33.4, gate: 'E', ga: 11.5, east: 'wall', south: 'wall' });
   // the street plaque on the corner of the north-west house's front wall
-  T.obj([-6.2, -10.6, -5.8, -7.4], (g) => { BJ.sign(g, 'R', -6.0, -10.4, -7.6, 2.4, 3.6, '#2E5E9E', '胡同', { ink: '#FBF8EE' }); }, { on: false, name: 'plaque' });
+  T.obj([-6.2, -10.6, -5.8, -7.4], (g) => { BJ.sign(g, 'R', -6.0, -10.4, -7.6, 2.4, 3.6, '#2E5E9E', '胡同', { ink: '#FBF8EE', lit: false }); g.glow('lamp', -5.4, -9.0, 4.6, { r: 1.0 }); }, { on: false, name: 'plaque' });   // (night: a lamp on the wall over the plaque)
   // the two shops on the corner square
   T.obj([6, 6.4, 19, 13.4], function (g) {
-    BJ.wing(g, 6, 6.4, 19, 13.4, { front: null, h: 5.4, rh: 2.8 });
-    g.fill(K.on('L', 13.43, 7, 18, 0.2, 4.4), '#8E3A2C'); K.win(g, 'L', 13.4, 7.6, 14, 1.2, 4.0, { style: 'glass' });
-    g.fill(K.on('L', 13.45, 15, 17.6, 0.2, 4.0), '#5E3A2A');
+    BJ.wing(g, 6, 6.4, 19, 13.4, { front: null, h: 5.4, rh: 2.8, lanterns: false });
+    g.fill(K.on('L', 13.43, 7, 18, 0.2, 4.4), '#8E3A2C'); BN.shopWin(g, 'L', 13.4, 7.6, 14, 1.2, 4.0, { style: 'glass' });
+    g.fill(K.on('L', 13.45, 15, 17.6, 0.2, 4.0), '#5E3A2A'); g.mark({ nc: '#E9A85A', win: 1, spill: true });   // (night: the tea shop open and lit)
+    g.glow('lamp', 11.5, 13.9, 5.0, { r: 1.1 });
     BJ.sign(g, 'L', 13.42, 9.2, 15.8, 4.5, 5.35, '#3F2A20', '茶', { ink: '#E9C55A' });
     const st = g.p(16.3, 14.6, 0); for (let k = 0; k < 3; k++) { const c = [st[0] + k * 2.6 - 2, st[1] - k * 0.5]; g.fill2(arcPts(c[0], c[1] - 2, 1.4, 0, TAU, 8).map((q) => [q[0], c[1] - 2 + (q[1] - c[1] + 2) * 0.6]), '#5E8A6A', true); }
   }, { name: 'tea shop' });
   T.obj([20, 6.4, 33.4, 13.4], function (g) {
-    BJ.wing(g, 20, 6.4, 33.4, 13.4, { front: null, h: 5.4, rh: 2.8 });
-    g.fill(K.on('L', 13.43, 21, 32.4, 0.2, 4.4), '#9C4A32'); K.win(g, 'L', 13.4, 21.6, 28, 1.2, 4.0, { style: 'glass' });
-    g.fill(K.on('L', 13.45, 29, 31.8, 0.2, 4.0), '#5E3A2A');
+    BJ.wing(g, 20, 6.4, 33.4, 13.4, { front: null, h: 5.4, rh: 2.8, lanterns: false });
+    g.fill(K.on('L', 13.43, 21, 32.4, 0.2, 4.4), '#9C4A32'); BN.shopWin(g, 'L', 13.4, 21.6, 28, 1.2, 4.0, { style: 'glass' });
+    g.fill(K.on('L', 13.45, 29, 31.8, 0.2, 4.0), '#5E3A2A'); g.mark({ nc: '#F0B060', win: 1, spill: true });   // (night: the noodle shop open late)
     BJ.sign(g, 'L', 13.42, 23, 30.4, 4.5, 5.35, '#C9382E', '面');
     // steam from the pot by the door
     const c = g.p(28.5, 14.4, 2.2); g.fill2([[c[0] - 1.6, c[1]], [c[0] + 1.6, c[1]], [c[0] + 1.4, c[1] - 2], [c[0] - 1.4, c[1] - 2]], '#9AA0A8', true);
+    g.glow('lamp', 24.5, 13.9, 5.0, { r: 1.1 });               // at night a lamp on the wall over the door
+    // and two red lanterns either side of the door, hung out for the evening
+    for (const x of [28.6, 32.2]) BN.lantern2(g, g.p(x, 14.3, 4.2), 1.4, g.p(x, 14.6, 0));
   }, { name: 'noodle shop' });
   T.obj([33.4, 6.4, 34.4, 33.6], (g) => BJ.greyWall(g, 33.6, 6.4, 34.4, 33.6, 3.4), { name: 'wall' });
 

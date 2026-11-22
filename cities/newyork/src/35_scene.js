@@ -29,4 +29,13 @@ const SCENE = {
   visit: ['fidi', 'chinatown', 'village', 'chelsea', 'empire', 'flatiron', 'grand', 'times', 'park'],
   dive: { times: 'steps' },
   bounds: { z: [0.6, 10], cx: [0, 1920], cy: [-60, 1160] },
+  // at night (a late-spring evening): seven windows in ten lit; Times Square's shop floors and the theatre doors, Macy's
+  // display windows and the Chelsea gallery always lit; the lights reflect in the harbour, the East River and the Lake;
+  // the first fireflies of mid-June over the lawns (Central Park's own greens and the planted beds listed with the engine's)
+  night: {
+    lit: 0.7,
+    windows: { '#E9D3A6': 1, '#F0DDAF': 1, '#EDE6D6': 1, '#F4F3EE': 1 },
+    water: [C.water, C.waterD, C.waterL, '#9CC3D9'],
+    grass: [C.grass, C.grassM, C.grassL, '#ADCB85', '#BFD99A', '#9FBF7E', '#A9C47E', '#C2D69F'],
+  },
 };

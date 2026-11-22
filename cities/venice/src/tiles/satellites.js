@@ -11,6 +11,9 @@
   const WL = VN.WL;
   const water = (g, pts, seed) => { const P = g.P(pts.map((p) => [p[0], p[1], WL])); K.blob2(g, P, VN.lagoon, { seed, rag: 1.0 }); g.water(pts.map((p) => [p[0] * 0.8, p[1] * 0.8, WL]), { dens: 0.5 }); };
   const land = (g, pts, col) => { const P = pts.map((p) => [p[0], p[1], 0]); g.fill(pts.map((p) => [p[0], p[1], WL]), '#B59479'); g.fill(P, col); g.outline(P, { w: 0.8, boil: false }); };
+  // the water off an island's near shores, where lights reflect at night: a clear fill (nothing shows by day), drawn
+  // last in the ground so nothing before it moves
+  const shore = (g, pts) => { for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length], nx = b[1] - a[1], ny = a[0] - b[0], l = Math.hypot(nx, ny); if (nx + ny <= 0) continue; const ox = nx / l * 5, oy = ny / l * 5; g.fill([[a[0], a[1], WL], [b[0], b[1], WL], [b[0] + ox, b[1] + oy, WL], [a[0] + ox, a[1] + oy, WL]], VN.WMASK); } };
   const H = (T, d) => T.obj([d.x0, d.y0, d.x1, d.y1], (g) => VN.house(g, d), { name: 'house' });
 
   /* ---------------- Murano ---------------- */
@@ -19,6 +22,7 @@
       water(g, [[-36, -10], [-26, -32], [0, -38], [26, -30], [36, -6], [32, 22], [8, 34], [-22, 30], [-36, 12]], 31);
       land(g, [[-24, -18], [-12, -26], [14, -24], [24, -10], [22, 14], [6, 22], [-16, 20], [-26, 6]], VN.paveC);
       VN.pave(g, -18, -18, 18, 14, { col: '#D2CDC2', scuff: false });
+      shore(g, [[-24, -18], [-12, -26], [14, -24], [24, -10], [22, 14], [6, 22], [-16, 20], [-26, 6]]);
     });
     // the furnace: a brick hall with two tall chimneys, the open mouth glowing
     T.obj([-16, -18, 4, -6], function (g) {
@@ -26,9 +30,9 @@
       K.box(g, -16, -18, 4, -6, 0, 8, { t: '#B9715A', l: '#C47A5E', r: '#A9634B' }, { w: 0.85 });
       K.gable(g, -16.4, -18.4, 4.4, -5.6, 8, 3, 'x', { a: VN.roof, b: shade(VN.roof, 0.12), e: '#C47A5E' }, { c: '#7A3A28' });
       for (const x of [-12, -2]) { K.box(g, x - 0.9, -14.9, x + 0.9, -13.1, 9, 20, { t: '#A9634B', l: '#B9715A', r: '#9A5640' }, { w: 0.6 }); }
-      g.fill(VN.archPts('L', -5.98, -10, -4, 0, 4.6, 'round', 0), '#4A2A1E'); g.fill(VN.archPts('L', -5.97, -8.6, -5.4, 0.6, 3.2, 'round', 0), '#F2A03C'); g.fill(VN.archPts('L', -5.96, -7.8, -6.2, 1.0, 2.4, 'round', 0), '#F8E07A');
-      K.sign(g, 'L', -5.97, -14.6, -10.6, 5.2, 6.4, '#2F3A55', 'VETRERIA', { ink: '#E9D9A0' });
-      K.sign(g, 'R', 4.02, -16, -8, 5.2, 6.4, '#2F3A55', 'MURANO', { ink: '#E9D9A0' });
+      g.fill(VN.archPts('L', -5.98, -10, -4, 0, 4.6, 'round', 0), '#4A2A1E'); g.mark({ nc: '#8A3A1A' }); g.fill(VN.archPts('L', -5.97, -8.6, -5.4, 0.6, 3.2, 'round', 0), '#F2A03C'); g.mark({ nc: true }); g.fill(VN.archPts('L', -5.96, -7.8, -6.2, 1.0, 2.4, 'round', 0), '#F8E07A'); g.mark({ nc: true });
+      g.glow('lantern', -7, -5.4, 2.0, { r: 2.8, col: '#FF9A3C' });                                     // the furnace mouth burns in the dark
+      { const i0 = g.cmds.length; K.sign(g, 'L', -5.97, -14.6, -10.6, 5.2, 6.4, '#2F3A55', 'VETRERIA', { ink: '#E9D9A0' }); K.sign(g, 'R', 4.02, -16, -8, 5.2, 6.4, '#2F3A55', 'MURANO', { ink: '#E9D9A0' }); g.mark({ nc: '#3F4E78' }, i0); }
     }, { name: 'fornace' });
     // smoke from the chimneys
     T.actor({ sample: 5, period: 3, grow: false, layer: 'top',
@@ -40,7 +44,7 @@
       draw(g, st) {
         const r = VN.person(g, 0, 0, 0, VN.who(2000, { dir: 3, pose: 'hold', top: '#F3F1EA', bot: '#5A4A3C', colombina: null, scarf: null, beanie: null }));
         const h = r.hands[0], end = [h[0] - 5.4, h[1] - 1.6 + [0, -0.4, 0, 0.4][st.f]];
-        g.line2([h, end], { w: 0.45, c: '#5E5A52', boil: false, ext: 0 }); g.disc2(end, 1.2, '#F2A03C'); g.disc2(end, 0.6, '#F8E07A');
+        g.line2([h, end], { w: 0.45, c: '#5E5A52', boil: false, ext: 0 }); g.disc2(end, 1.2, '#F2A03C'); g.mark({ nc: true, light: true }); g.disc2(end, 0.6, '#F8E07A'); g.mark({ nc: true });   // the gather glows
       } });
     H(T, { x0: 6, y0: -22, x1: 18, y1: -12, n: 3, col: VN.PLASTER[1], chim: [[12, -18]], shopR: [-20, -14, '#2F3A55', 'VETRI'] });
     H(T, { x0: -22, y0: 2, x1: -12, y1: 16, n: 2, col: VN.PLASTER[0], chim: [[-17, 8]], shopR: [4, 12, '#7A2E35', 'GIOIELLI'] });
@@ -49,8 +53,9 @@
       K.cyl(g, 18, 8, 1.8, 0, 1.0, { t: '#E2DCCF', l: '#ECE7DC', r: '#D6CFC1' }, { w: 0.5, n: 10 });
       K.cyl(g, 18, 8, 1.3, 1.0, 14, { t: '#F3F1EA', l: '#F6F4EE', r: '#DDD8CC' }, { w: 0.8, n: 10 });
       K.cyl(g, 18, 8, 1.6, 14, 14.6, { t: '#5E6660', l: '#6E7670', r: '#5E6660' }, { w: 0.5, n: 10 });
-      K.cyl(g, 18, 8, 1.0, 14.6, 16.4, { t: '#F2E3A6', l: '#F6EBC0', r: '#E2D59A' }, { w: 0.5, n: 10 });
+      { const i0 = g.cmds.length; K.cyl(g, 18, 8, 1.0, 14.6, 16.4, { t: '#F2E3A6', l: '#F6EBC0', r: '#E2D59A' }, { w: 0.5, n: 10 }); g.mark({ nc: (c) => (c === '#F6EBC0' ? '#FFF2C4' : c === '#E2D59A' ? '#F6DE8E' : undefined) }, i0); }
       K.cone(g, 18, 8, 1.2, 16.4, 1.6, '#5E6660', {});
+      g.glow('lantern', 18, 8, 15.5, { r: 2.0, col: '#FFF0C0' });                                       // the lantern room lit at night
     }, { name: 'faro' });
     VN.walker(T, VN.who(2010), [[-14, 0], [12, 0], [12, -4], [-14, -4]], 1.1, { phase: 0 });
     VN.walker(T, VN.carnival(2011, 'gown'), [[10, 10], [-10, 10], [-10, -2]], 0.9, { phase: 0.4 });
@@ -68,10 +73,11 @@
       g.fill(K.rect(-28, -3, 26, 3, WL), VN.water); g.water(K.rect(-28, -3, 26, 3, WL), { dens: 0.8 });
       g.fill(K.on('L', -3, -26, 24, WL, 0), '#C9A88E'); g.fill(K.on('L', -3, -26, 24, -0.4, 0), VN.istria);
       g.fill(K.rect(-26, 3, 24, 4, 0), VN.paveC);
+      shore(g, [[-26, -22], [-6, -28], [20, -22], [26, -2], [20, 18], [-2, 24], [-22, 18], [-28, 0]]);
     });
     const BC = ['#E8483C', '#F2C230', '#3D7FC4', '#3FA06A', '#E87FAE', '#8E5BC0', '#F08A2E', '#2FB0B0', '#E6D84A', '#C2384A'];
     // a row of houses along each side of the canal, every one a different colour
-    for (let i = 0; i < 6; i++) { const x0 = -22 + i * 7; H(T, { x0, y0: -14, x1: x0 + 6, y1: -4.6, n: 2, col: BC[i], roof: 'x', chim: [[x0 + 3, -9]], shut: true, shutCol: '#F3F1EA', closedP: 0.1, doorL: [x0 + 2, x0 + 3.6, '#F3F1EA'] }); }
+    for (let i = 0; i < 6; i++) { const x0 = -22 + i * 7; H(T, { x0, y0: -14, x1: x0 + 6, y1: -4.6, n: 2, dry: true, col: BC[i], roof: 'x', chim: [[x0 + 3, -9]], shut: true, shutCol: '#F3F1EA', closedP: 0.1, doorL: [x0 + 2, x0 + 3.6, '#F3F1EA'] }); }
     for (let i = 0; i < 5; i++) { const x0 = -20 + i * 7.2; H(T, { x0, y0: 5, x1: x0 + 6.2, y1: 13, n: 2, col: BC[(i + 6) % 10], roof: 'x', chim: [[x0 + 3, 9]], shutCol: '#F3F1EA', closedP: 0.1, doorL: [x0 + 2.2, x0 + 3.8, '#3A3530'] }); }
     // the leaning campanile
     T.obj([12, -22, 16, -18], function (g) {
@@ -101,6 +107,7 @@
       VN.pave(g, -22, -6, 6, 20, { col: '#DDD8CE', scuff: false });
       // the little harbour
       g.fill(K.rect(10, 4, 22, 18, WL), VN.lagoon); g.fill(K.on('L', 4, 10, 22, WL, 0), '#C9A88E'); g.fill(K.on('R', 10, 4, 18, WL, 0), '#B59479');
+      shore(g, [[-26, -24], [-4, -30], [20, -22], [26, 0], [20, 22], [-6, 26], [-26, 16], [-30, -4]]); g.fill(K.rect(10.5, 4.5, 21.5, 17.5, WL), VN.WMASK);   // and the little harbour
     });
     const W = { t: '#ECE8DF', l: '#F4F1EA', r: '#E0DBD0' };
     T.obj([-24, -26, 2, -6], function (g) {
@@ -116,6 +123,9 @@
       const cl = []; for (const a of [-21.2, -18.6, -15.4, -12.8]) { const A = g.p(F + 0.03, a, 1.6), B = g.p(F + 0.03, a, 13.4); cl.push(A[0], A[1], B[0], B[1]); } g.segs2(cl, '#D9D3C6', 1.4);
       VN.door(g, 'R', F, -18, -16, 5.6, { arch: 'round', col: '#4A3A30' });
       g.ring2(g.p(F + 0.03, -17, 15.4), 0.9, { w: 0.35, c: '#8E877A' });
+      // at night Palladio's front is floodlit, white across the Bacino from San Marco, and shines in the water
+      g.mark({ nc: (c) => (c === '#AAB3B6' || c === '#919CA0' ? VN.litStone(0.5)(mix(c, '#E9E4D9', 0.3)) : VN.litStone(1)(c)) }, 0);
+      for (const [a, z, r] of [[-17, 3.5, 3.0], [-21, 9, 2.4], [-13, 9, 2.4], [-17, 15.5, 2.4], [-11, 20, 2.2]]) g.glow('lantern', F + 1.2, a, z, { r, col: '#FFD9A6' });
     }, { name: 'san giorgio' });
     T.obj([-26, -30, -20, -24], function (g) {
       K.box(g, -26, -30, -20, -24, 0, 22, { t: '#B9715A', l: '#C47A5E', r: '#A9634B' }, { w: 0.85 });
@@ -124,6 +134,8 @@
       K.cyl(g, -23, -27, 2.2, 26, 27.4, W, { w: 0.55, n: 10 });
       K.cone(g, -23, -27, 2.3, 27.4, 7, '#6F9A86', {});
       const an = g.p(-23, -27, 34.4); g.disc2([an[0], an[1] - 1], 0.6, C.gold);
+      g.mark({ nc: (c) => (c === '#C47A5E' ? '#D88A62' : c === '#A9634B' ? '#B26A4C' : c === '#4A3E34' ? '#C9894A' : c === C.gold ? '#F6CC58' : VN.litStone(0.9)(c)) }, 0);   // floodlit at night
+      for (const z of [8, 18, 24]) g.glow('lantern', -19.4, -23.4, z, { r: 2.2, col: '#FFD39A' });
     }, { name: 'campanile', tall: true });
     // the monastery behind: two cloister wings, cypresses, a moored boat and a waiting sandolo in the harbour
     T.obj([2, -28, 22, -18], (g) => VN.house(g, { x0: 2, y0: -28, x1: 22, y1: -18, n: 2, col: '#EDE6D8', shut: false, arch2: 'round', roof: 'x', chim: [[8, -23], [16, -23]], winL: 7, seed: 9 }), { name: 'monastery' });

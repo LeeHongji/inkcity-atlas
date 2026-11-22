@@ -23,7 +23,7 @@ SF.tile('chaotianmen', 100, 100, { rim: 38 }, function (T) {
   /* ---- the Raffles sails on their mall podium ---- */
   T.obj([-26, -16, -6, 30], (g) => {
     K.box(g, -26, -16, -6, 30, 0, 6, { t: '#C9D3C9', l: '#DCD8CC', r: '#C4C0B4' }, { w: 0.8 });
-    g.fill(K.on('R', -5.97, -14, 28, 0.3, 4.4), '#56606A'); for (let y = -12; y < 28; y += 3) g.fine([[-5.95, y, 0.3], [-5.95, y, 4.4]], { w: 0.3, c: '#9A958A' });
+    g.fill(K.on('R', -5.97, -14, 28, 0.3, 4.4), '#56606A'); g.mark({ nc: '#F7D08A', spill: true }); for (let y = -12; y < 28; y += 3) g.fine([[-5.95, y, 0.3], [-5.95, y, 4.4]], { w: 0.3, c: '#9A958A' });
     CQH.sign(g, 'R', -5.9, -2, 10, 4.5, 5.8, '#2F4A6B', '朝天门');
     g.grass2(g.P(K.rect(-25, -15, -7, 29, 6)), { dens: 0.4 });
   }, { name: 'mall' });
@@ -34,7 +34,8 @@ SF.tile('chaotianmen', 100, 100, { rim: 38 }, function (T) {
       const z0 = 6 + (h - 6) * i / n, z1 = 6 + (h - 6) * (i + 1) / n, d = lean * i * i / 3;
       K.box(g, cx - hw + d, cy - hw + d, cx + hw + d, cy + hw + d, z0, z1, GL, { w: 0.75, nb: i > 0 });
       const ln = []; for (let z = z0 + 1.1; z < z1; z += 1.1) { for (const [a, b] of [[g.p(cx - hw + d, cy + hw + d, z), g.p(cx + hw + d, cy + hw + d, z)], [g.p(cx + hw + d, cy + hw + d, z), g.p(cx + hw + d, cy - hw + d, z)]]) ln.push(a[0], a[1], b[0], b[1]); } g.segs2(ln, '#7F96A2', 0.3);
-      g.fill(K.on('L', cy + hw + d + 0.03, cx - 0.5 + d, cx + 0.5 + d, z0, z1), '#E9F0F2'); g.fill(K.on('R', cx + hw + d + 0.03, cy - 0.5 + d, cy + 0.5 + d, z0, z1), '#C9D8DE');
+      g.cmds[g.cmds.length - 1].nc = '#86B9DA';                                  // at night its floors are lines of white light
+      g.fill(K.on('L', cy + hw + d + 0.03, cx - 0.5 + d, cx + 0.5 + d, z0, z1), '#E9F0F2'); g.mark({ nc: '#A6D2EE' }); g.fill(K.on('R', cx + hw + d + 0.03, cy - 0.5 + d, cy + 0.5 + d, z0, z1), '#C9D8DE'); g.mark({ nc: '#7FB0D2' });
     }
   };
   T.obj([-22, -8, -10, 30], (g) => {
@@ -42,7 +43,10 @@ SF.tile('chaotianmen', 100, 100, { rim: 38 }, function (T) {
     for (const cy of [-4, 5.5, 15, 24.5]) sail(g, -16, cy, 30, 1.6);
     // the Crystal: a horizontal glass conservatory along the four tops
     const x0 = -20, x1 = -11, y0 = -9, y1 = 30, z0 = 30.5, z1 = 34;
-    K.box(g, x0, y0, x1, y1, z0, z1, { t: '#E4EEF0', l: '#C6DCE3', r: '#AFC6D0' }, { w: 0.85 });
+    const iC = g.cmds.length; K.box(g, x0, y0, x1, y1, z0, z1, { t: '#E4EEF0', l: '#C6DCE3', r: '#AFC6D0' }, { w: 0.85 });
+    CQ.nmark(g, iC, '#C6DCE3', { nc: '#F0D29C' }); CQ.nmark(g, iC, '#AFC6D0', { nc: '#C29C68' }); CQ.nmark(g, iC, '#E4EEF0', { nc: '#8A9EB4' });   // the Crystal glows at night
+    for (const y of [-4, 8, 20]) g.glow('lantern', x1 + 0.3, y, (z0 + z1) / 2, { r: 3.4, col: '#FFEBC4' });
+    for (const cy of [-4, 5.5, 15, 24.5]) for (const z of [12, 22]) g.glow('lantern', -16 + 3 + 0.3, cy, z, { r: 2.2, col: '#BFE6FF' });
     const r = []; for (let y = y0 + 1.5; y < y1; y += 1.5) { const a = g.p(x1, y, z0), b = g.p(x1, y, z1); r.push(a[0], a[1], b[0], b[1]); } for (let x = x0 + 1.5; x < x1; x += 1.5) { const a = g.p(x, y1, z0), b = g.p(x, y1, z1); r.push(a[0], a[1], b[0], b[1]); } g.segs2(r, '#7F98A4', 0.3);
   }, { name: 'raffles' });
   T.obj([-24, -32, -10, -20], (g) => { CQ.block(g, { x0: -24, y0: -32, x1: -10, y1: -20, h: 9, col: '#D9D3C4', seed: 3, shop: ['重庆', '#2F4A6B'] }); }, { name: 'shop block' });
@@ -57,6 +61,10 @@ SF.tile('chaotianmen', 100, 100, { rim: 38 }, function (T) {
     // the name carved into the river wall, red infill
     CQH.text(g, 'R', P1 + 0.02, (P0 + P1) / 2 + 4, -1.6, 5.2, '朝天门', '#9E2A22', { center: true, w: 1.3 });
     CQ.rail(g, 'L', P1 - 0.4, P0, P1, PZ, { h: 1.4 }); CQ.rail(g, 'R', P1 - 0.4, P0, P1, PZ, { h: 1.4 });
+    // at night: lamps along the tip's railing, their light on the meeting of the waters below
+    CQ.railLamps(g, [P0 + 1, P1 - 0.4, PZ + 1.5], [P1 - 0.4, P1 - 0.4, PZ + 1.5], 6, { kind: 'lantern', col: '#FFC97A', base: WL, ends: false });
+    CQ.railLamps(g, [P1 - 0.4, P0 + 1, PZ + 1.5], [P1 - 0.4, P1 - 0.4, PZ + 1.5], 6, { kind: 'lantern', col: '#FFC97A', base: WL });
+    for (const [x, y] of [[P0 + 8, P0 + 8], [P1 - 8, P0 + 8], [P0 + 8, P1 - 8]]) g.glow('lamp', x, y, PZ + 1.6, { r: 0.8, base: PZ });
     // the flagpole on the square
     const b = g.p(42, 42, PZ), t = g.p(42, 42, PZ + 16); g.segs2([b[0], b[1], t[0], t[1]], '#8C8576', 0.6);
   }, { under: PZ, name: 'tip square' });
@@ -78,6 +86,7 @@ SF.tile('chaotianmen', 100, 100, { rim: 38 }, function (T) {
     CQ.rail(g, 'L', 77.6, 30, 62, WL + 0.8, { h: 1.2 });
     K.box(g, 52, 71, 60, 77, WL + 0.8, WL + 4.4, { t: '#E9E6DE', l: '#F3F1EA', r: '#D9D6CC' }, { w: 0.6 });
     CQH.sign(g, 'L', 77.05, 52.5, 59.5, WL + 2.4, WL + 3.8, '#C8392E', '长江');
+    CQ.railLamps(g, [31, 77.6, WL + 2.2], [51, 77.6, WL + 2.2], 5, { kind: 'lantern', col: '#FFC97A', base: WL });   // the pontoon's lamps (night)
   }, { name: 'pontoon' });
   T.obj([18, 79, 66, 86], (g) => g.at(42, 82.5, WL, (g2) => CQ.boat(g2, 0, { kind: 'cruise', L: 22, W: 3.4 })), { name: 'moored cruise' });
 

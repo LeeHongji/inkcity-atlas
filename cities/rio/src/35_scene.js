@@ -26,4 +26,13 @@ const SCENE = {
   visit: ['corcovado', 'centro', 'paodeacucar', 'santamarta', 'lapa', 'copacabana', 'sambodromo', 'lagoa', 'ipanema'],
   dive: { copacabana: 'praia', sambodromo: 'desfile' },
   bounds: { z: [0.5, 10], cx: [0, 2100], cy: [-120, 1200] },
+  // at night (a Carnival night in February): the open sea, Guanabara Bay and the water round Ilha Fiscal (clear fills,
+  // RP.WMASK: the sea's own fill runs on under the sand), the Lagoa, Parque Lage's pond, the Museum of Tomorrow's pools
+  // and the MAC's pool hold the lights' reflections; fireflies over the lawns and Tijuca's forest floor; two windows in
+  // three lit
+  night: {
+    water: ['rgba(127,192,201,0)', '#7FB2BF', '#7FB6A8', '#8CC6D2', '#86BBC4'],
+    grass: ['#B5CF8E', '#95B16B', '#C6DBA0', '#8FAF72'],
+    lit: 0.66,
+  },
 };

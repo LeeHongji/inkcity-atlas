@@ -11,6 +11,7 @@
    pavement, workers in hi-vis vests at the site. What moves: two tower cranes slew, trolley and hoist stone blocks from
    the yard onto the Glory towers (a 36 s cycle each, phase-shifted), the hooks swinging their loads up. */
 SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
+  const NL = { warm: '#FFE2B8', white: '#FFF6EA' };     // at night: the façades' warm floodlight, the new towers' whiter light
   const PAS = { t: '#E6DECF', l: '#DCD3C2', r: '#C6BCA8' }, NAT = { t: '#D6C6A6', l: '#C9B794', r: '#B09E7C' }, NEW = { t: '#F1EEE7', l: '#EDE9E0', r: '#D7D2C7' };
   /* a spindle bell tower: a round shaft tapering like a parabola, slits spiralling up, a mosaic mitre on top */
   const spindle = (g, x, y, z0, h, r0, col, seed) => {
@@ -23,9 +24,11 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
     g.line2(L, { w: 0.7 }); g.line2(Rr, { w: 0.7 });
     // the finial: a mitre of coloured mosaic with white balls
     const top = g.p(x, y, z0 + h), m = R.pick(['#D8AE48', '#C9392E', '#E9E2D2', '#6FA36B']);
+    const im = g.cmds.length;
     g.fill2([[top[0] - 1.8, top[1] + 0.5], [top[0] + 1.8, top[1] + 0.5], [top[0] + 1.1, top[1] - 5.5], [top[0], top[1] - 7.5], [top[0] - 1.1, top[1] - 5.5]], m, true);
     g.fill2([[top[0], top[1] + 0.5], [top[0] + 1.8, top[1] + 0.5], [top[0] + 1.1, top[1] - 5.5], [top[0], top[1] - 7.5]], shade(m, 0.14), true);
     for (const [dx, dy] of [[-1.5, -1], [1.5, -1], [-0.9, -4.5], [0.9, -4.5], [0, -8.2]]) g.disc2([top[0] + dx, top[1] + dy], 0.55, '#F6F3EA');
+    g.mark({ nc: true }, im); g.glow2('lantern', [top[0], top[1] - 3.5], top, { r: 1.0, col: '#FFE6BE' });   // at night the mosaic finial is lit
     g.line2([[top[0] - 1.8, top[1] + 0.5], [top[0], top[1] - 7.5], [top[0] + 1.8, top[1] + 0.5]], { w: 0.45, c: shade(m, 0.5), boil: false });
   };
   /* a tall stepped tower (Jesus, Mary, the evangelists): square in plan, tapering in rings, ribbed */
@@ -53,6 +56,7 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
     g.boilP = 0.2;
     K.box(g, -7, -22, 7, -9, 0, 17, NAT, { w: 0.9 });
     for (const [x, h] of [[-9.6, 37], [-5.1, 40.5], [5.1, 40.5], [9.6, 37]]) { K.cyl(g, x, -21.5, 2.2, 0, 14, NAT, { w: 0.7, n: 10 }); spindle(g, x, -21.5, 14, h - 14, 2.1, NAT, Math.round(x * 7 + 50)); }
+    BC.flood(g, 0, 0.72, NL.warm);                                    // at night the Nativity towers floodlit warm
   }, { name: 'nativity' });
   /* ---- the apse and Mary's tower with its star ---- */
   T.obj([-31, -12, -21, 12], function (g) {
@@ -60,7 +64,12 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
     const ap = []; for (let i = 0; i <= 12; i++) { const a = Math.PI / 2 + Math.PI * i / 12; ap.push([-22 + Math.cos(a) * 9, Math.sin(a) * 9]); }
     BC.prism(g, ap, 0, 15, NAT, { w: 0.85 });
     for (let i = 1; i < 12; i += 2) { const a = Math.PI / 2 + Math.PI * i / 12, c = g.p(-22 + Math.cos(a) * 9, Math.sin(a) * 9, 15); g.fill2([[c[0] - 1.2, c[1]], [c[0] + 1.2, c[1]], [c[0], c[1] - 9]], '#C9B794', true); g.line2([[c[0] - 1.2, c[1]], [c[0], c[1] - 9], [c[0] + 1.2, c[1]]], { w: 0.4, boil: false }); }
-    steeple(g, -15.6, 1, 15, 31, 3.6, NEW, (gg, c) => { for (let k = 0; k < 6; k++) { const a = TAU * k / 6 - Math.PI / 2; gg.fill2([[c[0], c[1] - 3], [c[0] + Math.cos(a) * 3.8, c[1] - 3 + Math.sin(a) * 3.8], [c[0] + Math.cos(a + 0.5) * 1.2, c[1] - 3 + Math.sin(a + 0.5) * 1.2]], '#EEF2F4', true); } gg.disc2([c[0], c[1] - 3], 1.3, '#D8E6EE'); gg.ring2([c[0], c[1] - 3], 3.9, { w: 0.3, c: '#9AB0BE' }); });
+    const iM = g.cmds.length;
+    steeple(g, -15.6, 1, 15, 31, 3.6, NEW, (gg, c) => { const is = gg.cmds.length; for (let k = 0; k < 6; k++) { const a = TAU * k / 6 - Math.PI / 2; gg.fill2([[c[0], c[1] - 3], [c[0] + Math.cos(a) * 3.8, c[1] - 3 + Math.sin(a) * 3.8], [c[0] + Math.cos(a + 0.5) * 1.2, c[1] - 3 + Math.sin(a + 0.5) * 1.2]], '#EEF2F4', true); } gg.disc2([c[0], c[1] - 3], 1.3, '#D8E6EE'); gg.ring2([c[0], c[1] - 3], 3.9, { w: 0.3, c: '#9AB0BE' });
+      // the twelve-pointed star of glass, lit from within every night since December 2021
+      gg.mark({ nc: (cc) => (cc === '#D8E6EE' ? '#FFFFFF' : '#F4FAFF') }, is); BC.litLines(gg, is, '#DCEBFF'); gg.glow2('lantern', [c[0], c[1] - 3], [c[0], c[1] - 3], { r: 3.2, col: '#F2F8FF' }); });
+    BC.flood(g, 0, 0.72, NL.warm, { to: iM }); BC.flood(g, iM, 0.9, NL.white);         // the apse warm, Mary's tower white
+    for (const z of [22, 32, 40]) g.glow('lantern', -15.6, 1, z, { r: z < 30 ? 2.6 : 1.8, col: '#FFF4E2' });
   }, { name: 'apse' });
   /* ---- the nave, west of the crossing ---- */
   T.obj([-22, -10, -7, 10], function (g) {
@@ -68,25 +77,33 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
     K.box(g, -22, -13, -7, 13, 0, 11, NAT, { w: 0.85 });
     K.box(g, -22, -9, -7, 9, 11, 17, NAT, { w: 0.85, nohid: true });
     K.gable(g, -22, -9, -7, 9, 17, 6, 'x', { a: '#C9B794', b: '#B09E7C', e: '#C9B794' }, { c: '#6E5E44' });
-    for (let x = -20; x < -8; x += 3) { K.win(g, 'L', 13, x, x + 1.4, 3, 9, { style: 'navy', arch: true }); K.win(g, 'L', 9, x, x + 1.4, 12, 16, { style: 'navy', arch: true }); }
+    for (let x = -20; x < -8; x += 3) { K.win(g, 'L', 13, x, x + 1.4, 3, 9, { style: 'navy', arch: true, lit: 0 }); K.win(g, 'L', 9, x, x + 1.4, 12, 16, { style: 'navy', arch: true, lit: 0 }); }
+    BC.flood(g, 0, 0.6, NL.warm);
   }, { name: 'nave west' });
   /* ---- the crossing: the Jesus tower and the four evangelists ---- */
   T.obj([-7, -9, 7, 9], function (g) {
     g.boilP = 0.18;
     K.box(g, -7, -9, 7, 9, 0, 22, PAS, { w: 0.9 });
-    for (const [f, p, a0, a1] of [['L', 9, -7, 7], ['R', 7, -9, 9]]) { for (let a = a0 + 1.2; a < a1 - 0.8; a += 2.4) K.win(g, f, p, a, a + 1.0, 12, 20, { style: 'navy', arch: true }); const rb = []; for (let a = a0 + 2.4; a < a1; a += 2.4) { const q0 = g.p.apply(g, K.pt(f, p + 0.03, a, 0)), q1 = g.p.apply(g, K.pt(f, p + 0.03, a, 22)); rb.push(q0[0], q0[1], q1[0], q1[1]); } g.segs2(rb, '#CFC9BC', 0.4); }
+    for (const [f, p, a0, a1] of [['L', 9, -7, 7], ['R', 7, -9, 9]]) { for (let a = a0 + 1.2; a < a1 - 0.8; a += 2.4) K.win(g, f, p, a, a + 1.0, 12, 20, { style: 'navy', arch: true, lit: 0 }); const rb = []; for (let a = a0 + 2.4; a < a1; a += 2.4) { const q0 = g.p.apply(g, K.pt(f, p + 0.03, a, 0)), q1 = g.p.apply(g, K.pt(f, p + 0.03, a, 22)); rb.push(q0[0], q0[1], q1[0], q1[1]); } g.segs2(rb, '#CFC9BC', 0.4); }
     K.box(g, -6, -6, 6, 6, 22, 28, NEW, { w: 0.8, nohid: true });
     const evs = [[-4.6, -4.6, '#F6F3EA'], [4.6, -4.6, '#D8AE48'], [-4.6, 4.6, '#C9584B'], [4.6, 4.6, '#6FA36B']];
-    const cap = (col) => (gg, c) => { gg.disc2([c[0], c[1] - 1.6], 1.6, col); gg.ring2([c[0], c[1] - 1.6], 1.6, { w: 0.35, c: shade(col, 0.5) }); gg.disc2([c[0] - 0.6, c[1] - 2.2], 0.5, '#FBFAF4'); };
+    // the evangelists' crowns (their symbols) are lit every night: they keep their colours and shine
+    const cap = (col) => (gg, c) => { const ic = gg.cmds.length; gg.disc2([c[0], c[1] - 1.6], 1.6, col); gg.ring2([c[0], c[1] - 1.6], 1.6, { w: 0.35, c: shade(col, 0.5) }); gg.disc2([c[0] - 0.6, c[1] - 2.2], 0.5, '#FBFAF4'); gg.mark({ nc: (cc) => mix(cc, '#FFFFFF', 0.15) }, ic); gg.glow2('lantern', [c[0], c[1] - 1.6], [c[0], c[1] - 1.6], { r: 1.6, col: '#FFF2DA' }); };
     for (const [x, y, col] of evs.slice(0, 2)) steeple(g, x, y, 28, 23, 2.0, NEW, cap(col));
+    const iT = g.cmds.length;
     steeple(g, 0, 0, 28, 36, 3.4, NEW, (gg, c) => {
-      // the four-armed cross of white glass on top
+      // the four-armed cross of white glass on top (lit from within every night since 10 June 2026)
+      const ix = gg.cmds.length; gg.glow2('lantern', [c[0], c[1] - 7], [c[0], c[1] - 7], { r: 3.8, col: '#F6FBFF' }); gg.glow2('lantern', [c[0], c[1] - 10], [c[0], c[1] - 10], { r: 1.6, col: '#FFFFFF' });
       const w = 1.0; gg.fill2([[c[0] - w, c[1]], [c[0] + w, c[1]], [c[0] + w, c[1] - 14], [c[0] - w, c[1] - 14]], '#F8F8F2', true);
       gg.fill2([[c[0] - 4.2, c[1] - 9], [c[0] + 4.2, c[1] - 9], [c[0] + 4.2, c[1] - 11], [c[0] - 4.2, c[1] - 11]], '#F8F8F2', true);
       gg.fill2([[c[0] + 0.2, c[1]], [c[0] + w, c[1]], [c[0] + w, c[1] - 14], [c[0] + 0.2, c[1] - 14]], '#D8E2E8', true);
       gg.outline2([[c[0] - w, c[1]], [c[0] - w, c[1] - 9], [c[0] - 4.2, c[1] - 9], [c[0] - 4.2, c[1] - 11], [c[0] - w, c[1] - 11], [c[0] - w, c[1] - 14], [c[0] + w, c[1] - 14], [c[0] + w, c[1] - 11], [c[0] + 4.2, c[1] - 11], [c[0] + 4.2, c[1] - 9], [c[0] + w, c[1] - 9], [c[0] + w, c[1]]], { w: 0.45, c: '#8A9AA6', boil: false });
+      gg.mark({ nc: (cc) => (cc === '#D8E2E8' ? '#E6F3FF' : '#FFFFFF') }, ix); BC.litLines(gg, ix, '#CFE4F6');
     });
     for (const [x, y, col] of evs.slice(2)) steeple(g, x, y, 28, 23, 2.0, NEW, cap(col));
+    // at night: the crossing floodlit warm, the Jesus tower and the evangelists in a whiter light, lit up their height
+    BC.flood(g, 0, 0.7, NL.warm, { to: iT }); BC.flood(g, iT, 0.92, NL.white);
+    for (const [z, r] of [[32, 3.6], [42, 3.0], [52, 2.4], [60, 1.8]]) g.glow('lantern', 0, 0, z, { r, col: '#FFF4E2' });
   }, { name: 'crossing' });
   /* ---- the nave east of the crossing, up to the Glory façade's frame ---- */
   T.obj([7, -13, 30, 13], function (g) {
@@ -94,7 +111,7 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
     K.box(g, 7, -13, 26, 13, 0, 11, PAS, { w: 0.85 });
     K.box(g, 7, -9, 26, 9, 11, 17, PAS, { w: 0.85, nohid: true });
     K.gable(g, 7, -9, 26, 9, 17, 6, 'x', { a: '#DCD3C2', b: '#C6BCA8', e: '#DCD3C2' }, { c: '#6E6450' });
-    for (let x = 9; x < 25; x += 3) { K.win(g, 'L', 13, x, x + 1.4, 3, 9, { style: 'navy', arch: true }); K.win(g, 'L', 9, x, x + 1.4, 12, 16, { style: 'navy', arch: true }); }
+    for (let x = 9; x < 25; x += 3) { K.win(g, 'L', 13, x, x + 1.4, 3, 9, { style: 'navy', arch: true, lit: 0 }); K.win(g, 'L', 9, x, x + 1.4, 12, 16, { style: 'navy', arch: true, lit: 0 }); }
     for (let x = 8.5; x < 26; x += 3) { const c = g.p(x, 13, 11); g.fill2([[c[0] - 0.9, c[1]], [c[0] + 0.9, c[1]], [c[0], c[1] - 6]], '#DCD3C2', true); g.line2([[c[0] - 0.9, c[1]], [c[0], c[1] - 6], [c[0] + 0.9, c[1]]], { w: 0.4, boil: false }); }
     // the Glory façade, still being built: a stone porch of tall dark doorways under a scaffold, the stumps of its
     // four bell towers rising out of it in the same stone as the Passion, wrapped in scaffolding
@@ -112,6 +129,7 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
       const sl = []; for (let i2 = 1; i2 < N; i2++) { const p = [(Lp[i2][0] + Rp[i2][0]) / 2, Lp[i2][1]], w2 = (Rp[i2][0] - Lp[i2][0]) / 2, ph = (i2 * 0.9) % 2 - 1; sl.push(p[0] + ph * w2 * 0.6 - 0.35, p[1] - 1.2, p[0] + ph * w2 * 0.6 + 0.35, p[1] + 0.2); } g.segs2(sl, '#4A4540', 0.9);
       const sc = []; for (let z = 14; z <= zt; z += 2) { const a = g.p(30.2, y - 2.4, z), b = g.p(30.2, y + 2.4, z), c = g.p(25.8, y + 2.4, z); sc.push(a[0], a[1], b[0], b[1], b[0], b[1], c[0], c[1]); } for (const yy of [y - 2.4, y + 2.4]) { const a = g.p(30.2, yy, 14), b = g.p(30.2, yy, zt); sc.push(a[0], a[1], b[0], b[1]); } g.segs2(sc, '#C9A24A', 0.4);
     }
+    BC.flood(g, 0, 0.55, NL.warm);                                    // the nave lit; the Glory site in a softer light
   }, { name: 'nave east' });
   /* ---- the Passion transept (near left): the portico of inclined bone columns, the pediment, four bell towers ---- */
   T.obj([-11, 9, 11, 26], function (g) {
@@ -127,12 +145,16 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
     for (let i = 0; i < 6; i++) { const x = -6 + i * 2.4, a = g.p(x, 25.4, 0), b = g.p(x + (i - 2.5) * 0.3, 24.6, 12); g.line2(K.curve([a, [lerp(a[0], b[0], 0.4) + 0.8, lerp(a[1], b[1], 0.4)], [lerp(a[0], b[0], 0.75) - 0.6, lerp(a[1], b[1], 0.75)], b], 3, false), { w: 1.6, c: '#EAE3D5', boil: false, ext: 0 }); g.line2([[a[0] + 0.8, a[1]], [b[0] + 0.8, b[1]]], { w: 0.3, c: '#9A8E78', boil: false }); }
     // the doors: bronze, covered in letters
     g.fill(K.on('L', 21.02, -4, 4, 0, 7), '#8A6A3A');
+    const iD = g.cmds.length;
     for (let z = 1; z < 7; z += 1) K.text(g, 'L', 21.04, 0, z, 0.55, 'JESUS DE NATZARET', '#D8AE48', { center: true, w: 0.22 });
+    // at night the Passion façade is floodlit from the square: warm on the stone, the towers lit up their height
+    BC.flood(g, 0, 0.85, NL.warm); BC.litLines(g, iD, '#FFD979');
+    for (const [x, y, z, r] of [[0, 25, 7, 4.2], [0, 24.6, 17, 3.0], [-4.6, 24.6, 30, 1.8], [4.2, 24.6, 30, 1.8], [-9.1, 24.6, 24, 1.6], [8.7, 24.6, 24, 1.6]]) g.glow('lantern', x, y, z, { r, col: '#FFE6BE' });
   }, { name: 'passion' });
 
   /* ---- the works yard: stacks of stone, a site hut, the fence ---- */
   T.obj([31, -24, 36, -18], (g) => { for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) K.box(g, 31.5 + i * 1.5, -23.5 + j * 2.6, 32.8 + i * 1.5, -21.3 + j * 2.6, 0, 1.2 + (i + j) % 2 * 1.2, { t: '#EFE9DC', l: '#E2DACA', r: '#CFC6B4' }, { w: 0.45, nohid: true, boil: false }); }, { name: 'stone' });
-  T.obj([31, 18, 36, 24], (g) => { K.box(g, 31.5, 18.5, 35.5, 23.5, 0, 4.2, { t: '#E9E6DE', l: '#F1EFE8', r: '#D9D5CA' }, { w: 0.6 }); g.fill(K.on('R', 35.52, 19.5, 22, 1.5, 3.2), C.glass); K.text(g, 'R', 35.55, 21, 3.5, 0.5, 'OBRA', '#C9392E', { center: true }); }, { name: 'site hut' });
+  T.obj([31, 18, 36, 24], (g) => { K.box(g, 31.5, 18.5, 35.5, 23.5, 0, 4.2, { t: '#E9E6DE', l: '#F1EFE8', r: '#D9D5CA' }, { w: 0.6 }); g.fill(K.on('R', 35.52, 19.5, 22, 1.5, 3.2), C.glass); g.mark({ nc: '#FFE4A4', win: 1 }); K.text(g, 'R', 35.55, 21, 3.5, 0.5, 'OBRA', '#C9392E', { center: true }); g.glow('lamp', 35.8, 21, 4.0, { r: 0.9 }); }, { name: 'site hut' });   // the night watchman's light
   T.obj([36.4, -27, 36.8, 27], (g) => { const segs = []; for (let y = -26.5; y < 27; y += 1.6) { const a = g.p(36.6, y, 0), b = g.p(36.6, y, 2.6); segs.push(a[0], a[1], b[0], b[1]); } g.segs2(segs, '#8A8A84', 0.3); g.line([[36.6, -27, 2.6], [36.6, 27, 2.6]], { w: 0.4, c: '#6E6E68', boil: false }); g.fill([[36.6, -10, 0.4], [36.6, 10, 0.4], [36.6, 10, 2.4], [36.6, -10, 2.4]], 'rgba(233,226,204,0.85)'); K.text(g, 'R', 36.65, 0, 0.9, 1.0, 'SAGRADA FAMÍLIA', '#3E6E52', { center: true }); }, { name: 'fence' });
 
   /* ---- Gaudí's little schoolhouse on the corner, its roof a wave of brick; gardens and benches round the church ---- */
@@ -145,7 +167,7 @@ SF.tile('sagrada', 0, -100, { rim: 12 }, function (T) {
     const rf = []; for (let i = 0; i <= 12; i++) { const x = lerp(-35, -23, i / 12); rf.push([x, 13, wv(x) - 0.6]); } g.fill(fr.concat(rf.slice().reverse()), '#B9805C');
     const br = []; for (let i = 0; i <= 12; i++) { const a = g.p.apply(g, fr[i]), c = g.p.apply(g, rf[i]); br.push(a[0], a[1], c[0], c[1]); } g.segs2(br, '#8E5A3E', 0.3);
     g.line(fr, { w: 0.7, boil: false }); g.line(rf, { w: 0.5, boil: false });
-    for (let x = -34; x < -24; x += 2.4) K.win(g, 'L', 23, x, x + 1.2, 1, 3.2, { style: 'glass' });
+    for (let x = -34; x < -24; x += 2.4) K.win(g, 'L', 23, x, x + 1.2, 1, 3.2, { style: 'glass', lit: 0.2 });
   }, { name: 'escoles' });
   for (const [x, y] of [[-30, -30], [-22, -32], [-33, -16], [26, -32], [-33, 4], [31, 30], [14, -32]]) T.obj([x, y], (g) => BC.plane(g, x, y, { r: 3.6, h: 5.8 }), { name: 'tree' });
   for (const [x, y] of [[-16, -28], [16, 28]]) T.cast([x, y], (g) => { K.bench(g, x, y, { face: 'L', L: 2.4 }); BC.person(g, x, y + 1.1, 1.3, BC.who(Math.round(x * 13 + 3300), { dir: 1, pose: 'sit' })); }, {});

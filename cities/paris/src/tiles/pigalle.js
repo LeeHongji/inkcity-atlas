@@ -23,22 +23,36 @@ SF.tile('pigalle', 100, 100, { rim: 60 }, function (T) {
   /* ---------------- the Moulin Rouge ---------------- */
   const MX0 = -30, MX1 = -8, MY0 = -26, MY1 = -13.5, RED = { t: '#C9584B', l: '#B8443A', r: '#9E3A31' };
   T.obj([MX0, MY0, MX1, MY1], function (g) {
-    g.boilP = 0.35;
+    g.boilP = 0.35; const i0 = g.cmds.length;
     K.box(g, MX0, MY0, MX1, MY1, 0, 8.6, RED, { w: 0.9 });
     // the bulb-lined sign band, the lettering, the canopy, the doors
-    const sb = K.on('L', MY1 + 0.04, MX0 + 2, MX1 - 2, 5.4, 7.9); g.fill(sb, '#7E2A24'); g.outline(sb, { w: 0.4, c: '#4A1A16', boil: false });
-    const c = g.p((MX0 + MX1) / 2, MY1 + 0.06, 6.65); PA.letters2(g, c, 46, 3.4, '#F6E7B0', 'MOULIN ROUGE', 0.55, PA.dirOf('L'));
-    const bulbs = []; for (let a = MX0 + 2.2; a < MX1 - 2; a += 0.6) { bulbs.push(g.p(a, MY1 + 0.07, 5.5)); bulbs.push(g.p(a, MY1 + 0.07, 7.8)); } for (const b of bulbs) g.disc2(b, 0.32, '#F6E7B0');
+    const sb = K.on('L', MY1 + 0.04, MX0 + 2, MX1 - 2, 5.4, 7.9), iS = g.cmds.length; g.fill(sb, '#7E2A24'); g.outline(sb, { w: 0.4, c: '#4A1A16', boil: false });
+    const c = g.p((MX0 + MX1) / 2, MY1 + 0.06, 6.65), iL = g.cmds.length; PA.letters2(g, c, 46, 3.4, '#F6E7B0', 'MOULIN ROUGE', 0.55, PA.dirOf('L'));
+    PA.litLines(g, iL, '#FF9A88');                                    // at night the name is red neon
+    const bulbs = []; for (let a = MX0 + 2.2; a < MX1 - 2; a += 0.6) { bulbs.push(g.p(a, MY1 + 0.07, 5.5)); bulbs.push(g.p(a, MY1 + 0.07, 7.8)); } for (const b of bulbs) { g.disc2(b, 0.32, '#F6E7B0'); g.mark({ nc: '#FFF2BE' }); }
+    bulbs.forEach((b, i) => { if (i % 6 < 2) g.glow2('lantern', b, b, { r: 0.7, col: '#FFD27A' }); });
+    g.glow2('neon', c, g.p((MX0 + MX1) / 2, MY1, 0), { r: 9, col: '#FF4A3A' });
+    const iA = g.cmds.length;
     PA.awning(g, 'L', MY1, MX0 + 4, MX1 - 4, 4.8, 2.2, { col: '#2A2622', ink: '#F6E7B0', seed: 3, word: 'BAL DU MOULIN ROUGE' });
+    const iD = g.cmds.length;
     for (const a of [-24, -19, -14]) g.fill(K.on('L', MY1 + 0.03, a - 1.2, a + 1.2, 0, 3.6), '#4A1A16');
-    for (let a = MY0 + 1.5; a < MY1 - 1; a += 3) PA.win(g, 'R', MX1, a, a + 1.2, 1.4, 4.2, { pane: '#7E2A24', sc: '#E9C46A' });
+    g.mark({ nc: '#E0784E' }, iD);                                     // the doors open on the lit hall
+    for (let a = MY0 + 1.5; a < MY1 - 1; a += 3) PA.win(g, 'R', MX1, a, a + 1.2, 1.4, 4.2, { pane: '#7E2A24', sc: '#E9C46A', lit: 1 });
     K.box(g, MX0 - 0.3, MY0 - 0.3, MX1 + 0.3, MY1 + 0.3, 8.6, 9.2, { t: '#8E3A30', l: '#E9C46A', r: '#C9A040' }, { w: 0.55, nohid: true });
+    const iW = g.cmds.length;
     // the windmill's body on the roof (its sails are an actor)
     const wx = -24, wy = -20;
     K.box(g, wx - 2.6, wy - 2.6, wx + 2.6, wy + 2.6, 9.2, 16.4, { t: '#C9584B', l: '#B8443A', r: '#9E3A31' }, { w: 0.85 });
     for (let z = 10.6; z < 16; z += 1.4) { const a = g.p(wx - 2.6, wy + 2.62, z), b = g.p(wx + 2.6, wy + 2.62, z), cc = g.p(wx + 2.62, wy - 2.6, z); g.segs2([a[0], a[1], b[0], b[1], b[0], b[1], cc[0], cc[1]], '#8A2E26', 0.3); }
     K.win(g, 'L', wy + 2.6, wx - 0.6, wx + 0.6, 11.4, 13.2, { style: 'dark' });
     K.hip(g, wx - 3.0, wy - 3.0, wx + 3.0, wy + 3.0, 16.4, 3.8, '#6E3A2A', { c: '#3A1E16' });
+    // at night the cabaret glows red: its walls and the windmill in red light, the gilt cornice bright (the awning
+    // and the sign keep their own night colours)
+    const redN = (c, fill) => (fill ? PA.floodCol(c, 0.85, '#FF9C8C') : undefined);
+    PA.nightCol(g, i0, redN, { to: iL }); PA.nightCol(g, iD + 3, redN, { to: iW }); PA.nightCol(g, iW, redN);
+    g.cmds[iS].nc = '#5E1A16';                                         // the band stays dark behind its neon
+    void iA;
+    g.glow('neon', wx, wy + 2.6, 12.6, { r: 4.5, col: '#FF5A48' });
     // the corner block next door: a tabac and a café
   }, { name: 'moulin rouge' });
   // the sails: four lattice blades turning in the plane facing the boulevard (+y), hub on the windmill's front
@@ -55,6 +69,9 @@ SF.tile('pigalle', 100, 100, { rim: 60 }, function (T) {
         g.line2([W(0, a, 0), B], { w: 1.0, c: '#4A1A16', boil: false, ext: 0 }); g.line2([A2, B2], { w: 0.6, c: '#9E3A31', boil: false, ext: 0 }); g.line2([B, B2], { w: 0.5, c: '#9E3A31', boil: false, ext: 0 });
       }
       g.disc2(hub, 1.0, '#E9C46A'); g.ring2(hub, 1.0, { c: '#4A1A16', w: 0.4 });
+      // at night the sails are traced in red neon round a lit hub
+      PA.nightCol(g, 0, (c, fill) => (fill ? (c === '#F1E2C6' ? '#F0B8A4' : '#FFE19A') : '#FF4E3E'), { lines: true });
+      g.mark({ light: true }, g.cmds.length - 2);
     } });
   // the queue along the canopy
   T.cast([-19, -11.4], function (g) { const sp = []; for (let i = 0; i < 11; i++) sp.push([-29 + i * 1.6, -11.6 + (i % 2) * 0.5]); sp.forEach(([x, y], i) => PA.person(g, x, y, 0, PA.who(1400 + i, { dir: i % 4 === 0 ? 1 : 2, pose: i % 3 === 0 ? 'hold' : 'stand' }))); }, { name: 'show queue' });
@@ -65,7 +82,7 @@ SF.tile('pigalle', 100, 100, { rim: 60 }, function (T) {
   T.obj([-36, -36, -30.5, -12], (g) => PA.haus(g, { x0: -36, y0: -36, x1: -30.5, y1: -12, et: 4, seed: 901, faces: 'LR', shopsL: [[-35.4, -31, '#2F3A4F', 'shop']], chim: [[-33, -35, 'x', 3]] }), { name: 'haus 1' });
   T.obj([-6, -36, 10, -12], (g) => PA.haus(g, { x0: -6, y0: -36, x1: 10, y1: -12, et: 4, seed: 902, shopsL: [[-5.4, 3, '#7E2A24', 'cafe'], [4.4, 9.4, '#2F4A3E', 'door']], shopsR: [[-34, -26, '#3F5F8F', 'shop'], [-24, -14, '#7E2A24', 'shop']], chim: [[2, -35, 'x', 4]] }), { name: 'haus tabac' });
   // the tabac's carotte: a red lozenge sign standing out from the corner
-  T.obj([10.4, -12.6], (g) => { const c = g.p(10.6, -12.4, 6.4); g.segs2([c[0] - 3, c[1] + 1.2, c[0], c[1]], '#2E3332', 0.4); g.fill2([[c[0], c[1] - 3.6], [c[0] + 1.6, c[1]], [c[0], c[1] + 3.6], [c[0] - 1.6, c[1]]], '#C9463E', true); g.line2([[c[0], c[1] - 3.6], [c[0] + 1.6, c[1]], [c[0], c[1] + 3.6], [c[0] - 1.6, c[1]]], { w: 0.4, c: '#6E1E18', close: true, boil: false }); const lt = []; for (let k = 0; k < 5; k++) lt.push(c[0] - 0.5, c[1] - 2.2 + k * 1.1, c[0] + 0.5, c[1] - 2.2 + k * 1.1); g.segs2(lt, '#F3E3A0', 0.3); }, { on: true, name: 'carotte' });
+  T.obj([10.4, -12.6], (g) => { const c = g.p(10.6, -12.4, 6.4); g.segs2([c[0] - 3, c[1] + 1.2, c[0], c[1]], '#2E3332', 0.4); g.fill2([[c[0], c[1] - 3.6], [c[0] + 1.6, c[1]], [c[0], c[1] + 3.6], [c[0] - 1.6, c[1]]], '#C9463E', true); g.mark({ nc: '#F0503E' }); g.glow2('neon', c, c, { r: 2.0, col: '#FF5040' }); g.line2([[c[0], c[1] - 3.6], [c[0] + 1.6, c[1]], [c[0], c[1] + 3.6], [c[0] - 1.6, c[1]]], { w: 0.4, c: '#6E1E18', close: true, boil: false }); const lt = []; for (let k = 0; k < 5; k++) lt.push(c[0] - 0.5, c[1] - 2.2 + k * 1.1, c[0] + 0.5, c[1] - 2.2 + k * 1.1); g.segs2(lt, '#F3E3A0', 0.3); }, { on: true, name: 'carotte' });
   PA.waiter(T, PA.terrace(T, 'L', -12, -5.4, 3, { seed: 91, z: 5.2, out: 2.4 }), 9, {});
   T.obj([14, -36, 36, -12], (g) => PA.haus(g, { x0: 14, y0: -36, x1: 36, y1: -12, et: 4, seed: 903, shopsL: [[15, 22, '#2F3A4F', 'shop'], [24, 30, '#5A3E2E', 'shop'], [31, 35, '#2F4A3E', 'door']], shopsR: [[-34, -26, '#7E2A24', 'shop'], [-24, -14, '#3F5F8F', 'shop']], chim: [[25, -35, 'x', 4]] }), { name: 'haus 3' });
   // the near side: a low row of little shops and a crêpe stand (kept low: this is the map's front edge)
@@ -75,7 +92,7 @@ SF.tile('pigalle', 100, 100, { rim: 60 }, function (T) {
     PA.mansard(g, x0, 27, x1, 33, 6.6, { h: 2.0, d: 0.9, h2: 0.3, dormers: 3.4, chim: [[x0 + 0.6, 30, 'y', 2]] });
     // and their fronts to the boulevard: the face we see from the boulevard is the far one (y = 16), we draw an awning edge
   }, { name: 'near shop ' + i }));
-  T.obj([-1.5, 17.5], (g) => K.stall(g, -1.5, 17.5, { face: 'R', L: 2.0, D: 1.3, a: '#E6C24F', b: '#F3F1EA', goods: (g2, D, L) => { for (let k = 0; k < 3; k++) g2.disc2(g2.p(D - 0.2, -L + 0.6 + k * 1.3, 2.7), 0.9, '#E9C98A'); } }), { name: 'crepes' });
+  T.obj([-1.5, 17.5], (g) => { K.stall(g, -1.5, 17.5, { face: 'R', L: 2.0, D: 1.3, a: '#E6C24F', b: '#F3F1EA', goods: (g2, D, L) => { for (let k = 0; k < 3; k++) g2.disc2(g2.p(D - 0.2, -L + 0.6 + k * 1.3, 2.7), 0.9, '#E9C98A'); } }); g.glow('lamp', -0.3, 17.5, 5.4, { r: 1.0 }); }, { name: 'crepes' });
   T.cast([2.2, 18.2], (g) => { PA.person(g, 2.2, 18.2, 0, PA.who(1420, { dir: 2, pose: 'hold' })); PA.person(g, 3.4, 16.2, 0, PA.who(1421, { dir: 2, k: 0.75 })); }, { on: true });
   // the strip between the boulevard and the shops: trees, benches, a caricaturist, parked scooters
   for (const x of [-32, -22, -11, 9, 19, 29]) T.obj([x, 14.2], (g) => PA.plane(g, x, 14.2, { r: 3.3, h: 6.0, turn: 0.5 + h1(x + 90) * 0.4 }), { name: 'strip tree' });

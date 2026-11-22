@@ -60,7 +60,8 @@ CQH.textP = function (g, P, a0, z0, h, str, col, o) {
     }
     if (o.vert) z -= h + tr; else a += h + tr;
   }
-  g.segs2(segs, col, o.w || clamp(h * 0.16, 0.2, 1.5));
+  const i0 = g.cmds.length; g.segs2(segs, col, o.w || clamp(h * 0.16, 0.2, 1.5));
+  if (o.lit) for (let k = i0; k < g.cmds.length; k++) g.cmds[k].nc = col;      // a lit sign's characters keep their colour at night
 };
 /* on a building face in K.on's coordinates: face 'L' (plane y = p, reads along +x), 'R' (plane x = p, reads along -y) */
 CQH.text = function (g, face, p, a, z0, h, str, col, o) {
@@ -70,9 +71,16 @@ CQH.text = function (g, face, p, a, z0, h, str, col, o) {
 /* a sign board with Chinese on it, as big as fits: a row on a wide board, a column on a tall one */
 CQH.sign = function (g, face, p, a0, a1, z0, z1, col, str, o) {
   o = o || {}; const q = K.on(face, p + 0.05, a0, a1, z0, z1);
-  g.fill(q, col); if (o.line !== false) g.outline(q, { w: o.lw || 0.45, c: o.c || shade(col, 0.5), boil: false });
+  g.fill(q, col); g.mark({ nc: true }); if (o.line !== false) g.outline(q, { w: o.lw || 0.45, c: o.c || shade(col, 0.5), boil: false });   // lit at night
   const n = [...str].length, W = Math.abs(a1 - a0), H = z1 - z0, vert = o.vert != null ? o.vert : H > W * 1.3;
   const ink = o.ink || (hex2rgb(col).reduce((x, y) => x + y) > 430 ? '#2C271C' : '#FBF4E2');
-  if (vert) { const h = Math.min(W * 0.72, H * 0.86 / (n + (n - 1) * 0.12)); CQH.text(g, face, p + 0.02, (a0 + a1) / 2, (z0 + z1) / 2, h, str, ink, { vert: true, center: true, w: o.w }); }
-  else { const h = Math.min(H * 0.72, W * 0.86 / (n + (n - 1) * 0.12)); CQH.text(g, face, p + 0.02, (a0 + a1) / 2, (z0 + z1) / 2 - h / 2, h, str, ink, { center: true, w: o.w }); }
+  if (vert) { const h = Math.min(W * 0.72, H * 0.86 / (n + (n - 1) * 0.12)); CQH.text(g, face, p + 0.02, (a0 + a1) / 2, (z0 + z1) / 2, h, str, ink, { vert: true, center: true, w: o.w, lit: true }); }
+  else { const h = Math.min(H * 0.72, W * 0.86 / (n + (n - 1) * 0.12)); CQH.text(g, face, p + 0.02, (a0 + a1) / 2, (z0 + z1) / 2 - h / 2, h, str, ink, { center: true, w: o.w, lit: true }); }
+  // the glow of a lit sign, in the board's colour (or its characters', on a dark board): one soft light per square of board
+  const hc = hex2rgb(col).reduce((x, y) => x + y) < 300 ? ink : col, along = Math.max(W, H), n2 = Math.max(1, Math.round(along / (Math.min(W, H) * 2.2 + 2)));
+  for (let i = 0; i < n2; i++) {
+    const t = (i + 0.5) / n2, a = W >= H ? lerp(a0, a1, t) : (a0 + a1) / 2, z = W >= H ? (z0 + z1) / 2 : lerp(z0, z1, t);
+    const c = g.p.apply(g, K.pt(face, p + 0.1, a, z));
+    g.glow2('neon', c, c, { r: Math.min(2.6, 0.3 * (along / n2) * 3.2), col: hc });
+  }
 };

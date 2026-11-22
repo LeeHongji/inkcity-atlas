@@ -25,4 +25,7 @@ const SCENE = {
   visit: ['zanipolo', 'formosa', 'riva', 'sanmarco', 'salute', 'mercato', 'squero', 'cannaregio', 'rialto'],
   dive: { cannaregio: 'campo' },
   bounds: { z: [0.65, 10], cx: [60, 1860], cy: [60, 1100] },
+  // at night: the canals' green water (and their mouths, the strips under the far banks' walls) and the open lagoon
+  // (a clear mask: the lagoon's own fill runs on under the places) carry the lights' reflections; two windows in three lit
+  night: { water: ['#8DB2A2', mix('#8DB2A2', '#A6C2BA', 0.5), '#7EA393', '#789D8E', 'rgba(166,194,186,0)'], lit: 0.66 },
 };

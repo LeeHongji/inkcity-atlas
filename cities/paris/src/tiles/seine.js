@@ -42,6 +42,9 @@ PA.seine = function (T) {
     g.line([[LQ, YA, WZ], [LQ, YQ, WZ]], { w: 0.45, c: '#5F7F80', boil: false });
     // mooring rings on the lower quai's face
     for (let y = YA + 10; y < YQ - 4; y += 17) { const c = g.p(LQ + 0.02, y, LQZ - 0.6); g.ring2(c, 0.9, { c: '#4A443B', w: 0.35 }); }
+    // at night: the lanterns on brackets along the tall quai wall, between the rings (their light lies on the lower
+    // quai and doubles in the river)
+    for (let y = YA + 18.5; y < YQ - 4; y += 17) if (Math.abs(y + 100) > 8 && Math.abs(y + 50) > 15 && Math.abs(y) > 4) g.glow('lamp', X0 + 0.15, y, -1.3, { r: 1.2, base: LQZ });
     // the right bank's edge line, where the paving meets the water
     g.line([[X1, YA, 0], [X1, YB, 0]], { w: 0.7, boil: false });
   });
@@ -96,7 +99,7 @@ PA.seine = function (T) {
         const dsh = []; for (let x = X0 + 2; x < X1 - 3; x += 8) { const a = g.p(x, yc, deck(x) + 0.02), b = g.p(x + 3.6, yc, deck(x + 3.6) + 0.02); dsh.push(a[0], a[1], b[0], b[1]); } g.segs2(dsh, '#F7F5EE', 0.9);
       }
       // the near face: spandrels over the arches and the piers between them
-      const face = stone, faceD = stoneD, ring = [];
+      const face = stone, faceD = stoneD, ring = [], iF = g.cmds.length;
       let prev = X0;
       const pieces = [];
       for (const a of AR) {
@@ -134,13 +137,15 @@ PA.seine = function (T) {
         const c = g.p((X0 + X1) / 2, y1 + 0.06, deck((X0 + X1) / 2) - 1.3); g.fill2(arcPts(c[0], c[1], 2.4, 0, TAU, 10).map((q) => [q[0], c[1] + (q[1] - c[1]) * 0.8]), PC.gold, true);
       }
       if (o.eagles) for (let i = 0; i < AR.length - 1; i++) { const m = (AR[i][1] + AR[i + 1][0]) / 2, c = g.p(m, y1 + 0.1, deck(m) - 1.7); g.disc2(c, 1.3, '#E9E2CC'); g.fill2([[c[0] - 2.2, c[1] - 0.2], [c[0], c[1] - 1.4], [c[0] + 2.2, c[1] - 0.2], [c[0], c[1] + 0.6]], '#E9E2CC', true); g.ring2(c, 1.3, { c: '#8C8064', w: 0.3 }); }
+      // at night the stone bridges are floodlit from the water: the face and its arches warm, the gilt bright
+      if (!iron) PA.flood(g, iF, 0.5);
     }, { name: o.name, under: -0.6 });
     // 3 the near parapet in three pieces, lamps on it
     const cuts = [X0, X0 + 9, X0 + 17.5, X1];
     for (let k = 0; k < 3; k++) {
       const a0 = cuts[k], a1 = cuts[k + 1];
       T.obj([a0, y1 - 0.7, a1, y1], function (g) {
-        const xx = xs(a0, a1, 6);
+        const xx = xs(a0, a1, 6), iP = g.cmds.length;
         if (iron) {
           const rl = []; for (let i = 0; i <= Math.round((a1 - a0) / 0.5); i++) { const x = lerp(a0, a1, i / Math.round((a1 - a0) / 0.5)), b = g.p(x, y1 - 0.2, deck(x)), t = g.p(x, y1 - 0.2, deck(x) + 1.3); rl.push(b[0], b[1], t[0], t[1]); }
           g.segs2(rl, '#3A4448', 0.25);
@@ -158,11 +163,12 @@ PA.seine = function (T) {
             g.fill(b.map((p) => [p[0], p[1], zt - 1.25]).concat(b.slice().reverse()), shade(stone, 0.03)); g.fill(b, shade(stone, -0.14)); g.line(b, { w: 0.55, boil: false });
           }
         }
-        for (const lx of o.lamps || []) if (lx >= a0 && lx < a1) PA.lamp(g, lx, y1 - 0.35, { z: deck(lx) + (iron ? 0 : 1.25), h: o.lampH || 6.4 });
+        if (!iron) PA.flood(g, iP, 0.4);                 // (before the lamps: their lanterns keep their own light)
+        for (const lx of o.lamps || []) if (lx >= a0 && lx < a1) PA.lamp(g, lx, y1 - 0.35, { z: deck(lx) + (iron ? 0 : 1.25), h: o.lampH || 6.4, refl: [lx, y1 + 1.2, WZ] });
       }, { name: o.name + ' parapet', on: true });
     }
     // lamps on the far parapet go in the span; here in their own small objects so they sort with the deck's walkers
-    for (const lx of o.lamps || []) T.obj([lx, y0 + 0.35], (g) => PA.lamp(g, lx, y0 + 0.35, { z: deck(lx) + (iron ? 0 : 1.25), h: o.lampH || 6.4 }), { on: true, name: 'bridge lamp' });
+    for (const lx of o.lamps || []) T.obj([lx, y0 + 0.35], (g) => PA.lamp(g, lx, y0 + 0.35, { z: deck(lx) + (iron ? 0 : 1.25), h: o.lampH || 6.4, refl: [lx + 1.2, y1 + 1.2, WZ] }), { on: true, name: 'bridge lamp' });
   }
   const STONE3 = [[X0, X0 + 5.4], [X0 + 6.4, X0 + 13.4], [X0 + 14.2, X0 + 21.6], [X0 + 22.4, X1 - 0.1]];
   bridge(-100, 6, { name: 'pont d iena', arches: STONE3, road: true, eagles: true, lamps: [X0 + 4, X1 - 4], stone: '#E2D7BD' });
@@ -171,6 +177,7 @@ PA.seine = function (T) {
   bridge(50, 13, { name: 'pont neuf', arches: STONE3, road: true, bays: true, lamps: [X0 + 6, X1 - 6], stone: '#E6DCC2' });
   // Alexandre III's four pillars with golden Pegasi, on the banks at the bridge's corners
   for (const [x, y] of [[X0 - 2.4, -61], [X0 - 2.4, -39], [X1 + 2.4, -61], [X1 + 2.4, -39]]) T.obj([x - 1.4, y - 1.4, x + 1.4, y + 1.4], function (g) {
+    const i0 = g.cmds.length;
     K.box(g, x - 1.4, y - 1.4, x + 1.4, y + 1.4, 0, 2.2, { t: '#E9E2CC', l: '#E3DCC6', r: '#CFC6AE' }, { w: 0.6 });
     K.box(g, x - 1.0, y - 1.0, x + 1.0, y + 1.0, 2.2, 13, { t: '#E9E2CC', l: '#EDE7D4', r: '#D6CDB4' }, { w: 0.7 });
     g.fill(K.on('L', y + 1.01, x - 0.7, x + 0.7, 5, 10.5), '#E2DAC3'); g.fill(K.on('R', x + 1.01, y - 0.7, y + 0.7, 5, 10.5), '#CDC3A9');
@@ -182,6 +189,8 @@ PA.seine = function (T) {
     g.fill2([[c[0] - 1.0, c[1] - 4.0], [c[0] - 4.6, c[1] - 9.4], [c[0] - 2.4, c[1] - 9.8], [c[0] + 0.4, c[1] - 4.6]], '#E6C25A', true);
     g.fill2([[c[0] - 0.2, c[1] - 4.2], [c[0] + 0.6, c[1] - 4.2], [c[0] + 0.4, c[1] - 8.2], [c[0] - 0.2, c[1] - 8.2]], PC.goldD, true); g.disc2([c[0] + 0.2, c[1] - 8.9], 0.8, PC.goldD);
     g.line2([[c[0] - 2.8, c[1] - 1.0], [c[0] + 2.4, c[1] - 1.4], [c[0] + 3.4, c[1] - 4.4]], { w: 0.4, c: '#7A5A1E', boil: false });
+    // floodlit at night, the gilded Pegasus shining at the top
+    PA.flood(g, i0, 0.7); g.glow2('lantern', [c[0], c[1] - 4.5], g.p(x, y, 0), { r: 2.2, col: '#FFC864' }); g.glow('lantern', x, y, 6, { r: 2.0, col: '#FFDDA6' });
   }, { name: 'pegasus pillar' });
 
   /* ---------------- the lower quai's people ---------------- */

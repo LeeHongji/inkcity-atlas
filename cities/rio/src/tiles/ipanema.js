@@ -22,6 +22,7 @@ SF.tile('ipanema', 100, 100, { rim: 40 }, function (T) {
     K.cyl(g, -12, -12, 2.5, 0, 0.9, { t: '#8CC6D2', l: '#D9D3C6', r: '#BDB6A6' }, { w: 0.6, n: 16 });
     K.cyl(g, -12, -12, 0.6, 0.9, 3.4, '#C9C2B2', { w: 0.5, n: 8 });
     K.cyl(g, -12, -12, 1.2, 3.4, 3.8, '#C9C2B2', { w: 0.5, n: 12 });
+    RJ.nightEach(g, 0, (c, d) => (d.k === K_FILL && c === '#8CC6D2' ? '#5FC0DA' : undefined)); for (const [x, y] of [[-14, -10], [-10, -10], [-10, -14]]) g.glow('lantern', x, y, 1.0, { r: 1.4, col: '#9FE4F2' });   // (night: the basin lit from below)
   }, { name: 'chafariz' });
   T.actor({ sample: 5, period: 2, at(t) { return { x: -12, y: -12, z: 3.8, key: Math.floor(t * 4) % 3, f: Math.floor(t * 4) % 3 }; },
     draw(g, st) { const c = g.p(0, 0, 0); for (let k = 0; k < 6; k++) { const a = TAU * k / 6 + st.f * 0.3, e = [c[0] + Math.cos(a) * 6.5, c[1] + 10 + Math.sin(a) * 2]; g.line2([c, [lerp(c[0], e[0], 0.5), c[1] - 3], e], { w: 0.5, c: '#CFE8EE', boil: false }); } } });
@@ -37,6 +38,8 @@ SF.tile('ipanema', 100, 100, { rim: 40 }, function (T) {
     const posts = []; for (const [px, py] of [[x - 3.2, y - 1.6], [x + 3.2, y - 1.6], [x + 3.2, y + 1.6], [x - 3.2, y + 1.6]]) { const a = g.p(px, py, 0), b = g.p(px, py, 6.6); posts.push(a[0], a[1], b[0], b[1]); } g.segs2(posts, '#8C8576', 0.45);
     const roof = [[x - 3.6, y - 2.0, 6.8], [x + 3.6, y - 2.0, 6.8], [x + 3.6, y + 2.0, 6.2], [x - 3.6, y + 2.0, 6.2]]; g.fill(roof, '#F6F4EE'); g.outline(roof, { w: 0.5, c: '#9A9488', boil: false });
     if (kind === 'rede') { for (let k = 0; k < 3; k++) { const a = g.p(x - 3.2 + k * 2.6, y + 1.6, 6.0), b = g.p(x - 1.0 + k * 2.6, y + 1.6, 6.0); g.fill2([a, b, [b[0], b[1] + 6], [lerp(a[0], b[0], 0.5), a[1] + 8], [a[0], a[1] + 6]], ['#E86A9A', '#F2C230', '#2F6DB5'][k], true); } }
+    // at night a bulb hangs under each canopy and lights the stall and its goods
+    RJ.bulb(g, x, y + 0.6, 5.7, { r: 1.2 }); RJ.nightEach(g, 0, (c, d) => (d.k === K_FILL ? RJ.litCol(c, 0.4) : undefined));
   }, { name: 'barraca' }));
   // sellers at the ends of their stalls, browsers walking the aisles, a painter at an easel
   STALLS.forEach(([x, y], i) => { if (i % 3 === 2) return; T.cast([x + 3.8, y + 0.6], (g) => RJ.person(g, x + 3.8, y + 0.6, 0, Object.assign(RJ.who(4620 + i), { dir: 1, pose: i % 4 === 0 ? 'hold' : 'stand', sunhat: i % 3 === 0 })), {}); });
@@ -56,8 +59,10 @@ SF.tile('ipanema', 100, 100, { rim: 40 }, function (T) {
   const NR = [[-36.5, 25.5, -18, 36.5, 7.6, '#F3EFE4', ['GAROTA DE IPANEMA'], '#2F6DB5'], [-17, 25.5, 2, 36.5, 8.4, '#F2D24B', ['SUCOS', 'SORVETES'], '#D9463B'], [3, 25.5, 22, 36.5, 9.2, '#CFE3D8', ['MODA PRAIA', 'FARMÁCIA'], '#3A9A5B']];
   NR.forEach(([x0, y0, x1, y1, h, c, words, sc], i) => T.obj([x0, y0, x1, y1], (g) => {
     g.boilP = 0.25; RJ.block(g, x0, y0, x1, y1, h, c, 4710 + i, { balc: i !== 0, gf: 3.8 });
-    const n = words.length; for (let k = 0; k < n; k++) K.sign(g, 'L', y1 + 0.06, lerp(x0 + 0.8, x1 - 0.8, k / n), lerp(x0 + 0.8, x1 - 0.8, (k + 1) / n) - 0.5, 2.6, 3.6, sc, words[k]);
-    if (i === 0) { const aw = [[x0 + 0.5, y1, 3.7], [x1 - 0.5, y1, 3.7], [x1 - 0.5, y1 + 2.2, 2.9], [x0 + 0.5, y1 + 2.2, 2.9]]; g.fill(aw, '#2F6DB5'); for (let k = 0; k < 9; k += 2) g.fill([[x0 + 0.5 + k * 1.9, y1, 3.7], [x0 + 2.4 + k * 1.9, y1, 3.7], [x0 + 2.4 + k * 1.9, y1 + 2.2, 2.9], [x0 + 0.5 + k * 1.9, y1 + 2.2, 2.9]], '#F6F3EA'); g.outline(aw, { w: 0.5, boil: false }); }
+    const n = words.length; for (let k = 0; k < n; k++) RJ.litSign(g, 'L', y1 + 0.06, lerp(x0 + 0.8, x1 - 0.8, k / n), lerp(x0 + 0.8, x1 - 0.8, (k + 1) / n) - 0.5, 2.6, 3.6, sc, words[k]);
+    if (i === 0) { const i0 = g.cmds.length, aw = [[x0 + 0.5, y1, 3.7], [x1 - 0.5, y1, 3.7], [x1 - 0.5, y1 + 2.2, 2.9], [x0 + 0.5, y1 + 2.2, 2.9]]; g.fill(aw, '#2F6DB5'); for (let k = 0; k < 9; k += 2) g.fill([[x0 + 0.5 + k * 1.9, y1, 3.7], [x0 + 2.4 + k * 1.9, y1, 3.7], [x0 + 2.4 + k * 1.9, y1 + 2.2, 2.9], [x0 + 0.5 + k * 1.9, y1 + 2.2, 2.9]], '#F6F3EA'); g.outline(aw, { w: 0.5, boil: false });
+      // at night the Garota de Ipanema's awning is lit from below, lamps hung along its edge over the pavement tables
+      RJ.lit(g, i0, 0.65); for (let k = 0; k < 4; k++) g.glow('lamp', lerp(x0 + 2, x1 - 2, k / 3), y1 + 2.0, 2.7, { r: 1.2 }); }
   }, { name: 'loja' }));
   // the Garota de Ipanema's pavement tables (outside, on the pavement beyond the tile's edge)
   for (const [x, s] of [[-33, 4730], [-27, 4732], [-21, 4734]]) T.cast([x, 39.5], (g) => { const f = g.p(x, 39.5, 0); RJ.table2(g, f); RJ.person(g, x - 1.2, 40.2, 1.3, Object.assign(RJ.who(s), { dir: 0, pose: 'sit', cup: '#F2C230' })); RJ.person(g, x + 1.2, 38.9, 1.3, Object.assign(RJ.who(s + 1), { dir: 1, pose: 'sit', cup: '#F2C230' })); }, {});
@@ -90,7 +95,7 @@ SF.tile('ipanema', 100, 100, { rim: 40 }, function (T) {
       draw(g) { g.disc2(g.p(0, 0, 0), 0.7, '#F2C230'); } });
   }
   // the coconut cart, the sacolé seller, kids in the shallows
-  T.cast([77, -6], (g) => { const c = g.p(77, -6, 0); g.fill2([[c[0] - 5, c[1] - 3], [c[0] + 5, c[1] - 1], [c[0] + 5, c[1] - 5], [c[0] - 5, c[1] - 7]], '#B07A44', true); for (let k = 0; k < 9; k++) g.disc2([c[0] - 4 + k, c[1] - 7 - (k % 3) * 1.2 + k * 0.2], 1.2, k % 2 ? '#7FB04A' : '#6E9C3E'); g.disc2([c[0] - 3.5, c[1] - 0.5], 1.3, '#3A3530'); g.disc2([c[0] + 3.5, c[1] + 1.4], 1.3, '#3A3530'); RJ.person(g, 79, -8.4, 0, Object.assign(RJ.who(4770, { carnaval: false }), { dir: 1, pose: 'hold', cap: '#F6F3EA' })); }, {});
+  T.cast([77, -6], (g) => { const c = g.p(77, -6, 0); g.glow2('lantern', [c[0] + 3.4, c[1] - 7.4], c, { r: 1.2, col: '#FFD27A' }); g.fill2([[c[0] - 5, c[1] - 3], [c[0] + 5, c[1] - 1], [c[0] + 5, c[1] - 5], [c[0] - 5, c[1] - 7]], '#B07A44', true); for (let k = 0; k < 9; k++) g.disc2([c[0] - 4 + k, c[1] - 7 - (k % 3) * 1.2 + k * 0.2], 1.2, k % 2 ? '#7FB04A' : '#6E9C3E'); g.disc2([c[0] - 3.5, c[1] - 0.5], 1.3, '#3A3530'); g.disc2([c[0] + 3.5, c[1] + 1.4], 1.3, '#3A3530'); RJ.person(g, 79, -8.4, 0, Object.assign(RJ.who(4770, { carnaval: false }), { dir: 1, pose: 'hold', cap: '#F6F3EA' })); }, {});
   RJ.walker(T, RJ.who(4771, { carnaval: false, set: { top: '#F6F3EA', cap: '#2F6DB5' } }), [[70, 34], [86, 10], [70, -14], [86, -34], [70, -14], [86, 10]], 0.8,
     { phase: 0.3, extra: (g, st, r) => { const h = r.hands[0]; g.fill2([[h[0] - 2.6, h[1] - 1], [h[0] + 2.6, h[1] - 1], [h[0] + 2.4, h[1] + 3], [h[0] - 2.4, h[1] + 3]], '#F6F4EE', true); g.fill2([[h[0] - 2.6, h[1] - 1], [h[0] + 2.6, h[1] - 1], [h[0] + 2.6, h[1]], [h[0] - 2.6, h[1]]], '#2F6DB5', true); } });
   for (let i = 0; i < 4; i++) T.actor({ sample: 0.5, period: 12, grow: false,

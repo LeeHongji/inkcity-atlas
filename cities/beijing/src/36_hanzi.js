@@ -84,9 +84,9 @@ BJ.hanzi = function (g, face, p, a, z0, h, str, col, o) {
 };
 /* a sign board on a face with a Chinese word centred on it, as big as fits (horizontal; o.vert for a column) */
 BJ.sign = function (g, face, p, a0, a1, z0, z1, col, word, o) {
-  o = o || {}; const q = K.on(face, p + 0.05, a0, a1, z0, z1);
+  o = o || {}; const q = K.on(face, p + 0.05, a0, a1, z0, z1), i0 = g.cmds.length;
   g.fill(q, col); if (o.line !== false) g.outline(q, { w: o.w || 0.45, c: o.c || shade(col, 0.5), boil: false });
-  const ink = o.ink || (hex2rgb(col).reduce((x, y) => x + y) > 430 ? '#2C271C' : '#FBF4DE'), n = [...word].length;
+  const ink = o.ink || (hex2rgb(col).reduce((x, y) => x + y) > 430 ? '#2C271C' : '#FBF4DE'), n = [...word].length, i1 = g.cmds.length;
   if (o.vert) {
     const h = Math.min(Math.abs(a1 - a0) * 0.72, (z1 - z0) * 0.9 / (n * 1.12 - 0.12));
     const am = (a0 + a1) / 2, top = (z0 + z1) / 2 + (n * 1.12 - 0.12) * h / 2;
@@ -95,4 +95,5 @@ BJ.sign = function (g, face, p, a0, a1, z0, z1, col, word, o) {
     const h = Math.min((z1 - z0) * 0.7, Math.abs(a1 - a0) * 0.9 / (n * 1.12 - 0.12));
     BJ.hanzi(g, face, p + 0.02, (a0 + a1) / 2, (z0 + z1) / 2 - h / 2, h, word, ink, { center: true });
   }
+  if (o.lit !== false) BN.litSign(g, i0, i1, face, p, a0, a1, z0, z1, col, ink, o);   // lit at night (src/36_beijing.js)
 };

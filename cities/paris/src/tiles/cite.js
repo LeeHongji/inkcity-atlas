@@ -57,7 +57,7 @@ SF.tile('cite', -100, 100, { rim: 34 }, function (T) {
     shopsR: i === 2 ? [[y0 + 1, y1 - 1, '#2E5B48', 'shop']] : i === 0 ? [[y0 + 2, y0 + 8, '#7E2A24', 'cafe']] : [[y0 + 1, y0 + 5, ['#3F5F8F', '#2F4A3E', '#5A3E2E'][i % 3], 'shop'], [y1 - 4, y1 - 1, '#2F3A4F', 'door']],
     chim: [[-33.7, y0 + 0.8, 'x', 3]] }), { name: 'latin row' }));
   // Shakespeare and Company's yellow sign on the green front
-  T.obj([-30.4, -1.5], (g) => { const q = K.on('R', -30.42, -4.5, 4.5, 3.8, 4.5); g.fill(q, '#E6C24F'); g.outline(q, { w: 0.4, c: '#8A6A1E', boil: false }); const c = g.p(-30.38, 0, 4.15); PA.letters2(g, c, 22, 1.2, '#2E5B48', 'SHAKESPEARE AND COMPANY', 0.3, PA.dirOf('R')); }, { on: true, name: 'bookshop sign' });
+  T.obj([-30.4, -1.5], (g) => { const q = K.on('R', -30.42, -4.5, 4.5, 3.8, 4.5); g.fill(q, '#E6C24F'); g.mark({ nc: '#FFD45A' }); g.outline(q, { w: 0.4, c: '#8A6A1E', boil: false }); const c = g.p(-30.38, 0, 4.15); PA.letters2(g, c, 22, 1.2, '#2E5B48', 'SHAKESPEARE AND COMPANY', 0.3, PA.dirOf('R')); g.glow2('lantern', c, c, { r: 2.4, col: '#FFD86A' }); }, { on: true, name: 'bookshop sign' });   // lit at night
   // trees and the parapet with the bouquinistes (we see the backs of the boxes and the propped-up lids)
   for (let y = -32; y < 35; y += 8.5) T.obj([-28.6, y], (g) => PA.plane(g, -28.6, y, { r: 3.3, h: 6.8, turn: 0.4 + h1(y + 77) * 0.5 }), { name: 'quai tree' });
   const BX = [-30, -24, -16, -10, 2, 8, 20, 26];
@@ -87,7 +87,7 @@ SF.tile('cite', -100, 100, { rim: 34 }, function (T) {
   const NY0 = 6, NY1 = 16, NM = 11;    // the nave's sides, the axis
   // the choir and the apse with its flying buttresses (far part)
   T.obj([-12, 4, 2, 18], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     K.box(g, -6, NY0, 2, NY1, 0, 10.5, STN, { w: 0.85 });
     // the apse: a half drum towards -x
     const ap = []; for (let i = 0; i <= 10; i++) { const a = Math.PI / 2 + Math.PI * i / 10; ap.push([-6 + Math.cos(a) * 5, NM + Math.sin(a) * 5]); }
@@ -95,22 +95,23 @@ SF.tile('cite', -100, 100, { rim: 34 }, function (T) {
     for (let i = 0; i < 10; i++) { const a = ap[i], b = ap[i + 1]; if (b[1] - a[1] <= 0 && (b[0] - a[0]) <= 0) continue; }
     // flying buttresses on the side we see: piers at y = 18, arches up to the clerestory
     for (let x = -4.5; x < 2; x += 2.6) PA.flyer(g, x, NY1, STN);
-    for (let x = -5; x < 2; x += 2.6) PA.win(g, 'L', NY1, x - 0.4, x + 0.4, 6, 9.4, { pane: '#5A6E86', surround: false });
+    for (let x = -5; x < 2; x += 2.6) PA.win(g, 'L', NY1, x - 0.4, x + 0.4, 6, 9.4, { pane: '#5A6E86', surround: false, lit: 0.15 });
     K.gable(g, -6, NY0 - 0.2, 2, NY1 + 0.2, 10.5, 5.5, 'x', { a: LEAD, b: shade(LEAD, 0.1), e: '#E6DBC2' }, { c: '#4A525A', noEnd: true });
     const apr = []; for (let i = 0; i <= 8; i++) { const a = Math.PI / 2 + Math.PI * i / 8; apr.push([-6 + Math.cos(a) * 5.2, NM + Math.sin(a) * 5.2, 10.5]); }
     g.fill(apr.concat([[-6, NM, 16]]), shade(LEAD, -0.05)); g.line(apr.slice(0, 5).concat([[-6, NM, 16]]), { w: 0.6, c: '#4A525A', boil: false });
+    PA.flood(g, i0, 0.38);                                           // the flank in the light from the parvis
   }, { name: 'choir' });
   // the transept with the south rose, the nave, the spire
   T.obj([2, 2, 17.5, 20], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     K.box(g, 2, NY0, 17.5, NY1, 0, 11, STN, { w: 0.9 });
     K.box(g, 3.5, 2.5, 8.5, 19.5, 0, 11, STN, { w: 0.9 });
     // flying buttresses along the nave
     for (let x = 10.2; x < 17.5; x += 2.6) PA.flyer(g, x, NY1, STN);
-    for (let x = 9.6; x < 17.5; x += 2.6) PA.win(g, 'L', NY1, x - 0.45, x + 0.45, 6.4, 9.8, { pane: '#5A6E86', surround: false });
+    for (let x = 9.6; x < 17.5; x += 2.6) PA.win(g, 'L', NY1, x - 0.45, x + 0.45, 6.4, 9.8, { pane: '#5A6E86', surround: false, lit: 0.15 });
     // the transept's rose window on its end we see
     const rc = g.p(6, 19.52, 7.0); g.disc2(rc, 6.6, '#C9D2DC'); g.ring2(rc, 6.6, { c: '#7A6E58', w: 0.5 }); const sp = []; for (let k = 0; k < 12; k++) { const a = TAU * k / 12; sp.push(rc[0], rc[1], rc[0] + Math.cos(a) * 6.4, rc[1] + Math.sin(a) * 6.4 * 0.9); } g.segs2(sp, '#7A6E58', 0.3); g.disc2(rc, 1.6, '#3F5F8F');
-    PA.win(g, 'L', 19.5, 4.6, 7.4, 1.0, 3.8, { pane: '#3A3530', surround: false });
+    PA.win(g, 'L', 19.5, 4.6, 7.4, 1.0, 3.8, { pane: '#3A3530', surround: false, lit: 0 });
     // roofs: the nave along x, the transept along y
     K.gable(g, 2, NY0 - 0.2, 17.5, NY1 + 0.2, 11, 6, 'x', { a: LEAD, b: shade(LEAD, 0.1), e: '#E6DBC2' }, { c: '#4A525A', noEnd: true });
     K.gable(g, 3.5, 2.3, 8.5, 19.7, 11, 6, 'y', { a: LEAD, b: shade(LEAD, 0.1), e: '#E6DBC2' }, { c: '#4A525A' });
@@ -125,11 +126,14 @@ SF.tile('cite', -100, 100, { rim: 34 }, function (T) {
     g.line2([[b[0] - 3.6, b[1]], [t[0], t[1]], [b[0] + 3.6, b[1]]], { w: 0.6, c: '#3E444B', boil: false });
     g.disc2([t[0], t[1] - 0.8], 0.5, PC.gold);
     for (let k = 0; k < 6; k++) { const a = Math.PI * 0.1 + Math.PI * 0.8 * k / 5, p = g.p(sx + Math.cos(a) * 2.6, sy + Math.sin(a) * 2.6, zb - 0.6); g.fill2([[p[0] - 0.5, p[1]], [p[0] + 0.5, p[1]], [p[0] + 0.35, p[1] - 2.4], [p[0] - 0.35, p[1] - 2.4]], '#7FA88E', true); }
+    // at night the cathedral is floodlit: the nave and transept softly, the rebuilt spire lit up its height
+    PA.flood(g, i0, 0.45);
+    g.glow('lantern', sx, sy, 22, { r: 2.2, col: '#FFE2B0' }); g.glow('lantern', sx, sy, 28, { r: 1.4, col: '#FFE2B0' });
   }, { name: 'nave' });
   // the west front and the twin towers, looking at us across the main arm
   T.obj([17.5, 3.5, 24.5, 18.5], function (g) {
     g.boilP = 0.3;
-    const x0 = 17.5, x1 = 24.5, F = x1;
+    const x0 = 17.5, x1 = 24.5, F = x1, i0 = g.cmds.length;
     K.box(g, x0, 3.5, x1, 18.5, 0, 17.2, STN, { w: 1.0 });
     // three portals, the gallery of kings, the rose, the open gallery
     for (const [m, hw, h] of [[6.2, 1.5, 6.0], [11, 1.9, 7.0], [15.8, 1.5, 6.0]]) {
@@ -138,11 +142,12 @@ SF.tile('cite', -100, 100, { rim: 34 }, function (T) {
       g.line(ring, { w: 0.4, c: '#A99A7B', boil: false }); g.line(pts.slice(2), { w: 0.55, boil: false });
       const tym = g.p(F + 0.05, m, h - 1.2); g.disc2(tym, 0.9, '#C9B996');
     }
+    const iPort = g.cmds.length;
     g.fill(K.on('R', F + 0.04, 3.5, 18.5, 8.0, 9.4), '#E2D6BB');
     const kings = []; for (let a = 4.2; a < 18; a += 0.85) { const p = g.p(F + 0.06, a, 8.15); kings.push(p); } for (const p of kings) { g.fill2([[p[0] - 0.55, p[1]], [p[0] + 0.55, p[1]], [p[0] + 0.45, p[1] - 3.4], [p[0] - 0.45, p[1] - 3.4]], '#C2B494', true); g.disc2([p[0], p[1] - 3.8], 0.5, '#C2B494'); }
     const rc = g.p(F + 0.05, 11, 12.5); g.disc2(rc, 9.2, '#E2D6BB'); g.disc2(rc, 8.0, '#B9C6D2'); g.ring2(rc, 8.0, { c: '#7A6E58', w: 0.5 });
     const sp = []; for (let k = 0; k < 16; k++) { const a = TAU * k / 16; sp.push(rc[0] + Math.cos(a) * 1.8, rc[1] + Math.sin(a) * 1.8, rc[0] + Math.cos(a) * 7.8, rc[1] + Math.sin(a) * 7.8); } g.segs2(sp, '#7A6E58', 0.32); g.ring2(rc, 4.6, { c: '#7A6E58', w: 0.35 }); g.disc2(rc, 1.8, '#3F5F8F');
-    for (const m of [6.2, 15.8]) PA.win(g, 'R', F, m - 0.9, m + 0.9, 10.4, 14.4, { pane: '#5A6E86', surround: false });
+    for (const m of [6.2, 15.8]) PA.win(g, 'R', F, m - 0.9, m + 0.9, 10.4, 14.4, { pane: '#5A6E86', surround: false, lit: 0 });
     const gal = []; for (let a = 3.8; a < 18.4; a += 0.7) { const p = g.p(F + 0.05, a, 15.4), q = g.p(F + 0.05, a, 17.0); gal.push(p[0], p[1], q[0], q[1]); } g.segs2(gal, '#6E6252', 0.55);
     g.line([K.pt('R', F + 0.05, 3.5, 15.3), K.pt('R', F + 0.05, 18.5, 15.3)], { w: 0.45, c: '#A99A7B', boil: false });
     // the two towers
@@ -157,6 +162,10 @@ SF.tile('cite', -100, 100, { rim: 34 }, function (T) {
       g.segs2(pn, '#B5A684', 0.55);
       g.line([[x0 + 0.4, y1, 28.9], [x1, y1, 28.9], [x1, y0, 28.9]], { w: 0.5, boil: false });
     }
+    // at night the west front and its towers are floodlit warm from the parvis, the doors open and lit
+    PA.flood(g, i0, 0.8, '#FFE0B0');
+    for (let k = i0; k < iPort; k++) if (g.cmds[k].c === '#4A4038') g.cmds[k].nc = '#B87A3E';
+    for (const [y, z, r] of [[11, 4, 4.4], [11, 12.5, 4.4], [6.2, 23, 3], [15.8, 23, 3]]) g.glow('lantern', F, y, z, { r, col: '#FFDDA6' });
   }, { name: 'west front' });
   // the flag on the south tower... and the bells' sound marks: a few strokes beside the north tower now and then
   T.actor({ sample: 5, period: 10, grow: false,

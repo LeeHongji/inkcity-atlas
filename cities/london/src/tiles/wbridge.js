@@ -18,12 +18,15 @@ SF.tile('wbridge', -50, 50, { order: 1.5, rim: 62, castAt: 140, shared: true, ha
     g.line([[x, ya, top], [x, yb, top]], { w: near ? 0.8 : 0.6, c: '#2E4A38', boil: false });
     g.line([[x, ya, 0.35], [x, yb, 0.35]], { w: 0.45, c: '#2E4A38', boil: false });
   };
-  const lampStd = (g, x, y) => {
+  const lampStd = (g, x, y, far) => {
     const b = g.p(x, y, 0), t = g.p(x, y, 8.6);
     g.fill2([[b[0] - 0.9, b[1]], [b[0] + 0.9, b[1]], [b[0] + 0.5, b[1] - 3], [b[0] - 0.5, b[1] - 3]], GRND);
     g.line2([[b[0], b[1] - 2.8], t], { w: 0.75, c: GRND, boil: false, ext: 0 });
     for (const [dx, dy] of [[-2.0, 1.0], [2.0, 1.0], [0, -0.6]]) { const c = [t[0] + dx, t[1] + dy]; g.fill2([[c[0] - 0.75, c[1]], [c[0] + 0.75, c[1]], [c[0] + 0.95, c[1] - 2.2], [c[0] - 0.95, c[1] - 2.2]], '#F2E3A6'); g.line2([[c[0] - 0.95, c[1] - 2.2], [c[0] + 0.95, c[1] - 2.2]], { w: 0.5, c: GRND, boil: false, ext: 0 }); }
     g.line2([[t[0] - 2.0, t[1] + 1.0], [t[0] + 2.0, t[1] + 1.0]], { w: 0.4, c: GRND, boil: false, ext: 0 });
+    // at night its three lanterns are lit; the near ones lay their light on the river below the bridge (the far ones'
+    // reflections fall on the water the bridge hides)
+    if (far) LK.glowDry(g, 'lamp', x, y, 9.4, { r: 2.4 }); else g.glow2('lamp', [t[0], t[1] - 0.9], b, { r: 2.4 });
   };
 
   T.obj([X0, Y0, X1, Y1], function (g) {
@@ -37,7 +40,7 @@ SF.tile('wbridge', -50, 50, { order: 1.5, rim: 62, castAt: 140, shared: true, ha
     LK.puddle(g, X1 - 4.2, -6, 1.2, 2.2, 811);
     // the far balustrade and its lamps
     balustrade(g, X0 + 0.4, Y0, Y1, false);
-    for (const y of [-14, 0, 14]) lampStd(g, X0 + 0.6, y);
+    for (const y of [-14, 0, 14]) lampStd(g, X0 + 0.6, y, true);
     // the east face: piers with cutwaters, green arch ribs, spandrels, the cornice
     const F = X1;
     g.fill([[F, Y0, WL], [F, Y1, WL], [F, Y1, 0], [F, Y0, 0]], GRN);

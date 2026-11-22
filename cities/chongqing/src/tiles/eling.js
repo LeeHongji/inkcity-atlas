@@ -22,20 +22,22 @@ SF.tile('eling', -100, -100, { rim: 0 }, function (T) {
     g.grass2(g.P(K.rect(-36, -36, 17, 17, Z1)), { dens: 0.5 });
     g.fill(K.rect(-6, -6, 16, 16, Z1 + 0.02), '#DCD5C5'); CQ.paving(g, -6, -6, 16, 16, Z1);
     CQ.rail(g, 'L', 17.6, -36, 17.5, Z1, { h: 1.3 }); CQ.rail(g, 'R', 17.6, -36, 17.5, Z1, { h: 1.3 });
+    CQ.railLamps(g, [-35, 17.6, Z1 + 1.4], [17.6, 17.6, Z1 + 1.4], 8.5, { base: Z1 }); CQ.railLamps(g, [17.6, -35, Z1 + 1.4], [17.6, 17.6, Z1 + 1.4], 8.5, { base: Z1, ends: false });   // park lamps on the railings (night)
   }, { name: 'lower terrace' });
   T.obj([-37, -37, -8, -8], (g) => {
     CQ.terrace(g, -37, -37, -8, -8, Z1, Z2, { top: '#DCD5C5' });
     CQ.rail(g, 'L', -8.4, -36, -8.5, Z2, { h: 1.3 }); CQ.rail(g, 'R', -8.4, -36, -8.5, Z2, { h: 1.3 });
+    CQ.railLamps(g, [-34, -8.4, Z2 + 1.4], [-8.4, -8.4, Z2 + 1.4], 9, { base: Z2 }); CQ.railLamps(g, [-8.4, -34, Z2 + 1.4], [-8.4, -8.4, Z2 + 1.4], 9, { base: Z2, ends: false });
   }, { on: true, name: 'summit' });
   T.obj([2, 18, 14, 24], (g) => { CQ.steps(g, 2, 18, 14, 24, 0, Z1, 'y', { rise: 0.55 }); CQ.rail(g, 'R', 14.1, 18, 24, 0, { h: 1.1 }); }, { name: 'gate stair' });
   T.obj([-8, -24, -2, -8], (g) => { CQ.steps(g, -8, -24, -2, -8, Z1, Z2, 'x', { rise: 0.55 }); }, { on: true, name: 'summit stair' });
   // the park gate: two posts and a tiled roof over the stair foot
-  T.obj([1, 25, 15, 27], (g) => { for (const x of [1.6, 14.4]) K.box(g, x - 0.6, 25.4, x + 0.6, 26.6, 0, 6.6, { t: '#B9B09C', l: '#7A4A3A', r: '#5E382C' }, { w: 0.6 }); K.box(g, 0.8, 25.2, 15.2, 26.8, 6.6, 7.6, '#7A4A3A', { w: 0.6 }); K.gable(g, -0.4, 24.6, 16.4, 27.4, 7.6, 1.6, 'x', CQC.roof, { c: '#33302C', w: 0.7 }); }, { name: 'gate' });
+  T.obj([1, 25, 15, 27], (g) => { for (const x of [1.6, 14.4]) K.box(g, x - 0.6, 25.4, x + 0.6, 26.6, 0, 6.6, { t: '#B9B09C', l: '#7A4A3A', r: '#5E382C' }, { w: 0.6 }); K.box(g, 0.8, 25.2, 15.2, 26.8, 6.6, 7.6, '#7A4A3A', { w: 0.6 }); K.gable(g, -0.4, 24.6, 16.4, 27.4, 7.6, 1.6, 'x', CQC.roof, { c: '#33302C', w: 0.7 }); for (const x of [1.6, 14.4]) g.glow('lamp', x, 26.8, 5.8, { r: 1.1, base: 0 }); }, { name: 'gate' });   // a lamp on each gate post (night)
 
   /* ---- the Liangjiang Pavilion on the summit ---- */
   T.obj([-36, -36, -23, -23], (g) => {   // footprint kept off the summit's centre: both are 'on', see pitfalls
     g.boilP = 0.3;
-    const cx = -29.5, cy = -29.5, tiers = 5, ROOF = '#4E5157', WALL = '#B9433A';
+    const cx = -29.5, cy = -29.5, tiers = 5, ROOF = '#4E5157', WALL = '#B9433A', i0 = g.cmds.length;
     let z = Z2, r = 6.4;
     K.cyl(g, cx, cy, 6.8, Z2, Z2 + 1, { t: '#D9D2C2', l: '#CFC7B5', r: '#B3AA96' }, { n: 8, w: 0.7 });
     z = Z2 + 1;
@@ -49,12 +51,17 @@ SF.tile('eling', -100, -100, { rim: 0 }, function (T) {
       const sk = []; for (let k = 0; k < 8; k++) { const a = TAU * k / 8 + Math.PI / 8; sk.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r, z - 0.9]); }
       const top = []; for (let k = 0; k < 8; k++) { const a = TAU * k / 8 + Math.PI / 8; top.push([cx + Math.cos(a) * r * 0.55, cy + Math.sin(a) * r * 0.55, z + 0.6]); }
       for (let k = 0; k < 8; k++) { const a = sk[k], b = sk[(k + 1) % 8], c = top[(k + 1) % 8], d = top[k]; const n = Math.cos(TAU * (k + 0.5) / 8 + Math.PI / 8) + Math.sin(TAU * (k + 0.5) / 8 + Math.PI / 8); if (n > -0.3) g.fill([a, b, c, d], n > 0.9 ? shade(ROOF, -0.1) : shade(ROOF, 0.1)); }
+      const iE = g.cmds.length;
       g.line(sk.concat([sk[0]]).filter((p, k) => true), { w: 0.6, c: '#2E2A26', boil: false });
       for (const p of sk) { const s = g.p.apply(g, p); if (s[1] > g.p(cx, cy, z - 0.9)[1] - 6) g.line2([s, [s[0] + (s[0] > g.p(cx, cy, z)[0] ? 0.8 : -0.8), s[1] - 1.8]], { w: 0.55, c: '#2E2A26', boil: false, ext: 0 }); }
+      CQ.nmark(g, iE, null, { nc: CQ.GOLD }, true);                              // at night every eave is a ring of gold light
       r *= 0.88;
     }
     K.cone(g, cx, cy, r * 0.6, z + 0.6, 4.2, ROOF);
     const t0 = g.p(cx, cy, z + 4.6), t1 = g.p(cx, cy, z + 7.2); g.segs2([t0[0], t0[1], t1[0], t1[1]], '#C99A33', 0.8); g.disc2(t0, 0.8, '#C99A33');
+    // the tower glows gold at night: its red drums lit warm, the gallery windows bright, a glow up its height
+    CQ.nmark(g, i0, WALL, { nc: '#D9703A' }); CQ.nmark(g, i0, shade(WALL, 0.15), { nc: '#B4552C' }); CQ.nmark(g, i0, '#C99A33', { nc: '#FFD27A' });
+    for (const [zz, r] of [[Z2 + 4, 4.6], [Z2 + 11, 3.8], [Z2 + 18, 3.0], [Z2 + 25, 2.2]]) g.glow('lantern', cx, cy, zz, { r, col: '#FFB958' });
   }, { on: true, name: 'pavilion' });
   for (const [x, y, z, o] of [[-32, -12, Z2, { r: 4.4 }], [-12, -32, Z2, { r: 4.6 }], [-28, 6, Z1, { r: 5.6 }], [10, -26, Z1, { r: 5.2 }], [28, 30, 0, { r: 4.6 }], [-30, 30, 0, { r: 4.4 }]]) T.obj([x, y], (g) => CQ.fig(g, x, y, Object.assign({ z }, o)), { on: z > 0, name: 'fig' });
   for (const [x, y, z] of [[-16, 10, Z1], [-30, 12, Z1], [-12, -12, Z2]]) T.obj([x, y], (g) => CQ.bloom(g, x, y, { z, r: 3.4 }), { on: true, name: 'plum' });
@@ -74,7 +81,7 @@ SF.tile('eling', -100, -100, { rim: 0 }, function (T) {
   T.cast([-14, -12], (g) => { CQ.person(g, -10.5, -14, Z2, CQ.who(1404, { dir: 0, pose: 'hold', phone: true })); CQ.person(g, -10, -11.6, Z2, CQ.who(1405, { dir: 0, umbrella: '#9C6B5A', pose: 'hold' })); }, { on: true, name: 'summit couple' });
 
   /* ---- the square dance: twelve aunties in rows, in step with the speaker's beat ---- */
-  T.obj([14, -2], (g) => { K.box(g, 13.2, -2.8, 14.8, -1.2, Z1, Z1 + 1.8, '#3A3530', { w: 0.5 }); g.disc2(g.p(14, -1.15, Z1 + 1.1), 0.5, '#8C8576'); }, { on: true, name: 'speaker' });
+  T.obj([14, -2], (g) => { K.box(g, 13.2, -2.8, 14.8, -1.2, Z1, Z1 + 1.8, '#3A3530', { w: 0.5 }); g.disc2(g.p(14, -1.15, Z1 + 1.1), 0.5, '#8C8576'); g.mark({ nc: '#7FD6FF' }); g.glow2('lantern', g.p(14, -1.15, Z1 + 1.1), null, { r: 0.6, col: '#7FD6FF' }); }, { on: true, name: 'speaker' });   // the dance speaker's little LED (night)
   for (let i = 0; i < 12; i++) {
     const x = -2 + (i % 4) * 4, y = -2 + Math.floor(i / 4) * 5, look = CQ.elder(1410 + i, { top: ['#C8392E', '#D98AA4', '#E6C24F', '#5F8FC9'][i % 4], hairStyle: i % 3 ? 'bob' : 'bun', dress: i % 5 === 0 ? '#C8392E' : undefined });
     T.actor({ sample: 5, period: 4, at(t) { const b = Math.floor(t * 4) % 8, d = b < 4 ? 0 : 3; return { x: x + (b < 4 ? b : 7 - b) * 0.25, y, z: Z1, key: b, b, d }; },

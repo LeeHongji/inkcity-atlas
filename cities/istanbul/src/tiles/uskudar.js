@@ -19,28 +19,34 @@ SF.tile('uskudar', 100, -100, { rim: 22 }, function (T) {
 
   /* ---- the pier ---- */
   T.obj([-39, -12, W0, 2], (g) => IS.iskele(g, -39, -12, W0, 2, { b: [-36.4, -4.6, -30, 1.4], H: 6, name: 'ÜSKÜDAR', nameFace: 'L', roof: '#8E9AA2', bollards: [[-38.6, -11], [-38.6, -1]] }), { name: 'üsküdar pier' });
-  T.obj([-35, -9], (g) => IS.lamp(g, -35, -9), { on: true });
+  T.obj([-35, -9], (g) => IS.lamp(g, -35, -9, { dry: true }), { on: true });
   /* ---- the Mihrimah Sultan mosque (north of the square) with its double portico facing the square ---- */
   T.obj([-21, -35, -3, -19.4], (g) => IS.mosque(g, { cx: -12, cy: -27, s: 7.4, sx: 9, sy: 7.6, H: 7.6, R: 4.6, semis: ['x-', 'x+', 'y-'], towers: true, domeH: 0.92 }), { name: 'mihrimah' });
   T.obj([-21, -19.4, -3, -16.2], (g) => IS.portico(g, -21, -3, -16.2, 3.2, 5.2, { n: 5 }), { name: 'portico' });
   T.obj([-24, -16.2, 0, -11.4], function (g) {   // the outer portico: a terrace, slender columns, a wide sloping lead roof
+    const i0 = g.cmds.length;
     K.box(g, -24, -16.2, 0, -11.4, 0, 0.6, { t: '#E3DCCC', l: '#D3CAB6', r: '#BFB6A2' }, { w: 0.6 });
     const roof = [[-24.6, -16.2, 5.9], [0.6, -16.2, 5.9], [0.6, -11.0, 4.3], [-24.6, -11.0, 4.3]];
     const cs = []; for (let x = -23.4; x <= -0.5; x += 2.6) { const a = g.p(x, -11.7, 0.6), b = g.p(x, -11.7, 4.4); cs.push(a[0], a[1], b[0], b[1]); } g.segs2(cs, '#C9C1AE', 0.9); g.segs2(cs, '#8C8576', 0.3);
     g.fill(roof, '#A3ACB3'); g.outline(roof, { w: 0.75, c: IS.C.leadInk, boil: false });
     const sm = []; for (let x = -23.6; x < 0; x += 1.2) { const a = g.p(x, -16.15, 5.88), b = g.p(x, -11.05, 4.32); sm.push(a[0], a[1], b[0], b[1]); } g.segs2(sm, '#8E979E', 0.28);
     g.fill([[-24.6, -11.0, 4.3], [0.6, -11.0, 4.3], [0.6, -11.0, 3.8], [-24.6, -11.0, 3.8]], '#8E979E');
+    // at night: floodlit with the mosque, lamps hanging under the sloping roof light the terrace where people sit
+    IS.flood(g, i0, 0.8);
+    for (let x = -22.1; x < 0; x += 5.2) g.glow('lamp', x, -12.6, 3.6, { r: 1.0, base: 0.6 });
   }, { name: 'outer portico' });
   for (const [x, y] of [[-21.6, -17.6], [-2.4, -17.6]]) T.obj([x, y], (g) => IS.minaret(g, x, y, 25, { r: 0.72, bal: [15.5] }), { name: 'minaret' });
   // people sitting on the portico terrace, facing the square
   for (const [x, s] of [[-20, 1], [-15, 2], [-9, 3], [-4, 4]]) T.cast([x, -13.6], (g) => IS.person(g, x, -13.6, 0.6, IS.who(1800 + s, { dir: 1, pose: 'sit', cup: s % 2 === 0 })), { on: true });
   /* ---- the fountain of Ahmed III in the square ---- */
   T.obj([-12.5, 1.5, -5.5, 8.5], function (g) {
-    const M = { t: '#ECE6D8', l: '#F3EFE6', r: '#DFD8C9' }, x0 = -12, y0 = 2, x1 = -6, y1 = 8;
+    const M = { t: '#ECE6D8', l: '#F3EFE6', r: '#DFD8C9' }, x0 = -12, y0 = 2, x1 = -6, y1 = 8, i0 = g.cmds.length;
     K.box(g, x0, y0, x1, y1, 0, 5.4, M, { w: 0.8 });
     for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) { IS.arcade(g, f, p + 0.02, a0 + 0.5, a1 - 0.5, 0.6, 4.4, 2, { dark: '#9FB8BE', pointed: true }); g.fill(K.on(f, p + 0.03, a0, a1, 4.6, 5.0), '#7FA8B6'); const tl = []; for (let a = a0 + 0.4; a < a1; a += 0.8) { const q = g.p.apply(g, K.pt(f, p + 0.04, a, 4.8)); tl.push(q); } for (const q of tl) g.disc2(q, 0.22, IS.C.gold); }
     K.hip(g, x0 - 1.8, y0 - 1.8, x1 + 1.8, y1 + 1.8, 5.4, 1.4, '#9DA7AE', { c: IS.C.leadInk, w: 0.7 });
     for (const [x, y] of [[x0 + 0.6, y0 + 0.6], [x1 - 0.6, y0 + 0.6], [x0 + 0.6, y1 - 0.6], [x1 - 0.6, y1 - 0.6], [(x0 + x1) / 2, (y0 + y1) / 2]]) IS.dome(g, x, y, (x === (x0 + x1) / 2) ? 1.3 : 0.75, 6.4, { drum: 0.2, win: 0, h: 0.8, ribs: 0, alem: x === (x0 + x1) / 2, w: 0.4 });
+    // at night: floodlit, its gilt lettering shining
+    IS.flood(g, i0, 0.84); IS.glowDry(g, 'lantern', x1 + 1.2, y1 + 1.2, 0.5, { r: 2.4, col: IS.N.flood });
   }, { name: 'fountain' });
   /* ---- houses up the hill, trees ---- */
   [[10, -34, 20, -24, 0, 3], [23, -34, 35, -25, 1, 2], [10, -20, 19, -10, 2, 2], [22, -20, 34, -9, 3, 3], [10, -5, 20, 6, 4, 2], [23, -4, 35, 8, 5, 3], [10, 13, 20, 24, 6, 2], [24, 14, 35, 25, 7, 3], [8, 28, 20, 35, 8, 2], [23, 29, 35, 35, 9, 2]].forEach(([a, b, c, d, k, f]) => T.obj([a, b, c, d], (g) => IS.konak(g, a, b, c, d, { floors: f, col: IS.WALLS[k % IS.WALLS.length], shop: k === 4 ? { word: 'ÇAY BAHÇESİ', sign: '#2E6E5A', aw: '#2E6E5A' } : k === 2 ? { word: 'ECZANE', sign: '#B8322A' } : k === 6 ? { word: 'SİMİT', sign: '#B8322A', aw: '#E9C46A' } : null }), { name: 'house' }));

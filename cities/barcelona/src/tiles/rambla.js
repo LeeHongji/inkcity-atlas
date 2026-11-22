@@ -45,19 +45,22 @@ SF.tile('rambla', 0, 100, { rim: 52 }, function (T) {
     const y1 = -15, a0 = -24, a1 = -14, m = (a0 + a1) / 2, w = (a1 - a0) / 2;
     // the arch: an iron frame, stained glass panels in its tympanum, the name on top
     const arch = [K.pt('L', y1 + 0.05, a0, 0), K.pt('L', y1 + 0.05, a1, 0)]; for (let i = 0; i <= 12; i++) { const t = Math.PI * i / 12; arch.push(K.pt('L', y1 + 0.05, m + Math.cos(t) * w, 7.5 + Math.sin(t) * 4.5)); }
-    g.fill(arch, '#3A3F44');
+    g.fill(arch, '#3A3F44'); g.mark({ nc: '#6A4A2E' });                // at night the hall behind the arch is lit
     // inside: the stalls under the market roof, pyramids of fruit, hams hanging, a stallholder
     const R = RNG(9101);
     for (let k = 0; k < 3; k++) { const z = 0.6 + k * 1.2; for (let x = a0 + 0.8; x < a1 - 0.6; x += 0.7) { const p = g.p(x, y1 + 0.08, z + 1.2); g.disc2(p, 0.85, R.pick(['#E07A3C', '#C9392E', '#E6C24F', '#8FBF73', '#D85A7A', '#F2B04A', '#7A3F6E'])); } }
     for (let x = a0 + 1.5; x < a1 - 1; x += 1.4) { const p = g.p(x, y1 + 0.08, 7.6); g.segs2([p[0], p[1] - 3, p[0], p[1]], '#5A4A3C', 0.25); g.fill2([[p[0] - 0.7, p[1]], [p[0] + 0.7, p[1]], [p[0] + 0.3, p[1] + 3.6], [p[0] - 0.3, p[1] + 3.2]], '#A8553E', true); }
     g.fill(K.on('L', y1 + 0.08, a0 + 0.4, a1 - 0.4, 3.6, 4.1), '#F3F1EA');
-    const gl = []; for (let i = 0; i < 7; i++) { const t0 = Math.PI * i / 7, t1 = Math.PI * (i + 1) / 7, q = [K.pt('L', y1 + 0.1, m, 7.5), K.pt('L', y1 + 0.1, m + Math.cos(t0) * w * 0.94, 7.5 + Math.sin(t0) * 4.2), K.pt('L', y1 + 0.1, m + Math.cos(t1) * w * 0.94, 7.5 + Math.sin(t1) * 4.2)]; g.fill(q, ['#E6C24F', '#4F8FBF', '#C9392E', '#7DBF9A', '#E07A5A', '#9A7CC0', '#E6C24F'][i]); gl.push(q); }
+    const iG = g.cmds.length, gl = []; for (let i = 0; i < 7; i++) { const t0 = Math.PI * i / 7, t1 = Math.PI * (i + 1) / 7, q = [K.pt('L', y1 + 0.1, m, 7.5), K.pt('L', y1 + 0.1, m + Math.cos(t0) * w * 0.94, 7.5 + Math.sin(t0) * 4.2), K.pt('L', y1 + 0.1, m + Math.cos(t1) * w * 0.94, 7.5 + Math.sin(t1) * 4.2)]; g.fill(q, ['#E6C24F', '#4F8FBF', '#C9392E', '#7DBF9A', '#E07A5A', '#9A7CC0', '#E6C24F'][i]); gl.push(q); }
     g.fill(K.on('L', y1 + 0.1, a0, a1, 7.0, 7.6), '#2E3230');
     g.line(arch.slice(2), { w: 0.9, c: '#2E3230', boil: false }); for (const x of [a0, a1]) g.line([K.pt('L', y1 + 0.06, x, 0), K.pt('L', y1 + 0.06, x, 7.5)], { w: 0.9, c: '#2E3230', boil: false });
     const sg = K.on('L', y1 + 0.12, a0 - 1.2, a1 + 1.2, 12.3, 14.2); g.fill(sg, '#2E3230'); K.text(g, 'L', y1 + 0.18, m, 12.75, 1.0, 'MERCAT DE SANT JOSEP', '#E6C24F', { center: true });
     K.text(g, 'L', y1 + 0.14, m, 10.2, 0.75, 'BOQUERIA', '#F3F1EA', { center: true });
+    // at night: the stained-glass fan lit from behind, the lettering shining, the fruit under the hall's lights
+    g.mark({ nc: true }, iG); BC.litLines(g, iG); BC.nightCol(g, 0, (c, fill) => (fill ? BC.floodCol(c, 0.65, '#FFD49A') : undefined), { to: iG });
+    for (const [x, z, r, col] of [[m, 9.6, 3.6, '#FFE0A0'], [m, 13.2, 2.4, '#FFE58A'], [m, 2.5, 3.0, '#FFD08A']]) g.glow('lantern', x, y1 + 0.4, z, { r, col });
     // the side bays: shopfronts under the arcade
-    for (const [b0, b1] of [[-29.5, -25], [-13, -8.5]]) { g.fill(K.on('L', y1 + 0.03, b0, b1, 0, 4.5), '#E9D3A6'); for (let i = 0; i < 4; i++) { const p = g.p(lerp(b0 + 0.6, b1 - 0.6, i / 3), y1 + 0.05, 1.4); g.disc2(p, 1.0, R.pick(['#E07A3C', '#8FBF73', '#C9392E', '#E6C24F'])); } K.sign(g, 'L', y1, b0, b1, 4.6, 5.8, '#3E6E52', b0 < -20 ? 'FRUITES' : 'SUCS', { line: false, ink: '#F3E3B0' }); }
+    for (const [b0, b1] of [[-29.5, -25], [-13, -8.5]]) { const ib = g.cmds.length; g.fill(K.on('L', y1 + 0.03, b0, b1, 0, 4.5), '#E9D3A6'); g.mark({ nc: '#FFD98A', win: 1, spill: true }); for (let i = 0; i < 4; i++) { const p = g.p(lerp(b0 + 0.6, b1 - 0.6, i / 3), y1 + 0.05, 1.4); g.disc2(p, 1.0, R.pick(['#E07A3C', '#8FBF73', '#C9392E', '#E6C24F'])); } K.sign(g, 'L', y1, b0, b1, 4.6, 5.8, '#3E6E52', b0 < -20 ? 'FRUITES' : 'SUCS', { line: false, ink: '#F3E3B0' }); g.mark({ nc: true }, ib); BC.litLines(g, ib); g.glow('lantern', (b0 + b1) / 2, y1 + 0.3, 5.2, { r: 1.4, col: '#FFD9A0' }); }
   }, { name: 'boqueria' });
   HOUSE([[-8, -37], [4, -37], [4, -13], [-8, -13]], 18, 42, { col: '#ECD3B0', flags: 0.3, tribune: [2, 3, 9] });
   T.obj([4, -37, 28, -13], function (g) {
@@ -65,13 +68,18 @@ SF.tile('rambla', 0, 100, { rim: 52 }, function (T) {
     const y1 = -13, ST = { t: '#F0E4CC', l: '#E9D7B4', r: '#D3BF98' };
     K.box(g, 4, -37, 28, y1, 0, 15, ST, { w: 0.9 });
     // the Liceu: three arched doors under a canopy, a row of tall arched windows between paired columns, the name
-    for (const x of [11, 16, 21]) { const ar = [K.pt('L', y1 + 0.04, x - 1.4, 0), K.pt('L', y1 + 0.04, x + 1.4, 0)]; for (let i = 0; i <= 8; i++) { const t = Math.PI * i / 8; ar.push(K.pt('L', y1 + 0.04, x + Math.cos(t) * 1.4, 3.2 + Math.sin(t) * 1.4)); } g.fill(ar, '#4A3A2C'); g.line(ar.slice(2), { w: 0.4, boil: false }); }
+    for (const x of [11, 16, 21]) { const ar = [K.pt('L', y1 + 0.04, x - 1.4, 0), K.pt('L', y1 + 0.04, x + 1.4, 0)]; for (let i = 0; i <= 8; i++) { const t = Math.PI * i / 8; ar.push(K.pt('L', y1 + 0.04, x + Math.cos(t) * 1.4, 3.2 + Math.sin(t) * 1.4)); } g.fill(ar, '#4A3A2C'); g.mark({ nc: '#FFC874', win: 1, spill: true }); g.line(ar.slice(2), { w: 0.4, boil: false }); }
     g.fill([[8, y1, 5.2], [24, y1, 5.2], [24, y1 + 2.2, 4.8], [8, y1 + 2.2, 4.8]], '#C9A86A'); g.outline([[8, y1, 5.2], [24, y1, 5.2], [24, y1 + 2.2, 4.8], [8, y1 + 2.2, 4.8]], { w: 0.5, boil: false });
-    for (let x = 6.5; x < 27; x += 3.4) { K.win(g, 'L', y1, x, x + 1.6, 6.4, 11.2, { style: 'navy', arch: true }); }
+    for (let x = 6.5; x < 27; x += 3.4) { K.win(g, 'L', y1, x, x + 1.6, 6.4, 11.2, { style: 'navy', arch: true, lit: 1 }); }
     const col = []; for (let x = 5.6; x < 28; x += 3.4) for (const d of [0, 2.4]) { const a = g.p(x + d, y1 + 0.3, 6.0), b = g.p(x + d, y1 + 0.3, 12); col.push(a[0], a[1], b[0], b[1]); } g.segs2(col, '#F6EEDB', 0.9);
     g.fill(K.on('L', y1 + 0.04, 4, 28, 12.4, 14.4), '#E2CFA8');
+    const iT = g.cmds.length;
     K.text(g, 'L', y1 + 0.08, 16, 12.8, 1.1, 'GRAN TEATRE DEL LICEU', '#7A5A2C', { center: true });
     K.box(g, 3.7, -37.3, 28.3, y1 + 0.3, 15, 15.6, ST, { w: 0.6, nohid: true });
+    // at night: the front floodlit, the canopy over the doors glowing with its lamps, the name lit
+    BC.litLines(g, iT, '#FFD27A'); BC.nightCol(g, 0, (c, fill) => (fill && c === '#C9A86A' ? '#FFD58A' : undefined)); BC.flood(g, 0, 0.7);
+    for (const x of [9, 13.5, 18.5, 23]) g.glow('lamp', x, y1 + 1.6, 4.7, { r: 1.1 });
+    g.glow('lantern', 16, y1 + 0.3, 13.3, { r: 2.4, col: '#FFDCA0' });
   }, { name: 'liceu' });
   HOUSE([[28, -36], [37, -27], [37, -13], [28, -13]], 16, 43, { col: '#EAD9B6', flags: 0.3 });
 
@@ -87,7 +95,12 @@ SF.tile('rambla', 0, 100, { rim: 52 }, function (T) {
     K.box(g, x - 2.2, -3.8, x + 2.2, -1.2, 0, 4.6, { t: '#3E6E52', l: '#4C7E60', r: '#3E6E52' }, { w: 0.6 });
     K.box(g, x - 2.6, -4.2, x + 2.6, -0.8, 4.6, 5.1, { t: '#2C5240', l: '#3E6E52', r: '#2C5240' }, { w: 0.5, nohid: true });
     const R = RNG(x * 13 + 5); for (let i = 0; i < 9; i++) { const p = g.p(x - 2 + (i % 5) * 1.0, -0.7, 0.6 + Math.floor(i / 5) * 1.3); g.fill2([[p[0] - 0.5, p[1]], [p[0] + 0.5, p[1]], [p[0] + 0.4, p[1] - 1.1], [p[0] - 0.4, p[1] - 1.1]], '#7A6A55', true); g.disc2([p[0], p[1] - 2.0], 1.2, R.pick(['#E07A5A', '#E6C24F', '#D85A7A', '#F3F1EA', '#9A7CC0', '#C9392E'])); }
+    const iS = g.cmds.length;
     K.sign(g, 'L', -1.2, x - 2, x + 2, 3.4, 4.3, '#3E6E52', 'FLORS', { line: false, ink: '#F3E3B0' });
+    // at night the kiosk stays open: lamps under its eaves light the flowers, its sign lit
+    BC.nightCol(g, 0, (c, fill) => (fill && c !== '#3E6E52' && c !== '#4C7E60' && c !== '#2C5240' ? BC.mixA(c, '#FFE2B0', 0.12) : undefined), { to: iS });
+    g.mark({ nc: true }, iS); BC.litLines(g, iS);
+    for (const dx of [-1.6, 1.6]) g.glow('lamp', x + dx, -0.6, 4.5, { r: 0.9 });
   }, { name: 'flower kiosk' });
 
   /* ---- Plaça Reial: palms, Gaudí's lamps, the fountain, café tables ---- */
@@ -96,7 +109,8 @@ SF.tile('rambla', 0, 100, { rim: 52 }, function (T) {
     const f = g.p(x, y, 0), t = g.p(x, y, 9.5);
     g.fill2([[f[0] - 1.6, f[1]], [f[0] + 1.6, f[1]], [f[0] + 1.0, f[1] - 4], [f[0] - 1.0, f[1] - 4]], '#8A6A4A', true);
     g.fill2([[f[0] - 0.5, f[1] - 4], [f[0] + 0.5, f[1] - 4], [t[0] + 0.4, t[1]], [t[0] - 0.4, t[1]]], '#2E3230', true);
-    for (let k = 0; k < 6; k++) { const a = TAU * k / 6, e = [t[0] + Math.cos(a) * 4.2, t[1] + Math.sin(a) * 1.4 - 1.5]; g.line2(K.curve([[t[0], t[1] + 1], [lerp(t[0], e[0], 0.5), t[1] - 2.4], e], 2, false), { w: 0.4, c: '#2E3230', boil: false }); g.disc2([e[0], e[1] + 0.9], 0.9, '#F3E3A8'); }
+    for (let k = 0; k < 6; k++) { const a = TAU * k / 6, e = [t[0] + Math.cos(a) * 4.2, t[1] + Math.sin(a) * 1.4 - 1.5]; g.line2(K.curve([[t[0], t[1] + 1], [lerp(t[0], e[0], 0.5), t[1] - 2.4], e], 2, false), { w: 0.4, c: '#2E3230', boil: false }); g.disc2([e[0], e[1] + 0.9], 0.9, '#F3E3A8'); g.mark({ nc: '#FFF0C2' }); g.glow2('lantern', [e[0], e[1] + 0.9], f, { r: 1.2, col: '#FFE2A8' }); }
+    g.glow2('lamp', [t[0], t[1] - 1], f, { r: 2.2 });                  // at night Gaudí's lamp lights the square
     g.fill2(arcPts(t[0], t[1] - 2.6, 1.6, Math.PI, TAU, 6), '#C9392E', true); g.disc2([t[0], t[1] - 4.6], 0.5, '#D8AE48');
   }, { name: 'gaudi lamp' });
   T.obj([-5.5, 20, 0.5, 26], function (g) {
@@ -105,7 +119,7 @@ SF.tile('rambla', 0, 100, { rim: 52 }, function (T) {
     g.segs2([t[0] - 0.4, t[1] - 6.4, t[0] - 3, t[1] - 1, t[0] + 0.4, t[1] - 6.4, t[0] + 3, t[1] - 1], '#BFE0E8', 0.45);
   }, { name: 'fountain' });
   // café tables in the square (each sitter drawn with the table)
-  const table = (g, x, y, seed) => { const tt = g.p(x, y, 2.3), tb = g.p(x, y, 0); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#3A3530', 0.45); g.fill2(arcPts(tt[0], tt[1], 2.3, 0, TAU, 10).map((q) => [q[0], tt[1] + (q[1] - tt[1]) * 0.45]), '#ECE8DF', true); g.fill2([[tt[0] - 0.4, tt[1]], [tt[0] + 0.4, tt[1]], [tt[0] + 0.5, tt[1] - 1.6], [tt[0] - 0.5, tt[1] - 1.6]], seed % 2 ? '#E3B23C' : '#C9584B', true); };
+  const table = (g, x, y, seed) => { const tt = g.p(x, y, 2.3), tb = g.p(x, y, 0); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#3A3530', 0.45); g.fill2(arcPts(tt[0], tt[1], 2.3, 0, TAU, 10).map((q) => [q[0], tt[1] + (q[1] - tt[1]) * 0.45]), '#ECE8DF', true); g.mark({ nc: '#C9A472' }); g.fill2([[tt[0] - 0.4, tt[1]], [tt[0] + 0.4, tt[1]], [tt[0] + 0.5, tt[1] - 1.6], [tt[0] - 0.5, tt[1] - 1.6]], seed % 2 ? '#E3B23C' : '#C9584B', true); g.mark({ nc: '#FFC65A' }); g.glow2('lantern', [tt[0], tt[1] - 1.0], tb, { r: 0.8, col: '#FFC874' }); };   // at night a candle in a glass on each table
   for (const [x, y, s] of [[-30, 27.5, 5101], [-24, 28, 5102], [20, 27.5, 5103], [28, 27, 5104], [-9, 27.5, 5105], [4, 28, 5106]]) T.cast([x, y], (g) => { table(g, x + 1.2, y, s); BC.person(g, x, y, 1.3, BC.who(s, { dir: 0, pose: 'sit' })); BC.person(g, x + 2.4, y - 0.4, 1.3, BC.who(s + 50, { dir: 3, pose: 'sit' })); }, {});
   // a red-and-white parasol over the corner terrace
   T.obj([-27, 27], (g) => { const t = g.p(-27, 27, 6.4), b = g.p(-27, 27, 0); g.segs2([b[0], b[1], t[0], t[1]], '#6E6A60', 0.45); g.fill2(arcPts(t[0], t[1] + 2.6, 8.6, Math.PI * 1.08, Math.PI * 1.92, 10).concat([[t[0], t[1] - 1.2]]), '#C9392E', true); }, { name: 'parasol', bias: 2 });

@@ -20,6 +20,7 @@ SF.tile('eminonu', 0, 0, { rim: 20 }, function (T) {
     const sl = []; for (let x = -10; x < 26; x += 4) { const a = g.p(x, -25, 0.01), b = g.p(x, 22, 0.01); sl.push(a[0], a[1], b[0], b[1]); } for (let y = -25; y < 22; y += 4) { const a = g.p(-10, y, 0.01), b = g.p(26, y, 0.01); sl.push(a[0], a[1], b[0], b[1]); }
     g.segs2(sl, '#D9D0BC', 0.35);
     g.fill(K.rect(-H, -28, 28, -25.6), '#DCD4C2'); g.fill(K.rect(24.4, -28, 28, H), '#DCD4C2');
+    IS.quayLights(g, [[27.4, -20], [27.4, -8], [27.4, 6], [27.4, 19], [27.4, 32]]);   // at night low lights along the Bosphorus quay
   }, { rim: true });
 
   /* ---- the New Mosque on its platform ---- */
@@ -28,6 +29,7 @@ SF.tile('eminonu', 0, 0, { rim: 20 }, function (T) {
     K.box(g, -36, -13, -11, 21, 0, YZ, { t: '#E2DACA', l: '#D3CAB6', r: '#BFB6A2' }, { w: 0.85 });
     for (let i = 0; i < 4; i++) K.box(g, -11, -6 + i * 0.01, -11 + 3.2 - i * 0.8, 14, 0, YZ * (i + 1) / 4, { t: '#E9E2D4', l: '#DCD4C2', r: '#C9C0AC' }, { w: 0.45, boil: false });
     g.fill(K.rect(-35.5, -12.5, -11.5, 20.5, YZ), '#EAE3D4');
+    for (const y of [-12, -6.4, 14.4, 20]) g.glow('lamp', -11.4, y, YZ + 1.6, { r: 1.0, base: YZ });   // at night lamps along the platform's edge and at the steps
   }, { name: 'platform' });
   IS.avlu(T, -33, -12.5, -15, 0, { d: 2.6, H: 4.4, z0: YZ, near: '' });
   T.obj([-33, 0, -14.6, 17.5], (g) => g.at(0, 0, YZ, (g2) => IS.mosque(g2, { cx: -24, cy: 8.6, s: 8.6, H: 8.4, R: 4.6, semis: ['x-', 'x+', 'y-', 'y+'], corner: true, towers: true, domeH: 0.95 })), { on: true, name: 'yeni cami' });
@@ -36,7 +38,7 @@ SF.tile('eminonu', 0, 0, { rim: 20 }, function (T) {
   /* ---- the Spice Bazaar ---- */
   T.obj([-36, 23, 14, 32], function (g) {
     g.boilP = 0.25;
-    const S = { t: '#D6C9AE', l: '#E2D3B4', r: '#CBBB9A' };
+    const S = { t: '#D6C9AE', l: '#E2D3B4', r: '#CBBB9A' }, i0 = g.cmds.length;
     K.box(g, -36, 23, 14, 32, 0, 6.4, S, { w: 0.85 });
     // the roof: a vault line with a row of small domes and chimneys
     for (let x = -33.5; x < 13; x += 3.4) IS.dome(g, x, 27.5, 1.45, 6.4, { drum: 0.35, win: 0, h: 1.1, ribs: 0, alem: false, w: 0.45 });
@@ -48,14 +50,16 @@ SF.tile('eminonu', 0, 0, { rim: 20 }, function (T) {
     }
     // the gate on the east end
     const q = [[14.02, 25, 0], [14.02, 30, 0]]; for (let k = 0; k <= 8; k++) { const t = Math.PI * k / 8; q.push([14.02, 27.5 + 2.5 * Math.cos(t), 3.6 + 2 * Math.sin(t)]); } g.fill(q, '#4E4A42');
-    K.sign(g, 'R', 14.02, 24.2, 30.8, 5.0, 6.2, '#2E5E8A', 'MISIR ÇARŞISI', { w: 0.3 });
+    const j0 = g.cmds.length; K.sign(g, 'R', 14.02, 24.2, 30.8, 5.0, 6.2, '#2E5E8A', 'MISIR ÇARŞISI', { w: 0.3 }); IS.litSign(g, j0);
+    // at night: its walls floodlit, the name over the gate lit; the spice shops are shut (moonlit)
+    IS.flood(g, i0, 0.58); g.glow('lamp', 14.6, 27.5, 6.3, { r: 1.2 });
   }, { name: 'spice bazaar' });
 
   /* ---- the ferry pier ---- */
   T.obj([PIER.x0, PIER.y0, PIER.x1, PIER.y1], (g) => IS.iskele(g, PIER.x0, PIER.y0, PIER.x1, PIER.y1, { b: [-1.6, -36.4, 3.8, -29.2], H: 5.6, name: 'KADIKÖY', clock: [1.1, -32.8], bollards: [[5.4, -37], [17.6, -37]] }), { name: 'pier' });
-  T.obj([16.8, -32], (g) => IS.lamp(g, 16.8, -32), { on: true, name: 'lamp' });
+  T.obj([16.8, -32], (g) => IS.lamp(g, 16.8, -32, { dry: true }), { on: true, name: 'lamp' });   // (its light would fall on the quay's edge: no reflection)
   // turnstiles at the pier's land end
-  T.obj([4.5, -28.6, 13, -27.6], (g) => { for (let x = 5; x < 13; x += 1.8) K.box(g, x, -28.5, x + 0.5, -27.7, 0, 2.2, { t: '#9AA3A8', l: '#B9C0C4', r: '#8E979C' }, { w: 0.4, boil: false }); K.sign(g, 'L', -27.6, 4.8, 12.8, 2.6, 3.4, '#1F4E79', 'ŞEHİR HATLARI', { w: 0.3 }); }, { name: 'turnstiles' });
+  T.obj([4.5, -28.6, 13, -27.6], (g) => { for (let x = 5; x < 13; x += 1.8) K.box(g, x, -28.5, x + 0.5, -27.7, 0, 2.2, { t: '#9AA3A8', l: '#B9C0C4', r: '#8E979C' }, { w: 0.4, boil: false }); const j0 = g.cmds.length; K.sign(g, 'L', -27.6, 4.8, 12.8, 2.6, 3.4, '#1F4E79', 'ŞEHİR HATLARI', { w: 0.3 }); IS.litSign(g, j0, { col: '#CFE2FF' }); }, { name: 'turnstiles' });
   // the gangways: down while the ferry is alongside
   T.actor({ sample: 0.2, period: IT.WC, grow: false, cast: false,
     at(t) { const u = IT.emTau(t); if (u < 0.4 || u > 9.1) return null; return { x: 4, y: -37.4, z: 0, key: 'g' }; },
@@ -111,7 +115,7 @@ SF.tile('eminonu', 0, 0, { rim: 20 }, function (T) {
     draw(g, st) { const p = g.p(0, 0, 0); for (let i = 0; i <= Math.min(3, st.f); i++) g.disc2([p[0] - i * 2.2, p[1] - 2 - i * 2.6], 1.4 + i * 0.7, 'rgba(246,244,238,' + (0.85 - i * 0.18) + ')'); } });
 
   /* ---- the quays: anglers on the Bosphorus edge, people by the Horn ---- */
-  for (const [y, s] of [[-14, 1501], [-2, 1502], [12, 1503], [26, 1504]]) T.cast([26.6, y], (g) => { IS.person(g, 26.6, y, 0, IS.who(s, { dir: 0, pose: 'hold', fcap: s % 2 ? '#3B3F47' : undefined, scarf: undefined, dress: undefined })); const a = g.p(27, y, 4.2), b = g.p(32, y, 7.2), c = g.p(33.6, y, IT.WL); g.line2([a, b], { w: 0.45, c: '#3A3128', boil: false, ext: 0 }); g.fine2([b, c], { w: 0.22, c: '#5A564E' }); const bk = g.p(25.6, y + 1.2, 0); g.fill2([[bk[0] - 1, bk[1]], [bk[0] + 1, bk[1]], [bk[0] + 1.3, bk[1] - 2], [bk[0] - 1.3, bk[1] - 2]], '#3F7FB8', true); }, { name: 'angler' });
+  for (const [y, s] of [[-14, 1501], [-2, 1502], [12, 1503], [26, 1504]]) T.cast([26.6, y], (g) => { IS.person(g, 26.6, y, 0, IS.who(s, { dir: 0, pose: 'hold', fcap: s % 2 ? '#3B3F47' : undefined, scarf: undefined, dress: undefined })); const a = g.p(27, y, 4.2), b = g.p(32, y, 7.2), c = g.p(33.6, y, IT.WL); g.line2([a, b], { w: 0.45, c: '#3A3128', boil: false, ext: 0 }); g.fine2([b, c], { w: 0.22, c: '#5A564E' }); const bk = g.p(25.6, y + 1.2, 0); g.fill2([[bk[0] - 1, bk[1]], [bk[0] + 1, bk[1]], [bk[0] + 1.3, bk[1] - 2], [bk[0] - 1.3, bk[1] - 2]], '#3F7FB8', true); IS.glowWet(g, 'lantern', 32, y, 7.2, { r: 0.7, col: IS.N.tip }); }, { name: 'angler' });   // at night a glow stick on the rod tip
   IS.cat(T, 25.4, -10.6, 0, { c: 0, pose: 'sit' });
   IS.cat(T, -12.6, 18, YZ, { c: 4, pose: 'loaf', fl: -1 });
   IS.catWalk(T, [[-30, -26.4], [-14, -26.4]], { c: 3, speed: 0.9, sit: 7 });

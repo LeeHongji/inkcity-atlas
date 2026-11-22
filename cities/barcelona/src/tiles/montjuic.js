@@ -38,18 +38,22 @@ SF.tile('montjuic', -100, 100, { rim: 64 }, function (T) {
     g.boilP = 0.18;
     const z0 = HILL;
     K.box(g, -35, -16, -24, 16, z0, z0 + 9, STN, { w: 0.9 });
-    for (let y = -14; y < 15; y += 2.6) { K.win(g, 'R', -24, y, y + 1.3, z0 + 1, z0 + 4, { style: 'navy', arch: true }); K.win(g, 'R', -24, y + 0.2, y + 1.1, z0 + 5.4, z0 + 7.6, { style: 'navy' }); }
+    for (let y = -14; y < 15; y += 2.6) { K.win(g, 'R', -24, y, y + 1.3, z0 + 1, z0 + 4, { style: 'navy', arch: true, lit: 0.25 }); K.win(g, 'R', -24, y + 0.2, y + 1.1, z0 + 5.4, z0 + 7.6, { style: 'navy', lit: 0.12 }); }
     // the portico in the middle
     g.fill([[-24, -5, z0 + 8], [-22, -5, z0 + 8], [-22, 5, z0 + 8], [-24, 5, z0 + 8]], '#F2EADA'); g.fill(K.on('R', -21.98, -5, 5, z0 + 7.4, z0 + 8), '#E8DCC2'); g.line([[-22, -5, z0 + 7.4], [-22, 5, z0 + 7.4]], { w: 0.5, boil: false }); g.fill(K.on('R', -23.95, -4, 4, z0, z0 + 7.4), '#8C8476');
     const col = []; for (let y = -4.4; y <= 4.5; y += 1.8) { const a = g.p(-21.9, y, z0), b = g.p(-21.9, y, z0 + 7.4); col.push(a[0], a[1], b[0], b[1]); } g.segs2(col, '#F6EEDB', 1.2);
     // corner towers like belfries
-    for (const [x, y] of [[-26, -14], [-26, 14], [-33, -14], [-33, 14]]) { K.box(g, x - 1.4, y - 1.4, x + 1.4, y + 1.4, z0 + 9, z0 + 16, STN, { w: 0.7, nohid: true }); K.win(g, 'R', x + 1.4, y - 0.6, y + 0.6, z0 + 12, z0 + 14.5, { style: 'dark', arch: true }); K.dome(g, x, y, 1.6, z0 + 16, 2.2, '#D9CFB8', { w: 0.6 }); const t = g.p(x, y, z0 + 18.4); g.segs2([t[0], t[1], t[0], t[1] - 3], '#8A7A5A', 0.5); }
+    for (const [x, y] of [[-26, -14], [-26, 14], [-33, -14], [-33, 14]]) { K.box(g, x - 1.4, y - 1.4, x + 1.4, y + 1.4, z0 + 9, z0 + 16, STN, { w: 0.7, nohid: true }); K.win(g, 'R', x + 1.4, y - 0.6, y + 0.6, z0 + 12, z0 + 14.5, { style: 'dark', arch: true, lit: 0 }); K.dome(g, x, y, 1.6, z0 + 16, 2.2, '#D9CFB8', { w: 0.6 }); const t = g.p(x, y, z0 + 18.4); g.segs2([t[0], t[1], t[0], t[1] - 3], '#8A7A5A', 0.5); }
     // the side domes and the big central dome on its drum
     for (const y of [-9, 9]) { K.cyl(g, -29.5, y, 2.4, z0 + 9, z0 + 11, STN, { w: 0.6, n: 12 }); K.dome(g, -29.5, y, 2.4, z0 + 11, 2.8, '#C9C2B2', { w: 0.6, shadow: '#ADA594' }); }
     K.cyl(g, -29.5, 0, 4.6, z0 + 9, z0 + 13, STN, { w: 0.8, n: 18 });
     for (let i = 0; i < 6; i++) { const a = -Math.PI * 0.15 + i * 0.22, c = [-29.5 + Math.cos(a) * 4.65, Math.sin(a) * 4.65]; g.fill([[c[0], c[1] - 0.3, z0 + 10], [c[0], c[1] + 0.3, z0 + 10], [c[0], c[1] + 0.3, z0 + 12.2], [c[0], c[1] - 0.3, z0 + 12.2]], '#5A6470'); }
     K.dome(g, -29.5, 0, 4.4, z0 + 13, 5.6, '#C9C2B2', { w: 0.8, shadow: '#A8A090', ribs: 12, ribCol: '#9A9282', ribW: 0.35 });
     const lan = g.p(-29.5, 0, z0 + 18.6); K.cyl(g, -29.5, 0, 0.9, z0 + 18.4, z0 + 20.4, STN, { w: 0.5, n: 8 }); g.disc2([lan[0], lan[1] - 8.5], 0.6, '#D8AE48');
+    // at night the Palau Nacional is floodlit warm over the fountain, its dome lit (the searchlights behind it are a
+    // night-only actor made last, below)
+    BC.flood(g, 0, 0.86, '#FFE0B0');
+    for (const [x, y, z, r] of [[-22, 0, z0 + 4, 4.4], [-24, -10, z0 + 4, 2.6], [-24, 10, z0 + 4, 2.6], [-29.5, 0, z0 + 15, 3.6], [-25.5, -14, z0 + 14, 1.6], [-25.5, 14, z0 + 14, 1.6]]) g.glow('lantern', x, y, z, { r, col: '#FFDDA6' });
   }, { name: 'palau nacional', on: true });
   for (const [x, y] of [[-34, -30], [-30, -24], [-24, -32], [-34, 24], [-28, 30], [-22, 26], [-21, -22]]) T.obj([x, y], (g) => K.tree(g, x, y, { r: 3.6, h: 4.6, z: HILL, col: '#6E9A50' }), { name: 'pine', on: true });
 
@@ -60,25 +64,28 @@ SF.tile('montjuic', -100, 100, { rim: 64 }, function (T) {
     for (let i = 0; i < n; i++) {
       const xa = HX + i, xb = xa + 1, z = HILL * (1 - (i + 1) / n);
       for (const [ya, yb, col] of [[-8, -3, '#E6DCC6'], [3, 8, '#E6DCC6'], [-3, 3, '#A9D3DC']]) {
-        g.fill([[xa, ya, z], [xb, ya, z], [xb, yb, z], [xa, yb, z]], i % 2 && col !== '#A9D3DC' ? '#DED3BA' : col);
-        g.fill([[xb, ya, z], [xb, yb, z], [xb, yb, z - HILL / n], [xb, ya, z - HILL / n]], col === '#A9D3DC' ? '#F3FAFB' : '#C9BCA0');
+        g.fill([[xa, ya, z], [xb, ya, z], [xb, yb, z], [xa, yb, z]], i % 2 && col !== '#A9D3DC' ? '#DED3BA' : col); if (col === '#A9D3DC') g.mark({ nc: '#6FC4E0' });
+        g.fill([[xb, ya, z], [xb, yb, z], [xb, yb, z - HILL / n], [xb, ya, z - HILL / n]], col === '#A9D3DC' ? '#F3FAFB' : '#C9BCA0'); if (col === '#A9D3DC') g.mark({ nc: '#DFF6FF' });   // at night the cascade is lit from under the water
       }
     }
     // the low walls of the cascade
     for (const y of [-3, 3]) g.line([[HX, y, HILL + 0.6], [-6, y, 0.6]], { w: 0.7, c: '#9A8A68', boil: false });
     for (const y of [-8, 8]) g.line([[HX, y, HILL + 0.4], [-6, y, 0.4]], { w: 0.6, boil: false });
+    for (let i = 1; i < 12; i += 3) g.glow('lantern', HX + i + 0.5, 0, HILL * (1 - (i + 1) / 12) + 0.3, { r: 1.6, col: '#BFEFFF' });
   }, { name: 'cascade' });
 
   /* ---- the Venetian towers at the near end of the avenue, lamps, the halls ---- */
   for (const y of [-7, 7]) T.obj([28.5, y - 1.5, 31.5, y + 1.5], function (g) {
     K.box(g, 28.5, y - 1.5, 31.5, y + 1.5, 0, 17, BRICK, { w: 0.8 });
     const br = []; for (let z = 1; z < 17; z += 1.2) { const a = g.p(28.5, y + 1.52, z), b = g.p(31.5, y + 1.52, z), c = g.p(31.52, y - 1.5, z); br.push(a[0], a[1], b[0], b[1], b[0], b[1], c[0], c[1]); } g.segs2(br, '#A5563A', 0.25);
-    K.win(g, 'L', y + 1.5, 29.4, 30.6, 13.5, 16, { style: 'dark', arch: true }); K.win(g, 'R', 31.5, y - 0.6, y + 0.6, 13.5, 16, { style: 'dark', arch: true });
+    K.win(g, 'L', y + 1.5, 29.4, 30.6, 13.5, 16, { style: 'dark', arch: true, lit: 0 }); K.win(g, 'R', 31.5, y - 0.6, y + 0.6, 13.5, 16, { style: 'dark', arch: true, lit: 0 });
     K.box(g, 28.2, y - 1.8, 31.8, y + 1.8, 17, 17.6, { t: '#EFE6D2', l: '#E8DCC2', r: '#D3C3A2' }, { w: 0.6, nohid: true });
     const b = g.p(30, y, 17.6), t = g.p(30, y, 22); g.fill2([[b[0] - 6, b[1]], [b[0] + 6, b[1]], t], '#C46A48', true); g.fill2([[b[0], b[1]], [b[0] + 6, b[1]], t], '#A5563A', true); g.line2([[b[0] - 6, b[1]], t, [b[0] + 6, b[1]]], { w: 0.6, boil: false });
+    BC.flood(g, 0, 0.8, '#FFCF9A');                                     // at night the brick towers floodlit from their feet
+    g.glow('lantern', 31.6, y, 6, { r: 2.2, col: '#FFC58A' }); g.glow('lantern', 30, y + 1.6, 15, { r: 1.4, col: '#FFC58A' });
   }, { name: 'venetian tower' });
   for (let x = 12; x <= 26; x += 7) for (const y of [-9, 9]) T.obj([x, y], (g) => BC.lamp(g, x, y, { side: y > 0 ? -1 : 1 }), { name: 'lamp' });
-  T.obj([-4, -35, 26, -13], function (g) { K.box(g, -4, -33, 26, -13, 0, 8, STN, { w: 0.85 }); for (let x = -2; x < 25; x += 3) K.win(g, 'L', -13, x, x + 1.5, 1.5, 6.5, { style: 'navy', arch: true }); K.text(g, 'L', -12.95, 11, 6.8, 0.9, 'FIRA DE BARCELONA', '#7A5A2C', { center: true }); }, { name: 'fira hall' });
+  T.obj([-4, -35, 26, -13], function (g) { K.box(g, -4, -33, 26, -13, 0, 8, STN, { w: 0.85 }); for (let x = -2; x < 25; x += 3) K.win(g, 'L', -13, x, x + 1.5, 1.5, 6.5, { style: 'navy', arch: true, lit: 0.2 }); K.text(g, 'L', -12.95, 11, 6.8, 0.9, 'FIRA DE BARCELONA', '#7A5A2C', { center: true }); }, { name: 'fira hall' });
   for (const [x, y] of [[0, 20], [10, 24], [20, 20], [30, 25], [-2, -22], [34, -20]]) T.obj([x, y], (g) => BC.plane(g, x, y, { r: 3.6, h: 5.6 }), { name: 'tree' });
 
   /* ---- the Magic Fountain: rings of jets in waves, colours changing ---- */
@@ -92,13 +99,14 @@ SF.tile('montjuic', -100, 100, { rim: 64 }, function (T) {
       for (let i = 0; i < 10; i++) { const a = TAU * i / 10 + 0.3, h = 8 + 7 * Math.max(0, Math.sin(ph + (st.pat > 2 ? a * 2 : 0))); jets.push([ox + Math.cos(a) * 3.0, oy + Math.sin(a) * 2.9, h, 1.3]); }
       jets.push([ox, oy, 14 + 10 * Math.max(0, Math.sin(ph * 0.5 + 1)), 2.6]);
       jets.sort((p, q) => (p[0] + p[1]) - (q[0] + q[1]));
+      // at night (the show is at night): every jet shines in its colour, the tall ones throw a halo
       for (const [x, y, h, w] of jets) {
         const b = g.p(x, y, 0.1), t = g.p(x, y, h), sp = w * 1.6;
-        g.fill2([[b[0] - w * 0.5, b[1]], [b[0] + w * 0.5, b[1]], [t[0] + sp * 0.5, t[1] + 2], [t[0], t[1] - 1.2], [t[0] - sp * 0.5, t[1] + 2]], c1, true);
-        g.fill2([[b[0] - w * 0.2, b[1]], [b[0] + w * 0.2, b[1]], [t[0] + 0.2, t[1] + 1], [t[0] - 0.2, t[1] + 1]], c0, true);
+        g.fill2([[b[0] - w * 0.5, b[1]], [b[0] + w * 0.5, b[1]], [t[0] + sp * 0.5, t[1] + 2], [t[0], t[1] - 1.2], [t[0] - sp * 0.5, t[1] + 2]], c1, true); g.mark({ nc: true, light: w > 2 || h > 12 });
+        g.fill2([[b[0] - w * 0.2, b[1]], [b[0] + w * 0.2, b[1]], [t[0] + 0.2, t[1] + 1], [t[0] - 0.2, t[1] + 1]], c0, true); g.mark({ nc: true });
         g.segs2([t[0] - sp, t[1] + 3.2, t[0] - sp * 0.4, t[1] + 0.2, t[0] + sp * 0.4, t[1] + 0.2, t[0] + sp, t[1] + 3.2], '#FFFFFF', 0.35);
       }
-      const mist = []; for (let i = 0; i < 16; i++) { const a = TAU * i / 16 + st.q * 0.2, p = g.p(ox + Math.cos(a) * 5.4, oy + Math.sin(a) * 5.2, 0.4); mist.push(p); } for (const p of mist) g.disc2(p, 1.0, c1);
+      const mist = []; for (let i = 0; i < 16; i++) { const a = TAU * i / 16 + st.q * 0.2, p = g.p(ox + Math.cos(a) * 5.4, oy + Math.sin(a) * 5.2, 0.4); mist.push(p); } for (const p of mist) { g.disc2(p, 1.0, c1); g.mark({ nc: true }); }
     } });
 
   /* ---- people ---- */
@@ -115,4 +123,48 @@ SF.tile('montjuic', -100, 100, { rim: 64 }, function (T) {
   for (const [x, y, s] of [[-20, -10, 2260], [-21, 11, 2261]]) T.cast([x, y], (g) => BC.person(g, x, y, HILL, BC.who(s, { dir: 0, pose: 'hold', phone: true })), { on: true });
 
   BC.block(T, { skip: { 'x+': [[-12, 12]] }, corners: { nn: 'bins', np: 'bicing', pp: 'motos' }, noTrees: ['x-'] });
+
+  /* ---- night only: the searchlights over the palace and La Mercè's piromusical ----
+     Made last of all (BC.late): an actor's number seeds its pen. Both are on the top layer, return nothing by day and
+     shine (their fills keep their colour at night, some cast a halo). */
+  const WX = T.cx, WY = T.cy;
+  BC.late.push(function (L) {
+    // the Palau Nacional's searchlights: Buïgas's fan of beams from the gallery behind the dome (1929, restored in
+    // 2018), a crown of pale light over Montjuïc. Nine beams, a few marks each.
+    L.actor({ layer: 'top', sample: 5, period: 10, grow: false,
+      at(t) { if (!LOOK.night) return null; return { x: WX - 31.5 - L.cx, y: WY - L.cy, z: HILL + 18, key: 'beams' }; },
+      draw(g) {
+        for (let i = 0; i < 9; i++) {
+          // the fan stands across the view (as the city sees it from the plaça), the beams widening and fading as they rise
+          const th = (i - 4) / 4 * 0.58, u = [Math.sin(th) * 0.7071, -Math.sin(th) * 0.7071, Math.cos(th)], side = [Math.cos(th) * 0.7071, -Math.cos(th) * 0.7071, -Math.sin(th)];
+          const P = (s, w) => g.p(u[0] * s + side[0] * w, u[1] * s + side[1] * w, u[2] * s + side[2] * w);
+          for (let j = 0; j < 7; j++) { const s0 = 2 + j * 6, s1 = s0 + 6, w0 = 0.2 + s0 * 0.04, w1 = 0.2 + s1 * 0.04, a = 0.16 * Math.pow(0.72, j); g.fill2([P(s0, -w0), P(s1, -w1), P(s1, w1), P(s0, w0)], 'rgba(236,242,255,' + a.toFixed(3) + ')', true); g.mark({ nc: true }); }
+          if (i % 4 === 0) { g.disc2(P(3, 0), 0.8, 'rgba(236,242,255,0)'); g.mark({ nc: true, light: true }); }   // a little glare where the lamps are
+        }
+      } });
+    // the piromusical that closes La Mercè over the Magic Fountain: shells rise from the hill and burst in turn, each
+    // a ring of strokes and sparks that opens and fades
+    const PAL = ['#FFD54A', '#FF5A6E', '#FFFFFF', '#7CF08A', '#6FC8FF', '#FF9AE0'], PER = 6, LIFE = 2.6;
+    for (let k = 0; k < 4; k++) L.actor({ layer: 'top', sample: 5, period: PER * 6, grow: false,
+      at(t) {
+        if (!LOOK.night) return null;
+        const u = t + k * PER / 4 + (k % 2) * 0.4, n = Math.floor(u / PER), f = (u - n * PER) / LIFE; if (f >= 1) return null;
+        const v = ((n % 6) + 6) % 6, q = Math.min(9, Math.floor(f * 10)), ox = (h1(v * 7 + k) - 0.5) * 22, oy = (h1(v * 13 + k * 5) - 0.5) * 26, zb = 46 + h1(v * 3 + k) * 14;
+        return { x: WX - 12 + ox - L.cx, y: WY + oy - L.cy, z: 0, key: k + '.' + v + '.' + q, v, q, zb, alpha: q >= 8 ? 1 - (q - 7) * 0.3 : null };
+      },
+      draw(g, st) {
+        const col = PAL[(st.v + k * 2) % PAL.length], f = st.q / 10, i0 = g.cmds.length;
+        if (f < 0.2) {                                                  // the shell climbing on its trail
+          const z = st.zb * (0.35 + f / 0.2 * 0.65), a = g.p(0, 0, z - 5), b = g.p(0, 0, z);
+          g.segs2([a[0], a[1], b[0], b[1]], '#FFE2A0', 0.5); g.disc2(b, 0.7, '#FFF2C8'); g.mark({ nc: true, light: true }); BC.litLines(g, i0);
+          return;
+        }
+        const e = (f - 0.2) / 0.8, R = 3 + 30 * Math.sqrt(e), c = g.p(0, 0, st.zb - e * 4), n = 18, rays = [];
+        for (let i = 0; i < n; i++) { const a = TAU * i / n + st.v, cx = Math.cos(a), sy = Math.sin(a); rays.push(c[0] + cx * R * 0.45, c[1] + sy * R * 0.45 + e * 3, c[0] + cx * R, c[1] + sy * R + e * e * 9); }
+        g.segs2(rays, col, 0.7 * (1 - e * 0.5));
+        for (let i = 0; i < n; i += 2) { const a = TAU * i / n + st.v; g.disc2([c[0] + Math.cos(a) * R, c[1] + Math.sin(a) * R + e * e * 9], 0.9 * (1 - e * 0.5), col); g.mark({ nc: true, light: i % 4 === 0 }); }
+        if (e < 0.4) { g.disc2(c, 2.2 * (1 - e), '#FFFFFF'); g.mark({ nc: true, light: true }); }
+        BC.litLines(g, i0);                                             // the strokes keep their colour at night
+      } });
+  });
 });

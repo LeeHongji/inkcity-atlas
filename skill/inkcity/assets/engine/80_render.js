@@ -23,7 +23,7 @@ function mkCanvas(w, h) { const c = document.createElement('canvas'); c.width = 
 /* forget everything drawn on the GPU: paper and grain, bakes, construction canvases, actor bitmaps, pose atlases */
 function gpuReset() {
   R.lost = false; R.jobs.length = 0; R.dead.length = 0; R.deadPx = 0; R.pixels = 0;
-  mkTextures(); R.paperPat = null; R.grainPat = null; R.warmCtx = null;
+  mkTextures(); R.paperPat = null; R.paperPatN = null; R.grainPat = null; R.warmCtx = null; GLOWTEX.clear();
   for (const c of ABMP.list) c.dl.bmp.delete(c.key);
   ABMP.list.length = 0; ABMP.px = 0;
   for (const a of SF.actors) a.lastB = null;
@@ -40,9 +40,9 @@ function mkTextures() {
     const a = k(ix, iy), b = k(ix + 1, iy), c = k(ix, iy + 1), d = k(ix + 1, iy + 1);
     return a + (b - a) * ux + (c - a) * uy + (a - b - c + d) * ux * uy;
   };
-  const paper = mkCanvas(N, N), grain = mkCanvas(N, N);
-  const pc = paper.getContext('2d'), gc = grain.getContext('2d');
-  const pd = pc.createImageData(N, N), gd = gc.createImageData(N, N);
+  const paper = mkCanvas(N, N), grain = mkCanvas(N, N), paperN = mkCanvas(N, N), grainN = mkCanvas(N, N);
+  const pc = paper.getContext('2d'), gc = grain.getContext('2d'), nc = paperN.getContext('2d'), gnc = grainN.getContext('2d');
+  const pd = pc.createImageData(N, N), gd = gc.createImageData(N, N), nd = nc.createImageData(N, N), gnd = gnc.createImageData(N, N), NP = NIGHT.paper;
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
     const i = (y * N + x) * 4;
     const fine = pn(x / 2.2, y / 2.2, Math.round(N / 2.2), 5) - 0.5, mid = pn(x / 8, y / 8, N / 8, 6) - 0.5, big = pn(x / 64, y / 64, N / 64, 7) - 0.5;
@@ -50,12 +50,15 @@ function mkTextures() {
     let v = fine * 3.4 + mid * 3.0 + big * 2.2;
     if (speck > 0.9965) v -= 5 + 6 * h2(x, y); else if (speck < 0.002) v += 3;
     pd.data[i] = clamp(240.5 + v, 0, 255); pd.data[i + 1] = clamp(238 + v * 0.95, 0, 255); pd.data[i + 2] = clamp(228 + v * 1.05, 0, 255); pd.data[i + 3] = 255;
+    nd.data[i] = clamp(NP[0] + v * 0.5, 0, 255); nd.data[i + 1] = clamp(NP[1] + v * 0.52, 0, 255); nd.data[i + 2] = clamp(NP[2] + v * 0.62, 0, 255); nd.data[i + 3] = 255;   // the night's paper
     const g = fine * 1.5 + mid * 1.1 + (pn(x / 3.3, y / 1.4, Math.round(N / 3.3), 9) - 0.5) * 0.9;     // paint grain, signed
     if (g > 0) { gd.data[i] = 255; gd.data[i + 1] = 252; gd.data[i + 2] = 244; gd.data[i + 3] = clamp(g * 15, 0, 255); }
     else { gd.data[i] = 70; gd.data[i + 1] = 58; gd.data[i + 2] = 44; gd.data[i + 3] = clamp(-g * 15, 0, 255); }
+    if (g > 0) { gnd.data[i] = 170; gnd.data[i + 1] = 182; gnd.data[i + 2] = 214; gnd.data[i + 3] = clamp(g * 6, 0, 255); }        // the night's grain
+    else { gnd.data[i] = 8; gnd.data[i + 1] = 10; gnd.data[i + 2] = 20; gnd.data[i + 3] = clamp(-g * 14, 0, 255); }
   }
-  pc.putImageData(pd, 0, 0); gc.putImageData(gd, 0, 0);
-  R.tex = { paper, grain, N };
+  pc.putImageData(pd, 0, 0); gc.putImageData(gd, 0, 0); nc.putImageData(nd, 0, 0); gnc.putImageData(gnd, 0, 0);
+  R.tex = { paper, grain, paperN, grainN, N };
 }
 
 /* ---------- views ---------- */
@@ -78,7 +81,7 @@ function grainOver(ctx, x0, y0, w, h) {
   ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-atop';
   if (!R.grainPat) R.grainPat = ctx.createPattern(R.tex.grain, 'repeat');
   const ox = ((-x0 % 512) + 512) % 512, oy = ((-y0 % 512) + 512) % 512;
-  ctx.translate(ox - 512, oy - 512); ctx.fillStyle = ctx.createPattern(R.tex.grain, 'repeat'); ctx.fillRect(0, 0, w + 1024, h + 1024);
+  ctx.translate(ox - 512, oy - 512); ctx.fillStyle = ctx.createPattern(LOOK.night ? R.tex.grainN : R.tex.grain, 'repeat'); ctx.fillRect(0, 0, w + 1024, h + 1024);
   ctx.restore();
 }
 /* the six boil drawings of a set of objects as one Path2D per colour per drawing; a generator so it can be sliced */
@@ -94,7 +97,7 @@ function* compileBoilGen(objs, hw, amp, region) {
           if (!d.rb) { const c = d.c; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < c.length; i += 2) { if (c[i] < x0) x0 = c[i]; if (c[i] > x1) x1 = c[i]; if (c[i + 1] < y0) y0 = c[i + 1]; if (c[i + 1] > y1) y1 = c[i + 1]; } d.rb = [x0 - 4, y0 - 4, x1 + 4, y1 + 4]; }
           if (!bbHit(d.rb, region)) continue;
         }
-        let p = by.get(d.col); if (!p) { p = new Path2D(); by.set(d.col, p); }
+        const col = colOf(d, d.col); let p = by.get(col); if (!p) { p = new Path2D(); by.set(col, p); }
         ribPath(p, d, hw, null, k * d.w.length, amp); any = true;
         if ((++n % 150) === 0) yield 'boil';
       }
@@ -342,8 +345,8 @@ function tileState(t, n, allLive) {
   if (n < t.castAt) return 2;
   return 3;
 }
-function compiled(dl, hw) {
-  const k = Math.round(hw * 4096);
+function compiled(dl, hw, raw) {
+  const night = LOOK.night && !raw, k = Math.round(hw * 4096) + (night ? 0.5 : 0), cl = (d, c) => (night ? nightOf(d, c) : c);
   let c = dl.comp.get(k);
   if (c) return c;
   // group the display list into Path2Ds; keep painter's order
@@ -352,13 +355,13 @@ function compiled(dl, hw) {
   for (const d of dl.cmds) {
     if (d.co) continue;
     switch (d.k) {
-      case K_FILL: { const p = need(0, d.c, 0), a = d.p; p.moveTo(a[0], a[1]); for (let i = 2; i < a.length; i += 2) p.lineTo(a[i], a[i + 1]); p.closePath(); break; }
-      case K_RIB: ribPath(need(0, d.col, 0), d, hw, null, -1, 0); break;
-      case K_STROKE: { const p = need(1, d.col, Math.max(0.35 * hw, d.wt * hw * 2)), a = d.p; p.moveTo(a[0], a[1]); for (let i = 2; i < a.length; i += 2) p.lineTo(a[i], a[i + 1]); break; }
-      case K_DISC: { const p = need(0, d.c, 0); p.moveTo(d.x + d.r, d.y); p.arc(d.x, d.y, d.r, 0, TAU); p.closePath(); break; }
-      case K_RING: { const p = need(1, d.col, Math.max(0.35 * hw, d.wt * hw * 2)); p.moveTo(d.x + d.r, d.y); p.arc(d.x, d.y, d.r, 0, TAU); break; }
-      case K_SEGS: { const p = need(1, d.col, Math.max(0.35 * hw, d.wt * hw * 2)), a = d.p; for (let i = 0; i < a.length; i += 4) { p.moveTo(a[i], a[i + 1]); p.lineTo(a[i + 2], a[i + 3]); } break; }
-      case K_TRIS: { const p = need(0, d.c, 0), a = d.p; for (let i = 0; i < a.length; i += 6) { p.moveTo(a[i], a[i + 1]); p.lineTo(a[i + 2], a[i + 3]); p.lineTo(a[i + 4], a[i + 5]); p.closePath(); } break; }
+      case K_FILL: { const p = need(0, cl(d, d.c), 0), a = d.p; p.moveTo(a[0], a[1]); for (let i = 2; i < a.length; i += 2) p.lineTo(a[i], a[i + 1]); p.closePath(); break; }
+      case K_RIB: ribPath(need(0, cl(d, d.col), 0), d, hw, null, -1, 0); break;
+      case K_STROKE: { const p = need(1, cl(d, d.col), Math.max(0.35 * hw, d.wt * hw * 2)), a = d.p; p.moveTo(a[0], a[1]); for (let i = 2; i < a.length; i += 2) p.lineTo(a[i], a[i + 1]); break; }
+      case K_DISC: { const p = need(0, cl(d, d.c), 0); p.moveTo(d.x + d.r, d.y); p.arc(d.x, d.y, d.r, 0, TAU); p.closePath(); break; }
+      case K_RING: { const p = need(1, cl(d, d.col), Math.max(0.35 * hw, d.wt * hw * 2)); p.moveTo(d.x + d.r, d.y); p.arc(d.x, d.y, d.r, 0, TAU); break; }
+      case K_SEGS: { const p = need(1, cl(d, d.col), Math.max(0.35 * hw, d.wt * hw * 2)), a = d.p; for (let i = 0; i < a.length; i += 4) { p.moveTo(a[i], a[i + 1]); p.lineTo(a[i + 2], a[i + 3]); } break; }
+      case K_TRIS: { const p = need(0, cl(d, d.c), 0), a = d.p; for (let i = 0; i < a.length; i += 6) { p.moveTo(a[i], a[i + 1]); p.lineTo(a[i + 2], a[i + 3]); p.lineTo(a[i + 4], a[i + 5]); p.closePath(); } break; }
     }
   }
   if (dl.comp.size > 8) dl.comp.clear();
@@ -461,6 +464,293 @@ function drawBoil(ctx, v, boil, k) {
   if (!boil || SF.noBoil) return;
   for (const g of boil[k]) { ctx.fillStyle = g.col; ctx.fill(g.path); }
 }
+/* ---------- night: the light itself ----------
+   Lights come from g.glow calls (K.lamp, K.tree ...), from the colours a scene lists in SCENE.night (its own lamps,
+   lanterns, signs and leaves), from the lit windows, and, for people and cars, from the light colours in their drawings.
+   Over the frame: a warm glow where the lights are thick, pools on the ground, halos with a glint on the brightest,
+   columns of light on water, head-lamp beams on the road, dust drifting in the lamplight, and motes rising over leaves,
+   flowers and lawns. Everything is a function of the frame time, so a night frame is as repeatable as a day one. */
+const GLOWTEX = new Map();
+/* a soft round light in one colour: a bright core falling away to nothing (64 px, drawn at any size) */
+function glowTex(col) {
+  let c = GLOWTEX.get(col); if (c) return c;
+  c = mkCanvas(64, 64); const x = c.getContext('2d'), p = parseCol(col) || [255, 210, 140, 1], rgb = p[0] + ',' + p[1] + ',' + p[2];
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(' + rgb + ',1)'); g.addColorStop(0.1, 'rgba(' + rgb + ',0.82)'); g.addColorStop(0.3, 'rgba(' + rgb + ',0.3)');
+  g.addColorStop(0.62, 'rgba(' + rgb + ',0.08)'); g.addColorStop(1, 'rgba(' + rgb + ',0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64); GLOWTEX.set(col, c); return c;
+}
+/* a wide, very soft glow (the light of a whole street): no bright core */
+function hazeTex(col) {
+  const key = 'haze' + col; let c = GLOWTEX.get(key); if (c) return c;
+  c = mkCanvas(64, 64); const x = c.getContext('2d'), p = parseCol(col), rgb = p[0] + ',' + p[1] + ',' + p[2];
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(' + rgb + ',0.6)'); g.addColorStop(0.45, 'rgba(' + rgb + ',0.28)'); g.addColorStop(1, 'rgba(' + rgb + ',0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64); GLOWTEX.set(key, c); return c;
+}
+/* the four-pointed glint of a bright light seen at night */
+function starTex() {
+  let c = GLOWTEX.get('*star'); if (c) return c;
+  c = mkCanvas(64, 64); const x = c.getContext('2d');
+  for (const vert of [false, true]) {
+    const g = vert ? x.createLinearGradient(0, 0, 0, 64) : x.createLinearGradient(0, 0, 64, 0);
+    g.addColorStop(0, 'rgba(255,244,220,0)'); g.addColorStop(0.5, 'rgba(255,248,230,0.95)'); g.addColorStop(1, 'rgba(255,244,220,0)');
+    x.fillStyle = g; x.beginPath(); if (vert) x.ellipse(32, 32, 1.3, 32, 0, 0, TAU); else x.ellipse(32, 32, 32, 1.3, 0, 0, TAU); x.fill();
+  }
+  const r = x.createRadialGradient(32, 32, 0, 32, 32, 7); r.addColorStop(0, 'rgba(255,250,236,1)'); r.addColorStop(1, 'rgba(255,240,210,0)');
+  x.fillStyle = r; x.fillRect(0, 0, 64, 64); GLOWTEX.set('*star', c); return c;
+}
+/* a head-lamp beam lying on the road: bright at the lamp, fading along its length and to its sides (128 x 32) */
+function beamTex() {
+  let c = GLOWTEX.get('*beam'); if (c) return c;
+  c = mkCanvas(128, 32); const x = c.getContext('2d'), d = x.createImageData(128, 32);
+  for (let j = 0; j < 32; j++) for (let i = 0; i < 128; i++) {
+    const u = i / 127, v = (j - 15.5) / 15.5, w = 0.35 + 0.65 * u, a = Math.pow(1 - u, 1.6) * Math.exp(-(v * v) / (w * w) * 2.2) * smooth(u / 0.06);
+    const k = (j * 128 + i) * 4; d.data[k] = 255; d.data[k + 1] = 238; d.data[k + 2] = 196; d.data[k + 3] = Math.round(255 * a);
+  }
+  x.putImageData(d, 0, 0); GLOWTEX.set('*beam', c); return c;
+}
+const LAMP_COL = '#FFC979', POOL_COL = '#FFB45C', AURA_COL = '#4FD8B0', HAZE_COL = '#FFA856', DUST_COL = '#FFE1AE';
+const MOTE_COL = ['#E9FF9F', '#A9F7DF', '#FFF2B0', '#FFD58A'];
+const AMB_G = 56;                                   // the warm glow over the city is summed in cells this many wide px across
+/* every light in the city, once: R.lights [{ k, x, y, gx, gy, r, col, pool, rx, ry }], R.wins (lit windows) and R.amb
+   (the warm glow over each part of the city), all in wide px */
+function nightPrep() {
+  if (R.lights) return R.lights;
+  const S = nightSet(), L = [], water = [], wins = [], LITS = new Set(LIT.concat(LIT_COOL, [LIT_DIM]));
+  const box = (p) => { let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < p.length; i += 2) { if (p[i] < x0) x0 = p[i]; if (p[i] > x1) x1 = p[i]; if (p[i + 1] < y0) y0 = p[i + 1]; if (p[i + 1] > y1) y1 = p[i + 1]; } return [x0, y0, x1, y1]; };
+  for (const t of SF.live) for (const ob of t.statics) {
+    const n0 = L.length, w0 = wins.length;
+    if (ob.glows) for (const e of ob.glows) L.push(Object.assign({}, e));
+    const trees = [];
+    for (const d of ob.list) {
+      const c = d.c || d.col; if (typeof c !== 'string') continue;
+      const key = c.toLowerCase();
+      if (d.k === K_FILL && (d.win != null || S.win.has(key))) {              // a window: lit or dark, decided once
+        const nc = nightOf(d, c);
+        if (LITS.has(nc)) { const b = box(d.p), w = b[2] - b[0], h = b[3] - b[1]; if (w * h > 1.2) wins.push({ x: (b[0] + b[2]) / 2, y: (b[1] + b[3]) / 2, r: Math.max(w, h) / 2, col: nc, dim: nc === LIT_DIM, cool: LIT_COOL.indexOf(nc) >= 0 }); }
+      }
+      const isLamp = S.lamps.has(key), isGlow = S.glowScene.has(key), isLeaf = S.foliage.has(key), isWater = ob.ground && S.water.has(key) && d.k === K_FILL;
+      const isShop = d.k === K_FILL && ((S.win.get(key) || 0) >= 0.99 || (d.nc && d.spill));
+      const isLawn = ob.ground && d.k === K_FILL && S.grass.has(key);
+      if (!isLamp && !isGlow && !isLeaf && !isWater && !isShop && !isLawn) continue;
+      const b = d.k === K_DISC ? [d.x - d.r, d.y - d.r, d.x + d.r, d.y + d.r] : d.p ? box(d.p) : d.c && d.c.length ? box(d.c) : null;
+      if (!b) continue;
+      const w = b[2] - b[0], h = b[3] - b[1], x = (b[0] + b[2]) / 2, y = (b[1] + b[3]) / 2;
+      if (isWater) { water.push({ b, p: d.p, gi: ob.gi }); continue; }
+      if (isLawn) {                                                          // motes over a lawn, scattered through it
+        const n = Math.min(14, Math.floor(w * h / 1500)), rr = RNG(Math.round(x * 7 + y * 13));
+        for (let k = 0, tries = 0; k < n && tries < n * 8; tries++) { const px = b[0] + w * rr(), py = b[1] + h * rr(); if (!pointInPoly(px, py, d.p)) continue; L.push({ k: 'bloom', x: px, y: py, gx: px, gy: py, r: 7, col: null, pool: false, lawn: true }); k++; }
+        continue;
+      }
+      if (isShop) { if (w * h > 20) L.push({ k: 'spill', x, y: b[3] - h * 0.3, gx: x, gy: b[3] + 3, r: Math.max(w, 6) / 2, col: null, pool: true }); continue; }
+      if (isLamp) { const gy = y + S.lampH * VZ; L.push({ k: 'lamp', x, y, gx: x, gy, r: Math.max(1.2, Math.max(w, h) / 2), col: null, pool: S.lampPool }); continue; }
+      if (isGlow) { if (w * h > 900) continue; L.push({ k: 'lantern', x, y, gx: x, gy: y, r: Math.max(1, Math.max(w, h) / 2), col: c, pool: false }); continue; }
+      if (isLeaf && d.k === K_FILL && w * h > 30 && w * h < 9000 && w / Math.max(h, 0.1) > 0.4 && w / Math.max(h, 0.1) < 2.6) {
+        const r = Math.sqrt(w * h / Math.PI) * 0.95;
+        if (trees.some((q) => Math.hypot(q.x - x, q.y - y) < q.r * 0.7)) continue;      // the shaded and lit facets of one crown
+        const e = { k: 'tree', x, y, gx: x, gy: y + r, r, col: null, pool: false }; trees.push(e); L.push(e);
+      }
+    }
+    for (let i = n0; i < L.length; i++) { L[i].t = t; L[i].gi = ob.gi; }  // a light shines once its place is drawn
+    for (let i = w0; i < wins.length; i++) { wins[i].t = t; wins[i].gi = ob.gi; }
+  }
+  // what stands in front: the halos, glows and reflections are laid over the finished frame, so a light, a lit window or
+  // a patch of water that a later standing object paints over must not shine through it
+  const OG = 48, grid = new Map(), gk = (i, j) => i * 100003 + j;
+  for (const ob of SF.statics) {
+    if (ob.ground || ob.cast || !ob.list) continue;
+    const fills = [];
+    for (const d of ob.list) {
+      if (d.k !== K_FILL && d.k !== K_DISC) continue;
+      const pc = typeof d.c === 'string' ? parseCol(d.c) : null; if (!pc || pc[3] < 0.9) continue;     // glass and shadows let light through
+      const b = d.k === K_DISC ? [d.x - d.r, d.y - d.r, d.x + d.r, d.y + d.r] : box(d.p);
+      if ((b[2] - b[0]) * (b[3] - b[1]) > 0.6) fills.push({ d, b });
+    }
+    if (!fills.length) continue;
+    ob._occ = fills;
+    for (let i = Math.floor(ob.bb[0] / OG); i <= Math.floor(ob.bb[2] / OG); i++) for (let j = Math.floor(ob.bb[1] / OG); j <= Math.floor(ob.bb[3] / OG); j++) { const k = gk(i, j); let a = grid.get(k); if (!a) grid.set(k, (a = [])); a.push(ob); }
+  }
+  // ground drawn over water (a quay, a bank, an island laid on a sea that runs under it) hides that water too
+  const gg = new Map();
+  for (const ob of SF.statics) {
+    if (!ob.ground || !ob.list) continue;
+    const fills = [];
+    for (const d of ob.list) {
+      if (d.k !== K_FILL || typeof d.c !== 'string' || S.water.has(d.c.toLowerCase())) continue;
+      const pc = parseCol(d.c); if (!pc || pc[3] < 0.9) continue;
+      const b = box(d.p); if ((b[2] - b[0]) * (b[3] - b[1]) > 4) fills.push({ d, b });
+    }
+    if (!fills.length) continue;
+    ob._occG = fills;
+    for (let i = Math.floor(ob.bb[0] / OG); i <= Math.floor(ob.bb[2] / OG); i++) for (let j = Math.floor(ob.bb[1] / OG); j <= Math.floor(ob.bb[3] / OG); j++) { const k = gk(i, j); let a = gg.get(k); if (!a) gg.set(k, (a = [])); a.push(ob); }
+  }
+  const landOver = (x, y, gi) => {
+    for (const ob of gg.get(gk(Math.floor(x / OG), Math.floor(y / OG))) || []) {
+      if (ob.gi <= gi || x < ob.bb[0] || x > ob.bb[2] || y < ob.bb[1] || y > ob.bb[3]) continue;
+      for (const f of ob._occG) { const b = f.b; if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue; if (pointInPoly(x, y, f.d.p)) return true; }
+    }
+    return false;
+  };
+  const covered = (x, y, gi) => {
+    for (const ob of grid.get(gk(Math.floor(x / OG), Math.floor(y / OG))) || []) {
+      if (ob.gi <= gi || x < ob.bb[0] || x > ob.bb[2] || y < ob.bb[1] || y > ob.bb[3]) continue;
+      for (const f of ob._occ) { const b = f.b; if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue; if (f.d.k === K_DISC ? Math.hypot(x - f.d.x, y - f.d.y) < f.d.r : pointInPoly(x, y, f.d.p)) return true; }
+    }
+    return false;
+  };
+  R.covered = covered;                                                     // (people's and cars' lights are checked as they move)
+  for (const e of L) if (e.k !== 'tree' && e.k !== 'bloom' && e.k !== 'spill' && e.gi != null && covered(e.x, e.y, e.gi)) e.hid = true;   // its pool on the ground stays
+  for (let i = wins.length - 1; i >= 0; i--) if (covered(wins[i].x, wins[i].y, wins[i].gi)) wins.splice(i, 1);
+  // light falling on water: the first point on the water in front of (below, on screen) what lights it that nothing
+  // stands over (a high light's reflection lies further down)
+  if (water.length) for (const e of L) {
+    if (e.k === 'tree' || e.k === 'bloom' || e.k === 'spill') continue;
+    for (let k = 2; k <= 60; k += 2) {
+      const qx = e.gx, qy = e.gy + k;
+      const wet = water.find((w) => qx > w.b[0] && qx < w.b[2] && qy > w.b[1] && qy < w.b[3] && pointInPoly(qx, qy, w.p));
+      if (wet) { if (!landOver(qx, qy, wet.gi) && !covered(qx, qy, -1)) { e.rx = qx; e.ry = qy; break; } }
+      else if (e.rx == null && k > 34) break;
+    }
+  }
+  // the warm glow of the lit city: every light adds to the cell it is in
+  const cells = new Map(), tix = new Map(SF.live.map((t, i) => [t, i]));
+  const add = (x, y, w, t) => { const k = (tix.get(t) || 0) * 1e7 + Math.floor(x / AMB_G) * 3001 + Math.floor(y / AMB_G); let c = cells.get(k); if (!c) cells.set(k, (c = { x: 0, y: 0, w: 0, t })); c.x += x * w; c.y += y * w; c.w += w; };
+  for (const e of L) { const w = e.k === 'lamp' ? 1 : e.k === 'spill' ? 0.9 : e.k === 'neon' ? 0.7 : e.k === 'lantern' ? 0.25 + Math.min(0.75, e.r / 6) : 0; if (w) add(e.x, e.y, w, e.t); }
+  for (const e of wins) add(e.x, e.y, (e.dim ? 0.03 : 0.08) * Math.min(3, e.r / 1.5), e.t);
+  R.amb = [...cells.values()].filter((c) => c.w > 0.3).map((c) => ({ x: c.x / c.w, y: c.y / c.w, w: c.w, t: c.t }));
+  R.wins = wins; R.lights = L; return L;
+}
+/* the lights in a person's or a car's drawing (head and tail lights, a lantern carried): centres in its own frame */
+function actorLights(dl) {
+  if (dl.lights !== undefined) return dl.lights;
+  const S = nightSet(), out = [];
+  for (const d of dl.cmds) {
+    if (d.k !== K_FILL && d.k !== K_DISC) continue;
+    if (!d.light && !S.glow.has(String(d.c).toLowerCase())) continue;
+    const col = d.nc || d.c;
+    if (d.k === K_DISC) { out.push({ x: d.x, y: d.y, r: d.r, col }); continue; }
+    const p = d.p; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (let i = 0; i < p.length; i += 2) { x0 = Math.min(x0, p[i]); x1 = Math.max(x1, p[i]); y0 = Math.min(y0, p[i + 1]); y1 = Math.max(y1, p[i + 1]); }
+    out.push({ x: (x0 + x1) / 2, y: (y0 + y1) / 2, r: d.light ? Math.max(1.2, Math.max(x1 - x0, y1 - y0) / 2) : 1.2, col, head: String(d.c).toUpperCase() === '#F6E7A8' });
+  }
+  dl.lights = out.length ? out : null; return dl.lights;
+}
+/* stage 'ground': pools of lamplight and shop light on the paving. stage 'air': everything else (see above).
+   o.lightT: seconds since night fell (the lamps come on in a wave from the middle of the view); none = all on */
+function drawLight(ctx, v, t, o, stage) {
+  const L = nightPrep(), pz = v.pz, tx = v.tx, ty = v.ty, rc = v.rect, lt = o.lightT;
+  const diag = Math.hypot(rc[2] - rc[0], rc[3] - rc[1]) / 2, cx = (rc[0] + rc[2]) / 2, cy = (rc[1] + rc[3]) / 2;
+  const onAt = (x, y) => lt == null ? 1 : clamp((lt - 0.1 - 1.2 * Math.min(1, Math.hypot(x - cx, y - cy) / diag)) / 0.35, 0, 1);
+  // while the city draws itself, a place's lights come on as its paint is finished (none over bare paper)
+  const nn = o.n == null ? t * FPS : o.n;
+  const tileOn = (tl) => { if (!tl || o.allLive || tl.rim < 0 || tl._st === -1 || tl._st == null) return 1; if (tl._st < 2) return 0; return smooth((nn - (tl.doneAt == null ? tl.castAt : tl.doneAt)) / 12); };
+  const on = (e) => onAt(e.x, e.y) * tileOn(e.t);
+  const vis = (x, y, R) => x + R > rc[0] && x - R < rc[2] && y + R > rc[1] && y - R < rc[3];
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'lighter';
+  const img = (tex, x, y, R, a, sy) => {
+    sy = sy || 1; const RR = R * pz;
+    if (a <= 0.004 || RR < 0.7) return;                                   // nothing a pixel wide
+    ctx.globalAlpha = a > 1 ? 1 : a; ctx.drawImage(tex, tx + x * pz - RR, ty + y * pz - RR * sy, RR * 2, RR * 2 * sy);
+  };
+  const spr = (col, x, y, R, a, sy) => img(glowTex(col), x, y, R, a, sy);
+  if (stage === 'ground') {
+    for (const e of L) {
+      if (!e.pool || (e.k !== 'lamp' && e.k !== 'spill')) continue;
+      if (e.k === 'spill') { const R = e.r * 1.8 + 8; if (vis(e.gx, e.gy, R)) spr(POOL_COL, e.gx, e.gy, R, 0.5 * on(e), 0.42); continue; }
+      const R = 24 + e.r * 3.5; if (!vis(e.gx, e.gy, R)) continue;
+      spr(POOL_COL, e.gx, e.gy, R, 0.75 * on(e), 0.5);
+    }
+    ctx.restore(); return;
+  }
+  // the warm glow of the lit city, cell by cell
+  const haze = hazeTex(HAZE_COL), HR = AMB_G * 1.75, hk = 0.16 * clamp(1.3 - pz / 3.2, 0.42, 1);   // an atmosphere seen from afar: thinner close to
+  for (const c of R.amb) if (vis(c.x, c.y, HR)) img(haze, c.x, c.y, HR, hk * Math.min(1.4, Math.sqrt(c.w / 2.5)) * on(c), 0.8);
+  // lit windows shine a little past their frames (a television flickers)
+  if (pz > 0.9) {
+    const wa = clamp((pz - 0.9) / 0.8, 0, 1);
+    for (let i = 0; i < R.wins.length; i++) {
+      const e = R.wins[i], Rw = e.r * 2.3 + 1.6; if (!vis(e.x, e.y, Rw)) continue;
+      let a = (e.dim ? 0.16 : 0.32) * wa * on(e);
+      if (e.cool) a *= 0.72 + 0.28 * Math.sin(t * 9 + i * 2.7) * Math.sin(t * 3.1 + i);
+      spr(e.col, e.x, e.y, Rw, a);
+    }
+  }
+  const glint = pz > 1.05, star = glint ? starTex() : null;
+  for (let i = 0; i < L.length; i++) {
+    const e = L[i];
+    if (e.k === 'tree' || e.k === 'bloom' || e.k === 'spill') continue;
+    const a = on(e); if (a <= 0) continue;
+    const col = e.k === 'lamp' ? LAMP_COL : e.col || LAMP_COL;
+    if (e.hid) { if (e.rx == null) continue; }                              // behind something: only its reflection, if any, shows
+    if (e.rx != null && vis(e.rx, e.ry + 10, 14)) {                        // a broken column of light on the water
+      for (let k = 0; k < 7; k++) {
+        const w = (4 - k * 0.45) * (0.75 + 0.35 * Math.sin(t * 2.6 + k * 1.9 + e.x)), dx = Math.sin(t * 1.7 + k * 1.3 + e.y) * 0.9;
+        ctx.globalAlpha = 0.5 * a * (1 - k / 7.5); ctx.fillStyle = col;
+        ctx.fillRect(tx + (e.rx + dx - w / 2) * pz, ty + (e.ry + k * 2.4) * pz, w * pz, Math.max(1, 0.9 * pz));
+      }
+    }
+    if (e.hid) continue;
+    const R = e.k === 'lamp' ? 10 + e.r * 4.8 : 3.5 + e.r * 3.6; if (!vis(e.x, e.y, R * 1.3)) continue;
+    spr(col, e.x, e.y, R, (e.k === 'lamp' ? 0.95 : 0.68) * a);
+    if (pz > 1.2) spr('#FFF7DE', e.x, e.y, Math.max(1.4, e.r * 1.3), 0.6 * a);
+    if (glint && ((e.k === 'lamp' && h1(i * 31 + 7) < 0.5) || (e.k === 'lantern' && e.r >= 2.6))) {   // some lamps and the lit landmarks glint
+      const tw = 0.7 + 0.3 * Math.sin(t * (1.1 + h1(i) * 0.8) + i * 1.7);
+      img(star, e.x, e.y, (e.k === 'lamp' ? 5 + e.r * 1.6 : 2.5 + e.r * 1.6) * clamp(pz / 2.5, 0.75, 1.25), 0.5 * a * tw);
+    }
+    // dust turning slowly in the light
+    const nd = e.k === 'lamp' ? 3 : e.r > 1.4 ? 1 : 0;
+    for (let j = 0; j < nd && pz > 1.4; j++) {
+      const s0 = h2(i * 7 + j, 611), s1 = h2(i * 7 + j, 612), P = 9 + 7 * s0, ang = TAU * (t / P + s1), rad = R * (0.35 + 0.45 * s0);
+      const x = e.x + Math.cos(ang) * rad, y = e.y + R * 0.25 + Math.sin(ang * 0.7 + s1 * 5) * rad * 0.6 - ((t / (P * 1.7) + s0) % 1) * R * 0.5;
+      img(glowTex(DUST_COL), x, y, 0.9 + 0.8 * s1, 0.75 * a * (0.5 + 0.5 * Math.sin(t * 2.2 + s0 * 40)));
+    }
+  }
+  // head lamps, tail lights, a lantern carried; a car's beams on the road ahead
+  const beam = beamTex();
+  for (const A of ACTS) {
+    const ls = actorLights(A.dl); if (!ls) continue;
+    const st = A.st, s = (st.s == null ? 1 : st.s) * A.grow, front = A.slot < 1e9 ? A.slot - 0.5 : null;   // the first object drawn over this actor
+    const hidden = (x, y) => front != null && R.covered(x, y, front);
+    for (const l of ls) { const x = st.sx + l.x * s, y = st.sy + l.y * s, Rl = 2.5 + l.r * 2.6 * s; if (vis(x, y, Rl) && !hidden(x, y)) spr(l.col, x, y, Rl, 0.6 * Math.min(1, 5 / l.r)); }
+    if (st.ang != null && ls.some((l) => l.head || l.col === '#D0483A')) {
+      const ca = Math.cos(st.ang), sa = Math.sin(st.ang), dx = (ca - sa) * AX, dy = (ca + sa) * AY, n = Math.hypot(dx, dy) || 1;
+      const ux = dx / n, uy = dy / n, len = 22 * s, wid = 9 * s, fx = st.sx + ux * 9 * s, fy = st.sy + uy * 4 * s;
+      if (vis(fx + ux * len / 2, fy + uy * len / 2, len) && !hidden(fx, fy)) {
+        ctx.globalAlpha = 0.5; ctx.setTransform(ux * pz, uy * pz, -uy * pz, ux * pz, tx + fx * pz, ty + fy * pz);
+        ctx.drawImage(beam, 0, -wid / 2, len, wid); ctx.setTransform(1, 0, 0, 1, 0, 0);
+      }
+    }
+  }
+  // motes rising over leaves, flowers and lawns (some hang and blink, like fireflies)
+  const core = clamp(0.8 * pz, 1, 3.2) / pz;                                // a mote is a point of light a pixel or three across
+  const lod = clamp((pz - 0.6) / 1.8, 0.3, 1), halo = pz > 1.5;            // fewer motes, and no soft glow round each, far out
+  for (let i = 0; i < L.length; i++) {
+    const e = L[i]; if (e.k !== 'tree' && e.k !== 'bloom') continue;
+    if (!vis(e.x, e.y, e.r * 2.4)) continue;
+    const a0 = on(e);
+    if (e.k === 'tree') spr(e.col || AURA_COL, e.x, e.y, e.r * 1.65, 0.24 * a0);
+    const n = Math.max(1, Math.round(clamp(Math.round(e.r / (e.k === 'tree' ? 3.2 : e.lawn ? 3 : 4)), 2, 10) * lod));
+    for (let j = 0; j < n; j++) {
+      const s0 = h2(i * 13 + j, 501), s1 = h2(i * 13 + j, 502), s2 = h2(i * 13 + j, 503), big = s0 > 0.84 ? 1.8 : 1;
+      let x, y, a;
+      if (s1 < 0.3) {                                                       // a firefly: wanders round one spot and blinks
+        x = e.x + (s2 - 0.5) * 2 * e.r + Math.sin(t * (0.6 + s0) + s1 * 20) * 0.4 * e.r;
+        y = e.y + (s0 - 0.6) * e.r + Math.sin(t * (0.9 + s2) + s0 * 15) * 0.3 * e.r;
+        a = Math.pow(Math.max(0, Math.sin(t * (0.9 + s2 * 0.8) + s0 * 50)), 3) * a0;
+      } else {                                                              // rising from the leaves and fading
+        const P = 6 + 7 * s0, u = (((t / P + s1) % 1) + 1) % 1;
+        x = e.x + (s2 - 0.5) * 1.9 * e.r + Math.sin(t * (0.45 + s0 * 0.5) + s1 * 9) * 0.4 * e.r;
+        y = e.y + e.r * (e.k === 'tree' ? 0.3 : 0.1) - u * e.r * 1.9 + Math.sin(t * 0.8 + s2 * 7) * 0.12 * e.r;
+        a = smooth(u / 0.18) * (1 - smooth((u - 0.6) / 0.4)) * (0.55 + 0.45 * Math.sin(t * (1.5 + 2 * s1) + s0 * 30)) * a0;
+      }
+      const mc = e.col && s0 < 0.6 ? e.col : MOTE_COL[(s2 * 4) | 0];
+      if (halo || big > 1) spr(mc, x, y, core * 11 * big, 0.2 * a);
+      spr(mc, x, y, core * 4.5 * big, a);
+    }
+  }
+  ctx.restore();
+}
 const ACTS = [];
 /* Draw the city at time t (seconds) through view v.
    o.n: film frame (float) that decides which tiles are built; o.allLive: everything is finished;
@@ -471,9 +761,11 @@ SF.draw = function (ctx, v, t, o) {
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   // paper, locked to the world
+  const night = LOOK.night;
   if (!R.paperPat) R.paperPat = ctx.createPattern(R.tex.paper, 'repeat');
+  if (night && !R.paperPatN) R.paperPatN = ctx.createPattern(R.tex.paperN, 'repeat');
   const pox = ((tx % 512) + 512) % 512, poy = ((ty % 512) + 512) % 512;
-  ctx.save(); ctx.translate(pox - 512, poy - 512); ctx.fillStyle = R.paperPat; ctx.fillRect(0, 0, v.cw + 1024, v.ch + 1024); ctx.restore();
+  ctx.save(); ctx.translate(pox - 512, poy - 512); ctx.fillStyle = night ? R.paperPatN : R.paperPat; ctx.fillRect(0, 0, v.cw + 1024, v.ch + 1024); ctx.restore();
   if (v.clip) { ctx.save(); ctx.beginPath(); ctx.rect(v.clip[0], v.clip[1], v.clip[2], v.clip[3]); ctx.clip(); }
   const variant = (((Math.floor(7 * t) + (o.phase | 0)) % BOIL_N) + BOIL_N) % BOIL_N;
   // tile states
@@ -526,6 +818,7 @@ SF.draw = function (ctx, v, t, o) {
       blit(b.base.cv, b.base.x, b.base.y, exact, k);
       ctx.setTransform(pz, 0, 0, pz, tx, ty); drawBoil(ctx, v, b.boil, variant);
     }
+    if (night) drawLight(ctx, v, t, o, 'ground');              // pools of lamplight lie on the ground, under people and buildings
     for (let i = 0; i < tiles.length; i++) {
       const q = bs[i]; if (!q) continue;
       for (const sp of q.b.sprites) {
@@ -552,8 +845,9 @@ SF.draw = function (ctx, v, t, o) {
     }
   }
   flushActors(3e9);
+  if (night) drawLight(ctx, v, t, o, 'air');
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (v.clip) ctx.restore();
   // the ending: the whole frame, paper tooth included, goes to a flat warm cream
-  if (o.fade > 0) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = clamp(o.fade, 0, 1); ctx.fillStyle = 'rgb(242,237,228)'; ctx.fillRect(0, 0, v.cw, v.ch); ctx.globalAlpha = 1; }
+  if (o.fade > 0) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = clamp(o.fade, 0, 1); ctx.fillStyle = night ? 'rgb(' + NIGHT.paper.join(',') + ')' : 'rgb(242,237,228)'; ctx.fillRect(0, 0, v.cw, v.ch); ctx.globalAlpha = 1; }
 };

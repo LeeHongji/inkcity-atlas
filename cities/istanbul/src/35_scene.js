@@ -26,4 +26,8 @@ const SCENE = {
   visit: ['galata', 'karakoy', 'uskudar', 'suleymaniye', 'eminonu', 'kizkulesi', 'bazaar', 'sultanahmet', 'kadikoy'],
   dive: { bazaar: 'carsi', eminonu: 'kopru' },
   bounds: { z: [0.7, 10], cx: [60, 1860], cy: [40, 1120] },
+  // at night (late April, about nine): two windows in three lit; the Horn, the Bosphorus and the bay (and the open water
+  // round the satellites: a clear mask, their land lies on the same blob), the Sultanahmet fountain's basin carry the
+  // lights' reflections; no fireflies over the lawns this early in the year (motes rise from the tulips and trees)
+  night: { lit: 0.66, water: ['#8CC2C0', '#73A9AA', '#B2D9D3', '#9CCFD0', 'rgba(159,203,199,0)'], grass: [] },
 };

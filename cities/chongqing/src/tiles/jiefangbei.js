@@ -27,6 +27,7 @@ SF.tile('jiefangbei', 0, 0, { rim: 18 }, function (T) {
   /* ---- the monument ---- */
   T.obj([MX - 5, MY - 5, MX + 5, MY + 5], (g) => {
     g.boilP = 0.3;
+    const i0 = g.cmds.length;
     const W = { t: '#ECE8DF', l: '#E9E4D9', r: '#D3CDC0' };
     K.cyl(g, MX, MY, 4.6, 0, 0.7, { t: '#D9D3C4', l: '#CFC8B8', r: '#B9B2A2' }, { n: 8, w: 0.7 });
     K.cyl(g, MX, MY, 3.8, 0.7, 1.4, { t: '#E0DACD', l: '#D6CFC0', r: '#C0B9A9' }, { n: 8, w: 0.7 });
@@ -40,19 +41,24 @@ SF.tile('jiefangbei', 0, 0, { rim: 18 }, function (T) {
     const t0 = g.p(MX, MY, 25.6), t1 = g.p(MX, MY, 28); g.segs2([t0[0], t0[1], t1[0], t1[1]], '#8C8576', 0.6); g.disc2(t1, 0.6, '#D23B2F');
     // the name on a stone plaque at the foot, in gold
     K.box(g, MX - 2.6, MY + 4.4, MX + 2.6, MY + 5.1, 0, 2.4, { t: '#C9C2B2', l: '#8C7A62', r: '#6E5E4A' }, { w: 0.55 });
-    CQH.text(g, 'L', MY + 5.1, MX, 0.5, 1.4, '解放碑', '#E2B550', { center: true, w: 0.5 });
+    CQH.text(g, 'L', MY + 5.1, MX, 0.5, 1.4, '解放碑', '#E2B550', { center: true, w: 0.5, lit: true });
+    // at night: floodlit warm ivory from its foot, gold LEDs round the base, the clock faces glowing, the red light on top
+    CQ.nmark(g, i0, null, { nc: (c) => c === '#D23B2F' ? '#FF4A3A' : c === '#F7F4EA' ? '#FFF6DC' : c[0] === '#' ? shade(mix(c, '#F0B060', 0.42), 0.12) : undefined });
+    for (const [z, r] of [[2, 3.2], [9, 2.2], [17.5, 2.4], [23.5, 1.4]]) g.glow('lantern', MX, MY, z, { r, col: '#FFC870' });
+    g.glow('lantern', MX, MY, 28, { r: 0.7, col: '#FF5A48' });
+    for (let k = 0; k < 4; k++) { const a = Math.PI * (0.1 + 0.27 * k); g.glow('lamp', MX + Math.cos(a) * 4.9, MY + Math.sin(a) * 4.9, 0.6, { r: 0.8, base: 0 }); }
   }, { name: 'monument' });
 
   /* ---- the stores: the tall department store with its screen, shop rows along the far street ---- */
   T.obj([-24, -14, -8, 2], (g) => {
-    CQ.block(g, { x0: -24, y0: -14, x1: -8, y1: 2, h: 28, col: '#D8D6CF', seed: 11, st: 3.2, bay: 2.2, shop: ['重庆', '#2F4A6B'], shopR: ['火锅', CQC.red], cage: false, laundry: false });
+    CQ.block(g, { x0: -24, y0: -14, x1: -8, y1: 2, h: 28, col: '#D8D6CF', seed: 11, st: 3.2, bay: 2.2, shop: ['重庆', '#2F4A6B'], shopR: ['火锅', CQC.red], cage: false, laundry: false, lit: 0.85, crown: '#F4E2B8' });
     const s = K.on('R', -7.95, -12, -2, 12, 22); g.fill(s, '#2E3238'); g.outline(s, { w: 0.7, boil: false });
   }, { name: 'store' });
   T.actor({ sample: 5, period: 12, grow: false, at(t) { const c = Math.floor(t / 4) % 3; return { x: -7.9, y: -2, z: 12, key: c, c }; },
-    draw(g, st) { const P = (a, z) => [0, -a, z]; const bg = ['#C8392E', '#2F5F8F', '#E6B84A'][st.c]; g.fill([P(0.4, 0.4), P(9.6, 0.4), P(9.6, 9.6), P(0.4, 9.6)], bg);
-      if (st.c === 0) CQH.textP(g, (a, z) => P(a, z), 1.6, 3.2, 3.0, '火锅', '#F6E7B8');
-      else if (st.c === 1) CQH.textP(g, (a, z) => P(a, z), 1.6, 3.2, 3.0, '重庆', '#F4F1E6');
-      else { const c = g.p.apply(g, P(5, 5)); g.disc2(c, 9, '#F4F1E6'); CQH.textP(g, (a, z) => P(a, z), 1.6, 3.2, 3.0, '小面', '#C8392E'); } } });
+    draw(g, st) { const P = (a, z) => [0, -a, z]; const bg = ['#C8392E', '#2F5F8F', '#E6B84A'][st.c]; g.fill([P(0.4, 0.4), P(9.6, 0.4), P(9.6, 9.6), P(0.4, 9.6)], bg); g.mark({ nc: true, light: true });   // a screen shines at night
+      if (st.c === 0) CQH.textP(g, (a, z) => P(a, z), 1.6, 3.2, 3.0, '火锅', '#F6E7B8', { lit: true });
+      else if (st.c === 1) CQH.textP(g, (a, z) => P(a, z), 1.6, 3.2, 3.0, '重庆', '#F4F1E6', { lit: true });
+      else { const c = g.p.apply(g, P(5, 5)); g.disc2(c, 9, '#F4F1E6'); g.mark({ nc: true }); CQH.textP(g, (a, z) => P(a, z), 1.6, 3.2, 3.0, '小面', '#C8392E', { lit: true }); } } });
   for (const [x0, x1, n, sg, col] of [[-34, -26, 3, ['茶馆', '#3F6B4E'], '#E3DCCB'], [-24, -15, 2, ['小面', '#D9732F'], CQC.plaster], [-13, -4, 3, null, '#D9CDB4'], [-2, 8, 2, ['火锅', CQC.red], CQC.plaster], [10, 20, 3, ['重庆', '#2F4A6B'], '#E7E1D2'], [22, 34, 2, ['小面', '#E6B84A'], CQC.plaster]]) {
     T.obj([x0, -35, x1, -27], (g) => CQ.block(g, { x0, y0: -35, x1, y1: -27, h: n * 3.2 + 0.4, gf: 3.6, st: 3.2, col, seed: x0 + 40, shop: sg || [null, '#B9A27D'], tank: n > 2 }), { name: 'shop' });
   }
@@ -98,7 +104,7 @@ SF.tile('jiefangbei', 0, 0, { rim: 18 }, function (T) {
   // the balloon seller: an actor so the balloons bob
   T.actor({ sample: 5, period: 8, at(t) { const f = Math.floor(t * 3) % 6; return { x: -4, y: 28, key: f, f }; },
     draw(g, st) { const r = CQ.person(g, 0, 0, 0, CQ.elder(813, { dir: 1, pose: 'hold' })); const h = r.hands[0], cols = ['#D23B2F', '#E6C24F', '#5F8FC9', '#8FBF73', '#D98AA4', '#F3F1EA'];
-      for (let i = 0; i < 6; i++) { const b = [h[0] - 5 + i * 2 + Math.sin(st.f + i) * 0.5, h[1] - 16 - (i % 3) * 3 + Math.cos(st.f * 1.3 + i) * 0.4]; g.fine2([[h[0], h[1]], b], { w: 0.2, c: '#5A564E' }); g.disc2(b, 1.9, cols[i]); g.disc2([b[0] - 0.6, b[1] - 0.6], 0.5, '#FBF8F0'); } } });
+      for (let i = 0; i < 6; i++) { const b = [h[0] - 5 + i * 2 + Math.sin(st.f + i) * 0.5, h[1] - 16 - (i % 3) * 3 + Math.cos(st.f * 1.3 + i) * 0.4]; g.fine2([[h[0], h[1]], b], { w: 0.2, c: '#5A564E' }); g.disc2(b, 1.9, cols[i]); g.mark({ nc: true, light: true }); g.disc2([b[0] - 0.6, b[1] - 0.6], 0.5, '#FBF8F0'); g.mark({ nc: true }); } } });   // light-up balloons at night
   // walkers criss-crossing the square
   const routes = [[[-30, 30], [30, -24]], [[34.5, 30], [34.5, -24]], [[-30, 0], [32, 0], [32, 30]], [[0, 34], [-1, -22], [26, -22]], [[17, 34], [17, -22]], [[-30, 33], [22, 33]], [[-22, 34], [34, -4]], [[9, -22], [9, 2]], [[-30, -6], [32, -6]]];
   routes.forEach((pts, i) => CQ.walk(T, i % 4 === 3 ? CQ.elder(820 + i) : CQ.who(820 + i, i === 2 ? { umbrella: '#C8392E' } : i === 6 ? { phone: true } : {}), pts.concat(pts.slice(1, -1).reverse()), 1.2 + h1(i * 5) * 0.5, { phase: h1(i * 9 + 1) }));

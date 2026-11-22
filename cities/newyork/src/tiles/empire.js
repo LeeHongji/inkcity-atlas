@@ -40,6 +40,7 @@ SF.tile('empire', 0, 0, { rim: 26 }, function (T) {
       for (let a = A0 + sp * 0.5; a < A1 - sp * 0.3; a += sp) {
         const q = K.on(f, pl + 0.03, a - 0.32, a + 0.32, z0 + (o.b || 0.4), z1 - (o.t || 0.4));
         g.fill(q, f === 'L' ? STRIP : shade(STRIP, 0.1));
+        if (o.lit) { const nc = NK.stripLit(Math.round(a * 7 + z0 * 3) + (f === 'L' ? 0 : 500), o.lit, 11); if (nc) g.mark({ nc }); }   // office windows lit at night
         const p0 = g.p.apply(g, K.pt(f, pl + 0.05, a, z0 + (o.b || 0.4))), p1 = g.p.apply(g, K.pt(f, pl + 0.05, a, z1 - (o.t || 0.4)));
         segs.push(p0[0], p0[1], p1[0], p1[1]);
       }
@@ -53,8 +54,8 @@ SF.tile('empire', 0, 0, { rim: 26 }, function (T) {
     NK.windows(g, 'R', 9, -19.5, 1.5, 2.6, 1.3, 3, 10, { style: 'navy', fill: 0.45, hfill: 0.62 });
     // ground floor: shop glass along 34th St, the entrance on Fifth
     for (let x = -26; x < 7; x += 4.2) K.win(g, 'L', 2.02, x, x + 3.2, 0.2, 2.3, { style: 'glass', w: 0.35 });
-    g.fill(K.on('R', 9.03, -11.5, -6.5, 0, 2.5), '#3A3530');
-    g.fill(K.on('R', 9.06, -12, -6, 2.5, 3.0), '#B79A5A');
+    g.fill(K.on('R', 9.03, -11.5, -6.5, 0, 2.5), '#3A3530'); g.mark({ nc: '#FFD98A', spill: true });   // at night the lobby's gold light through the doors
+    g.fill(K.on('R', 9.06, -12, -6, 2.5, 3.0), '#B79A5A'); g.mark({ nc: '#F2CF7A' });
     NK.text(g, 'R', 9.06, -9, 2.55, 0.38, 'EMPIRE STATE', '#3A3128', { center: true, w: 0.3 });
     for (const y of [-16, -3]) K.win(g, 'R', 9.02, y - 1.4, y + 1.4, 0.2, 2.3, { style: 'glass', w: 0.35 });
     NK.cornice(g, -27, -20, 9, 2, 6.6, { t: '#E4DECF', l: '#D3CBB7', r: '#BCB39E' }, { h: 0.6, d: 0.3 });
@@ -66,9 +67,10 @@ SF.tile('empire', 0, 0, { rim: 26 }, function (T) {
     deco(g, -24, -17, 6, -1, 6.6, 8.6, { sp: 1.7 });
     deco(g, -21.5, -15.5, 3.5, -2.5, 8.6, 15.5, { sp: 1.5 });                 // the wings, set back at the 21st floor
     deco(g, -19, -15, 1, -3, 15.5, 19, { sp: 1.45 });                         // and again at the 30th
-    deco(g, -16, -14, -2, -4, 19, 46, { sp: 1.35, b: 0.5 });                  // the shaft
-    deco(g, -12, -14, -6, -3, 19, 45.4, { sp: 1.2, b: 0.5, w: 0.75 });       // its central bay on 34th St
-    deco(g, -16, -11.5, -1, -6.5, 19, 45.4, { sp: 1.2, b: 0.5, w: 0.75 });  // and on Fifth
+    deco(g, -16, -14, -2, -4, 19, 46, { sp: 1.35, b: 0.5, lit: 0.42 });                  // the shaft
+    deco(g, -12, -14, -6, -3, 19, 45.4, { sp: 1.2, b: 0.5, w: 0.75, lit: 0.5 });       // its central bay on 34th St
+    deco(g, -16, -11.5, -1, -6.5, 19, 45.4, { sp: 1.2, b: 0.5, w: 0.75, lit: 0.5 });  // and on Fifth
+    const iTop = g.cmds.length;                                               // from here up: the tower lights
     deco(g, -14.5, -12.6, -3.5, -5.4, 46, 48.4, { sp: 1.2 });
     deco(g, -13.4, -11.6, -4.6, -6.4, 48.4, 50.4, { sp: 1.1 });
     deco(g, -12.4, -10.8, -5.6, -7.2, 50.4, 52.2, { sp: 1.0 });
@@ -87,10 +89,17 @@ SF.tile('empire', 0, 0, { rim: 26 }, function (T) {
     g.line2([a0, a1], { w: 0.6, c: '#5E5A52', boil: false, ext: 0 });
     g.segs2([a0[0] - 0.6, a0[1] - 5, a0[0] + 0.6, a0[1] - 5, a0[0] - 0.4, a0[1] - 10, a0[0] + 0.4, a0[1] - 10], '#5E5A52', 0.35);
     g.disc2(a1, 0.55, '#E0503E');
+    // at night the top is floodlit in its signature white (the tower lights, from the setbacks to the mast), the beacon red
+    const TOPN = { '#ECE7DA': '#F4F7FF', '#DCD5C3': '#E2EAFA', '#C3BBA8': '#B4C3E0', [STRIP]: '#C6D4EE', [shade(STRIP, 0.1)]: '#AEBEDC', [MULL]: '#FFFFFF',
+      '#EEF0EE': '#F6FAFF', '#D9DEE0': '#E4ECFA', '#AEB6BA': '#B8C6E2', '#C9CED0': '#E8EFFC', '#8E979C': '#C2D0EA', '#5E5A52': '#D6E0F4' };
+    const fl = NK.flood(0.85, '#E8F0FF'); g.mark({ nc: (c) => TOPN[c] || (c === '#E0503E' ? '#FF5A48' : fl(c)) }, iTop); NK.nmark(g, iTop, { nc: (c) => TOPN[c] }, true);
+    for (const [z, r] of [[44, 4.2], [47.5, 4.6], [51, 4.2], [55, 3.6], [58.5, 3.0], [62.5, 2.0]]) g.glow('lantern', CX, CY, z, { r, col: '#E6EEFF' });
+    g.glow('lantern', CX, CY, 66.5, { r: 0.9, col: '#FF4A3C' });
   }), { name: 'empire state' });
   // the marquee canopy over the entrance and two flagpoles
   T.obj([9.5, -10], (g) => {
-    K.box(g, 9, -12.4, 11.4, -5.6, 3.1, 3.5, '#B79A5A', { w: 0.5, boil: false });
+    K.box(g, 9, -12.4, 11.4, -5.6, 3.1, 3.5, '#B79A5A', { w: 0.5, boil: false }); NK.nmark(g, 0, { nc: NK.flood(0.85, '#FFD080') });
+    g.glow('lamp', 10.8, -9, 3.0, { r: 1.8 }); g.glow('neon', 9.4, -9, 2.4, { r: 3.2, col: '#FFC86A' });   // the canopy's lights over the door
     for (const y of [-12, -6]) { const b = g.p(11.2, y, 0), t = g.p(11.2, y, 3.1); g.segs2([b[0], b[1], t[0], t[1]], '#7A6A4A', 0.4); }
   }, { name: 'marquee' });
   for (const y of [-14.5, -3.5]) { T.obj([9.6, y], (g) => { const b = g.p(9.6, y, 6.6), t = g.p(9.6, y, 12); g.line2([b, t], { w: 0.5, c: '#5E5A52', boil: false }); g.disc2(t, 0.4, C.gold); }); NK.flagActor(T, 9.6, y, 11.8, { w: 3.6, h: 2.2, phase: y * 0.13 }); }
@@ -138,7 +147,7 @@ SF.tile('empire', 0, 0, { rim: 26 }, function (T) {
     g.fill2(bell, '#7E9C6A', true); g.fill2([[bc[0] + 0.4, bc[1]], [bc[0] + 1.6, bc[1]], [bc[0] + 2.0, bc[1] + 6.0], [bc[0] + 3.0, bc[1] + 7.2], [bc[0] + 0.8, bc[1] + 7.2]], '#5E7E52', true);
     g.outline2(bell, { w: 0.4, c: '#2F4A30', boil: false });
     // the clock on the side
-    const cl = g.p(26.03, 6.5, 4.4); g.disc2(cl, 1.6, '#F1EEE6'); g.ring2(cl, 1.6, { w: 0.4, c: '#3A3128' }); g.segs2([cl[0], cl[1], cl[0], cl[1] - 1.1, cl[0], cl[1], cl[0] + 0.8, cl[1] + 0.3], '#3A3128', 0.3);
+    const cl = g.p(26.03, 6.5, 4.4); g.disc2(cl, 1.6, '#F1EEE6'); g.mark({ nc: '#FFF3D6' }); g.glow2('lantern', cl, cl, { r: 1.4, col: '#FFE7B0' }); g.ring2(cl, 1.6, { w: 0.4, c: '#3A3128' }); g.segs2([cl[0], cl[1], cl[0], cl[1] - 1.1, cl[0], cl[1], cl[0] + 0.8, cl[1] + 0.3], '#3A3128', 0.3);
     K.box(g, 17.6, 4.6, 26.4, 8.4, 6.4, 7.0, '#B3AC9C', { w: 0.6, boil: false });
     // Minerva in green bronze with her spear, the two bell ringers with their hammers
     const bz = { skin: BR, hair: BRD, top: BR, bot: BRD, shoe: BRD, dress: BR, hairStyle: 'long', ink: '#2F4A40' };

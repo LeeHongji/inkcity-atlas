@@ -48,7 +48,7 @@ K.win = function (g, face, p, a0, a1, z0, z1, o) {
     for (let i = 0; i <= n; i++) { const t = Math.PI * i / n; pts.push(K.pt(face, p, m + (a1 - m) * Math.cos(t), zc + r * 0.9 * Math.sin(t))); }
   } else pts = K.on(face, p, a0, a1, z0, z1);
   const col = o.col || (st === 'navy' ? C.navy : st === 'glass' ? C.glass : st === 'dark' ? '#3A3530' : C.glassD);
-  g.fill(pts, col);
+  const i0 = g.cmds.length; g.fill(pts, col); g.mark({ win: o.lit == null ? true : o.lit }, i0);   // at night some panes light up
   const P = g.P(pts);
   if (st === 'navy' && o.skips !== false) g.scuff2(P, { n: 1 + (Math.abs((a1 - a0) * (z1 - z0)) > 6 ? 2 : 0), len: 1.2, c: '#DDE3EA', w: 0.5, dir: -0.9, spread: 1.2 });
   if (st === 'glass') {
@@ -178,6 +178,7 @@ K.tree = function (g, x, y, o) {
   const hl = pts.filter((p) => (p[0] - cx) * 0.6 + (p[1] - cy) < -r * 0.55);
   if (hl.length >= 2) { hl.push([cx - r * 0.25, cy - r * 0.3]); g.fill2(sortAround(hl), shade(col, -0.2)); }
   g.outline2(pts, { c: o.ink || C.leafInk, w: 0.9, ext: 0.5 });
+  g.glow2('tree', [cx, cy], f, { r });
   const segs = [];
   for (let i = 0; i < 4; i++) {            // a few C-shaped leaf marks
     const a = R() * TAU, d = r * (0.2 + R() * 0.5), px = cx + Math.cos(a) * d, py = cy + Math.sin(a) * d * 0.9, l = r * (0.12 + R() * 0.12), t = -0.9 + R() * 0.6;
@@ -199,6 +200,7 @@ K.cypress = function (g, x, y, o) {
   g.fill2(pts, col);
   g.fill2([[f[0] + w * 0.1, f[1] - h * 0.12]].concat(pts.slice(n + 1)), shade(col, 0.16));
   g.outline2(pts, { c: '#2F4A2C', w: 0.9 });
+  g.glow2('tree', [f[0], f[1] - h * 0.55], f, { r: w * 1.4 });
 };
 /* palm: segmented trunk, drooping fronds */
 K.palm = function (g, x, y, o) {
@@ -218,6 +220,7 @@ K.palm = function (g, x, y, o) {
     g.outline2(pts, { c: C.leafInk, w: 0.7, boil: false });
   }
   g.disc2(top, 1.5, '#7A5A3C');
+  g.glow2('tree', top, f, { r: r * 0.9 });
 };
 /* clipped box hedge */
 K.hedge = function (g, x0, y0, x1, y1, h, o) {
@@ -232,6 +235,7 @@ K.bush = function (g, x, y, o) {
   const pts = []; for (let i = 0; i < 8; i++) { const a = TAU * i / 8 + R(), rr = r * (0.88 + R() * 0.24); pts.push([f[0] + Math.cos(a) * rr, f[1] - r * 0.75 + Math.sin(a) * rr * 0.85]); }
   g.fill2(pts, col); g.fill2(sortAround(pts.filter((p) => p[0] - f[0] + (p[1] - f[1] + r * 0.75) > -r * 0.1).concat([[f[0], f[1] - r * 0.7]])), shade(col, 0.12));
   g.outline2(pts, { c: o.ink || shade(col, 0.5), w: 0.75 });
+  g.glow2('bloom', [f[0], f[1] - r * 0.75], f, { r });
 };
 /* a low bed with rows of blooms. Soil box is static; draw blooms separately with K.blooms for the cast */
 K.blooms = function (g, x0, y0, x1, y1, z, cols, o) {
@@ -240,6 +244,8 @@ K.blooms = function (g, x0, y0, x1, y1, z, cols, o) {
     const p = g.p(x + (R() - 0.5) * 0.5, y + (R() - 0.5) * 0.5, z + 0.5), col = R.pick(cols);
     g.disc2(p, r * (0.8 + R() * 0.35), col); g.ring2(p, r, { c: shade(col, 0.45), w: 0.4 });
   }
+  const a = g.p((x0 + x1) / 2, (y0 + y1) / 2, z + 0.5), b = g.p(x0, y0, z), c = g.p(x1, y1, z);
+  g.glow2('bloom', a, a, { r: Math.max(4, Math.hypot(c[0] - b[0], c[1] - b[1]) / 2) });
 };
 
 /* ---------- people ---------- */
@@ -727,6 +733,7 @@ K.lamp = function (g, x, y, o) {
   const globe = (dx, dy, r) => { g.disc2([t[0] + dx, t[1] + dy], r, '#F2E3A6'); g.fill2(arcPts(t[0] + dx + r * 0.2, t[1] + dy + r * 0.2, r * 0.8, -0.6, 1.9, 6), '#E3CE85'); g.ring2([t[0] + dx, t[1] + dy], r, { c: '#7A6A3A', w: 0.45 }); };
   if (n === 1) globe(0, -1.6, 2.1);
   else { if (n >= 4) globe(0, -4.3, 1.9); globe(-2.5, -1.2, 1.9); globe(2.5, -1.2, 1.9); globe(0, -0.6, 2.0); }
+  g.glow2('lamp', [t[0], t[1] - (n === 1 ? 1.6 : 1.8)], f, { r: n === 1 ? 2.1 : 3.4 });
 };
 /* bench facing lower-right (face 'R') or lower-left ('L'); length along the other axis */
 K.bench = function (g, x, y, o) {

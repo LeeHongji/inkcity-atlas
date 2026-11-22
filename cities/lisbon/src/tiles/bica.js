@@ -9,7 +9,9 @@
    parapet and pots of basil on the balconies. On the top of the hill: the Miradouro de Santa Catarina with its rock
    giant Adamastor and young people on the grass looking at the river; in the far corner A Brasileira, the green and
    gold café front, with Fernando Pessoa in bronze at his table and tourists sitting beside him.
-   At the foot of the street, people drinking outside a bar. */
+   At the foot of the street, people drinking outside a bar.
+   At night: the funicular's cars lit as they pass, the houses' lanterns down the steep street, A Brasileira's green
+   front glowing gold, lamps along Santa Catarina's parapet over the young crowd, the bars at the foot. */
 SF.tile('bica', -100, 0, { rim: 12 }, function (T) {
   const H = 37, ZM = 7, ZW = 13, XB = 32, XT = -16, Y0 = 21.5, Y1 = 30.5, YC = 26;
   const zs = (x) => ZW * clamp((XB - x) / (XB - XT), 0, 1);           // the street's height
@@ -32,7 +34,7 @@ SF.tile('bica', -100, 0, { rim: 12 }, function (T) {
     for (let b = 0; b < 5; b++) { const m = lerp(-H, XT, (b + 0.5) / 5); if (b === 2) LX.door(g, 'L', Y1, m - 0.8, m + 0.8, 0, 3.4, '#4F6A5E'); else LX.win(g, 'L', Y1, m - 0.6, m + 0.6, 1.4, 3.6, { glass: '#6A7F8C' }); LX.win(g, 'L', Y1, m - 0.55, m + 0.55, 6.2, 8.6, { bal: b % 2 === 1, glass: '#5E7380' }); }
     LX.azulejo(g, 'L', Y1, -31, -22, 10.0, 12.2, 'b', 6);
   }, { name: 'santa catarina' });
-  T.obj([-H, Y1 - 0.6, XT, Y1], (g) => LX.parapet(g, 'L', Y1, -H, XT, ZW, { h: 1.1 }), { on: true, name: 'parapet' });
+  T.obj([-H, Y1 - 0.6, XT, Y1], (g) => LX.parapet(g, 'L', Y1, -H, XT, ZW, { h: 1.1, lamps: 7 }), { on: true, name: 'parapet' });
 
   /* ---------------- the street on its embankment ---------------- */
   const LOOP = [1.2, 13.2];
@@ -72,8 +74,9 @@ SF.tile('bica', -100, 0, { rim: 12 }, function (T) {
     LX.house(g, { x0: -35, y0: -35, x1: -20, y1: -16, z: ZW, n: 3, col: '#EFE6D4', seed: 95, bal: 1, faces: 'LR' });
     // the green and gold front
     const p = -16, z = ZW; g.fill(K.on('L', p + 0.08, -34.5, -20.5, z, z + 4.4), '#2F5A44');
-    for (let x = -33.5; x < -21; x += 3) { const q = K.on('L', p + 0.1, x, x + 1.8, z + 0.4, z + 3.4); g.fill(q, '#B9C9C2'); g.outline(q, { w: 0.35, c: '#C9A44A', boil: false }); }
-    K.sign(g, 'L', p + 0.1, -34, -21, z + 3.5, z + 4.3, '#2F5A44', 'A BRASILEIRA', { ink: '#E9C766', c: '#C9A44A' });
+    for (let x = -33.5; x < -21; x += 3) { const q = K.on('L', p + 0.1, x, x + 1.8, z + 0.4, z + 3.4); g.fill(q, '#B9C9C2'); g.mark({ nc: '#FFCF86', spill: true }); g.outline(q, { w: 0.35, c: '#C9A44A', boil: false }); }   // (the café's gold interior at night)
+    { const i0 = g.cmds.length; K.sign(g, 'L', p + 0.1, -34, -21, z + 3.5, z + 4.3, '#2F5A44', 'A BRASILEIRA', { ink: '#E9C766', c: '#C9A44A' }); g.mark({ nc: '#3C7458' }, i0); }
+    for (const x of [-33, -27.5, -22]) g.glow('lamp', x, p + 0.7, z + 4.9, { r: 1.3, base: z });
   }, { on: true, name: 'a brasileira' });
   T.cast([-27, -12.5], function (g) {
     const z = ZW;
@@ -118,8 +121,8 @@ SF.tile('bica', -100, 0, { rim: 12 }, function (T) {
     const end = [P(x + L, yc - Wd, z0(x + L)), P(x + L, yc + Wd, z0(x + L)), P(x + L, yc + Wd, z1(x + L)), P(x + L, yc - Wd, z1(x + L))];
     const roof = [P(x - L - 0.3, yc - Wd - 0.2, z1(x - L) + 0.3), P(x + L + 0.3, yc - Wd - 0.2, z1(x + L) + 0.3), P(x + L + 0.3, yc + Wd + 0.2, z1(x + L) + 0.3), P(x - L - 0.3, yc + Wd + 0.2, z1(x - L) + 0.3)];
     g.fill(near, LC.tram); g.fill(end, LC.tramD);
-    for (let i = 0; i < 4; i++) { const a = x - L + 0.6 + i * 2.5, b = a + 1.8; const q = [P(a, yc + Wd + 0.02, z0(a) + 2.4), P(b, yc + Wd + 0.02, z0(b) + 2.4), P(b, yc + Wd + 0.02, z0(b) + 4.6), P(a, yc + Wd + 0.02, z0(a) + 4.6)]; g.fill(q, '#5F7380'); if (i % 2 === k > 0 ? 1 : 0) { const m = g.p(a + 0.9, yc + Wd * 0.5, z0(a + 0.9) + 3.4); g.disc2(m, 0.75, SKIN[(i + 1) % 5]); } }
-    g.fill(end.map((q, i) => i < 2 ? [q[0], lerp(yc - Wd, yc + Wd, i ? 0.85 : 0.15), q[2] + 2.4] : [q[0], lerp(yc - Wd, yc + Wd, i === 2 ? 0.85 : 0.15), q[2] - 1.0]), '#5F7380');
+    for (let i = 0; i < 4; i++) { const a = x - L + 0.6 + i * 2.5, b = a + 1.8; const q = [P(a, yc + Wd + 0.02, z0(a) + 2.4), P(b, yc + Wd + 0.02, z0(b) + 2.4), P(b, yc + Wd + 0.02, z0(b) + 4.6), P(a, yc + Wd + 0.02, z0(a) + 4.6)]; g.fill(q, '#5F7380'); g.mark({ nc: '#FFE3A6' }); if (i % 2 === k > 0 ? 1 : 0) { const m = g.p(a + 0.9, yc + Wd * 0.5, z0(a + 0.9) + 3.4); g.disc2(m, 0.75, SKIN[(i + 1) % 5]); } }
+    g.fill(end.map((q, i) => i < 2 ? [q[0], lerp(yc - Wd, yc + Wd, i ? 0.85 : 0.15), q[2] + 2.4] : [q[0], lerp(yc - Wd, yc + Wd, i === 2 ? 0.85 : 0.15), q[2] - 1.0]), '#5F7380'); g.mark({ nc: '#FFE6B0', light: true });
     g.fill([P(x - L, yc + Wd + 0.02, z0(x - L)), P(x + L, yc + Wd + 0.02, z0(x + L)), P(x + L, yc + Wd + 0.02, z0(x + L) + 0.6), P(x - L, yc + Wd + 0.02, z0(x - L) + 0.6)], '#8A6A1E');
     g.fill(roof, '#F3F1EA'); g.outline(roof, { w: 0.55, boil: false });
     g.outline(near, { w: 0.65, boil: false }); g.outline(end, { w: 0.55, boil: false });

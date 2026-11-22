@@ -114,6 +114,8 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     g.line(shore.map((p) => [p[0] + 2.4, p[1], WZ]), { w: 0.5, c: '#E2EFEF', boil: false });
     // the quay wall where the promenade meets the water (its face looks out to sea)
     for (const [ya, yb] of PM) { g.fill([[S0, ya, 0], [S0, yb, 0], [S0, yb, WZ], [S0, ya, WZ]], '#BFB29A'); g.line([[S0, ya, 0], [S0, yb, 0]], { w: 0.75, boil: false, ext: 0 }); g.line([[S0, ya, WZ], [S0, yb, WZ]], { w: 0.5, c: '#5F8F96', boil: false, ext: 0 }); }
+    // at night: low lamps along the quay's edge light the promenade, each laying a column of light on the sea
+    for (const [ya, yb] of PM) for (let y = ya + 4; y < yb - 2; y += 8) g.glow('lamp', S0 - 0.5, y, 1.3, { r: 0.9 });
     // the harbour mouth: the promenade's quay wall turns along it
     g.fill([[137, BST.MOUTH0, 0], [S0, BST.MOUTH0, 0], [S0, BST.MOUTH0, WZ], [137, BST.MOUTH0, WZ]], '#CDBFA4'); g.line([[137, BST.MOUTH0, 0], [S0, BST.MOUTH0, 0]], { w: 0.75, boil: false });
     g.line([[137, BST.MOUTH1, 0], [S0, BST.MOUTH1, 0]], { w: 0.75, boil: false });
@@ -187,5 +189,6 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     draw(g) { K.boat(g, -Math.PI / 2 + 0.25, { kind: 'sail', L: 3.6, W: 1.3, hull: ['#F3F1EA', '#2F4A63', '#C9584B'][i], mast: 10 + i }); } });
   T.actor({ cast: false, sample: 0.5, period: 120, grow: false,
     at(t) { const u = (t / 120) % 1, y = lerp(-180, 180, u), a = Math.min(1, (170 - Math.abs(y)) / 14); if (a <= 0.02) return null; return { x: 192, y, z: WZ, key: 'f', alpha: a < 1 ? a : null }; },
-    draw(g) { K.boat(g, Math.PI / 2, { kind: 'ferry', L: 11, W: 3.0, hull: '#F3F1EA', stripe: '#2F5A8C', stackCol: { t: '#2F5A8C', l: '#3F70A8', r: '#2F5A8C' } }); } });
+    // the night ferry to the Balearics: its saloon windows lit
+    draw(g) { K.boat(g, Math.PI / 2, { kind: 'ferry', L: 11, W: 3.0, hull: '#F3F1EA', stripe: '#2F5A8C', stackCol: { t: '#2F5A8C', l: '#3F70A8', r: '#2F5A8C' } }); BC.litPanes(g, 0, C.navy, '#FFE3A6', true); } });
 });

@@ -62,13 +62,14 @@ SF.tile('shibuya', 0, 0, { rim: 30 }, function (T) {
     // the giant screen on the face towards the crossing (its picture is an actor), a second one on the side
     const scr = K.on('R', x1 + 0.05, -33.5, -18.2, 12.5, 27.5); g.fill(scr, '#2E3238'); g.outline(scr, { w: 0.9, boil: false });
     const s2 = K.on('L', y1 + 0.05, -33.5, -23, 17, 25); g.fill(s2, '#2E3238');
-    const s2i = K.on('L', y1 + 0.08, -33, -23.5, 17.5, 24.5); g.fill(s2i, '#E7A9A0');
-    for (let i = 0; i < 4; i++) g.fill(K.on('L', y1 + 0.1, -33 + i * 2.4, -33 + i * 2.4 + 1.2, 17.5, 24.5), ['#F3E3A0', '#A9D1E6', '#F3F1EA', '#C9E3A8'][i]);
+    const s2i = K.on('L', y1 + 0.08, -33, -23.5, 17.5, 24.5); g.lit({ nc: true }, () => { g.fill(s2i, '#E7A9A0');
+    for (let i = 0; i < 4; i++) g.fill(K.on('L', y1 + 0.1, -33 + i * 2.4, -33 + i * 2.4 + 1.2, 17.5, 24.5), ['#F3E3A0', '#A9D1E6', '#F3F1EA', '#C9E3A8'][i]); });
+    { const q = g.p.apply(g, K.pt('L', y1 + 0.1, -28.2, 21)); g.glow2('neon', q, q, { r: 9, col: '#F7C6B8' }); }
     g.outline(s2, { w: 0.7, boil: false });
     // rooftop: a billboard frame and a water tank
     K.box(g, x0 + 2, y0 + 2, x0 + 8, y0 + 5, Z, Z + 2.2, '#C9CCCC', { w: 0.6 });
     K.cyl(g, x0 + 12, y0 + 6, 1.6, Z, Z + 2.6, { t: '#E9E6DE', l: '#D9D6CC', r: '#BDBAB1' }, { w: 0.6, n: 10 });
-    const bb = K.on('L', y1 - 3, x0 + 3, x1 - 3, Z + 0.5, Z + 5.5); g.fill(bb, '#E6C24F'); g.outline(bb, { w: 0.6, boil: false });
+    const bb = K.on('L', y1 - 3, x0 + 3, x1 - 3, Z + 0.5, Z + 5.5); g.fill(bb, '#E6C24F'); g.mark({ nc: true }); g.outline(bb, { w: 0.6, boil: false });
     TK.sign(g, 'L', y1 - 3, x0 + 4, x1 - 4, Z + 1.2, Z + 4.8, '#E6C24F', { seed: 11, n: 5, ink: '#3A3128' });
     void bb;
   }, { name: 'screen tower' });
@@ -145,6 +146,7 @@ SF.tile('shibuya', 0, 0, { rim: 30 }, function (T) {
   T.actor({ sample: 5, period: 10, grow: false,
     at(t) { const f = Math.floor(t * 3) % 6, c = Math.floor(t / 3.5) % 3; return { x: -15.9, y: -18.2, z: 12.5, key: c + '.' + f, f, c }; },
     draw(g, st) {
+      const i0 = g.cmds.length;
       const X = -15.9 - (-15.9), Y = 18.2, W = (a, z) => [X + 0.0, a + Y, z - 12.5];   // face R at x = -15.9, a = world y
       const q = (a0, a1, z0, z1, col) => g.fill([W(a0, z0), W(a1, z0), W(a1, z1), W(a0, z1)], col);
       const bg = [['#F2B6C2', '#F7D9DF'], ['#F3E3A0', '#FBF1C9'], ['#A9D1E6', '#D6EAF4']][st.c];
@@ -163,6 +165,7 @@ SF.tile('shibuya', 0, 0, { rim: 30 }, function (T) {
       g.fill(ez([[-5.2, 13.6], [-3.6, 13.6], [-3.6, 15.6], [-5.0, 15.6]]), '#FBFAF6');
       const o = ez(K.curve([[-4.6, 19], [4.6, 19], [4.8, 23], [2.6, 25.4], [-2.6, 25.4], [-4.8, 23]], 3, true).map((p) => [p[0], p[1]]));
       g.outline(o, { w: 0.4, c: '#8C8576', boil: false });
+      g.mark({ nc: true }, i0); g.cmds[i0].light = true;                    // a screen shines at night
     } });
 
   // signals on the four corners: car heads and the walking man
@@ -175,13 +178,13 @@ SF.tile('shibuya', 0, 0, { rim: 30 }, function (T) {
       const h = [t[0] - 4.6, t[1] + 0.8];
       g.fill2([[h[0] - 0.4, h[1] - 1.3], [h[0] + 4.6, h[1] - 1.3], [h[0] + 4.6, h[1] + 1.1], [h[0] - 0.4, h[1] + 1.1]], '#3A3530', true);
       const carGreen = (sx === sy) ? st.ph === 'A' : st.ph === 'B', carY = (sx === sy) ? st.ph === 'Ay' : st.ph === 'By';
-      [['#5FC07A', carGreen], ['#E9C543', carY], ['#E0503E', !carGreen && !carY]].forEach(([c, on], i) => g.disc2([h[0] + 0.7 + i * 1.5, h[1] - 0.1], 0.62, on ? c : '#5A544A'));
+      [['#5FC07A', carGreen], ['#E9C543', carY], ['#E0503E', !carGreen && !carY]].forEach(([c, on], i) => { g.disc2([h[0] + 0.7 + i * 1.5, h[1] - 0.1], 0.62, on ? c : '#5A544A'); if (on) g.mark({ nc: true, light: true }); });
       // the pedestrian head: a red standing man above a green walking man
       const p = [t[0] + 0.6, t[1] + 3.2];
       g.fill2([[p[0], p[1] - 3.4], [p[0] + 2.2, p[1] - 3.4], [p[0] + 2.2, p[1] + 1.4], [p[0], p[1] + 1.4]], '#3A3530', true);
       const pg = st.ph === 'P', pr = !pg && st.ph !== 'Pb';
-      g.fill2([[p[0] + 0.8, p[1] - 3.0], [p[0] + 1.4, p[1] - 3.0], [p[0] + 1.4, p[1] - 1.4], [p[0] + 0.8, p[1] - 1.4]], pr ? '#E0503E' : '#5A544A', true);
-      g.fill2([[p[0] + 0.6, p[1] - 0.6], [p[0] + 1.6, p[1] - 0.6], [p[0] + 1.4, p[1] + 1.0], [p[0] + 0.8, p[1] + 1.0]], pg ? '#5FC07A' : '#5A544A', true);
+      g.fill2([[p[0] + 0.8, p[1] - 3.0], [p[0] + 1.4, p[1] - 3.0], [p[0] + 1.4, p[1] - 1.4], [p[0] + 0.8, p[1] - 1.4]], pr ? '#E0503E' : '#5A544A', true); if (pr) g.mark({ nc: true, light: true });
+      g.fill2([[p[0] + 0.6, p[1] - 0.6], [p[0] + 1.6, p[1] - 0.6], [p[0] + 1.4, p[1] + 1.0], [p[0] + 0.8, p[1] + 1.0]], pg ? '#5FC07A' : '#5A544A', true); if (pg) g.mark({ nc: true, light: true });
     } });
 
   /* ---- the cars: road A (along x) and road B (along y), two per lane, queueing at the stop lines ---- */

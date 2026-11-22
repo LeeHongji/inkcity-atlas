@@ -30,14 +30,14 @@ SF.tile('luxembourg', -100, 0, { rim: 10 }, function (T) {
   /* ---------------- the palace ---------------- */
   const STN = { t: '#F2EBDA', l: '#EEE3CA', r: '#D8CBAC' }, SLATE = '#6C7580';
   const block = (x0, y0, x1, y1, Z, rh, name, dome) => T.obj([x0, y0, x1, y1], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     K.box(g, x0, y0, x1, y1, 0, Z, STN, { w: 0.9 });
     for (const face of ['R', 'L']) {
       const p = face === 'L' ? y1 : x1, A0 = face === 'L' ? x0 : y0, A1 = face === 'L' ? x1 : y1, n = Math.max(1, Math.round((A1 - A0) / 2.4)), bw = (A1 - A0) / n, pil = [];
       for (let i = 0; i < n; i++) {
         const m = A0 + bw * (i + 0.5);
-        const ar = [K.pt(face, p + 0.04, m - 0.55, 0.6), K.pt(face, p + 0.04, m + 0.55, 0.6)]; for (let k = 0; k <= 6; k++) { const t = Math.PI * k / 6; ar.push(K.pt(face, p + 0.04, m + Math.cos(t) * 0.55, 3.2 + Math.sin(t) * 0.55)); } g.fill(ar, '#5E6B76');
-        PA.win(g, face, p, m - 0.55, m + 0.55, 5.0, 7.8, { pane: '#5E6B76' });
+        const ar = [K.pt(face, p + 0.04, m - 0.55, 0.6), K.pt(face, p + 0.04, m + 0.55, 0.6)]; for (let k = 0; k <= 6; k++) { const t = Math.PI * k / 6; ar.push(K.pt(face, p + 0.04, m + Math.cos(t) * 0.55, 3.2 + Math.sin(t) * 0.55)); } g.fill(ar, '#5E6B76'); g.mark({ win: 0.3 });
+        PA.win(g, face, p, m - 0.55, m + 0.55, 5.0, 7.8, { pane: '#5E6B76', lit: 0.45 });
         const a = g.p.apply(g, K.pt(face, p + 0.05, A0 + bw * i, 0.3)), b = g.p.apply(g, K.pt(face, p + 0.05, A0 + bw * i, Z - 0.4)); pil.push(a[0], a[1], b[0], b[1]);
       }
       g.segs2(pil, '#CDBF9E', 0.6);
@@ -51,7 +51,10 @@ SF.tile('luxembourg', -100, 0, { rim: 10 }, function (T) {
       for (let k = 0; k < 4; k++) { const a = Math.PI * 0.05 + k * 0.3, p = g.p(cx + Math.cos(a) * 3.02, cy + Math.sin(a) * 3.02, Z + 1.2); g.fill2([[p[0] - 0.4, p[1]], [p[0] + 0.4, p[1]], [p[0] + 0.4, p[1] - 4.6], [p[0] - 0.4, p[1] - 4.6]], '#5E6B76', true); }
       K.dome(g, cx, cy, 3.1, Z + 3.4, 4.0, SLATE, { w: 0.75, ribs: 8, ribCol: '#4A525A', ribW: 0.5, shadow: shade(SLATE, 0.15), band: true });
       K.cyl(g, cx, cy, 0.7, Z + 7.3, Z + 8.6, { t: '#E9E2CC', l: '#EEE3CA', r: '#D8CBAC' }, { w: 0.5, n: 8 }); g.disc2(g.p(cx, cy, Z + 9.0), 0.45, PC.gold);
-    } else PA.mansard(g, x0 + 0.3, y0 + 0.3, x1 - 0.3, y1 - 0.3, Z + 0.5, { h: rh, d: 1.4, h2: 0.6, col: SLATE, seam: '#5A626C', dormers: 3.0, chim: [[(x0 + x1) / 2, y0 + 1.2, 'x', 3]] });
+    } else PA.mansard(g, x0 + 0.3, y0 + 0.3, x1 - 0.3, y1 - 0.3, Z + 0.5, { h: rh, d: 1.4, h2: 0.6, col: SLATE, seam: '#5A626C', dormers: 3.0, chim: [[(x0 + x1) / 2, y0 + 1.2, 'x', 3]], dlit: 0.25 });
+    // at night the Senate's palace is floodlit, softly
+    PA.flood(g, i0, 0.5);
+    if (dome) g.glow('lantern', x1 + 0.3, (y0 + y1) / 2, 6, { r: 3, col: '#FFDDA6' });
   }, { name });
   block(-34, -30, -26, -20, 11, 3.6, 'palace pavilion 1');
   block(-33, -20, -25, -5, 9.6, 3.0, 'palace wing 1');
@@ -83,7 +86,7 @@ SF.tile('luxembourg', -100, 0, { rim: 10 }, function (T) {
     K.box(g, 22, 20, 30, 26, 0, 5.4, { t: '#C9B48C', l: '#E9DCC0', r: '#D2C2A0' }, { w: 0.8 });
     K.gable(g, 21.6, 19.6, 30.4, 26.4, 5.4, 2.6, 'x', { a: '#B8443A', b: '#9E3A31', e: '#E9DCC0' }, { c: '#6E2A22' });
     g.fill(K.on('L', 26.03, 23.5, 28.5, 1.6, 4.2), '#7E2A24'); g.fill(K.on('L', 26.04, 24, 28, 2.2, 3.8), '#3A2E26');
-    PA.sign(g, 'L', 26, 23, 29, 4.4, 5.2, '#2F5D4B', { seed: 31, word: 'GUIGNOL', ink: '#F3DFA0' });
+    PA.sign(g, 'L', 26, 23, 29, 4.4, 5.2, '#2F5D4B', { seed: 31, word: 'GUIGNOL', ink: '#F3DFA0', lit: false });   // shut at night
   }, { name: 'guignol' });
   // Guignol himself at the window, bobbing
   T.actor({ sample: 5, period: 10, grow: false,

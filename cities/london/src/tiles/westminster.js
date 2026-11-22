@@ -10,6 +10,9 @@
    What moves: walkers, the flag, pigeons on the square. */
 SF.tile('westminster', -100, 0, { rim: 8 }, function (T) {
   const H = 37, RN = LT.RIV.N - 1.2, GO = LK.C.gothic, GOT = { t: '#D2BC90', l: GO, r: LK.C.gothicD }, ROOF = '#7E8B98', GRASS = '#A8CB7E';
+  // at night the Palace is floodlit gold from the terrace and the river; its roofs and spires stay dark over it
+  const DIM = new Set([ROOF, shade(ROOF, 0.12), '#6E7A86', '#3E4650', '#2E353E', '#8E979E', '#7C858C']);
+  const dimRoof = (c) => (DIM.has(c) ? mix(nightColour(c), '#C8945A', 0.18) : undefined), FLW = '#FFC872';
   T.ground(function (g) {
     LK.ground(g, -H, -H, H, RN, '#E2DED3');
     LK.paving(g, -H, 25, H, RN, { step: 2.4, col: '#E6E1D5' });                     // the river terrace
@@ -24,7 +27,7 @@ SF.tile('westminster', -100, 0, { rim: 8 }, function (T) {
 
   /* ---------------- Westminster Abbey (west of the square) ---------------- */
   T.obj([-35, -33, -15, -21], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     const S = { t: '#D8CDB4', l: '#E2D6BC', r: '#C6B99C' };
     // the nave with its aisles and the steep lead roof, the east apse
     K.box(g, -30, -31, -17, -23, 0, 5.2, S, { w: 0.8 });
@@ -38,8 +41,11 @@ SF.tile('westminster', -100, 0, { rim: 8 }, function (T) {
     K.win(g, 'L', -20.98, -24.0, -21.5, 0, 3.2, { style: 'dark', arch: 'gothic', col: '#4A4640', w: 0.4 });
     // the twin west towers
     for (const y of [-31.5, -25.5]) { K.box(g, -34.5, y - 2.0, -30, y + 2.0, 0, 15.5, S, { w: 0.75 }); K.win(g, 'L', y + 2.02, -33.2, -31.6, 9.5, 13.5, { style: 'dark', arch: 'gothic', col: '#5A5E68', w: 0.35 }); for (const [px, py] of [[-34.5, y - 2], [-30, y - 2], [-30, y + 2], [-34.5, y + 2]]) { const b = g.p(px, py, 15.5), t = g.p(px, py, 18); g.fill2([[b[0] - 0.6, b[1]], [b[0] + 0.6, b[1]], [t[0], t[1]]], S.l); g.outline2([[b[0] - 0.6, b[1]], [t[0], t[1]], [b[0] + 0.6, b[1]]], { w: 0.4, boil: false }); } LK.battle(g, -34.5, y - 2, -30, y + 2, 15.5, S.l, { mw: 0.5, st: 1.1, mh: 0.6 }); }
+    // at night: floodlit, the north transept and the west towers brightest
+    LK.flood(g, i0, 0.7, LK.FLOOD.warm, dimRoof);
+    for (const [x, y, z, r] of [[-22.75, -20.4, 3.5, 2.6], [-22.75, -20.4, 9.5, 2.2], [-32.2, -23.0, 8, 2.0], [-29.4, -27.5, 10, 1.8], [-24, -22.4, 3.0, 1.8]]) g.glow('lantern', x, y, z, { r, col: '#FFD9A0' });
   }, { name: 'abbey' });
-  T.obj([-14, -21, -8, -15], (g) => { K.box(g, -13, -20, -8.5, -16, 0, 4.6, { t: '#D2C6AC', l: '#DED2B8', r: '#C3B597' }, { w: 0.7 }); K.gable(g, -13.2, -20.2, -8.3, -15.8, 4.6, 2.2, 'x', { a: '#8E979E', b: '#7C858C', e: '#DED2B8' }, { w: 0.6 }); K.box(g, -14, -19.5, -12, -17.5, 0, 8.6, { t: '#D2C6AC', l: '#DED2B8', r: '#C3B597' }, { w: 0.65 }); LK.battle(g, -14, -19.5, -12, -17.5, 8.6, '#DED2B8', { mw: 0.45, st: 0.9, mh: 0.55 }); K.win(g, 'L', -15.98, -11.8, -10.2, 1.0, 3.6, { style: 'dark', arch: 'gothic', col: '#5A5E68', w: 0.3 }); }, { name: "st margaret's" });
+  T.obj([-14, -21, -8, -15], (g) => { K.box(g, -13, -20, -8.5, -16, 0, 4.6, { t: '#D2C6AC', l: '#DED2B8', r: '#C3B597' }, { w: 0.7 }); K.gable(g, -13.2, -20.2, -8.3, -15.8, 4.6, 2.2, 'x', { a: '#8E979E', b: '#7C858C', e: '#DED2B8' }, { w: 0.6 }); K.box(g, -14, -19.5, -12, -17.5, 0, 8.6, { t: '#D2C6AC', l: '#DED2B8', r: '#C3B597' }, { w: 0.65 }); LK.battle(g, -14, -19.5, -12, -17.5, 8.6, '#DED2B8', { mw: 0.45, st: 0.9, mh: 0.55 }); K.win(g, 'L', -15.98, -11.8, -10.2, 1.0, 3.6, { style: 'dark', arch: 'gothic', col: '#5A5E68', w: 0.3 }); LK.flood(g, 0, 0.5, LK.FLOOD.warm, dimRoof); g.glow('lantern', -11, -15.4, 3, { r: 1.8, col: '#FFD9A0' }); }, { name: "st margaret's" });
 
   /* ---------------- the Palace of Westminster ---------------- */
   // the Victoria Tower at the west end
@@ -51,6 +57,8 @@ SF.tile('westminster', -100, 0, { rim: 8 }, function (T) {
     LK.battle(g, -34.5, 11.5, -26.5, 20.5, 26, GO, { mw: 0.6, st: 1.2, mh: 0.7 });
     for (const [px, py] of [[-34.5, 11.5], [-26.5, 11.5], [-26.5, 20.5], [-34.5, 20.5]]) K.cone(g, px, py, 0.9, 25.0, 5.2, GO);
     LK.pole(g, -30.5, 16, 26, 7.5);
+    LK.flood(g, 0, 1, LK.FLOOD.gold, dimRoof);
+    for (const [z, r] of [[4, 2.8], [12, 2.6], [20, 2.4]]) { g.glow('lantern', -30.5, 21.1, z, { r, col: FLW }); g.glow('lantern', -25.9, 16, z + 2, { r: r * 0.85, col: FLW }); }
   }, { name: 'victoria tower' });
   LK.flag(T, -30.5, 16, 33.5, { L: 4.4, H: 2.4, ph: 0.6 });
   // the long river front in two pieces, the Central Tower over the middle
@@ -64,12 +72,18 @@ SF.tile('westminster', -100, 0, { rim: 8 }, function (T) {
     // pavilions with their own tall roofs break the long front
     for (const px of [x0 + 7, x1 - 7]) { K.box(g, px - 1.8, 23.8, px + 1.8, 26.6, 0, 13.6, GOT, { w: 0.75, nohid: true }); LK.gothicFace(g, 'L', 26.6, px - 1.8, px + 1.8, 0, 13.6, { bay: 1.2, st: 4.6 }); LK.battle(g, px - 1.8, 23.8, px + 1.8, 26.6, 13.6, GO, { mw: 0.45, st: 0.9, mh: 0.5 }); for (const [qx, qy] of [[px - 1.8, 26.6], [px + 1.8, 26.6], [px + 1.8, 23.8], [px - 1.8, 23.8]]) { const b = g.p(qx, qy, 13.6), t = g.p(qx, qy, 16.4); g.fill2([[b[0] - 0.55, b[1]], [b[0] + 0.55, b[1]], [t[0], t[1]]], GO); g.line2([[b[0] - 0.55, b[1]], [t[0], t[1]], [b[0] + 0.55, b[1]]], { w: 0.35, c: '#8A7448', boil: false }); } }
     if (central) { const cx = central, cy = 19; K.cyl(g, cx, cy, 2.6, 10, 19.5, GOT, { w: 0.75, n: 8 }); LK.gothicFace(g, 'L', cy + 2.5, cx - 1.2, cx + 1.2, 12, 19, { bay: 1.2, st: 3.4 }); K.cone(g, cx, cy, 2.7, 19.5, 8.5, '#6E7A86'); const t = g.p(cx, cy, 28), tt = g.p(cx, cy, 29.4); g.line2([t, tt], { w: 0.5, c: '#3E4650', boil: false, ext: 0 }); }
+    // at night: floodlit gold along the river front; the floodlights' glow in the Thames below
+    LK.flood(g, 0, 1, LK.FLOOD.gold, dimRoof);
+    for (let x = x0 + 2.6; x < x1 - 1; x += 4.6) g.glow('lantern', x, 26.7, 3.2, { r: 2.4, col: FLW });
+    for (const px of [x0 + 7, x1 - 7]) g.glow('lantern', px, 27.2, 10.5, { r: 2.0, col: FLW });
+    if (x1 > 20) g.glow('lantern', x1 + 0.6, 19, 5, { r: 2.4, col: FLW });
+    if (central) g.glow('lantern', central, 21.8, 16, { r: 2.2, col: FLW });
   }, { name: 'palace' });
   front(-26.5, -2, -4); front(-2, 25);
 
   /* ---------------- Elizabeth Tower (Big Ben) ---------------- */
   T.obj([26, 15.5, 32.5, 22], function (g) {
-    g.boilP = 0.35;
+    g.boilP = 0.35; const i0 = g.cmds.length;
     const x0 = 26.6, x1 = 31.8, y0 = 16.2, y1 = 21.4, z1 = 19.5, z2 = 24.6, z3 = 27.6, Z = 37;
     K.box(g, x0, y0, x1, y1, 0, z1, GOT, { w: 0.9 });
     LK.gothicFace(g, 'L', y1, x0, x1, 0, z1, { bay: 1.3, st: 3.6 }); LK.gothicFace(g, 'R', x1, y0, y1, 0, z1, { bay: 1.3, st: 3.6 });
@@ -78,19 +92,26 @@ SF.tile('westminster', -100, 0, { rim: 8 }, function (T) {
     for (const [f, p, a0, a1] of [['L', y1 + 0.37, x0 - 0.35, x1 + 0.35], ['R', x1 + 0.37, y0 - 0.35, y1 + 0.35]]) {
       const am = (a0 + a1) / 2, zm = (z1 + z2) / 2, r = 1.95, dial = [];
       for (let i = 0; i < 20; i++) { const t = TAU * i / 20; dial.push(K.pt(f, p, am + Math.cos(t) * r, zm + Math.sin(t) * r)); }
-      g.fill(dial, '#F6F1E2'); g.outline(dial, { w: 0.55, c: '#3A3128', boil: false });
+      g.fill(dial, '#F6F1E2'); g.mark({ nc: '#FFF1C2' }); g.outline(dial, { w: 0.55, c: '#3A3128', boil: false });   // lit from behind every night
       const tick = []; for (let i = 0; i < 12; i++) { const t = TAU * i / 12, a = g.p.apply(g, K.pt(f, p, am + Math.cos(t) * r * 0.8, zm + Math.sin(t) * r * 0.8)), b = g.p.apply(g, K.pt(f, p, am + Math.cos(t) * r * 0.95, zm + Math.sin(t) * r * 0.95)); tick.push(a[0], a[1], b[0], b[1]); } g.segs2(tick, '#2A2622', 0.4);
       const c = g.p.apply(g, K.pt(f, p, am, zm)), hh = g.p.apply(g, K.pt(f, p, am + 0.7, zm + 0.6)), mm = g.p.apply(g, K.pt(f, p, am - 0.1, zm + 1.5)); g.segs2([c[0], c[1], hh[0], hh[1]], '#1E1B19', 0.55); g.segs2([c[0], c[1], mm[0], mm[1]], '#1E1B19', 0.4);
     }
     // the open belfry and the spire with its pinnacles
     K.box(g, x0, y0, x1, y1, z2, z3, GOT, { w: 0.8, nohid: true });
-    for (const [f, p, a0, a1] of [['L', y1 + 0.02, x0, x1], ['R', x1 + 0.02, y0, y1]]) for (let i = 0; i < 3; i++) { const a = lerp(a0, a1, (i + 0.5) / 3); K.win(g, f, p, a - 0.55, a + 0.55, z2 + 0.6, z3 - 0.4, { style: 'dark', arch: 'gothic', col: '#3E4148', w: 0.3 }); }
+    for (const [f, p, a0, a1] of [['L', y1 + 0.02, x0, x1], ['R', x1 + 0.02, y0, y1]]) for (let i = 0; i < 3; i++) { const a = lerp(a0, a1, (i + 0.5) / 3); K.win(g, f, p, a - 0.55, a + 0.55, z2 + 0.6, z3 - 0.4, { style: 'dark', arch: 'gothic', col: '#3E4148', w: 0.3, lit: 1 }); }
     const ap = g.p((x0 + x1) / 2, (y0 + y1) / 2, Z), base = [g.p(x0, y1, z3), g.p(x1, y1, z3), g.p(x1, y0, z3)];
     g.fill2([base[0], base[1], ap], '#3E4650'); g.fill2([base[1], base[2], ap], '#2E353E');
     const gl = []; for (let i = 1; i < 5; i++) { const t = i / 5; for (const [a, b] of [[base[0], base[1]], [base[1], base[2]]]) { gl.push(lerp(a[0], ap[0], t), lerp(a[1], ap[1], t), lerp(b[0], ap[0], t), lerp(b[1], ap[1], t)); } } g.segs2(gl, '#D9A93E', 0.45);
     g.line2([base[0], ap, base[2]], { w: 0.7, c: '#1E1B19', boil: false }); g.line2([base[1], ap], { w: 0.5, c: '#1E1B19', boil: false });
     for (const [px, py] of [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]) { const b = g.p(px, py, z3), t = g.p(px, py, z3 + 3.2); g.fill2([[b[0] - 0.6, b[1]], [b[0] + 0.6, b[1]], [t[0], t[1]]], '#D9A93E'); g.line2([[b[0] - 0.6, b[1]], [t[0], t[1]], [b[0] + 0.6, b[1]]], { w: 0.35, c: '#8A6A2A', boil: false }); }
     const t0 = g.p((x0 + x1) / 2, (y0 + y1) / 2, Z), t1 = g.p((x0 + x1) / 2, (y0 + y1) / 2, Z + 2.2); g.line2([t0, t1], { w: 0.5, c: '#D9A93E', boil: false, ext: 0 }); g.disc2(t1, 0.4, '#D9A93E');
+    // at night: the four dials lit from behind (every night since 1876), the shaft floodlit gold, the gilding bright,
+    // and the Ayrton Light shining above the belfry (Parliament is sitting this evening)
+    const GILT = { '#D8BE7C': '#F4D27E', '#E2C47A': '#FCDC8C', '#C2A35C': '#E6B866', '#D9A93E': '#F2C35A' };
+    LK.flood(g, i0, 1, LK.FLOOD.gold, (c) => GILT[c] || dimRoof(c));
+    for (const [f, p, a] of [['L', y1 + 0.6, (x0 + x1) / 2], ['R', x1 + 0.6, (y0 + y1) / 2]]) g.glow('lantern', ...K.pt(f, p, a, (z1 + z2) / 2), { r: 2.8, col: '#FFF0C0' });
+    for (const [z, r] of [[4, 2.6], [12, 2.4]]) { g.glow('lantern', (x0 + x1) / 2, y1 + 0.6, z, { r, col: FLW }); g.glow('lantern', x1 + 0.6, (y0 + y1) / 2, z + 3, { r: r * 0.85, col: FLW }); }
+    { const c = (x0 + x1) / 2, d = (y0 + y1) / 2, p = g.p(c + 0.9, d + 0.9, z3 + 1.8); g.disc2(p, 0.55, 'rgba(255,255,255,0)'); g.mark({ nc: '#FFF6D8' }); g.glow2('lantern', p, g.p(c, y1, 0), { r: 1.3, col: '#FFF4CC' }); }
   }, { name: 'elizabeth tower' });
 
   /* ---------------- the square's furniture: statues, the phone box, the Tube, the river parapet ---------------- */

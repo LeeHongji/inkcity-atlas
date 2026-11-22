@@ -47,7 +47,7 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
     K.box(g, cx - h, cy - h, cx + h, cy + h, 0, 2.6, { t: '#C9CDD0', l: '#7E8A94', r: '#6A7680' }, { w: 0.9 });
     K.box(g, cx - h, cy - h, cx + h, cy + h, 2.6, Z0, { t: '#D9E2E8', l: '#C7D3DB', r: '#A9B9C4' }, { w: 0.9 });
     const fins = []; for (const [f, p, a0, a1] of [['L', cy + h, cx - h, cx + h], ['R', cx + h, cy - h, cy + h]]) for (let a = a0 + 0.8; a < a1; a += 0.8) { const q0 = g.p.apply(g, K.pt(f, p + 0.02, a, 2.7)), q1 = g.p.apply(g, K.pt(f, p + 0.02, a, Z0 - 0.1)); fins.push(q0[0], q0[1], q1[0], q1[1]); }
-    g.segs2(fins, '#8FA5B4', 0.3);
+    g.segs2(fins, '#8FA5B4', 0.3); g.cmds[g.cmds.length - 1].nc = '#E6F0FA';          // at night the podium's fins are lit
     // the chamfered shaft: base square corners B, top square T at the edge midpoints (pulled in a little)
     const B = [[cx - h, cy - h], [cx + h, cy - h], [cx + h, cy + h], [cx - h, cy + h]];
     const Tp = [[cx, cy - h * ins], [cx + h * ins, cy], [cx, cy + h * ins], [cx - h * ins, cy]];
@@ -64,13 +64,13 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
       g.fill(f.q, mix('#CFE0EA', '#9FB6C6', t));
       // floor lines across the facet
       const fl = []; for (let z = Z0 + 3; z < Z1 - 1; z += 3.2) { const pts = []; for (let k = 0; k < 3; k++) { const a = f.q[k], b = f.q[(k + 1) % 3]; if ((a[2] - z) * (b[2] - z) < 0) { const u = (z - a[2]) / (b[2] - a[2]); pts.push(g.p(lerp(a[0], b[0], u), lerp(a[1], b[1], u), z)); } } if (pts.length === 2) fl.push(pts[0][0], pts[0][1], pts[1][0], pts[1][1]); }
-      g.segs2(fl, mix('#B5C8D4', '#8AA2B3', t), 0.28);
+      g.segs2(fl, mix('#B5C8D4', '#8AA2B3', t), 0.28); g.cmds[g.cmds.length - 1].nc = t < 0.5 ? '#EBCF96' : '#C9A870';   // lit office floors at night
       g.outline(f.q, { w: 0.75, c: '#4E5F6E', boil: false });
     }
     // a glint down the lit facet
     const gl0 = g.p(cx - h * 0.4, cy + h * 0.8, Z0 + 4), gl1 = g.p(cx - h * 0.1, cy + h * 0.6, Z1 - 8); g.line2([gl0, gl1], { w: 0.9, c: '#F4F8FA', boil: false, ext: 0 });
     // parapet ring and the spire
-    const top = Tp.map((p) => [p[0], p[1], Z1]), topU = Tp.map((p) => [p[0], p[1], Z1 + 1.2]);
+    const top = Tp.map((p) => [p[0], p[1], Z1]), topU = Tp.map((p) => [p[0], p[1], Z1 + 1.2]), iTop = g.cmds.length;
     g.fill(topU, '#E3E8EA'); for (let i = 0; i < 4; i++) { const a = top[i], b = top[(i + 1) % 4]; if ((b[1] - a[1]) - (b[0] - a[0]) > -0.01 || true) { const q = [a, b, topU[(i + 1) % 4], topU[i]]; const n = nrm(q); if (n[0] + n[1] > 0) g.fill(q, '#C9D3D9'); } }
     g.outline(topU, { w: 0.6, c: '#4E5F6E', boil: false });
     K.cyl(g, cx, cy, 1.5, Z1 + 1.2, Z1 + 3.2, { t: '#E9ECEC', l: '#DCE1E3', r: '#BFC7CB' }, { w: 0.6, n: 10 });
@@ -79,8 +79,12 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
     g.line2([[s0[0] - 1.1, s0[1]], [s1[0] - 0.3, s1[1]]], { w: 0.5, c: '#6E7E8C', boil: false }); g.line2([[s0[0] + 1.1, s0[1]], [s1[0] + 0.3, s1[1]]], { w: 0.5, c: '#6E7E8C', boil: false });
     for (let k = 1; k < 6; k++) { const p = g.p(cx, cy, Z1 + 3.2 + k * 2.2), w = 1.1 - k * 0.14; g.segs2([p[0] - w - 0.5, p[1], p[0] + w + 0.5, p[1]], '#8E9AA3', 0.35); }
     g.disc2([s1[0], s1[1] - 0.5], 0.45, '#E0503E');
+    // at night the spire is lit white up to its beacon
+    g.mark({ nc: NK.flood(0.9, '#EEF4FF') }, iTop); NK.nmark(g, iTop, { nc: (c) => (c === '#8E9AA3' ? '#E8F0FF' : undefined) }, true); g.mark({ nc: '#FFFFFF' });
+    for (const [z, r] of [[Z1 + 2, 2.6], [Z1 + 7, 1.8], [Z1 + 12, 1.4]]) g.glow('lantern', cx, cy, z, { r, col: '#E6EEFF' });
+    g.glow2('lantern', [s1[0], s1[1] - 0.5], g.p(cx, cy, 0), { r: 2.2, col: '#F4F8FF' });
     // the lobby glass at the foot
-    K.win(g, 'L', cy + h, cx - h + 1.5, cx + h - 1.5, 0.3, 2.3, { style: 'glass', w: 0.4 });
+    g.lit({ win: 1, spill: true }, () => K.win(g, 'L', cy + h, cx - h + 1.5, cx + h - 1.5, 0.3, 2.3, { style: 'glass', w: 0.4 }));   // the lobby, lit
   }, { name: 'one wtc' });
 
   /* ---------------- temples: the Stock Exchange and Federal Hall ---------------- */
@@ -104,6 +108,7 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
     g.boilP = 0.3;
     K.box(g, -12, -30, 8, -22, 0, 22, { t: '#E3DED2', l: '#E9E4D8', r: '#D3CDBF' }, { w: 0.85 });       // the annex behind
     NK.windows(g, 'R', 8, -29.5, -22.5, 4, 3, 6, 2, { style: 'navy' }); NK.windows(g, 'L', -22, -11.5, 7.5, 17, 1.6, 3, 7, { style: 'navy', hfill: 0.6 });
+    const i0 = g.cmds.length;                                                                                // (the front is floodlit at night)
     K.box(g, -13, -22, 9, -16, 0, 14.5, MARBLE, { w: 0.9 });                                                 // the temple block
     K.box(g, -13, -16, -9.5, -14.2, 0, 14.5, MARBLE, { w: 0.8 }); K.box(g, 5.5, -16, 9, -14.2, 0, 14.5, MARBLE, { w: 0.8 });   // the two piers
     g.fill(K.on('L', -16 + 0.02, -9.5, 5.5, 2, 12.4), '#B9B2A2');                                                // the recess behind the columns
@@ -119,10 +124,15 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
     K.box(g, -13.4, -16.4, 9.4, -13.6, 12.4, 14.6, MARBLE, { w: 0.7 });                                            // the entablature
     NK.text(g, 'L', -13.6, -2, 13.0, 1.1, 'NEW YORK STOCK EXCHANGE', '#6E6650', { center: true, w: 0.3 });
     pediment(g, -13.4, 9.4, -16.4, 2.8, 14.6, 4.6, MARBLE);
+    // at night the temple front is floodlit and the flag lit across the columns
+    NK.nmark(g, i0, { nc: (c) => (c === '#C9463E' ? '#E0503F' : c === '#F6F2E8' ? '#FBF4E2' : c === '#2F4A7A' ? '#3A5C98' : undefined) });
+    NK.floodMark(g, i0, 0.62, '#FFE2B0');
+    for (const x of [-8.4, -3.28, 1.84]) g.glow('lantern', x + 1.3, -13.2, 1.8, { r: 2.6, col: '#FFDFA8' });
+    g.glow('lantern', -2, -13.4, 8, { r: 5, col: '#FFE8C0' });
   }, { name: 'stock exchange' });
   // Federal Hall: a Doric temple on high steps
   T.obj([13, -30, 31, -11], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     K.box(g, 14, -30, 30, -17.5, 0, 12, MARBLE, { w: 0.9 });
     g.fill(K.on('L', -17.5 + 0.02, 15.5, 28.5, 3.4, 10), '#C9C2B2');
     K.win(g, 'L', -17.5, 20.6, 23.4, 3.4, 8, { style: 'dark' });
@@ -132,12 +142,15 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
     K.box(g, 13.8, -17.6, 30.2, -15.5, 10.6, 12.4, MARBLE, { w: 0.7 });
     pediment(g, 13.8, 30.2, -17.6, 2.0, 12.4, 3.6, MARBLE);
     const p = g.p(31.2, -24, 12.4), t = g.p(31.2, -24, 21); g.line2([p, t], { w: 0.6, c: '#8C8576', boil: false });
+    NK.floodMark(g, i0, 0.55, '#FFE2B0');                                             // floodlit at night
+    for (const x of [16, 22, 28]) g.glow('lantern', x, -11.5, 3.6, { r: 2.4, col: '#FFDFA8' });
   }, { name: 'federal hall' });
   fidiFlag(T, 31.2, -24, 21, { w: 5.2, h: 3.2 });
   // George Washington on his plinth at the foot of the steps
   T.obj([22, -9.5], function (g) {
     K.box(g, 20.8, -10.7, 23.2, -8.3, 0, 3.4, { t: '#C9C3B6', l: '#D6D0C3', r: '#B9B3A6' }, { w: 0.6 });
     NK.person(g, 22, -9.5, 3.4, { dir: 1, pose: 'stand', skin: '#5E6E5A', hair: '#4E5E4A', top: '#5E6E5A', bot: '#55654F', shoe: '#4E5E4A', jacket: '#6A7A64', hairStyle: 'pony', k: 1.25, reach: [-2.5, -11] });
+    NK.floodMark(g, 0, 0.6, '#FFE2B0'); g.glow('lantern', 22, -8.0, 1.4, { r: 1.6, col: '#FFDFA8' });   // lit from the plinth at night
   }, { name: 'washington' });
 
   /* ---------------- the plaza: the Charging Bull, bollards, the cart ---------------- */
@@ -182,6 +195,12 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
     // the bronze parapet, names cut into it
     for (const [a, b] of [[[PX0 - 0.6, PY0 - 0.6], [PX1 + 0.6, PY0]], [[PX0 - 0.6, PY0], [PX0, PY1 + 0.6]], [[PX1, PY0], [PX1 + 0.6, PY1 + 0.6]], [[PX0, PY1], [PX1 + 0.6, PY1 + 0.6]]]) K.box(g, a[0], a[1], b[0], b[1], 0, 1.3, { t: '#4A4038', l: '#5E5246', r: '#4E443A' }, { w: 0.55, boil: false });
     const nm = []; for (const [f, p, A0, A1] of [['L', PY1 + 0.6, PX0, PX1], ['R', PX1 + 0.6, PY0, PY1]]) for (let a = A0 + 0.5; a < A1 - 0.5; a += 0.9) { const q = g.p.apply(g, K.pt(f, p + 0.02, a, 0.9)); nm.push(q[0], q[1], q[0] + 1.1, q[1] + (f === 'L' ? 0.6 : -0.6)); } g.segs2(nm, '#2E2620', 0.25);
+    // at night the names in the parapet are lit from within, and lights under the falling water light the walls
+    g.cmds[g.cmds.length - 1].nc = '#FFD98A';
+    NK.nmark(g, 0, { nc: (c) => ({ '#6E6A64': '#7E8794', '#5E5A54': '#6A7380', '#7FA6C2': '#5E8EB8', '#E9EEF0': '#DCE6EE', '#D5DDE1': '#B8C6D2' })[c] });
+    for (let a = PX0 + 2; a < PX1; a += 4) g.glow('lantern', a, PY0 + 0.4, WZ + 0.6, { r: 1.6, col: '#DDEEFF' });
+    for (let a = PY0 + 2; a < PY1; a += 4) g.glow('lantern', PX0 + 0.4, a, WZ + 0.6, { r: 1.6, col: '#DDEEFF' });
+    g.glow('lantern', -20, 19.6, WZ - 0.8, { r: 1.8, col: '#CFE6FF' });
   }, { name: 'pool' });
   // the water falling down the far inner walls and into the void
   T.actor({ sample: 5, period: 10, grow: false,
@@ -191,7 +210,7 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
       const P = (x, y, z) => g.p(x + o[0], y + o[1], z);
       for (let a = PX0 + 0.3; a < PX1; a += 0.55) { const k = (Math.round(a * 4) + st.ph) % 3; const q0 = P(a, PY0 + 0.02, -0.1), q1 = P(a, PY0 + 0.02, WZ + 0.2 + k * 0.4); s.push(q0[0], q0[1], q1[0], q1[1]); }
       for (let a = PY0 + 0.3; a < PY1; a += 0.55) { const k = (Math.round(a * 4) + st.ph) % 3; const q0 = P(PX0 + 0.02, a, -0.1), q1 = P(PX0 + 0.02, a, WZ + 0.2 + k * 0.4); s.push(q0[0], q0[1], q1[0], q1[1]); }
-      g.segs2(s, 'rgba(250,252,252,0.9)', 0.32);
+      g.segs2(s, 'rgba(250,252,252,0.9)', 0.32); g.cmds[g.cmds.length - 1].nc = 'rgba(236,246,255,0.92)';   // lit at night
       const f = []; for (let a = -22.4; a < -17.6; a += 0.45) { const k = (Math.round(a * 5) + st.ph) % 3; const q0 = P(a, 19.42, WZ - 0.05), q1 = P(a, 19.42, WZ - 0.9 - k * 0.5); f.push(q0[0], q0[1], q1[0], q1[1]); }
       g.segs2(f, 'rgba(160,190,205,0.9)', 0.3);
       const foam = []; for (let a = PX0 + 0.4; a < PX1 - 0.3; a += 0.8) { const q = P(a + (st.ph % 2) * 0.3, PY0 + 0.6, WZ + 0.02); foam.push(q[0] - 0.8, q[1], q[0] + 0.8, q[1]); } g.segs2(foam, '#F6F8F8', 0.45);
@@ -206,7 +225,7 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
   /* ---------------- the Oculus ---------------- */
   // a low white vault on an ellipse; its ribs cross at the glass spine and fly on upwards as two wings, highest at the ends
   T.obj([0, 15, 26, 30], function (g) {
-    g.boilP = 0.2;
+    g.boilP = 0.2; const i0 = g.cmds.length;
     const cx = 13, cy = 22.5, L = 10.5, W = 4.0, ZS = 5.0, N = 6;
     const wid = (u) => W * Math.sqrt(Math.max(0.08, 1 - u * u));
     const rib = (a, b, wa, wb, col) => { const A = g.p.apply(g, a), B = g.p.apply(g, b), dx = B[0] - A[0], dy = B[1] - A[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l; const q = [[A[0] + nx * wa, A[1] + ny * wa], [B[0] + nx * wb, B[1] + ny * wb], [B[0] - nx * wb, B[1] - ny * wb], [A[0] - nx * wa, A[1] - ny * wa]]; g.fill2(q, col); g.outline2(q, { w: 0.35, c: '#8C979C', boil: false }); };
@@ -221,6 +240,10 @@ SF.tile('fidi', -100, -100, { rim: 6 }, function (T) {
     g.line(ell(0.8).slice(0, 17), { w: 0.7, c: '#6E7A80', boil: false });
     const sp = []; for (let i = -N; i <= N; i++) sp.push([cx + (i / N) * L * 0.9, cy, ZS]); g.line(sp, { w: 0.9, c: '#8C979C', boil: false });
     wing(1);
+    // at night the hall glows white through its glass spine and between the ribs
+    const OCN = { '#D2E2EA': '#D9DED6', '#DCE9EF': '#E6E8DC', '#F8F8F6': '#EEF1F2', '#E6EAEB': '#C9D0D8', '#EEEFEC': '#C2C6C2', '#DCDFDC': '#A9AEAC' };
+    g.mark({ nc: (c) => OCN[c] }, i0); NK.nmark(g, i0, { nc: (c) => (c === '#F8F8F6' ? '#F4F6F6' : undefined) }, true);
+    for (const u of [-0.55, 0.55]) g.glow('lantern', cx + u * L * 0.8, cy, ZS - 1.6, { r: 2.4, col: '#F2F0E4' });
   }, { name: 'oculus' });
 
   /* ---------------- sidewalk furniture ---------------- */

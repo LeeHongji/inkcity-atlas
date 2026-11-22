@@ -31,7 +31,7 @@ SM.acqua = function (T) {
 
   /* ---- the water ---- */
   T.actor({ grow: false, sample: 0.5, period: PT, bias: -2,
-    at(t) { const lq = Math.round(level(tauOf(t)) * Q) / Q; if (lq <= 0) return null; return { x: X0, y: Y0, z: 0, key: lq, lq }; },
+    at(t) { const lq = Math.round(level(tauOf(t)) * Q) / Q; if (lq <= 0) return null; const n = LOOK.night && lq >= 0.8; return { x: X0, y: Y0, z: 0, key: lq + (n ? 'n' : ''), lq, n }; },
     draw(g, st) {
       const lq = st.lq, h = lq * HMAX, ox = -X0, oy = -Y0;          // draw in tile coords, shifted so the anchor is the origin
       const W = (x, y, z) => [x + ox, y + oy, z];
@@ -57,11 +57,24 @@ SM.acqua = function (T) {
         refl([[-24, -20, 1.5], [-7, -20, 1.5], [-7, -20, 5], [-24, -20, 5]], '#C9A13A');
         refl([[-2.5, -18, 0], [26, -18, 0], [26, -18, 4.4], [-2.5, -18, 4.4]], '#B9A898');
         refl([[-2.5, -18, 9], [26, -18, 9], [26, -18, 15.5], [-2.5, -18, 15.5]], '#E9B9A6');
+        const r0 = g.cmds.length;
         refl([[-1, -8.5, 1.2], [4.5, -8.5, 1.2], [4.5, -14, 1.2], [4.5, -14, 28], [4.5, -8.5, 28], [-1, -8.5, 28]], '#C47454');
         refl([[-1, -8.5, 28], [4.5, -8.5, 28], [4.5, -14, 28], [4.5, -14, 37.4], [4.5, -8.5, 37.4], [-1, -8.5, 37.4]], '#F3EFE6');
         refl([[-1, -8.5, 37.4], [4.5, -8.5, 37.4], [4.5, -14, 37.4], [1.75, -11.25, 48.4]], '#6F9A86');
         refl([[30.3, -10.8, 1.3], [31.7, -10.8, 1.3], [31.7, -10.8, 14], [30.3, -10.8, 14]], '#B9A9A0');
         refl([[30.3, -0.8, 1.3], [31.7, -0.8, 1.3], [31.7, -0.8, 14], [30.3, -0.8, 14]], '#B9A9A0');
+        if (st.n) {   // at night the flooded square doubles the lights: the floodlit fronts glow in it, every lamp lays a broken column on it
+          const sea = nightColour(VN.flood), L1 = VN.litStone(1);
+          g.mark({ nc: (c) => { const l = L1(c); return l ? mix(l, sea, 0.45) : undefined; } }, r0);
+          for (const [x, y, z, col] of SM.LIGHTS) {
+            if (x < X0 + 0.5 || y < Y0 + 0.5) continue;
+            for (let k = 0; k < 6; k++) {
+              const zz = 2 * h - z - 0.4 - k * 1.15, w = (1.5 - k * 0.17) * (0.8 + 0.4 * h1(x * 3 + y * 7 + k)), dx = (h1(x + y * 5 + k * 3) - 0.5) * 0.5;
+              const a = g.p.apply(g, W(x + dx - w * 0.5, y + dx + w * 0.5, zz)), b = g.p.apply(g, W(x + dx + w * 0.5, y + dx - w * 0.5, zz));
+              const P = clipS([[a[0], a[1]], [b[0], b[1]], [b[0], b[1] + 0.9], [a[0], a[1] + 0.9]]); if (P.length > 2) { g.fill2(P, 'rgba(' + col + ',' + (0.75 - k * 0.1).toFixed(2) + ')', true); g.mark({ nc: true }); }
+            }
+          }
+        }
         const rp = []; for (let i = 0; i < 160; i++) { const x = lerp(X0 + 1, X1 - 1, h1(i * 1.37)), y = lerp(Y0 + 1, Y1 - 1, h1(i * 2.91)), c = g.p.apply(g, W(x, y, h)), l = 2 + h1(i * 5.3) * 6; rp.push(c[0] - l, c[1], c[0] + l, c[1]); }
         g.segs2(rp, VN.flood, 1.3);
         g.water(sheet, { dens: 0.5 });
@@ -189,7 +202,7 @@ SM.acqua = function (T) {
 
   /* ---- Caffè Quadri's tables, its orchestra on the little stage ---- */
   for (const [y, n] of [[2, 2], [8, 2], [14, 1], [20, 2], [26, 2]]) T.cast([-25.5, y], function (g) {
-    VN.table(g, -25.5, y, 0, { cups: ['#F3F1EA', '#C9463E'] });
+    VN.table(g, -25.5, y, 0, { cups: ['#F3F1EA', '#C9463E'] }); g.glow('lantern', -25.5, y, 2.9, { r: 0.7, col: '#FFC870' });   // a little table lamp at night
     for (let k = 0; k < n; k++) { const sx = -25.5 + (k ? 1.6 : -1.5), sy = y + (k ? 0.6 : -0.8), w = (y + k) % 3 === 0 ? VN.carnival(700 + y + k, 'volto') : VN.who(700 + y * 3 + k); VN.person(g, sx, sy, 1.3, Object.assign({}, w, { dir: k ? 2 : 0, pose: 'sit' })); }
   }, { name: 'quadri tables' });
   T.obj([-27.6, -9.4, -23.2, -2.6], function (g) {
@@ -200,6 +213,7 @@ SM.acqua = function (T) {
       if (inst === 'bass') { g.fill2(K.curve([[hh[0] + 1, hh[1] + 4], [hh[0] + 3.2, hh[1] + 1], [hh[0] + 2.4, hh[1] - 4], [hh[0] + 1.0, hh[1] - 10], [hh[0] - 0.4, hh[1] - 3], [hh[0] - 0.8, hh[1] + 2]], 3, true), '#8A4A2A', true); } };
     musician(-26.4, -5.2, 0, 'violin'); musician(-24.4, -7.2, 1, 'bass'); musician(-24.4, -4.0, 2, 'violin');
     const ps = g.P([[-26.0, -8.4, 1.3]]); VN.person(g, -25.0, -8.6, 1.0, VN.who(723, { dir: 2, pose: 'sit', top: '#2A2622' })); void ps;
+    for (const y of [-8.8, -3.2]) g.glow('lamp', -23.4, y, 5.4, { r: 1.3 });                                // the stage's lamps at night
   }, { name: 'orchestra' });
 
   /* ---- the two red lions of the piazzetta dei Leoncini, children riding them ---- */

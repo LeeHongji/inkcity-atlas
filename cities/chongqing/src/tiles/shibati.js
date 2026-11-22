@@ -33,7 +33,8 @@ SF.tile('shibati', 0, 100, { rim: 46 }, function (T) {
       CQ.terrace(g, -37, y0, 37, y1, 0, z, { top: k % 2 ? '#D6CEBD' : '#DCD5C5' });
       g.fill(K.rect(-CW, y0, CW, y1, z), '#CFC6B3');
       const j = []; for (let y = y0 + 1.5; y < y1; y += 1.5) { const a = g.p(-CW, y, z), b = g.p(CW, y, z); j.push(a[0], a[1], b[0], b[1]); } g.segs2(j, '#B3A991', 0.25);
-      if (k > 0) { CQ.steps(g, -CW, y0, CW, y0 + 4.5, z, ZS[k - 1], 'y', { rise: 0.5, zb: z }); CQ.rail(g, 'R', CW + 0.2, y0, y0 + 4.5, z, { h: 1.0 }); }
+      if (k > 0) { CQ.steps(g, -CW, y0, CW, y0 + 4.5, z, ZS[k - 1], 'y', { rise: 0.5, zb: z }); CQ.rail(g, 'R', CW + 0.2, y0, y0 + 4.5, z, { h: 1.0 }); g.glow('lamp', CW + 0.2, y0 + 4.3, z + 1.3, { r: 1.0, base: z }); }   // a lamp at each flight's foot (night)
+      if (k > 0) g.glow('lamp', -CW - 0.3, y0 + 0.2, z + 2.4, { r: 0.9, base: z });   // and one on the wall at each landing
     }
   }, { name: 'terraces' });
   // the last flight, from the bottom ground up onto terrace 3
@@ -45,6 +46,7 @@ SF.tile('shibati', 0, 100, { rim: 46 }, function (T) {
     K.box(g, -6.4, -13.2, 6.4, -11.4, z + 8, z + 9.6, { t: '#5E6168', l: '#7A4A3A', r: '#5E382C' }, { w: 0.7 });
     K.gable(g, -7.6, -13.8, 7.6, -10.8, z + 9.6, 1.6, 'x', CQC.roof, { c: '#33302C', w: 0.7 });
     CQH.sign(g, 'L', -11.4, -4, 4, z + 6, z + 7.8, '#9E2A22', '十八梯', { ink: '#F2D27A' });
+    for (const x of [-5, 5]) g.glow('lantern', x, -11.5, z + 7.6, { r: 1.8, col: '#FFC06A' });   // the gate floodlit (night)
   }, { on: true, name: 'gate' });
 
   /* ---- houses stepping down either side ---- */
@@ -70,6 +72,7 @@ SF.tile('shibati', 0, 100, { rim: 46 }, function (T) {
     K.box(g, 6, 17.5, 10, 20.5, z, z + 2.6, { t: '#D9D3C4', l: '#C9463E', r: '#A9382F' }, { w: 0.6 });
     K.cyl(g, 8.8, 19, 1.0, z + 2.6, z + 3.8, { t: '#5A564E', l: '#9C9A94', r: '#7A7872' }, { w: 0.45, n: 10 });
     CQ.person(g, 11, 18.6, z, CQ.who(900, { dir: 2, pose: 'hold', top: '#F3F1EA', cap: '#F3F1EA' }));
+    g.glow('lamp', 7, 19.5, z + 3.0, { r: 0.9, base: z });                       // a bulb on the counter (night)
   }, { on: true, name: 'noodles' });
   CQ.steamActor(T, 8.8, 19, ZS[3] + 4, 0.9);
   for (const [x, y, d, s] of [[6.5, 24, 3, 901], [9.5, 24.5, 2, 902], [12.5, 23.5, 2, 903], [14, 20, 2, 904]]) T.cast([x, y], (g) => g.at(x, y, ZS[3], (g2) => { CQ.stool(g2, 0, 0, s % 2 ? '#C9463E' : '#4F7FB8'); CQ.person(g2, 0, 0, 1.3, CQ.who(s, { dir: d, pose: 'sit', bowl: true, reach: [2.6, 3] })); }), { on: true, name: 'eater' });

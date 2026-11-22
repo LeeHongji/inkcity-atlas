@@ -62,10 +62,11 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   for (const zx of [-100, 0]) for (const [dx, y] of [[-3.4, -64.2], [3.4, -35.8]]) T.obj([zx + dx, y], (g) => {
     const x = zx + dx, b = g.p(x, y, 0), t = g.p(x, y, 8.2), seg = [];
     for (let i = 0; i < 8; i++) { const a = [lerp(b[0], t[0], i / 8), lerp(b[1], t[1], i / 8)], c = [lerp(b[0], t[0], (i + 1) / 8), lerp(b[1], t[1], (i + 1) / 8)]; g.line2([a, c], { w: 0.9, c: i % 2 ? '#F3F1EA' : '#2A2622', boil: false, ext: 0 }); }
-    g.disc2([t[0], t[1] - 1.4], 1.5, '#F0A23A'); g.ring2([t[0], t[1] - 1.4], 1.5, { w: 0.4, c: '#8A5A1E' }); void seg;
+    g.disc2([t[0], t[1] - 1.4], 1.5, '#F0A23A'); g.mark({ nc: '#FFB347' }); g.glow2('lantern', [t[0], t[1] - 1.4], b, { r: 1.8, col: '#FFB347' }); g.ring2([t[0], t[1] - 1.4], 1.5, { w: 0.4, c: '#8A5A1E' }); void seg;
   }, { name: 'beacon' });
   const lamps = [[-64.5, -140], [-64.5, -100], [-35.5, -120], [-35.5, -80], [35.5, -140], [35.5, -100], [64.5, -120], [64.5, -80], [-120, -64.5], [-80, -64.5], [-20, -64.5], [20, -35.5], [80, -64.5], [120, -35.5], [-35.5, 90], [-35.5, 130], [64.5, 100], [64.5, 140], [35.5, 120], [-64.5, 115]];
-  for (const [x, y] of lamps) T.obj([x, y], (g) => LK.lamp(g, x, y), { name: 'lamp' });
+  // the two at y -140 stand past the map's edge, on bare paper: no light from them at night
+  for (const [x, y] of lamps) T.obj([x, y], (g) => LK.lamp(g, x, y, { light: y !== -140 }), { name: 'lamp' });
 
   /* ---- the timetable ---- */
   const CARS = ['#8FA3B5', '#F1EFE8', '#2F343B', '#B9A27D', '#6C7A89', '#C9584B', '#E7E2D6'];
@@ -78,7 +79,7 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   LT.ROAD.free.forEach((ln, li) => ln.cars.forEach((c, k) => {
     const hl = LT.HL[c.kind], ang = angOf(ln), col = CARS[(li * 3 + k * 2) % CARS.length];
     T.actor({ cast: false, sample: 0.18, period: 25,
-      at(t) { return place(ln, LT.freeS(c.s0, LT.tc(t)), hl); },
+      at(t) { const st = place(ln, LT.freeS(c.s0, LT.tc(t)), hl); if (st) st.ang = ang; return st; },   // (ang: the head lamps' beams at night)
       draw(g) { LK.vehicle(g, ang, c.kind, col, ln.ax === 'y' ? '12' : '11'); } });
   }));
   // the Tower Bridge lanes narrow onto the bridge (LT.bOff): x follows y, the heading follows the slope

@@ -25,4 +25,7 @@ const SCENE = {
   visit: ['eiffel', 'etoile', 'montmartre', 'opera', 'pigalle', 'marais', 'cite', 'luxembourg', 'louvre'],
   dive: { opera: 'cafe' },
   bounds: { z: [0.7, 10], cx: [60, 1860], cy: [60, 1100] },
+  // at night: two windows in three lit; the Seine, the fountains' basins and the sea round Mont-Saint-Michel hold the
+  // lights' reflections; motes hang over the lawns (Paris's own lawn green and Versailles's)
+  night: { lit: 0.66, water: ['#9DBDBC', '#7FA2A3', '#C2D8D3', '#B9D3D6'], grass: ['#B9CC8C', '#B5CF8E'] },
 };

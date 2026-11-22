@@ -66,7 +66,7 @@ VN.hump = function (T, ax, c, b, o, role) {
     if (o.rail === 'iron') { const rl = []; for (let i = 0; i < vs.length; i++) { const a = g.p.apply(g, L([[W + 0.06, vs[i], deck(vs[i]) + 0.35]])[0]), e = g.p.apply(g, L([[W + 0.06, vs[i], deck(vs[i]) + PH - 0.15]])[0]); rl.push(a[0], a[1], e[0], e[1]); } g.segs2(rl, '#3A3F3C', 0.3); }
     else { const br = []; for (let i = 0; i < vs.length - 1; i += 2) { const v = vs[i], a = g.p.apply(g, L([[W + 0.06, v, deck(v) + PH * 0.5]])[0]), e = g.p.apply(g, L([[W + 0.06, v + 0.7, deck(v + 0.7) + PH * 0.5]])[0]); br.push(a[0], a[1], e[0], e[1]); } g.segs2(br, shade(body, 0.28), 0.28); }
     g.fill(L(vs.map((v) => [ui, v, deck(v) + PH]).concat(vs.slice().reverse().map((v) => [W + 0.1, v, deck(v) + PH + 0.05]))), stone);
-    for (const [e, on] of [[va, endA], [vb, endB]]) if (on) { const q = L([[ui, e, 0], [W + 0.05, e, 0], [W + 0.05, e, PH], [ui, e, PH]]); g.fill(q, stone); g.outline(q, { w: 0.5 }); }
+    for (const [e, on] of [[va, endA], [vb, endB]]) if (on) { const q = L([[ui, e, 0], [W + 0.05, e, 0], [W + 0.05, e, PH], [ui, e, PH]]); g.fill(q, stone); g.outline(q, { w: 0.5 }); const lp = L([[W - PW / 2, e, PH + 1.0]])[0]; VN.glowDry(g, 'lamp', lp[0], lp[1], lp[2], { r: 1.4 }); }   // at night a lantern on each end post (no reflection: the bridge stands over the water beside it)
     g.line(L(vs.map((v) => [W + 0.1, v, deck(v) + PH + 0.05])), { w: 0.85, boil: false });
     g.line(L(vs.map((v) => [ui, v, deck(v) + PH])), { w: 0.5 });
     g.line(L(vs.map((v) => [W + 0.05, v, deck(v) - 0.05])), { w: 0.55, c: '#6E5040' });
@@ -121,7 +121,11 @@ VN.pontoon = function (T, ax, a, b0, name, wait) {
     for (let u = A0 + 2; u < A1 - 5; u += 2.2) K.win(g, face, b0 + 2.0, u, u + 1.4, z + 1.8, z + 3.8, { style: 'glass' });
     if (wait) wait(g, A0, A1, b0, B1, z);
     box(g, A0 + 0.6, b0 + 0.2, A1 - 0.6, B1 - 0.3, z + 4.6, z + 5.1, { t: '#C9C4B8', l: '#E6C24F', r: '#C9A43A' }, { w: 0.55 });
-    K.sign(g, face, B1 - 0.29, A0 + 1.4, A1 - 1.4, z + 4.62, z + 5.08, '#E6C24F', name, { ink: '#2A2622' });
+    { const i0 = g.cmds.length; K.sign(g, face, B1 - 0.29, A0 + 1.4, A1 - 1.4, z + 4.62, z + 5.08, '#E6C24F', name, { ink: '#2A2622' }); g.mark({ nc: true }, i0); }
+    // at night: lamps under the roof (at the Rialto and the Ca' d'Oro they keep no reflection: on screen the bridge, the
+    // houses across the canal stand over the water in front)
+    // (the Rialto stop's downstream lamp would shine through the bridge's shops in front of it: it has none)
+    for (const u of [A0 + 2.2, A1 - 2.2]) { const q = X ? [u, B1 - 0.7] : [B1 - 0.7, u]; if (name === 'RIALTO' && u > a) continue; if (name === 'RIALTO' || name === "CA' D'ORO") VN.glowDry(g, 'lamp', q[0], q[1], z + 4.2, { r: 1.3 }); else g.glow('lamp', q[0], q[1], z + 4.2, { r: 1.3, base: z }); }
     const ps = []; for (let u = A0 + 0.8; u < A1; u += 2.6) { const q = X ? [u, B1 - 0.4] : [B1 - 0.4, u], p0 = g.p(q[0], q[1], z), p1 = g.p(q[0], q[1], z + 4.6); ps.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(ps, '#5E6660', 0.4);
   }, { name: 'imbarcadero' });
 };

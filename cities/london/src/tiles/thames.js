@@ -53,11 +53,14 @@ const THAMES = function (T) {
     g.line([[E, RN - 1.2, 0], [E, RN - 1.2, D], [E, RS + 1.2, D], [E, RS + 1.2, 0]], { w: 0.85, boil: false });
     g.line([[E, RN, 0], [E, RN, WL], [E, RS, WL], [E, RS, 0]], { w: 0.7, boil: false });
     g.line([[-E, RN - 1.2, 0], [-E, RS + 1.2, 0]], { w: 0.7, boil: false });
+    // a clear fill over the open water the view shows (from the foreshore's edge to where the south bank's edge starts
+    // to hide the river): at night the lights' reflections fall on it (SCENE.night.water), never on the mud or the bank
+    g.fill(fs.concat([[E, RS - 9.9, WL], [-E, RS - 9.9, WL]]), LK.C.WMASK);
   });
 
   /* ---------------- HMS Belfast, moored below Tower Bridge ---------------- */
   T.obj([15.5, 55.8, 35.5, 60.8], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     const y = 58.3, hw = 2.0, x0 = 16, x1 = 35, z = WL, zd = WL + 2.4, light = '#C9CDD0', dark = '#8E979E', mid = '#AEB5BA';
     // the hull: dazzle camouflage in greys, the bow (west) raked
     const hull = (yy) => [[x0 + 1.6, yy, z], [x1, yy, z], [x1 + 0.4, yy, zd], [x0, yy, zd + 0.4]];
@@ -81,6 +84,10 @@ const THAMES = function (T) {
       g.segs2(gs, '#5A6066', 0.4);
     }
     g.fine([[x0 + 0.2, y, zd + 0.6], [x0 + 9.8, y, zd + 10.5], [x0 + 15, y, zd + 8.5], [x1 + 0.3, y, zd + 0.6]], { w: 0.25, c: '#5A6066' });
+    // at night: floodlit from the quay, the bridge windows lit, a white light at each masthead
+    LK.flood(g, i0, 0.5, '#EEDCC0', (c) => (c === '#3F4A55' ? '#FFE2A8' : undefined));
+    for (const x of [x0 + 3, x0 + 9.5, x0 + 15.5]) g.glow('lantern', x, y + hw + 0.5, zd + 1.0, { r: 2.2, col: '#FFE6C0', base: WL });
+    for (const [mx, h] of [[x0 + 9.8, 10.5], [x0 + 15.0, 8.5]]) { const p = g.p(mx, y, zd + h - 1.3); LK.navLight(g, p, '#FFF6E0', 0.4); g.glow2('lantern', p, g.p(mx, y + hw + 0.5, WL), { r: 0.9, col: '#FFF6E0' }); }
   }, { name: 'belfast' });
   LK.flag(T, 35.2, 58.3, WL + 4.2, { L: 1.8, H: 1.0, ph: 0.3 });
 
@@ -116,6 +123,7 @@ const THAMES = function (T) {
     { at: -3.6, fn(g, P) { mast(-3.6, 10.6)(g, P); const s = [P(-3.6, 0, 2.6), P(-3.6, 0, 9.4), P(-6.8, 0, 8.0), P(-7.0, 0, 2.9)]; g.fill(s, SAIL); g.outline(s, { w: 0.35, c: '#8C8576', boil: false }); } },
     { at: 0, fn(g, P, vis) { mast(0, 13.6)(g, P); squares(0, [[3.0, 6.0, 2.4], [6.2, 8.8, 2.1], [9.0, 11.2, 1.7], [11.4, 12.9, 1.3]])(g, P, vis); } },
     { at: 3.2, fn(g, P, vis) { mast(3.2, 12.6)(g, P); squares(3.2, [[3.0, 5.8, 2.3], [6.0, 8.4, 2.0], [8.6, 10.6, 1.6], [10.8, 12.0, 1.2]])(g, P, vis); } },
+    { at: -6.9, fn(g, P) { LK.navLight(g, g.p.apply(g, P(-7.0, 0, 2.7)), '#FFD27A', 0.5); } },     // the stern lantern (night only)
     { at: 7.4, fn(g, P) { g.line([P(6.6, 0, 1.9), P(10.2, 0, 2.9)], { w: 0.6, c: '#4A3A2C', boil: false, ext: 0 }); for (const [a, b] of [[[3.6, 10.6], [9.6, 2.8]], [[3.6, 8.8], [8.2, 2.5]]]) { const j = [P(a[0], 0, a[1]), P(b[0], 0, b[1]), P(lerp(a[0], b[0], 0.15) + 0.6, 0, 2.4)]; g.fill(j, SAIL); g.outline(j, { w: 0.3, c: '#8C8576', boil: false }); } g.fine([P(3.2, 0, 12.6), P(10.2, 0, 2.9)], { w: 0.25, c: '#6B5E4E' }); } },
   ];
   LK.boatActors(T, SHIP, [[-9.2, -2.0], [-2.0, 1.7], [1.7, 5.0], [5.0, 10.4]], (t) => { const s = LT.ship(LT.tc(t)); return s ? { x: s.x, y: s.y, ang: s.ang, alpha: s.alpha } : null; }, { period: LT.CYC, nq: 64, sample: 0.3 });

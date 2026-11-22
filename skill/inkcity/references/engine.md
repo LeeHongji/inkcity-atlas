@@ -102,6 +102,7 @@ the screen (people, tree crowns, flags, faces). `g.p(x, y, z)` converts one poin
 | `g.fine(pts, o)` / `g.fine2` | plain thin stroke (rails, seams, mullions): cheap |
 | `g.outline(pts, o)` / `g.outline2` | polygon outline; every straight run is its own stroke, so corners are joined by hand |
 | `g.poly(pts, col, o)` / `g.poly2` | fill + outline |
+| `g.mark(o, from)` / `g.lit(o, fn)` / `g.glow(kind, x, y, z, o)` | night: how the fills just drawn look at night, and where light comes from (§9c) |
 | `g.disc2(pt, r, col)`, `g.ring2(pt, r, o)` | filled circle / circle outline (wide px) |
 | `g.segs2([x0,y0,x1,y1,…], col, w)`, `g.tris2([…6 per triangle], col)` | batches of tiny marks: cheap |
 | `g.scuff(poly, o)` | short dry-brush strokes in a polygon `{dir (screen radians), len, c, dens, w, spread}` |
@@ -250,6 +251,46 @@ guidebook):
 - `SF.ui = false` hides the canvas's own pen icons (the overlay draws its own controls); `SF.home = () => cam` makes
   key 0 / Esc glide there instead of cutting to `SCENE.wide`.
 Keep the overlay out of `?f` / `?film` pages so recording and the checks see only the map.
+- `SF.setLook({ night })` switches day and night (key N, `?night` opens at night and records at night); `SF.look.night`
+  reads it, `SF.on('look', fn)` hears it, `SF.paper()` is the bare paper's colour now (an overlay looking for empty paper
+  must compare with it).
+
+## 9c. Night
+Night is the same drawing: every colour goes through one moonlit grade when it is drawn (`nightColour` in
+`00_core.js`: darker, its own hue kept, tinted blue), so whatever stands in front still hides what is behind. Day frames
+are untouched: nothing night-only runs unless `LOOK.night`. On a switch the cached pictures are drawn again (the same
+path as after a GPU reset), the old frame fades out over a second, and the lamps come on in a wave.
+
+What lights up, and how a scene says so:
+- **Windows** from `K.win` light up on their own (a share of them, mostly warm). A scene's own window colours:
+  `SCENE.night.windows = { colour: share }` (share 1: always lit, a shop floor; it also throws light on the pavement in
+  front). Inside a helper: `g.lit({ win: true }, () => ...)` or `g.mark({ win: 0.6 })` on the pane just filled.
+- **Lights that keep their colour** (lanterns, signs, screens, a lit tower): `g.mark({ nc: true })` after the fill (its
+  day colour at night), `{ nc: '#hex' }` a colour, `{ nc: (c) => ... }` from its day colour (return undefined to grade it
+  as usual). `g.lit(o, fn)` marks everything filled inside `fn`. Colours listed in `SCENE.night.glow` keep their colour
+  everywhere and get a halo; avoid colours a wall or a roof also uses.
+- **The light itself**: `g.glow(kind, x, y, z, { r, col, base })` (or `g.glow2(kind, pt, groundPt, o)`): `'lamp'` a warm
+  halo and a pool on the ground under it, `'lantern'` / `'neon'` a halo in `col`, `'tree'` / `'bloom'` a faint aura
+  and motes drifting up (`col` tints them: pink over cherry blossom). `K.lamp`, `K.tree`, `K.palm`, `K.cypress`,
+  `K.bush`, `K.blooms` call it already. A glow costs nothing by day, so a pole can carry a street light that only
+  exists at night.
+- **People and cars**: head and tail lights (`K.lights`) glow; in an actor's drawing `g.mark({ nc: true, light: true })`
+  makes a fill shine with a halo (a taxi's roof lamp, a signal's lit lamp, a giant screen).
+- `SCENE.night.lamps` / `foliage` list the scene's own lamp-globe and leaf colours (halos and motes without editing
+  helpers); `grass` the lawn colours fireflies hang over (default the engine's grass); `water` the colours a light
+  reflects in (default the engine's water); `grade` another moonlight; `lit` the share of windows lit (default 0.62).
+- Drawn over the frame from all that: a warm glow where the lights are thick (thinner close up), pools of light on the
+  paving, halos (a four-pointed glint on some lamps and on big lit landmarks), lit windows shining past their frames
+  (a cool one flickers like a television), columns of light on water, head-lamp beams on the road (an actor whose
+  state has `ang` and whose drawing has head or tail lights), dust turning in the lamplight, and motes rising or hanging
+  and blinking over leaves, flowers and lawns. These are laid over the finished frame, so the engine checks what
+  stands in front: a light, a lit window's glow or a reflection that a later standing object paints over is not drawn
+  (a hidden lamp keeps its pool on the ground). Light the place generously: a street at night is lit by every pole, every
+  shop front and most windows; a dark patch reads as a hole in the map.
+- Night-only actors (a sparkle, a beacon): `layer: 'top'`, `at(t)` returns null unless `LOOK.night`. An actor's (and a
+  static object's) seed comes from its creation order, so adding one shifts the drawing of everything created after
+  it: create night-only things last, or the day changes.
+Check at night with `PAGE_Q=night node scripts/verify.mjs` and `interact.mjs` as by day.
 
 ## 10. Rendering and performance
 

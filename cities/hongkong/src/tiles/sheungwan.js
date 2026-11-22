@@ -21,22 +21,27 @@ SF.tile('sheungwan', 100, 0, { rim: 26 }, function (T) {
 
   /* ---- Western Market ---- */
   T.obj([-35, -35, -13, -15], (g) => {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     const BR = { t: '#C98A6A', l: '#C2694E', r: '#A65A42' }, ST = { t: '#ECE6D6', l: '#F3EEE0', r: '#DCD5C1' };
     K.box(g, -34, -34, -14, -16, 0, 10.6, BR, { w: 0.85 });
     for (const z of [0, 3.6, 7.2, 10.0]) K.box(g, -34.1, -34.1, -13.9, -15.9, z, z + 0.6, ST, { w: 0.35, boil: false });
     for (const [f, p, a0, a1] of [['L', -16, -34, -14], ['R', -14, -34, -16]]) for (let a = a0 + 2.4; a < a1 - 2.4; a += 2.6) { K.win(g, f, p + 0.02, a, a + 1.4, 4.4, 6.8, { style: 'navy', arch: true, w: 0.3 }); K.win(g, f, p + 0.02, a, a + 1.4, 0.8, 3.3, { style: 'navy', arch: true, w: 0.3 }); }
     for (const [x, y] of [[-34, -34], [-14, -34], [-14, -16], [-34, -16]]) { K.box(g, x - 1.6, y - 1.6, x + 1.6, y + 1.6, 0, 12.6, BR, { w: 0.7 }); for (const z of [3.6, 7.2, 10.6]) K.box(g, x - 1.7, y - 1.7, x + 1.7, y + 1.7, z, z + 0.5, ST, { w: 0.3, boil: false }); K.hip(g, x - 2, y - 2, x + 2, y + 2, 12.6, 2.0, '#8E9AA3', { w: 0.55 }); }
     K.hip(g, -33.6, -33.6, -14.4, -16.4, 10.6, 3.2, '#B9654C', { w: 0.7, ridge: 8 });
-    K.sign(g, 'L', -15.9, -29, -19, 8.0, 9.2, '#2C2622', 'WESTERN MARKET', { ink: '#E6C24F', w: 0.3 });
+    const i1 = g.cmds.length; K.sign(g, 'L', -15.9, -29, -19, 8.0, 9.2, '#2C2622', 'WESTERN MARKET', { ink: '#E6C24F', w: 0.3 });
+    // at night the brick and its stone bands are floodlit warm, its name lit
+    const FL = new Set(['#C98A6A', '#C2694E', '#A65A42', '#ECE6D6', '#F3EEE0', '#DCD5C1', '#B9654C', '#8E9AA3']);
+    HK.nite(g, i0, { nc: (c) => (FL.has(c) ? mix(mix(nightColour(c), c, 0.58), '#FFC890', 0.16) : undefined) }); HK.nite(g, i1, { nc: true });
+    for (const [x, y, z, r] of [[-24, -15.8, 2.0, 3.0], [-14, -15.8, 7.0, 2.4], [-34, -15.8, 7.0, 2.4], [-13.8, -25, 2.0, 2.6]]) g.glow('lantern', x, y, z, { r, col: '#FFD9A0' });
   }, { name: 'western market' });
 
   /* ---- the Shun Tak Centre: two dark towers with red bands ---- */
   for (const [x0, x1, y0, y1, h] of [[6, 18, -35, -23, 36], [22, 34, -33, -21, 32]]) T.obj([x0, y0, x1, y1], (g) => {
-    HK.tower(g, x0, y0, x1, y1, 0, h, { col: '#4A5560', tone: { t: '#3A444E', l: '#4E5A66', r: '#3A444E' }, fl: 2.0, ml: 2.0, lit: 0.3, grid: '#2E363E', seed: x0 });
+    HK.tower(g, x0, y0, x1, y1, 0, h, { col: '#4A5560', tone: { t: '#3A444E', l: '#4E5A66', r: '#3A444E' }, fl: 2.0, ml: 2.0, lit: 0.3, grid: '#2E363E', seed: x0, nwin: x0 === 6 ? { L: 0.25, R: 0.62 } : 0.62 });
     for (const z of [h - 4, h - 2.2]) K.box(g, x0 - 0.1, y0 - 0.1, x1 + 0.1, y1 + 0.1, z, z + 0.9, { t: '#B8322A', l: '#C8372D', r: '#A42C24' }, { w: 0.4, boil: false });
+    if (x0 === 6) HK.snowflakes(g, 'L', y1, [[9, 25, 2.4], [14.6, 19, 2.0], [9.6, 12.6, 1.7], [14.8, 7.6, 1.4], [11.8, 30.4, 1.2]]);   // December: snowflakes of light on its face to the harbour
   }, { name: 'shun tak' });
-  T.obj([4, -20, 36, -10], (g) => { K.box(g, 4, -20, 36, -10, 0, 5.2, { t: '#D9D4C8', l: '#E6E1D5', r: '#CFC9BC' }, { w: 0.8 }); g.fill(K.on('L', -9.98, 5, 35, 1.0, 4.2), '#93AEBD'); K.sign(g, 'L', -9.95, 8, 32, 4.3, 5.1, '#2F4F6E', 'MACAU FERRY TERMINAL', { w: 0.3 }); }, { name: 'ferry terminal' });
+  T.obj([4, -20, 36, -10], (g) => { K.box(g, 4, -20, 36, -10, 0, 5.2, { t: '#D9D4C8', l: '#E6E1D5', r: '#CFC9BC' }, { w: 0.8 }); g.fill(K.on('L', -9.98, 5, 35, 1.0, 4.2), '#93AEBD'); g.mark({ nc: '#FFE6B4', spill: true }); const i0 = g.cmds.length; K.sign(g, 'L', -9.95, 8, 32, 4.3, 5.1, '#2F4F6E', 'MACAU FERRY TERMINAL', { w: 0.3 }); HK.nite(g, i0, { nc: true }); }, { name: 'ferry terminal' });
 
   /* ---- Wing Lok Street: dried-seafood tong lau along the far side of the lane, goods out on the pavement ---- */
   const SHOPS = [[-36, -26, '海味', '#8E2F2F'], [-25, -15, '海味', '#2F4F6E'], [-14, -4, '士多', '#2F6B4A'], [-3, 8, '海味', '#B8322A']];
@@ -65,7 +70,7 @@ SF.tile('sheungwan', 100, 0, { rim: 26 }, function (T) {
 
   /* ---- the waterfront: anglers on the seawall, lamps ---- */
   for (const [x, s] of [[-8, 8121], [2, 8122], [18, 8123], [30, 8124]]) T.cast([x, 23], (g) => { HK.person(g, x, 23, 0, HK.who(s, { dir: 1, pose: 'hold', cap: s % 2 ? '#3B3F47' : undefined })); const a = g.p(x - 0.4, 23.4, 4.2), b = g.p(x - 1.6, 27.6, 7.2), c = g.p(x - 1.8, 30, HT.HAR.WL); g.line2([a, b], { w: 0.45, c: '#3A3128', boil: false, ext: 0 }); g.fine2([b, c], { w: 0.22, c: '#5A564E' }); const bk = g.p(x + 1.1, 22.4, 0); g.fill2([[bk[0] - 1, bk[1]], [bk[0] + 1, bk[1]], [bk[0] + 1.2, bk[1] - 1.8], [bk[0] - 1.2, bk[1] - 1.8]], '#C8372D', true); }, { name: 'angler' });
-  for (const [a, b] of [[-36.6, 36.6]]) T.obj([a, I - 0.5, b, I - 0.1], (g) => HK.rail(g, [a, I - 0.3], [b, I - 0.3], { h: 1.7 }), { name: 'seawall rail' });
+  for (const [a, b] of [[-36.6, 36.6]]) T.obj([a, I - 0.5, b, I - 0.1], (g) => { HK.rail(g, [a, I - 0.3], [b, I - 0.3], { h: 1.7 }); HK.railLights(g, a, b, I - 0.3); }, { name: 'seawall rail' });
   for (const [x, y] of [[-12, 21], [12, 21], [-36, 3.4], [10, 3.4], [30, 3.4]]) T.obj([x, y], (g) => HK.lamp(g, x, y, { h: 8, arm: 1.8 }), { name: 'lamp' });
 
   /* ---- life on the lane ---- */

@@ -12,7 +12,7 @@ const HARBOUR = function (T) {
     g.fill(K.rect(-E, I, E, Kw, WL), HK.C.water);
     // the dark band in the Island's shadow, the warm streaks of its lights
     g.fill(K.rect(-E, I, E, I + 4.4, WL), '#86A6A8');
-    { const R = RNG(31), s = [], w = []; for (let i = 0; i < 260; i++) { const x = -E + R() * 2 * E, y = I + 0.6 + R() * 7, L = 0.8 + R() * 2.2, a = g.p(x, y, WL), b = g.p(x + L, y, WL); (R() < 0.6 ? s : w).push(a[0], a[1], b[0], b[1]); } g.segs2(s, '#E9C27A', 0.55); g.segs2(w, '#F6E7B8', 0.4); }
+    { const R = RNG(31), s = [], w = []; for (let i = 0; i < 260; i++) { const x = -E + R() * 2 * E, y = I + 0.6 + R() * 7, L = 0.8 + R() * 2.2, a = g.p(x, y, WL), b = g.p(x + L, y, WL); (R() < 0.6 ? s : w).push(a[0], a[1], b[0], b[1]); } const i0 = g.cmds.length; g.segs2(s, '#E9C27A', 0.55); g.segs2(w, '#F6E7B8', 0.4); HK.nite(g, i0, { nc: true }); }   // at night still the Island's lights in the water
     // the sky's washed bands and the sun's gold on the open water
     for (let x = -E; x < E; x += 22) { const R = RNG(Math.round(x + 900)), y = I + 10 + R() * 30; g.fill([[x, y, WL], [x + 14 + R() * 6, y, WL], [x + 16, y + 1.3, WL], [x + 2, y + 1.3, WL]], '#B9CFCB'); }
     g.water(K.rect(-E, I + 4, E, Kw - 3, WL), { dens: 0.7, c: '#6F9396' });

@@ -27,15 +27,16 @@ SF.tile('causeway', -100, 0, { rim: 10 }, function (T) {
     g.fill([[-37, 39.4, WL], [-7, 39.4, WL], [-7, 39.6, WL + 1.6], [-37, 39.6, WL + 1.6]], '#B9B3A6');
     g.fill([[-37, 39.6, WL + 1.6], [-7, 39.6, WL + 1.6], [-7, 41.6, WL], [-37, 41.6, WL]], '#CFC9BC'); g.line([[-37, 39.6, WL + 1.6], [-7, 39.6, WL + 1.6]], { w: 0.6, boil: false }); g.line([[-37, 41.6, WL], [-7, 41.6, WL]], { w: 0.5, boil: false });
     const st = []; for (let k = 0; k < 40; k++) { const R = RNG(k + 5), x = -36.5 + R() * 29, q = g.p(x, 40.6, WL + 0.9); st.push(q[0] - 0.8, q[1], q[0] + 0.8, q[1] - 0.2); } g.segs2(st, '#9E9A90', 0.4);
-    const L = g.p(-7.4, 40.5, WL + 1.6); g.fill2([[L[0] - 0.6, L[1]], [L[0] + 0.6, L[1]], [L[0] + 0.5, L[1] - 3.6], [L[0] - 0.5, L[1] - 3.6]], '#C8372D', true); g.disc2([L[0], L[1] - 4.0], 1.4, 'rgba(255,214,140,0.35)'); g.disc2([L[0], L[1] - 4.0], 0.45, '#FFF0C8');
+    const L = g.p(-7.4, 40.5, WL + 1.6); g.fill2([[L[0] - 0.6, L[1]], [L[0] + 0.6, L[1]], [L[0] + 0.5, L[1] - 3.6], [L[0] - 0.5, L[1] - 3.6]], '#C8372D', true); g.disc2([L[0], L[1] - 4.0], 1.4, 'rgba(255,214,140,0.35)'); g.mark({ nc: 'rgba(255,110,90,0.4)' }); g.disc2([L[0], L[1] - 4.0], 0.45, '#FFF0C8'); g.mark({ nc: '#FF7A66' });
+    g.glow2('lantern', [L[0], L[1] - 4.0], [L[0], L[1] + 1], { r: 1.8, col: '#FF6A55' });   // the breakwater's red light at night
   }, { name: 'breakwater' });
   const MOOR = [[-32, 29, 0.0, 'sam'], [-25, 31.5, 0.2, 'yacht'], [-17, 28.4, -0.1, 'sam'], [-9, 31, 0.1, 'house'], [-29, 35.5, 0.05, 'sam'], [-14, 35.2, 0.15, 'yacht']];
   MOOR.forEach(([x, y, a, kind], i) => T.actor({ sample: 2, period: 4, grow: false,
     at(t) { const f = Math.floor(t * 2 + i * 1.3) % 4; return { x, y, z: WL + [0, 0.12, 0.2, 0.08][f], key: kind + f, f }; },
     draw(g) {
       if (kind === 'sam') HK.sampan(g, a, { L: 3.4 });
-      else if (kind === 'yacht') { K.boat(g, a, { kind: 'motor', L: 4.6, W: 1.5, hull: '#F6F4EE', stripe: '#2F4F6E' }); const p = g.p(0, 0, 1.3); g.line2([p, [p[0], p[1] - 22]], { w: 0.4, c: '#5A564E', boil: false, ext: 0 }); g.fine2([[p[0], p[1] - 22], [p[0] + 10, p[1] - 1]], { w: 0.2, c: '#8E8A84' }); }
-      else { K.boat(g, a, { kind: 'row', L: 4.4, W: 1.6, hull: '#6E4A30', stripe: '#C8372D', deck: '#B9976A' }); K.rbox(g, -0.6, 0, 2.4, 1.2, a, 1.0, 3.0, { t: '#C9A26B', l: '#B58F58', r: '#9E7B48' }, { w: 0.5 }); const L = g.p(0.6, 0, 3.3); g.fine2([[L[0] - 6, L[1] + 1], [L[0] + 6, L[1] - 2]], { w: 0.2, c: '#3A3530' }); for (let k = 0; k < 5; k++) { const c = [L[0] - 4.8 + k * 2.4, L[1] + 0.5 - k * 0.6]; g.disc2(c, 0.8, k % 2 ? '#E6C24F' : '#C8372D'); } }
+      else if (kind === 'yacht') { K.boat(g, a, { kind: 'motor', L: 4.6, W: 1.5, hull: '#F6F4EE', stripe: '#2F4F6E' }); const p = g.p(0, 0, 1.3); g.line2([p, [p[0], p[1] - 22]], { w: 0.4, c: '#5A564E', boil: false, ext: 0 }); g.fine2([[p[0], p[1] - 22], [p[0] + 10, p[1] - 1]], { w: 0.2, c: '#8E8A84' }); HK.light2(g, [p[0], p[1] - 21.6], 0.45, '#FFFBEE'); }   // the anchor light at night
+      else { K.boat(g, a, { kind: 'row', L: 4.4, W: 1.6, hull: '#6E4A30', stripe: '#C8372D', deck: '#B9976A' }); K.rbox(g, -0.6, 0, 2.4, 1.2, a, 1.0, 3.0, { t: '#C9A26B', l: '#B58F58', r: '#9E7B48' }, { w: 0.5 }); const L = g.p(0.6, 0, 3.3); g.fine2([[L[0] - 6, L[1] + 1], [L[0] + 6, L[1] - 2]], { w: 0.2, c: '#3A3530' }); for (let k = 0; k < 5; k++) { const c = [L[0] - 4.8 + k * 2.4, L[1] + 0.5 - k * 0.6]; g.disc2(c, 0.8, k % 2 ? '#E6C24F' : '#C8372D'); g.mark({ nc: true, light: true }); } }   // its lanterns lit at night
     } }));
   // a sampan woman sculling a passenger out to the yachts and back
   T.actor({ sample: 0.3, period: 24, grow: false,
@@ -47,24 +48,25 @@ SF.tile('causeway', -100, 0, { rim: 10 }, function (T) {
     HK.tower(g, -35, -35, -13, -16, 0, 42, { col: '#C9D3D8', tone: { t: '#B9C3C8', l: '#D2DBDF', r: '#B3BEC4' }, fl: 2.4, ml: 2.0, lit: 0.3, seed: 31 });
     K.box(g, -30, -30, -18, -21, 42, 46, { t: '#B9C3C8', l: '#C9D3D8', r: '#A9B5BC' }, { w: 0.6 });
     // the atrium portal under the screen
-    g.fill(K.on('L', -15.98, -30, -18, 0, 9.6), '#3F4A55'); g.outline(K.on('L', -15.97, -30, -18, 0, 9.6), { w: 0.6, boil: false });
-    K.sign(g, 'L', -15.95, -33.6, -14.6, 19.6, 21.4, '#2C2622', 'TIMES SQUARE', { ink: '#F3F1EA', w: 0.3 });
+    g.fill(K.on('L', -15.98, -30, -18, 0, 9.6), '#3F4A55'); g.mark({ nc: '#E9C27A', spill: true }); g.outline(K.on('L', -15.97, -30, -18, 0, 9.6), { w: 0.6, boil: false });
+    const i0 = g.cmds.length; K.sign(g, 'L', -15.95, -33.6, -14.6, 19.6, 21.4, '#2C2622', 'TIMES SQUARE', { ink: '#F3F1EA', w: 0.3 }); HK.nite(g, i0, { nc: true }); HK.signGlow(g, 'L', -15.95, -33.6, -14.6, 19.6, 21.4, '#F3F1EA', 0.2);
   }, { name: 'times square' });
   T.actor({ sample: 5, period: 8, grow: false,
     at(t) { const f = Math.floor(t * 1.5) % 6; return { x: -24, y: -15.9, key: 's' + f, f }; }, bias: 3,
     draw(g, st) {
-      const q = [[-10, 0, 10.4], [10, 0, 10.4], [10, 0, 19.0], [-10, 0, 19.0]];
+      const q = [[-10, 0, 10.4], [10, 0, 10.4], [10, 0, 19.0], [-10, 0, 19.0]], i0 = g.cmds.length;
       const scr = [['#E2572B', '#F2C230'], ['#2F4F9A', '#46D3E6'], ['#C8372D', '#F6F1E6'], ['#3E8A4E', '#F7D046'], ['#B07CFF', '#FF4F7B'], ['#1E1C1A', '#F2C230']][st.f];
       g.fill(q, scr[0]); g.outline(q, { w: 0.7, c: '#2A2622', boil: false });
       if (st.f === 2 || st.f === 5) K.textP(g, (a, z) => [a, 0.05, z], 0, 12.6, 3.4, 'SALE', scr[1], { center: true, w: 1.4 });
       else if (st.f === 1) HK.zh(g, (a, z) => [a, 0.05, z], 0, 17.6, 5.4, '香港', scr[1], { center: true, w: 1.2 });
       else { for (let k = 0; k < 5; k++) g.fill([[-9 + k * 4, 0.05, 11], [-7 + k * 4, 0.05, 11], [-6 + k * 4, 0.05, 18.4], [-8 + k * 4, 0.05, 18.4]], scr[1]); }
+      HK.nite(g, i0, { nc: (c) => (c === '#2A2622' ? undefined : c) }); g.cmds[i0].light = true;   // the screen shines at night
     } });
   /* ---- SOGO and slim towers behind ---- */
   T.obj([-9, -36, 13, -16], (g) => {
     K.box(g, -8, -35, 12, -17, 0, 22, { t: '#E3DED3', l: '#ECE7DB', r: '#D6D0C2' }, { w: 0.85 });
-    for (const [f, p, a0, a1] of [['L', -17, -8, 12], ['R', 12, -35, -17]]) { g.fill(K.on(f, p + 0.02, a0 + 0.6, a1 - 0.6, 0.4, 5.2), '#F2DDA8'); for (let z = 7; z < 21; z += 3.4) g.fill(K.on(f, p + 0.02, a0 + 0.6, a1 - 0.6, z, z + 1.6), f === 'L' ? '#93AEBD' : '#7E9AAD'); }
-    K.sign(g, 'L', -16.95, -4, 8, 16.6, 19.8, '#F6F3EA', 'SOGO', { ink: '#C8372D', w: 0.5 });
+    for (const [f, p, a0, a1] of [['L', -17, -8, 12], ['R', 12, -35, -17]]) { g.fill(K.on(f, p + 0.02, a0 + 0.6, a1 - 0.6, 0.4, 5.2), '#F2DDA8'); for (let z = 7; z < 21; z += 3.4) { g.fill(K.on(f, p + 0.02, a0 + 0.6, a1 - 0.6, z, z + 1.6), f === 'L' ? '#93AEBD' : '#7E9AAD'); g.mark({ nc: f === 'L' ? '#FFE6B4' : '#F2CF8E' }); } }   // the store's floors lit at night
+    const i0 = g.cmds.length; K.sign(g, 'L', -16.95, -4, 8, 16.6, 19.8, '#F6F3EA', 'SOGO', { ink: '#C8372D', w: 0.5 }); HK.nite(g, i0, { nc: true }); HK.signGlow(g, 'L', -16.95, -4, 8, 16.6, 19.8, '#FFE8E0', 0.3);
   }, { name: 'sogo' });
   for (const [x0, x1, y0, y1, h, col] of [[16, 26, -36, -26, 19, '#E8D3E2'], [27, 36, -34, -24, 15, '#D9E7C5'], [16, 34, -22, -12, 11, '#F2D7B8']]) T.obj([x0, y0, x1, y1], (g) => HK.resi(g, x0, y0, x1, y1, 0, h, { col, lit: 0.3 }), { name: 'tower' });
   // neon over the lane
@@ -77,7 +79,7 @@ SF.tile('causeway', -100, 0, { rim: 10 }, function (T) {
     K.rbox(g, 17, 18, 2.6, 0.45, -0.35, 1.0, 1.9, { t: '#3A3F45', l: '#2E3338', r: '#24282C' }, { w: 0.45 });
     for (const dy of [-0.7, 0.7]) { const c = g.p(17, 18 + dy, 1.0); g.disc2(c, 1.2, '#5A4632'); g.ring2(c, 1.2, { w: 0.3, c: '#2A2622' }); }
   }, { name: 'noonday gun' });
-  for (const [a, b] of [[-36.6, 9.4], [22.6, 36.6]]) T.obj([a, I - 0.5, b, I - 0.1], (g) => HK.rail(g, [a, I - 0.3], [b, I - 0.3], { h: 1.7 }), { name: 'seawall rail' });
+  for (const [a, b] of [[-36.6, 9.4], [22.6, 36.6]]) T.obj([a, I - 0.5, b, I - 0.1], (g) => { HK.rail(g, [a, I - 0.3], [b, I - 0.3], { h: 1.7 }); HK.railLights(g, a, b, I - 0.3); }, { name: 'seawall rail' });
   for (const [x, y] of [[-30, 18], [-14, 18], [28, 18], [-20, 9]]) T.obj([x, y], (g) => K.tree(g, x, y, { r: 3.2, h: 4.2, col: '#6FA06A' }), { name: 'tree' });
 
   /* ---- the crossing: shoppers wait at the kerb, then flood over on the green man ---- */
@@ -104,7 +106,7 @@ SF.tile('causeway', -100, 0, { rim: 10 }, function (T) {
   // a pedestrian light at each kerb: red / green man (the actor flips with the cycle)
   for (const [x, y] of [[-0.6, -1.6], [5.0, 6.6]]) T.actor({ sample: 1, period: CYC, grow: false,
     at(t) { const g0 = tau(t) >= 9; return { x, y, key: g0 ? 'g' : 'r', go: g0 }; },
-    draw(g, st) { const b = g.p(0, 0, 0), t0 = g.p(0, 0, 5); g.line2([b, t0], { w: 0.5, c: '#5A564E', boil: false, ext: 0 }); g.fill2([[t0[0] - 1.1, t0[1]], [t0[0] + 1.1, t0[1]], [t0[0] + 1.1, t0[1] + 3.0], [t0[0] - 1.1, t0[1] + 3.0]], '#2A2622', true); g.disc2([t0[0], t0[1] + (st.go ? 2.2 : 0.8)], 0.55, st.go ? '#5BE08A' : '#FF4F3C'); } });
+    draw(g, st) { const b = g.p(0, 0, 0), t0 = g.p(0, 0, 5); g.line2([b, t0], { w: 0.5, c: '#5A564E', boil: false, ext: 0 }); g.fill2([[t0[0] - 1.1, t0[1]], [t0[0] + 1.1, t0[1]], [t0[0] + 1.1, t0[1] + 3.0], [t0[0] - 1.1, t0[1] + 3.0]], '#2A2622', true); g.disc2([t0[0], t0[1] + (st.go ? 2.2 : 0.8)], 0.55, st.go ? '#5BE08A' : '#FF4F3C'); g.mark({ nc: true, light: true }); } });
   // more life: a selfie under the screen, a family with bags, strollers along the waterfront
   HK.stand(T, -22, -9, HK.who(9301, { dir: 1, pose: 'hold', phone: true, hairStyle: 'long' }), { name: 'selfie' });
   T.cast([-28, -6], (g) => { HK.person(g, -28.6, -6, 0, HK.who(9302, { dir: 0, bag: '#F6F3EA' })); HK.person(g, -27.2, -5.6, 0, HK.who(9303, { dir: 0, k: 0.7 })); HK.person(g, -26, -6.4, 0, HK.who(9304, { dir: 0, rwb: true })); }, { name: 'family' });

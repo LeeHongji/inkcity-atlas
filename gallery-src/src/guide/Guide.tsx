@@ -143,7 +143,8 @@ function readInk(): Ink | null {
   const x = c.getContext("2d", { willReadFrequently: true }); if (!x) return null
   x.drawImage(cv, 0, 0, cw, ch)
   const d = x.getImageData(0, 0, cw, ch).data, g = new Uint8Array(cw * ch)
-  for (let i = 0; i < cw * ch; i++) { const r = d[i * 4], gg = d[i * 4 + 1], bb = d[i * 4 + 2]; g[i] = Math.abs(r - 240) + Math.abs(gg - 238) + Math.abs(bb - 228) > 26 ? 1 : 0 }
+  const P = SF().paper?.() || [240, 238, 228]                     // the paper by day, the night's paper at night
+  for (let i = 0; i < cw * ch; i++) { const r = d[i * 4], gg = d[i * 4 + 1], bb = d[i * 4 + 2]; g[i] = Math.abs(r - P[0]) + Math.abs(gg - P[1]) + Math.abs(bb - P[2]) > 26 ? 1 : 0 }
   return { g, cw, ch, k }
 }
 function inkIn(ink: Ink, r: Rect) {
@@ -207,15 +208,15 @@ function NoteRing({ x, y, label, seed }: { x: number; y: number; label: string; 
     </svg>
   )
 }
-function MarginNotes({ notes, v, show }: { notes: MarginNote[]; v: View; show: boolean }) {
+function MarginNotes({ notes, v, show, night }: { notes: MarginNote[]; v: View; show: boolean; night: boolean }) {
   const k = v.pz / SF().wide.z                     // 1 at the wide zoom on a 1920 x 1080 screen
   const fs = Math.max(13, Math.min(19, 17 * k)), wk = Math.max(0.66, Math.min(1.35, k))
   const [ink, setInk] = React.useState<{ key: string; ink: Ink | null } | null>(null)
   const [openNote, setOpenNote] = React.useState(-1)
-  const key = `${v.z.toFixed(3)}|${v.cx.toFixed(0)}|${v.cy.toFixed(0)}|${v.w}|${v.h}`
+  const key = `${v.z.toFixed(3)}|${v.cx.toFixed(0)}|${v.cy.toFixed(0)}|${v.w}|${v.h}|${night}`
   React.useEffect(() => {
     if (!show || v.gliding) return
-    const t = setTimeout(() => setInk({ key, ink: readInk() }), 450)   // after the bakes have sharpened
+    const t = setTimeout(() => setInk({ key, ink: readInk() }), night ? 1300 : 450)   // after the bakes have sharpened (and a change of look has faded in)
     return () => clearTimeout(t)
   }, [key, show, v.gliding])
   React.useEffect(() => { setOpenNote(-1) }, [key, show])
@@ -245,7 +246,7 @@ function MarginNotes({ notes, v, show }: { notes: MarginNote[]; v: View; show: b
   }
   return (
     <div aria-hidden={!show} className="pointer-events-none absolute inset-0 transition-opacity duration-500" style={{ opacity: show && ready ? 1 : 0, visibility: show ? "visible" : "hidden" }}>
-      <svg className="absolute inset-0 size-full overflow-visible" fill="none" stroke="var(--ll-ink-soft, #4a423b)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
+      <svg className="on-map absolute inset-0 size-full overflow-visible" fill="none" stroke="var(--ll-ink-soft, #4a423b)" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round">
         {L.map(({ n, tx, ty, text }, i) => {
           if (!text) return null
           const D = Math.hypot(tx - text.sx0, ty - text.sy0) || 1
@@ -254,7 +255,7 @@ function MarginNotes({ notes, v, show }: { notes: MarginNote[]; v: View; show: b
         })}
       </svg>
       {L.map(({ n, text }, i) => text ? (
-        <p key={i} ref={(el) => { refs.current[i] = el }} className="absolute m-0 font-hand leading-[1.3] text-ink"
+        <p key={i} ref={(el) => { refs.current[i] = el }} className="on-map absolute m-0 font-hand leading-[1.3] text-ink"
           style={{ left: text.left ? text.ax - text.w - 4 : text.ax + 4, top: text.ay, width: text.w, fontSize: fs, textAlign: text.left ? "right" : "left", transform: "translateY(-50%)", textWrap: "balance", textShadow: HALO }}>
           {n.text}
         </p>
@@ -379,6 +380,7 @@ export function Guide({ g }: { g: GuideData }) {
   const v = useView()
   const [explore, setExplore] = React.useState(() => SF().app.mode === "explore")
   const [notesOn, setNotesOn] = React.useState(() => localStorage.getItem("inkcity-notes") !== "off")
+  const [night, setNight] = React.useState(() => !!SF().look?.night)
   const [page, setPage] = React.useState<{ kind: "list" } | { kind: "place"; i: number } | { kind: "moment" }>({ kind: "list" })
   const [look, setLook] = React.useState<{ place: number; i: number; arrived: boolean } | null>(null)
   const [seen, setSeen] = React.useState<Set<string>>(() => new Set())
@@ -410,6 +412,7 @@ export function Guide({ g }: { g: GuideData }) {
     })
     SF().on("film", () => { setExplore(false); setLook(null) })
     SF().on("arrive", () => setLook((l) => (l ? { ...l, arrived: true } : l)))
+    SF().on("look", (a) => setNight(!!(a as { night?: boolean })?.night))
   }, [go])
   React.useEffect(() => { localStorage.setItem("inkcity-notes", notesOn ? "on" : "off") }, [notesOn])
 
@@ -474,18 +477,23 @@ export function Guide({ g }: { g: GuideData }) {
       <Switch checked={notesOn} onCheckedChange={setNotesOn} aria-label="Notes on the map" /> notes
     </label>
   )
+  const nightSwitch = SF().setLook ? (
+    <label className="flex items-center gap-2 font-hand text-[15px] text-ink" title="night (N)">
+      <Switch checked={night} onCheckedChange={(c) => SF().setLook?.({ night: c })} aria-label="Night" /> night
+    </label>
+  ) : null
   const ui = Math.max(1, Math.min(1.45, Math.min(v.w / 1920, v.h / 1080)))   // the paper pieces grow on big screens
   const panelW = side ? Math.round(Math.max(300, Math.min(360, v.w * 0.24))) : Math.min(v.w - 20, 560)
 
   return (
     <LangCtx.Provider value={g.lang || ""}>
-    <div className="ll-guide pointer-events-none fixed inset-0 z-10 overflow-hidden" data-explore={explore} data-layout={side ? "side" : "sheet"}>
+    <div className="ll-guide pointer-events-none fixed inset-0 z-10 overflow-hidden" data-explore={explore} data-layout={side ? "side" : "sheet"} data-night={night}>
       {/* while the city draws itself: only a quiet hint */}
-      <p className="pointer-events-none absolute bottom-6 left-1/2 m-0 w-max max-w-[90vw] -translate-x-1/2 text-center font-hand text-[15px] text-pencil-text transition-opacity duration-700"
+      <p className="on-map pointer-events-none absolute bottom-6 left-1/2 m-0 w-max max-w-[90vw] -translate-x-1/2 text-center font-hand text-[15px] text-pencil-text transition-opacity duration-700"
         style={{ opacity: explore ? 0 : 0.85 }}>the city is drawing itself · {coarse ? "tap" : "click"} anywhere to skip</p>
 
       <div className="transition-opacity duration-700" style={{ opacity: explore ? 1 : 0, visibility: explore ? "visible" : "hidden" }}>
-        <MarginNotes notes={g.notes} v={v} show={notesOn && isWide && !v.gliding} />
+        <MarginNotes notes={g.notes} v={v} show={notesOn && isWide && !v.gliding} night={night} />
         {circle}
 
         {/* the title, written on the map's paper; once zoomed in it moves onto a small taped label */}
@@ -493,12 +501,12 @@ export function Guide({ g }: { g: GuideData }) {
           style={{ zoom: ui, left: small ? 14 : 28, top: small ? 10 : 22, maxWidth: roomy ? 390 : Math.min(320, v.w - (side ? panelW + 60 : 28)) }}>
           {isWide && !small ? (
             <>
-              <a href="../../index.html" className="font-hand text-[14px] text-ink-soft underline decoration-dotted underline-offset-4 hover:text-ink">← the Atlas</a>
-              <h1 className={`m-0 mt-1 flex flex-wrap items-baseline gap-x-3 font-script leading-none font-bold text-ink ${small ? "text-[2.1rem]" : roomy ? "text-[3.1rem]" : "text-[2.6rem]"}`} style={{ textShadow: HALO }}>
+              <a href="../../index.html" className="on-map font-hand text-[14px] text-ink-soft underline decoration-dotted underline-offset-4 hover:text-ink">← the Atlas</a>
+              <h1 className={`on-map m-0 mt-1 flex flex-wrap items-baseline gap-x-3 font-script leading-none font-bold text-ink ${small ? "text-[2.1rem]" : roomy ? "text-[3.1rem]" : "text-[2.6rem]"}`} style={{ textShadow: HALO }}>
                 {g.city}<LocalName text={g.local} size={small ? 21 : 28} />
               </h1>
               {roomy ? (
-                <p id="ink-guide-intro" className="mt-3 mb-0 font-hand text-[15.5px] leading-[1.5] text-ink-soft transition-opacity duration-500"
+                <p id="ink-guide-intro" className="on-map mt-3 mb-0 font-hand text-[15.5px] leading-[1.5] text-ink-soft transition-opacity duration-500"
                   style={{ opacity: notesOn ? 1 : 0, textShadow: HALO }}>{g.intro}</p>
               ) : null}
             </>
@@ -535,6 +543,7 @@ export function Guide({ g }: { g: GuideData }) {
                 </button>
                 <div className="flex items-center gap-3">
                   <Button size="xs" variant="outline" onClick={goWide}>whole city</Button>
+                  {nightSwitch}
                   {notesSwitch}
                 </div>
               </div>
@@ -550,6 +559,7 @@ export function Guide({ g }: { g: GuideData }) {
             <Button size="sm" variant="outline" onClick={goWide}>whole city{small ? null : <Kbd className="ms-1">0</Kbd>}</Button>
             <Button size="sm" variant="outline" onClick={() => SF().replay()}>the tour{small ? null : <Kbd className="ms-1">R</Kbd>}</Button>
             <span className="ms-2">{notesSwitch}</span>
+            {nightSwitch ? <span className="ms-1">{nightSwitch}</span> : null}
           </div>
         ) : null}
       </div>

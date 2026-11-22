@@ -27,7 +27,8 @@ export async function withBrowser(fn) {
   try { browser = await launch(); return await fn(browser); }
   finally { clearInterval(keep); if (browser) await browser.close(); try { fs.rmdirSync(LOCK); } catch (e) {} }
 }
-export const url = (page, q) => 'file://' + path.resolve(page) + (q ? '?' + q : '');
+// PAGE_Q adds to every page's query (PAGE_Q=night runs a check at night)
+export const url = (page, q) => { const all = [q, process.env.PAGE_Q].filter(Boolean).join('&'); return 'file://' + path.resolve(page) + (all ? '?' + all : ''); };
 export function pageArg() {
   const p = process.argv[2];
   if (!p || !fs.existsSync(p)) { console.error('usage: node ' + path.basename(process.argv[1]) + ' <page.html> ...'); process.exit(2); }

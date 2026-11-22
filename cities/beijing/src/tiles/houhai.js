@@ -28,6 +28,8 @@ SF.tile('houhai', -100, -100, { rim: 0 }, function (T) {
     // the promenade along the far shore, the lake lane along the near shore, the lane to the Drum Tower
     g.fill(K.rect(-H, -27.4, 6, -24.6), '#D9D2C2'); g.fill(K.rect(-H, 15.8, 22, 20.6), BC.hutong); g.fill(K.rect(21, -16, 27, 20.6), BC.hutong);
     g.fill(K.rect(13, -16, 37, -6), '#DCD6C8');
+    // at night small lights along the kerb of the far bank, under the bars: their light lies on the lake
+    for (let x = -34.5; x < 5; x += 3.3) g.glow('lantern', x, -24.5, 0.5, { r: 0.75, col: '#FFC66E' });
   }, { rim: true });
   BJ.sidewalk(T, ['s', 'e'], { sp: 14, skip: { s: [[-6, 2], [18, 30]], e: [[-20, -2]] }, bikes: [['e', 8, 5]] });
 
@@ -35,12 +37,12 @@ SF.tile('houhai', -100, -100, { rim: 0 }, function (T) {
   const BARS = [[-36, -26, 'BAR', '#C9382E'], [-26, -16, 'LIVE MUSIC', '#3F5F8F'], [-15, -5, 'CAFE', '#5E8A6A'], [-4, 6, 'BAR', '#8E3A2C']];
   BARS.forEach(([x0, x1, word, col], i) => T.obj([x0, -36, x1, -28], function (g) {
     const y0 = -36, y1 = -28;
-    BJ.shop(g, x0, y0, x1, y1, { front: 'L', col, lat: i % 2 ? '#8E3A2C' : '#5E6E8E', seed: 800 + i, goods: ['#E9B53C', '#F3E3B8', '#C9584B', '#5E8A6A'] });
-    K.sign(g, 'L', y1 + 0.12, x0 + 1.4, x1 - 1.4, 5.9, 7.7, '#2A2420', word, { ink: '#F2C94C', c: '#C9A23A' });
+    BJ.shop(g, x0, y0, x1, y1, { front: 'L', col, lat: i % 2 ? '#8E3A2C' : '#5E6E8E', seed: 800 + i, goods: ['#E9B53C', '#F3E3B8', '#C9584B', '#5E8A6A'], lanterns: false, upLit: 1 });
+    BN.kSign(g, 'L', y1 + 0.12, x0 + 1.4, x1 - 1.4, 5.9, 7.7, '#2A2420', word, { ink: '#F2C94C', c: '#C9A23A', gpD: 2.2 });   // lit at night, doubled in the lake
     // a string of red lanterns along the eave
     const a = g.p(x0 + 0.4, y1 + 1.5, 5.0), b = g.p(x1 - 0.4, y1 + 1.5, 5.0);
     const pts = []; for (let k = 0; k <= 8; k++) { const t = k / 8; pts.push([lerp(a[0], b[0], t), lerp(a[1], b[1], t) + 2.0 * 4 * t * (1 - t)]); } g.fine2(pts, { w: 0.25, c: '#4A4540' });
-    for (let k = 1; k < 8; k += 2) TB_lantern2(g, [pts[k][0], pts[k][1] + 1.6], 1.0);
+    for (let k = 1; k < 8; k += 2) TB_lantern2(g, [pts[k][0], pts[k][1] + 1.6], 1.0, g.p(lerp(x0 + 0.4, x1 - 0.4, k / 8), y1 + 2.2, 0));
   }, { name: 'bar' }));
   // drinkers at tables on the promenade, the guitarist
   [[-31, -26.2, 800], [-20.6, -26.2, 804], [-9.8, -26.2, 808]].forEach(([x, y, s]) => T.cast([x, y], (g) => {
@@ -48,6 +50,7 @@ SF.tile('houhai', -100, -100, { rim: 0 }, function (T) {
     K.cyl(g, x, y, 0.9, 0, 2.2, { t: '#F3F1EA', l: '#E9E6DE', r: '#C9C6BD' }, { w: 0.4, n: 8 });
     const tp = g.p(x, y, 2.2); g.fill2([[tp[0] - 0.4, tp[1]], [tp[0] + 0.4, tp[1]], [tp[0] + 0.4, tp[1] - 1.6], [tp[0] - 0.4, tp[1] - 1.6]], '#E9B53C', true);
     K.box(g, x + 1.1, y - 0.5, x + 2.1, y + 0.5, 0, 1.2, '#3A3530', { w: 0.3, boil: false }); BJ.person(g, x + 1.6, y, 1.2, BJ.who(s + 1, { dir: 2, pose: 'sit' }));
+    g.glow('lantern', x - 0.3, y + 0.3, 2.5, { r: 0.7, col: '#FFC46A' });   // at night a candle on the table
   }, { on: false }));
   T.cast([1.6, -26.6], (g) => { const r = BJ.person(g, 1.6, -26.6, 0, BJ.who(812, { dir: 1, pose: 'hold', reach: [1.2, -7.4], hairStyle: 'long' })); const hd = r.hands[0]; g.fill2(K.curve([[hd[0] - 3.4, hd[1] - 1.6], [hd[0] + 0.4, hd[1] - 4.8], [hd[0] + 1.8, hd[1] - 3.2], [hd[0] - 1.8, hd[1] + 0.2]], 3, true), '#B8743A', true); g.segs2([hd[0] + 1, hd[1] - 4, hd[0] + 6, hd[1] - 8], '#5A4030', 0.5); }, { on: false });
   // willows along the far shore and round the lake
@@ -64,13 +67,15 @@ SF.tile('houhai', -100, -100, { rim: 0 }, function (T) {
     g.outline(face, { w: 0.7, boil: false });
     const deck = L.concat(R.slice().reverse()); g.fill(deck, '#EAE5D9'); g.outline(deck, { w: 0.6, boil: false });
     for (const xx of [9.7, 12.9]) { const segs = [], dots = []; for (let k = 0; k <= n; k++) { const y = -9.5 + 13 * k / n, a = g.p(xx, y, bz(y)), b = g.p(xx, y, bz(y) + 1.0); segs.push(a[0], a[1], b[0], b[1]); dots.push(b); } for (let k = 0; k < n; k++) segs.push(dots[k][0], dots[k][1] + 0.6, dots[k + 1][0], dots[k + 1][1] + 0.6); g.segs2(segs, '#A9A394', 0.45); for (const d of dots) g.disc2([d[0], d[1] - 0.3], 0.36, '#F7F5EF'); }
+    // at night small lamps on the end posts of each parapet, their light lying on the lake
+    for (const xx of [9.7, 12.9]) for (const y of [-9.5, -3, 3.5]) g.glow2('lantern', g.p(xx, y, bz(y) + 1.3), g.p(xx + (xx > 11 ? 1.2 : 0.4), y, WZ), { r: 1.0, col: '#FFD08A' });
   }, { name: 'bridge' });
   K.walker(T, BJ.who(820), [[11.3, -11], [11.3, 5]], 0.8, { phase: 0.2, z: (x, y) => bz(y) });
   K.walker(T, BJ.who(821, { dress: '#C9584B' }), [[10.6, 5], [10.6, -11]], 0.7, { phase: 0.6, z: (x, y) => bz(y) });
 
   /* ---------------- the Drum Tower ---------------- */
   T.obj([15, -35, 33, -19], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     K.box(g, 15, -35, 33, -19, 0, 9, { t: '#A9A69E', l: '#B4B1A9', r: '#9E9B93' }, { w: 1 });
     const segs = []; for (const [f, p, a0, a1] of [['L', -19, 15, 33], ['R', 33, -35, -19]]) for (let z = 0.6; z < 9; z += 0.6) { const a = g.p.apply(g, K.pt(f, p + 0.02, a0, z)), b = g.p.apply(g, K.pt(f, p + 0.02, a1, z)); segs.push(a[0], a[1], b[0], b[1]); } g.segs2(segs, '#97948C', 0.2);
     for (const x of [19, 24, 29]) { const pts = [K.pt('L', -18.97, x - 1.6, 0)]; for (let k = 0; k <= 10; k++) { const t = Math.PI * k / 10; pts.push(K.pt('L', -18.97, x - 1.6 * Math.cos(t), 3.6 + 1.6 * Math.sin(t))); } pts.push(K.pt('L', -18.97, x + 1.6, 0)); g.fill(pts, '#3A3530'); g.line(pts, { w: 0.5, boil: false }); }
@@ -79,6 +84,9 @@ SF.tile('houhai', -100, -100, { rim: 0 }, function (T) {
     BJ.roof(g, 17, -33, 31, -21, 14.6, 3.2, { type: 'hip', col: '#7E8A86', top: 0.42, over: 1.8, lift: 0.6, c: '#3E5A4E' });
     BJ.hallBody(g, 18, -32, 30, -22, 15.6, 19.0, { bx: 5, by: 4, doors: false });
     BJ.roof(g, 18, -32, 30, -22, 19.0, 5.6, { type: 'xie', col: '#7E8A86', over: 1.8, lift: 0.8, c: '#3E5A4E', rc: '#3E6E4E', gcol: '#A8382E' });
+    // at night the Drum Tower is floodlit: warm light up the brick podium and the red hall, its arches dark
+    BN.flood(g, i0, 0.7, BN.FLOOD, { lines: 0.25 });
+    for (const [x, y, z, r] of [[19, -18.6, 2.5, 2.2], [24, -18.6, 2.5, 2.4], [29, -18.6, 2.5, 2.2], [33.2, -27, 3, 2.4], [24, -20.6, 11.5, 3.0], [31.2, -27, 12, 2.6], [24, -21.6, 19.5, 2.6]]) g.glow('lantern', x, y, z, { r, col: '#FFC27A' });
   }, { name: 'drum tower' });
   // the pedicab rank and the tanghulu seller in front of the tower
   T.cast([18, -12], (g) => { for (const [x, y] of [[16.4, -12.6], [16.4, -8.6]]) g.at(x, y, 0, (g2) => BJ.pedicab(g2, 0, { riders: [], seed: 830 + x })); }, { on: false });
@@ -99,7 +107,7 @@ SF.tile('houhai', -100, -100, { rim: 0 }, function (T) {
     BJ.sign(g, 'R', 34.4, 1, 8, 4.0, 5.4, '#9E2E24', '饺子', { ink: '#F2C94C' });
     BJ.sign(g, 'R', 34.4, 20, 27, 4.0, 5.4, '#3F2A20', '茶', { ink: '#E9C55A' });
   }, { name: 'shops' });
-  T.cast([-22, 16.4], (g) => { const r = BJ.person(g, -22, 16.4, 0, BJ.who(840, { old: true, dir: 3, pose: 'sit', cap: '#5A5A55' })); K.box(g, -22.5, 15.9, -21.5, 16.9, 0, 1.0, '#5E8A6A', { w: 0.3, boil: false }); void r; const h = g.p(-22, 16.4, 4.4), tip = g.p(-26, 8, 9); g.segs2([h[0], h[1], tip[0], tip[1]], '#5A4A3C', 0.35); const fl = g.p(-26, 8, WZ); g.fine2([tip, fl], { w: 0.15, c: '#8C8576' }); g.disc2(fl, 0.4, '#E0503E'); }, { on: false });
+  T.cast([-22, 16.4], (g) => { const r = BJ.person(g, -22, 16.4, 0, BJ.who(840, { old: true, dir: 3, pose: 'sit', cap: '#5A5A55' })); K.box(g, -22.5, 15.9, -21.5, 16.9, 0, 1.0, '#5E8A6A', { w: 0.3, boil: false }); void r; const h = g.p(-22, 16.4, 4.4), tip = g.p(-26, 8, 9); g.segs2([h[0], h[1], tip[0], tip[1]], '#5A4A3C', 0.35); const fl = g.p(-26, 8, WZ); g.fine2([tip, fl], { w: 0.15, c: '#8C8576' }); g.disc2(fl, 0.4, '#E0503E'); g.mark({ nc: '#FF7A4A' }); g.glow2('lantern', fl, fl, { r: 0.5, col: '#FF8A5A' }); }, { on: false });   // (night: a luminous float)
 
   /* ---------------- the lake's life ---------------- */
   // paddle boats on loops, a canopied tourist boat, ducks
@@ -120,6 +128,9 @@ SF.tile('houhai', -100, -100, { rim: 0 }, function (T) {
       for (const u of [-1.8, 0, 1.8]) BJ.person(g, u * ca, u * sa, 0.9, BJ.tourist(860 + Math.round(u), '#E85A3A', { dir: d, pose: 'sit', noLegs: true, k: 0.9 }));
       const posts = []; for (const u of [-3.4, 3.4]) for (const v of [-1.5, 1.5]) { const a = g.p(u * ca - v * sa, u * sa + v * ca, 1.2), b = g.p(u * ca - v * sa, u * sa + v * ca, 5.6); posts.push(a[0], a[1], b[0], b[1]); } g.segs2(posts, '#A8382E', 0.7);
       K.rbox(g, 0, 0, 4.0, 2.0, st.ang, 5.6, 6.2, { t: '#C9A26B', l: '#A8382E', r: '#8E2E26' }, { w: 0.55 });
+      // at night a red lantern hangs under the canopy at its two near corners
+      const cs = []; for (const u of [-3.4, 3.4]) for (const v of [-1.5, 1.5]) cs.push([u * ca - v * sa, u * sa + v * ca]);
+      cs.sort((p, q) => q[0] + q[1] - p[0] - p[1]).slice(0, 2).forEach((q) => BN.lantern2(g, g.p(q[0], q[1], 4.6), 1.3, null, { light: true }));
     } });
   T.actor({ sample: 0.3, period: TAU / 0.3, grow: false,
     at(t) { const a = -t * 0.3, x = -28 + Math.cos(a) * 4, y = -17 + Math.sin(a) * 2.4, q = Math.round(Math.atan2(-Math.cos(a), Math.sin(a)) / (TAU / 8)); return { x, y, z: WZ, key: 'd' + ((q % 8) + 8) % 8, q }; },

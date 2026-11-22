@@ -38,7 +38,10 @@ declare global {
   interface Window {
     GUIDE?: Guide
     SF?: {
-      on: (k: "explore" | "film" | "arrive", f: (a: unknown) => void) => void
+      on: (k: "explore" | "film" | "arrive" | "look", f: (a: unknown) => void) => void
+      look?: { night: boolean }
+      setLook?: (o: { night?: boolean }) => void
+      paper?: () => number[]
       view: () => { mode: string; z: number; cx: number; cy: number; pz: number; w: number; h: number; paused: boolean; gliding: boolean }
       toScreen: (wx: number, wy: number, v?: ReturnType<NonNullable<Window["SF"]>["view"]>) => [number, number]
       prj: (x: number, y: number, z?: number) => [number, number]

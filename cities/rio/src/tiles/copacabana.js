@@ -46,6 +46,12 @@ SF.tile('copacabana', 100, 0, { rim: 22 }, function (T) {
     for (const [y, c] of [[-8, '#3A9A5B'], [8, '#2F6DB5']]) { const b = g.p(33, y, 14), t = g.p(33, y, 19); g.segs2([b[0], b[1], t[0], t[1]], '#6E6A60', 0.4); g.fill2([[t[0], t[1]], [t[0] + 5, t[1] + 0.6], [t[0] + 5, t[1] + 3.2], [t[0], t[1] + 2.6]], c, true); }
     // the awnings of the restaurant at the corner
     for (let y = -11; y < -4; y += 2.4) g.fill([[36, y, 3.4], [36, y + 1.8, 3.4], [37.4, y + 1.8, 2.6], [37.4, y, 2.6]], '#F2C230');
+    // at night the Palace is floodlit, its white front warm over the avenue; the name in gold, the restaurant's awnings lit
+    RJ.flood(g, 0, 1.0, '#F6D29A', (c, d) => (d.k === K_FILL && c === '#F2C230' ? '#FFD45E' : d.k !== K_FILL && c === '#B08A3E' ? '#F6CB6A' : undefined));
+    for (let y = -11; y <= 11; y += 5.5) g.glow2('lantern', g.p(36.6, y, 3.6), g.p(39, y, 0), { r: 2.0, col: '#FFD9A0' });
+    for (const y of [-9.8, -7.4, -5.0]) g.glow('lamp', 37.0, y + 0.9, 2.6, { r: 1.0 });
+    g.glow2('lantern', g.p(36.9, 0, 15.2), g.p(39, 0, 0), { r: 2.6, col: '#FFE0A8' });
+    for (const x of [26, 30, 34]) g.glow2('lantern', g.p(x, 13.6, 3.2), g.p(x, 16, 0), { r: 1.6, col: '#FFD9A0' });
   }, { name: 'copacabana palace' });
   const BLK = [[24, -36.5, 36, -15.5, 16.5, '#F0D9A8', 7101], [24, 15.5, 36, 36.5, 15.2, '#CFE3D8', 7102]];
   for (const [x0, y0, x1, y1, h, c, sd] of BLK) T.obj([x0, y0, x1, y1], (g) => { g.boilP = 0.25; RJ.block(g, x0, y0, x1, y1, h, c, sd, { pool: sd === 7102, shops: { face: 'L', words: sd === 7102 ? ['SUCOS', 'FARMÁCIA'] : ['PADARIA', 'BAR'], cols: ['#3A9A5B', '#D9463B', '#2F6DB5', '#F2C230'] } }); }, { name: 'prédio' });
@@ -61,7 +67,7 @@ SF.tile('copacabana', 100, 0, { rim: 22 }, function (T) {
     if (sd === 7122) { for (let i = 0; i < 3; i++) K.cyl(g, 2 + i * 4, -8, 0.9, h, h + 1.2, { t: '#5E9AD6', l: '#3E7FC1', r: '#2F6AA6' }, { w: 0.45, n: 10 }); const a = g.p(0, -2, h + 1.6), b = g.p(14, -2, h + 1.6); g.fine2([a, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 + 1], b], { w: 0.2, c: '#5A564E' }); for (let k = 1; k < 6; k++) { const t = k / 6, c2 = [lerp(a[0], b[0], t), lerp(a[1], b[1], t) + 0.8]; g.fill2([[c2[0] - 1, c2[1]], [c2[0] + 1, c2[1]], [c2[0] + 0.9, c2[1] + 2.4], [c2[0] - 0.9, c2[1] + 2.4]], ['#F3F1EA', '#E86A9A', '#2F6DB5', '#F2C230', '#3A9A5B'][k % 5], true); } }
   }, { name: 'prédio' });
   // a rooftop party on the near inner block: a grill's smoke, friends dancing, a speaker
-  T.cast([10, 28], (g) => { const z = 10.4; K.box(g, 3, 30, 5, 31.5, z, z + 1.0, '#3A3530', { w: 0.4 }); for (const [x, y, s, d] of [[6, 27, 7131, 0], [9, 29, 7132, 1], [12, 26, 7133, 0], [8, 32, 7134, 1]]) RJ.person(g, x, y, z, Object.assign(RJ.who(s), { dir: d, pose: s % 2 ? 'cheer' : 'hold', cup: s % 2 ? undefined : '#F2C230', ph: 0.25 })); }, { on: true });
+  T.cast([10, 28], (g) => { const z = 10.4; K.box(g, 3, 30, 5, 31.5, z, z + 1.0, '#3A3530', { w: 0.4 }); for (let k = 0; k < 6; k++) RJ.bulb(g, 3 + k * 2.6, 35.8, z + 0.3, { r: 0.7, col: ['#FFD27A', '#FF8AB8', '#8AD8FF'][k % 3], base: z }); /* (night: party lights along the parapet) */ for (const [x, y, s, d] of [[6, 27, 7131, 0], [9, 29, 7132, 1], [12, 26, 7133, 0], [8, 32, 7134, 1]]) RJ.person(g, x, y, z, Object.assign(RJ.who(s), { dir: d, pose: s % 2 ? 'cheer' : 'hold', cup: s % 2 ? undefined : '#F2C230', ph: 0.25 })); }, { on: true });
   T.cast([0, -28], (g) => { const z = 9.4; for (const [x, y, s] of [[13, -24, 7136], [12, -21, 7137]]) RJ.person(g, x, y, z + 0.1, Object.assign(RJ.who(s, { beach: true }), { lie: -2.5, pose: 'stand', dir: 0 })); }, { on: true });
   // the praça: mango trees, a newsstand, two domino tables, pigeons
   for (const [x, y] of [[-31, -31], [-14, -30], [-28, -14], [-12, -12]]) T.obj([x, y], (g) => K.tree(g, x, y, { r: 5.0, h: 5.2, col: '#4F8A45' }), { name: 'mangueira' });
@@ -86,13 +92,13 @@ SF.tile('copacabana', 100, 0, { rim: 22 }, function (T) {
   RJ.suco(T, 40, -11.6, 7315, 'SUCOS');
   RJ.parked(T, 39.6, 16, 6, 'y', 7320);
   // the praça: kids playing, a popcorn cart, a dog
-  T.obj([-30, -20], (g) => K.stall(g, -30, -20, { L: 1.8, D: 1.2, a: '#F2C230', b: '#F6F3EA' }), { name: 'pipoca' });
+  T.obj([-30, -20], (g) => { K.stall(g, -30, -20, { L: 1.8, D: 1.2, a: '#F2C230', b: '#F6F3EA' }); RJ.bulb(g, -30, -20, 5.9, { r: 1.2 }); }, { name: 'pipoca' });
   for (let k = 0; k < 3; k++) RJ.walker(T, RJ.who(7330 + k, { set: { k: 0.72 } }), [[-34 + k, -11], [-16, -10 - k], [-24, -8]], 2.0, { phase: k * 0.31 });
   RJ.dog(T, [[-33, -34], [-10, -33], [-20, -26]], 1.5, '#E6D2B0', 0.5);
   // a feira livre in the side street: fruit and vegetable stalls under striped awnings, shoppers with trolleys
   const FG = [['#E04A3A', '#F2C230', '#9CCB4A'], ['#EE8A2E', '#F2C230', '#7A3A6A'], ['#9CCB4A', '#5E8F4E', '#E04A3A'], ['#F6F3EA', '#E9C9A0', '#F2C230']];
   [[-16, 6, '#3A9A5B'], [-16, 14.5, '#D9463B'], [-16, 23, '#2F6DB5'], [-16, 31.5, '#F2C230']].forEach(([x, y, a], i) => {
-    T.obj([x, y], (g) => K.stall(g, x, y, { L: 3.2, D: 1.6, a, b: '#F6F3EA', goods: (g2, D, L) => { const R = RNG(7400 + i); for (let k = 0; k < 10; k++) { const p = g2.p(-D + 0.5 + (k % 2) * 1.2, -L + 0.5 + Math.floor(k / 2) * 1.3, 2.9); g2.disc2(p, 0.75, R.pick(FG[i])); } } }), { name: 'feira' });
+    T.obj([x, y], (g) => { K.stall(g, x, y, { L: 3.2, D: 1.6, a, b: '#F6F3EA', goods: (g2, D, L) => { const R = RNG(7400 + i); for (let k = 0; k < 10; k++) { const p = g2.p(-D + 0.5 + (k % 2) * 1.2, -L + 0.5 + Math.floor(k / 2) * 1.3, 2.9); g2.disc2(p, 0.75, R.pick(FG[i])); } } }); for (const v of [-1.6, 1.6]) RJ.bulb(g, x, y + v, 5.9, { r: 1.1 }); }, { name: 'feira' });
     T.cast([x + 2.6, y - 2.6], (g) => RJ.person(g, x + 2.6, y - 2.6, 0, Object.assign(RJ.who(7410 + i, { carnaval: false }), { dir: 0, pose: 'hold', cap: '#F6F3EA' })), {});
   });
   for (let k = 0; k < 5; k++) RJ.walker(T, RJ.who(7420 + k, { set: k % 2 ? { sunhat: true } : {} }), [[-10.5 - (k % 2), 2], [-10.5 - (k % 2), 35]], 0.6 + h1(k) * 0.3, { phase: h1(k * 3 + 1), extra: k % 2 ? (g, st, r) => { const h = r.hands[0]; g.fill2([[h[0] - 1.4, h[1]], [h[0] + 1.4, h[1]], [h[0] + 1.2, h[1] + 3], [h[0] - 1.2, h[1] + 3]], '#2F6DB5', true); } : undefined });

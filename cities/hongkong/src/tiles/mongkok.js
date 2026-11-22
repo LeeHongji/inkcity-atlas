@@ -32,7 +32,7 @@ SF.tile('mongkok', 100, 100, { rim: 36 }, function (T) {
   ];
   BL.forEach(([x, z0, z1, col, str, neon], i) => HK.bladeObj(T, x, -7.6, 'y', 4.2 + (i % 3) * 0.6, z0, z1, col, str, { neon, ink: neon ? undefined : (col === '#F2C230' ? '#8E2620' : '#FBF8EE') }));
   // wide Latin neon boxes higher up
-  for (const [x, z, w, txt, nc] of [[-31, 18.6, 7, 'KARAOKE', HK.C.neon[4]], [10, 16.6, 6, 'HOTEL', HK.C.neon[2]], [26, 13.6, 7, 'SAUNA', HK.C.neon[0]]]) T.obj([x, -7.6], (g) => { const q = K.on('L', -7.5, x - w / 2, x + w / 2, z, z + 2.0); g.fill(q, '#2C2622'); g.outline(q, { w: 0.4, boil: false }); const h = Math.min(1.2, (w - 0.6) / K.textW(txt, 1)); K.text(g, 'L', -7.45, x, z + 1 - h / 2, h, txt, nc + '88', { center: true, w: 1.1 }); K.text(g, 'L', -7.44, x, z + 1 - h / 2, h, txt, '#FFF6EC', { center: true, w: 0.45 }); }, { name: 'neon box' });
+  for (const [x, z, w, txt, nc] of [[-31, 18.6, 7, 'KARAOKE', HK.C.neon[4]], [10, 16.6, 6, 'HOTEL', HK.C.neon[2]], [26, 13.6, 7, 'SAUNA', HK.C.neon[0]]]) T.obj([x, -7.6], (g) => { const q = K.on('L', -7.5, x - w / 2, x + w / 2, z, z + 2.0); g.fill(q, '#2C2622'); g.outline(q, { w: 0.4, boil: false }); const h = Math.min(1.2, (w - 0.6) / K.textW(txt, 1)); const i0 = g.cmds.length; K.text(g, 'L', -7.45, x, z + 1 - h / 2, h, txt, nc + '88', { center: true, w: 1.1 }); K.text(g, 'L', -7.44, x, z + 1 - h / 2, h, txt, '#FFF6EC', { center: true, w: 0.45 }); HK.nite(g, i0, { nc: true }); HK.signGlow(g, 'L', -7.5, x - w / 2, x + w / 2, z, z + 2, nc, 0.4); }, { name: 'neon box' });
 
   /* ---- the Ladies' Market: two rows of stalls along the street ---- */
   const GOODS = [['#C8372D', '#E6C24F', '#3F5F8F'], ['#E06A8A', '#F3F1EA', '#2F343B'], ['#5FA58F', '#E6C24F', '#B07CC9'], ['#7FB7D9', '#F0A23A', '#F3F1EA']];
@@ -40,10 +40,11 @@ SF.tile('mongkok', 100, 100, { rim: 36 }, function (T) {
     const x = -33 + i * 8.2 + (yy > 0 ? 3 : 0); if (x > 34) continue;
     T.obj([x - 2.4, yy - 1.2, x + 2.4, yy + 1.2], (g) => {
       K.box(g, x - 2.2, yy - 1.0, x + 2.2, yy + 1.0, 0, 1.8, { t: '#B9A27D', l: '#8E7A5C', r: '#7A684E' }, { w: 0.45, boil: false });
-      const gd = GOODS[(i + (yy > 0 ? 1 : 0)) % GOODS.length]; for (let k = 0; k < 8; k++) { const q = g.p(x - 1.8 + (k % 4) * 1.2, yy - 0.5 + Math.floor(k / 4) * 1.0, 1.85); g.fill2([[q[0] - 1.2, q[1] - 0.5], [q[0] + 1.2, q[1] - 0.5], [q[0] + 1.2, q[1] + 0.4], [q[0] - 1.2, q[1] + 0.4]], gd[k % 3], true); }
+      const gd = GOODS[(i + (yy > 0 ? 1 : 0)) % GOODS.length], i0 = g.cmds.length; for (let k = 0; k < 8; k++) { const q = g.p(x - 1.8 + (k % 4) * 1.2, yy - 0.5 + Math.floor(k / 4) * 1.0, 1.85); g.fill2([[q[0] - 1.2, q[1] - 0.5], [q[0] + 1.2, q[1] - 0.5], [q[0] + 1.2, q[1] + 0.4], [q[0] - 1.2, q[1] + 0.4]], gd[k % 3], true); }
       // a rail of hanging T-shirts and the tarp above
       const ps = []; for (const xx of [x - 2.2, x + 2.2]) { const a = g.p(xx, yy, 1.8), b = g.p(xx, yy, 5.8); ps.push(a[0], a[1], b[0], b[1]); } g.segs2(ps, '#5A564E', 0.3);
       for (let k = 0; k < 4; k++) { const q = g.p(x - 1.6 + k * 1.05, yy, 5.2); g.fill2([[q[0] - 1.1, q[1]], [q[0] + 1.1, q[1]], [q[0] + 0.9, q[1] + 3.0], [q[0] - 0.9, q[1] + 3.0]], gd[(k + 1) % 3], true); }
+      HK.nite(g, i0, { nc: (c) => (c === '#5A564E' ? undefined : HK.lift(0.6)(c)) }); g.glow(i % 2 ? 'lantern' : 'lamp', x, yy, 5.5, { r: 1.0, col: '#FFD58A' });   // at night a bulb under the tarp lights the goods
       const tp = [[x - 2.8, yy - 1.6, 6.2], [x + 2.8, yy - 1.6, 6.2], [x + 2.8, yy + 1.6, 6.0], [x - 2.8, yy + 1.6, 6.0]]; g.fill(tp, ['#3F5F8F', '#C8372D', '#3E7A5A', '#E6B83E'][(i * 2 + (yy > 0 ? 1 : 0)) % 4]); g.outline(tp, { w: 0.4, c: '#3A3530', boil: false });
     }, { name: 'stall' });
   }
@@ -55,20 +56,22 @@ SF.tile('mongkok', 100, 100, { rim: 36 }, function (T) {
     for (let k = 0; k < 3; k++) {
       const a0 = -35.4 + k * 7.8, a1 = a0 + 7.2;
       // a wall of water bags facing the street (the shop's far face, seen as the bags hung out on its front rails)
-      g.fill(K.on('L', 20.02, a0, a1, 0, 5.4), '#2F4A5A');
+      g.fill(K.on('L', 20.02, a0, a1, 0, 5.4), '#2F4A5A'); g.mark({ nc: '#3F8696' }); g.glow('lantern', (a0 + a1) / 2, 20.4, 0.8, { r: 2.6, col: '#9FE6EE' });   // lit tanks at night
       HK.board(g, 'L', 20.05, a0, a1, 5.6, 7.4, ['#E6C24F', '#C8372D', '#3F7F5A'][k], '金魚', { en: 'GOLDFISH' });
     }
     // the bags themselves: rows of little clear pouches with an orange fish in each
     const bags = [], fish = [];
     for (let k = 0; k < 3; k++) for (let r = 0; r < 3; r++) for (let c = 0; c < 6; c++) { const q = g.p(-35 + k * 7.8 + c * 1.18 + 0.6, 20.3, 4.6 - r * 1.5); bags.push(q); }
+    const ib = g.cmds.length;
     for (const q of bags) { g.fill2([[q[0] - 1.3, q[1] - 0.2], [q[0] + 1.3, q[1] - 0.2], [q[0] + 1.6, q[1] + 2.6], [q[0], q[1] + 3.6], [q[0] - 1.6, q[1] + 2.6]], 'rgba(214,236,242,0.75)', true); fish.push(q[0] - 0.4, q[1] + 2.1, q[0] + 0.5, q[1] + 1.9); }
     g.segs2(fish, '#F08A2A', 0.7);
+    HK.nite(g, ib, { nc: (c) => (c === '#F08A2A' ? c : 'rgba(206,240,248,0.82)') });   // the bags glow under the shop lights
   }, { name: 'goldfish shops' });
   T.obj([-8, 10, 8, 22], (g) => {
     K.box(g, -8, 10, 8, 22, 0, 10.4, { t: '#2F343B', l: '#3B3F47', r: '#2A2E35' }, { w: 0.8 });
     g.fill(K.on('L', 22.02, -7.4, 7.4, 0.2, 7.6), '#F2DDA8');
-    const s = []; for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) { const q = g.p(-6.6 + c * 1.6, 22.05, 1.2 + r * 1.6); s.push(q[0] - 1.6, q[1], q[0] + 1.6, q[1]); } g.segs2(s, '#C9584B', 1.0);
-    K.sign(g, 'L', 22.05, -7.6, 7.6, 8.0, 10.0, '#C8372D', 'SNEAKERS', { w: 0.3 });
+    const s = []; for (let r = 0; r < 4; r++) for (let c = 0; c < 9; c++) { const q = g.p(-6.6 + c * 1.6, 22.05, 1.2 + r * 1.6); s.push(q[0] - 1.6, q[1], q[0] + 1.6, q[1]); } g.segs2(s, '#C9584B', 1.0); HK.nite(g, g.cmds.length - 1, { nc: true });
+    const i0 = g.cmds.length; K.sign(g, 'L', 22.05, -7.6, 7.6, 8.0, 10.0, '#C8372D', 'SNEAKERS', { w: 0.3 }); HK.nite(g, i0, { nc: true }); HK.signGlow(g, 'L', 22.05, -7.6, 7.6, 8.0, 10.0, '#FF6A5A', 0.3);
   }, { name: 'sneaker shop' });
   // the MTR exit: a canopy over a stair down, the station's name
   T.obj([12, 11, 22, 19], (g) => {
@@ -76,6 +79,7 @@ SF.tile('mongkok', 100, 100, { rim: 36 }, function (T) {
     g.fill(K.rect(12.6, 12.4, 21.4, 18.6, 0.01), '#5E584E'); const st = []; for (let k = 1; k < 8; k++) { const a = g.p(12.6, 12.4 + k * 0.8, 0.02), b = g.p(21.4, 12.4 + k * 0.8, 0.02); st.push(a[0], a[1], b[0], b[1]); } g.segs2(st, '#8E877A', 0.35);
     HK.rail(g, [12.4, 12.4], [12.4, 18.8], { h: 1.8 }); HK.rail(g, [21.6, 12.4], [21.6, 18.8], { h: 1.8 });
     const r = [[11.6, 10.8, 4.6], [22.4, 10.8, 4.6], [22.4, 16, 4.2], [11.6, 16, 4.2]]; g.fill(r, '#C8372D'); g.outline(r, { w: 0.5, c: '#6E1E18', boil: false });
+    for (const x of [14.5, 19.5]) g.glow('lamp', x, 13.6, 4.0, { r: 1.1 });          // night: the lights under the canopy
     HK.board(g, 'L', 12.42, 13.4, 20.6, 1.0, 3.4, '#C8372D', '旺角', { en: 'MONG KOK', rim: '#F3F1EA' });
   }, { name: 'mtr exit' });
   // the pawnshop on the corner with its bat-and-coin sign

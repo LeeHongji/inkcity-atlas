@@ -33,8 +33,11 @@ SF.tile('formosa', 0, -100, { rim: 10 }, function (T) {
     const pd = [[-28.4, F + 0.02, 12.6], [-17.6, F + 0.02, 12.6], [-23, F + 0.02, 15.4]]; g.fill(pd, '#F6F2EA'); g.outline(pd, { w: 0.6, boil: false });
     const cl = []; for (const a of [-27.4, -25.2, -20.8, -18.6]) { const p0 = g.p(a, F + 0.03, 0.8), p1 = g.p(a, F + 0.03, 11.4); cl.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(cl, '#D9D2C4', 1.1);
     VN.door(g, 'L', F, -24.2, -21.8, 5.4, { arch: 'round', col: '#4A3A30' });
-    VN.win(g, 'L', F, -24, -22, 7.4, 10.6, { arch: 'round', sh: null, pane: '#55606A' });
-    for (const a of [-31.5, -14.5]) VN.win(g, 'L', F, a - 0.8, a + 0.8, 3, 7.6, { arch: 'round', sh: null, pane: '#55606A' });
+    VN.win(g, 'L', F, -24, -22, 7.4, 10.6, { arch: 'round', sh: null, pane: '#55606A', lit: 1 });
+    for (const a of [-31.5, -14.5]) VN.win(g, 'L', F, a - 0.8, a + 0.8, 3, 7.6, { arch: 'round', sh: null, pane: '#55606A', lit: 0.5 });
+    // at night: the white front floodlit for Carnival, a lantern over the door
+    g.mark({ nc: (c) => (c === '#F3EFE6' || c === '#F6F2EA' || c === '#D9D2C4' ? VN.litStone(0.8)(c) : undefined) }, 0);
+    g.glow('lamp', -23, F + 0.7, 6.4, { r: 1.5 }); g.glow('lantern', -23, F + 1, 11, { r: 2.6, col: '#FFD9A0' });
     for (const a of [-28.4, -23, -17.6]) { const c = g.p(a, F, a === -23 ? 15.4 : 12.6); g.fill2([[c[0] - 0.5, c[1]], [c[0] + 0.5, c[1]], [c[0] + 0.4, c[1] - 2.8], [c[0] - 0.4, c[1] - 2.8]], '#F6F2EA', true); g.disc2([c[0], c[1] - 3.2], 0.5, '#F6F2EA'); }
   }, { name: 'santa maria formosa' });
   T.obj([-36, -12, -31, -7], function (g) {
@@ -51,10 +54,10 @@ SF.tile('formosa', 0, -100, { rim: 10 }, function (T) {
   H({ x0: -8, y0: -37, x1: 4, y1: -27, n: 4, col: P[0], chim: [[-3, -33], [1, -30, 'square']], shopL: [-6.5, 2.5, '#2F3A55', 'MASCHERE'], altana: [-2, -32, { wash: ['#F3F1EA', '#D98AA4', '#5F8FC9'] }], goods: (g, f, p, s0, s1) => { for (let i = 0; i < 5; i++) { const c = g.p.apply(g, K.pt(f, p + 0.05, lerp(s0 + 1, s1 - 1, i / 4), 1.9 + (i % 2) * 0.8)); g.fill2(arcPts(c[0], c[1], 1.1, 0, TAU, 8).map((q) => [q[0], c[1] + (q[1] - c[1]) * 1.2]), ['#F4F1EA', '#D9B24A', '#C9463E', '#2F4F8F', '#F4F1EA'][i], true); g.disc2([c[0] - 0.4, c[1] - 0.2], 0.2, '#2A2622'); g.disc2([c[0] + 0.4, c[1] - 0.2], 0.2, '#2A2622'); } } });
   H({ x0: 4, y0: -37, x1: 16, y1: -27, n: 3, col: P[3], chim: [[9, -33]], shopL: [5.5, 14.5, '#7A2E35', 'TABACCHI'] });
   H({ x0: 16, y0: -37, x1: 27, y1: -27, n: 4, col: P[7], chim: [[21, -32], [24, -30]], balcony: ['L', 21.5, ['#C9463E', '#E6C24F']] });
-  H({ x0: 27, y0: -37, x1: 37, y1: -26, n: 3, z0: VN.WL, col: P[2], chim: [[31, -32]] });
+  H({ x0: 27, y0: -37, x1: 37, y1: -26, n: 3, z0: VN.WL, dry: true, col: P[2], chim: [[31, -32]] });
   H({ x0: -37, y0: 6, x1: -27, y1: 20, n: 3, col: P[8], chim: [[-32, 11]], shopR: [8, 18, '#3E5A44', 'GELATERIA'] });
-  H({ x0: -37, y0: 22, x1: -25, y1: 37, n: 4, z0: VN.WL, col: P[5], chim: [[-31, 27]], altana: [-31, 31, {}] });
-  H({ x0: 26, y0: 8, x1: 37, y1: 24, n: 2, z0: VN.WL, col: P[6], roof: 'x', chim: [[31, 14]], shopL: [27.5, 35, '#5A4A6A', 'COSTUMI'] });
+  H({ x0: -37, y0: 22, x1: -25, y1: 37, n: 4, z0: VN.WL, dry: true, col: P[5], chim: [[-31, 27]], altana: [-31, 31, {}] });
+  H({ x0: 26, y0: 8, x1: 37, y1: 24, n: 2, z0: VN.WL, dry: true, col: P[6], roof: 'x', chim: [[31, 14]], shopL: [27.5, 35, '#5A4A6A', 'COSTUMI'] });
 
   /* ---------- the stage and the troupe ---------- */
   T.obj([-8, -24, 6, -17], function (g) {
@@ -65,6 +68,10 @@ SF.tile('formosa', 0, -100, { rim: 10 }, function (T) {
     const bk = g.P(K.on('L', -23.55, -7.4, 5.4, 4.6, 9.6)); g.fill2([[lerp(bk[0][0], bk[1][0], 0.2), bk[0][1] - 0.2], [lerp(bk[0][0], bk[1][0], 0.5), bk[0][1] - 9], [lerp(bk[0][0], bk[1][0], 0.8), bk[1][1] + 1]], '#C9A26B', true);
     g.fill(K.on('L', -23.5, -7.6, 5.6, 8.6, 10.2), '#B5303A'); g.outline(K.on('L', -23.6, -7.4, 5.4, 1.8, 10.2), { w: 0.6, boil: false });
     K.sign(g, 'L', -23.45, -4, 2, 8.8, 9.9, '#B5303A', 'COMMEDIA', { ink: '#E9D9A0' });
+    // at night the stage lights: the backdrop and the curtain lit, footlights along the front, two lamps on the posts
+    g.mark({ nc: (c) => (c === '#E9D9A0' ? '#FFE7A8' : c === '#9DB8C4' ? '#B4CCD4' : c === '#C9A26B' ? '#E0B070' : c === '#B5303A' ? '#D2443E' : undefined) }, 0);
+    for (let a = -6.6; a < 5.5; a += 2.4) g.glow('lantern', a, -16.8, 2.1, { r: 0.7, col: '#FFE0A0' });
+    for (const a of [-7.2, 5.2]) g.glow('lamp', a, -23.2, 10.6, { r: 1.5, base: 1.8 });
   }, { name: 'stage' });
   T.actor({ sample: 5, period: 4,
     at(t) { const f = Math.floor(t * 2) % 8; return { x: -1, y: -19.5, z: 1.8, key: f, f }; },
@@ -83,7 +90,9 @@ SF.tile('formosa', 0, -100, { rim: 10 }, function (T) {
     K.box(g, 16, -12, 22, -8, 0, 2.4, { t: '#E9DFC2', l: '#F1E6CC', r: '#D9CDB0' }, { w: 0.6 });
     const pile = []; for (let i = 0; i < 9; i++) { const c = g.p(16.8 + (i % 5) * 1.1, -10.5 + Math.floor(i / 5) * 1.2, 2.5); pile.push(c); } for (const c of pile) { g.disc2(c, 0.9, '#C98A3E'); g.disc2([c[0] - 0.2, c[1] - 0.3], 0.35, '#F6F1E4'); }
     const pts = [[15.6, -12.4, 6], [22.4, -12.4, 6], [22.4, -7.6, 5.2], [15.6, -7.6, 5.2]]; g.fill(pts, '#E6C24F'); g.outline(pts, { w: 0.5, boil: false, c: '#8A6A1E' });
-    K.sign(g, 'L', -7.58, 16.4, 21.6, 4.2, 5.0, '#C9463E', 'FRITTELLE', { ink: '#F6F1E4' });
+    { const i0 = g.cmds.length; K.sign(g, 'L', -7.58, 16.4, 21.6, 4.2, 5.0, '#C9463E', 'FRITTELLE', { ink: '#F6F1E4' }); g.mark({ nc: true }, i0); }
+    g.mark({ nc: (c) => (c === '#E6C24F' ? '#D9A83E' : c === '#E9DFC2' || c === '#F1E6CC' ? '#E6C48C' : c === '#C98A3E' ? '#E0A04A' : undefined) }, 0);   // lit at night
+    g.glow('lamp', 19, -10, 4.6, { r: 1.6, base: 0 });
     const ps = []; for (const [x, y] of [[15.8, -7.8], [22.2, -7.8]]) { const a = g.p(x, y, 0), b = g.p(x, y, 5.2); ps.push(a[0], a[1], b[0], b[1]); } g.segs2(ps, '#6E5A44', 0.45);
   }, { name: 'frittelle' });
   T.cast([23.5, -9], (g) => VN.person(g, 23.5, -9, 0, VN.who(1620, { dir: 1, pose: 'hold', top: '#F3F1EA', colombina: null })), { name: 'seller' });
@@ -108,10 +117,12 @@ SF.tile('formosa', 0, -100, { rim: 10 }, function (T) {
         let d = ((t * sp - i * 3.0) % LL + LL) % LL, k = 0; while (k < 3 && d > Math.hypot(lp[k + 1][0] - lp[k][0], lp[k + 1][1] - lp[k][1])) { d -= Math.hypot(lp[k + 1][0] - lp[k][0], lp[k + 1][1] - lp[k][1]); k++; }
         const a = lp[k], b = lp[k + 1], l = Math.hypot(b[0] - a[0], b[1] - a[1]), u = d / l, dx = b[0] - a[0], dy = b[1] - a[1];
         const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 0 : 2) : (dy > 0 ? 1 : 3), ph = Math.floor((((t * sp - i * 3) / 2.4) % 1 + 1) % 1 * 8) / 8;
-        return { x: a[0] + dx * u, y: a[1] + dy * u, dir, ph, key: dir + '.' + ph };
+        const n = LOOK.night && i > 0 && i % 2 === 1;                    // at night every other masker carries a lantern
+        return { x: a[0] + dx * u, y: a[1] + dy * u, dir, ph, n, key: dir + '.' + ph + (n ? 'n' : '') };
       },
       draw(g, st) {
         const r = VN.person(g, 0, 0, 0, Object.assign({}, w, { dir: st.dir, pose: i === 0 ? 'hold' : 'walk', ph: st.ph }));
+        if (st.n) VN.handLantern(g, r, 1);
         if (i === 0) { const h = r.hands[0], c = [h[0], h[1] + 1.6]; g.fill2(arcPts(c[0], c[1], 2.2, 0, TAU, 12).map((q) => [q[0], c[1] + (q[1] - c[1]) * 0.5]), '#F3F1EA', true); g.fill2([[c[0] - 2.2, c[1]], [c[0] + 2.2, c[1]], [c[0] + 2.2, c[1] + 2.4], [c[0] - 2.2, c[1] + 2.4]], '#B5303A', true); g.segs2([c[0] - 2.2, c[1] + 0.2, c[0], c[1] + 2.2, c[0], c[1] + 2.2, c[0] + 2.2, c[1] + 0.2], '#E6C24F', 0.35); }
       } });
   });

@@ -42,6 +42,10 @@ SF.tile('city', 100, -100, { rim: 24 }, function (T) {
     for (const yy of [y0 + 0.2, y1 - 0.2]) { const ya = yy - 1.8, yb = yy + 1.8; K.box(g, -34, ya, -30, yb, 0, 11.0, PS, { w: 0.75 }); K.cyl(g, -32, yy, 1.7, 11.0, 15.4, PS, { w: 0.6, n: 10 }); const sc = []; for (const a of [-0.5, 0.4, 1.3, 2.2]) { const p = g.p(-32 + Math.cos(a) * 1.7, yy + Math.sin(a) * 1.7, 11.4), q = g.p(-32 + Math.cos(a) * 1.7, yy + Math.sin(a) * 1.7, 15.0); sc.push(p[0], p[1], q[0], q[1]); } g.segs2(sc, '#B9B19C', 0.6); K.dome(g, -32, yy, 1.8, 15.4, 2.2, '#909DA6'); K.cone(g, -32, yy, 0.6, 17.4, 2.0, '#909DA6'); const q = g.p(-32, yy, 19.6); g.disc2(q, 0.4, '#E0B54A'); }
     K.box(g, -34.5, y0 + 2, -30, y1 - 2, 0, 12.4, PS, { w: 0.7, nohid: true });
     const wp = [[-30, y1 - 2, 12.4], [-30, y0 + 2, 12.4], [-30, ym, 14.2]]; g.fill(wp, '#ECE6D6'); g.outline(wp, { w: 0.6 });
+    // at night: floodlit, the great dome glowing pale over the City, the golden ball and cross shining
+    LK.flood(g, 0, 0.9, LK.FLOOD.warm, (c) => (c === '#E0B54A' ? '#FAD06A' : undefined));
+    for (const [x, y, z, r] of [[xc + 4.6, ym + 4.6, 12.5, 3.2], [xc + 3.4, ym + 3.4, 20.5, 3.0], [xc + 1.0, ym + 1.0, 25.8, 1.8], [-29.4, ym, 6.5, 2.6], [-29.4, ym, 11, 2.0], [xc, 21.6, 4, 2.4], [-31, y1 + 1.6, 9, 1.8], [-6, y1 + 0.6, 3.5, 2.0]]) g.glow('lantern', x, y, z, { r, col: '#FFE2B0' });
+    g.glow('lantern', xc, ym, 29.0, { r: 1.4, col: '#FFD27A' });
   }, { name: "st paul's" });
   // the cathedral steps on the west, a flag
   T.obj([-37, 6, -34.5, 20], (g) => { for (let i = 0; i < 4; i++) K.box(g, -37 + i * 0.6, 6 + i * 0.3, -34.5, 20 - i * 0.3, i * 0.3, (i + 1) * 0.3, { t: '#E6E1D6', l: '#DCD6C9', r: '#C9C2B2' }, { w: 0.4, boil: false, nohid: true }); }, { name: 'steps' });
@@ -60,6 +64,15 @@ SF.tile('city', 100, -100, { rim: 24 }, function (T) {
     for (let k = 0; k < 6; k++) { const band = []; const back = []; for (let z = 0; z <= Z - 2; z += 0.8) { const a = z * 0.13 + k * TAU / 6, u = Math.cos(a - Math.PI * 0.25); if (u < -0.05) { if (band.length > 2) { g.fill2(band.concat(back.reverse()), '#3E5566'); } band.length = 0; back.length = 0; continue; } const r = rad(z), p = g.p(cx + Math.cos(a) * r, cy + Math.sin(a) * r, z), q = g.p(cx + Math.cos(a + 0.28) * r, cy + Math.sin(a + 0.28) * r, z); band.push(p); back.push(q); } if (band.length > 2) g.fill2(band.concat(back.reverse()), '#3E5566'); }
     const gr = []; for (let z = 2; z < Z - 1; z += 2.4) { const i = Math.round(z / 0.8); gr.push(L[i][0], L[i][1], R[i][0], R[i][1]); } g.segs2(gr, '#C3D3DC', 0.3);
     g.line2(sil, { w: 0.85, c: '#3E4E5A', close: true, boil: false });
+    // at night: its offices lit through the glass, the dome at the top (a bar) glowing warm
+    const GN = { '#A7BFCC': '#536F8C', '#86A2B4': '#425C78', '#3E5566': '#2C3E52' };
+    g.mark({ nc: (c) => GN[c] }, 0);
+    { const R = RNG(31); for (let z = 1.2; z < Z - 5; z += 2.0) for (let k = 0; k < 5; k++) { if (R() > 0.6) continue; const a0 = -Math.PI * 0.25 + Math.PI * (k + 0.1) / 5, a1 = -Math.PI * 0.25 + Math.PI * (k + 0.9) / 5, za = z + 0.35, zb = z + 1.4, q = [];
+      for (let i = 0; i <= 3; i++) { const a = lerp(a0, a1, i / 3); q.push([cx + Math.cos(a) * rad(za) * 0.995, cy + Math.sin(a) * rad(za) * 0.995, za]); }
+      for (let i = 3; i >= 0; i--) { const a = lerp(a0, a1, i / 3); q.push([cx + Math.cos(a) * rad(zb) * 0.995, cy + Math.sin(a) * rad(zb) * 0.995, zb]); }
+      g.fill(q, 'rgba(255,255,255,0)'); g.mark({ nc: R() < 0.7 ? '#F2E6C4' : '#DCE8F4' }); } }
+    for (const [z, r] of [[10, 2.4], [24, 2.2]]) g.glow('lantern', cx + 2.4, cy + 2.4, z, { r, col: '#E6EEFF' });
+    g.glow('lantern', cx, cy, Z - 2.4, { r: 2.4, col: '#FFD9A0' });
   }, { name: 'gherkin' });
   // the Walkie-Talkie: wider at the top, the sky garden under its crown
   T.obj([-6, -36, 9, -24], function (g) {
@@ -76,6 +89,13 @@ SF.tile('city', 100, -100, { rim: 24 }, function (T) {
     const top = [[x0, y0, Z], [Rr(Z), y0, Z], [Rr(Z), L(Z), Z], [x0, L(Z), Z]]; g.fill(top, '#8FB078'); g.fill([[x0, L(Z), Z], [Rr(Z), L(Z), Z], [Rr(Z), L(Z) - 1.6, Z + 2.6], [x0, L(Z) - 1.6, Z + 2.6]], '#CFE0E8');
     g.outline(face, { w: 0.85, boil: false }); g.line([[Rr(0), y0, 0], ...side.slice(1)], { w: 0.7, boil: false });
     g.line([[x0, L(Z) - 1.6, Z + 2.6], [Rr(Z), L(Z) - 1.6, Z + 2.6], [Rr(Z), L(Z), Z]], { w: 0.6, boil: false });
+    // at night: the offices lit behind the glass, the Sky Garden under its crown lit warm and green
+    const WT = { '#A9C0CE': '#506E8C', '#7F9BAE': '#3E5A78', '#8FB078': '#8FBE76', '#CFE0E8': '#FFE2A8' };
+    g.mark({ nc: (c) => WT[c] }, 0);
+    LK.floorBands(g, (z) => [x0 + 0.3, L(z) + 0.02, z], (z) => [x1 - 0.3, L(z) + 0.02, z], 1.0, Z - 1.5, { step: 1.6, n: 4, seed: 41 });
+    LK.floorBands(g, (z) => [Rr(z) + 0.02, L(z) - 0.3, z], (z) => [Rr(z) + 0.02, y0 + 0.3, z], 1.0, Z - 1.5, { step: 1.6, n: 4, seed: 42, share: 0.5 });
+    for (const [z, r] of [[10, 2.4], [22, 2.2]]) g.glow('lantern', 1.5, L(z) + 0.6, z, { r, col: '#E6EEFF' });
+    g.glow('lantern', 1.5, L(Z) - 0.8, Z + 1.2, { r: 3.4, col: '#FFDCA0' }); g.glow('lantern', Rr(Z) - 1, -30, Z + 0.8, { r: 2.4, col: '#FFDCA0' });
   }, { name: 'walkie-talkie' });
   // the Cheesegrater: a steep wedge, its bracing showing on the sloping face
   T.obj([12, -36, 26, -22], function (g) {
@@ -87,6 +107,13 @@ SF.tile('city', 100, -100, { rim: 24 }, function (T) {
     const hz = []; for (let z = 3; z < Z; z += 3) { const a = g.p(x0, lerp(yb, yt, z / Z), z), b = g.p(x1, lerp(yb, yt, z / Z), z); hz.push(a[0], a[1], b[0], b[1]); } g.segs2(hz, '#9AB0BE', 0.3);
     g.fill([[x1 + 0.01, yb + 0.1, 0], [x1 + 0.01, yb - 2.0, 0], [x1 + 0.01, yb - 2.0, 6], [x1 + 0.01, yb + 0.1, 6]], '#E6A23C');
     g.outline(L, { w: 0.85, boil: false }); g.line([[x1, y0, 0], [x1, y0, Z], [x1, yt, Z]], { w: 0.75, boil: false }); g.line([[x0, yt, Z], [x0, y0, Z], [x1, y0, Z]], { w: 0.6, boil: false });
+    // at night: the offices lit behind the glass, the orange of its lift core shining
+    const CG = { '#B3C6D2': '#56738F', '#8EA7B6': '#3E5A76', '#E6A23C': '#FFB24A' };
+    g.mark({ nc: (c) => CG[c] }, 0);
+    LK.floorBands(g, (z) => [x0 + 0.3, lerp(yb, yt, z / Z) + 0.02, z], (z) => [x1 - 0.3, lerp(yb, yt, z / Z) + 0.02, z], 0.8, Z - 1.5, { step: 1.5, n: 4, seed: 43 });
+    LK.floorBands(g, (z) => [x1 + 0.02, lerp(yb, yt, z / Z) - 0.3, z], (z) => [x1 + 0.02, y0 + 0.3, z], 0.8, Z - 1.5, { step: 1.5, n: 3, seed: 44, share: 0.5 });
+    for (const [z, r] of [[8, 2.4], [22, 2.2]]) g.glow('lantern', 19, lerp(yb, yt, z / Z) + 0.6, z, { r, col: '#E6EEFF' });
+    g.glow('neon', x1 + 0.4, yb - 1, 3, { r: 2.4, col: '#FFB24A' });
   }, { name: 'cheesegrater' });
   // a plain City block or two to fill the skyline's feet
   T.obj([-14, -22, -4, -12], (g) => { K.box(g, -14, -22, -4, -12, 0, 14, { t: '#C9D1D6', l: '#DCE3E6', r: '#B9C4CA' }, { w: 0.8 }); for (let z = 1.5; z < 13; z += 2.2) { K.win(g, 'L', -11.98, -13.4, -4.6, z, z + 1.2, { style: 'glass' }); K.win(g, 'R', -3.98, -21.4, -12.6, z, z + 1.2, { style: 'glass' }); } }, { name: 'office' });
@@ -98,18 +125,21 @@ SF.tile('city', 100, -100, { rim: 24 }, function (T) {
     const x0 = 10, x1 = 34, y0 = 5, y1 = 14, MAR = '#8E2F3A', CRE = '#EDE3C8', h = 7.6;
     // shopfronts along the two sides of the arcade, the glass barrel roof on cream and maroon ironwork
     K.box(g, x0, y0, x1, y0 + 2.6, 0, h, { t: '#C9BDA0', l: CRE, r: '#D9CCAA' }, { w: 0.7 });
-    const SHOP = ['THE LAMB', 'CHEESE', 'FLOWERS', 'BOOKS', 'COFFEE', 'SHIRTS', 'WINE', 'BREAD']; let si = 0; for (let x = x0 + 0.8; x < x1 - 1; x += 3.0) { g.fill(K.on('L', y0 + 2.62, x, x + 2.4, 0, 3.6), MAR); g.fill(K.on('L', y0 + 2.64, x + 0.3, x + 2.1, 0.4, 3.0), '#E9CF92'); K.sign(g, 'L', y0 + 2.64, x, x + 2.4, 3.8, 4.6, '#3F6B4E', SHOP[si++ % SHOP.length], { ink: '#F3E3B0', line: false }); }
+    const SHOP = ['THE LAMB', 'CHEESE', 'FLOWERS', 'BOOKS', 'COFFEE', 'SHIRTS', 'WINE', 'BREAD']; let si = 0; for (let x = x0 + 0.8; x < x1 - 1; x += 3.0) { g.fill(K.on('L', y0 + 2.62, x, x + 2.4, 0, 3.6), MAR); g.fill(K.on('L', y0 + 2.64, x + 0.3, x + 2.1, 0.4, 3.0), '#E9CF92'); g.mark({ win: 1, nc: '#FFD08A' }); const i1 = g.cmds.length; K.sign(g, 'L', y0 + 2.64, x, x + 2.4, 3.8, 4.6, '#3F6B4E', SHOP[si++ % SHOP.length], { ink: '#F3E3B0', line: false }); g.mark({ nc: '#4A8A62' }, i1); }
     const arch = (x) => { const pts = []; for (let i = 0; i <= 10; i++) { const t = Math.PI * i / 10; pts.push([x, (y0 + y1) / 2 - Math.cos(t) * (y1 - y0) / 2, h + Math.sin(t) * 2.6]); } return pts; };
     const roof = []; for (let i = 0; i <= 10; i++) roof.push(arch(x0)[i]); for (let i = 10; i >= 0; i--) roof.push(arch(x1)[i]);
-    g.fill(arch(x0).concat(arch(x1).slice().reverse()), '#CFDFE6');
+    g.fill(arch(x0).concat(arch(x1).slice().reverse()), '#CFDFE6'); g.mark({ nc: '#E8D6A8' });   // the glass roof lit from inside at night
     const rb = []; for (let x = x0; x <= x1; x += 2.0) { const pts = arch(x); for (let i = 0; i < pts.length - 1; i++) { const a = g.p.apply(g, pts[i]), b = g.p.apply(g, pts[i + 1]); rb.push(a[0], a[1], b[0], b[1]); } } g.segs2(rb, MAR, 0.45);
     for (const i of [0, 3, 5, 7, 10]) g.fine([arch(x0)[i], arch(x1)[i]], { w: 0.35, c: MAR });
     K.box(g, x0, y1 - 2.6, x1, y1, 0, h, { t: '#C9BDA0', l: CRE, r: '#D9CCAA' }, { w: 0.75, faces: 'lr' });
-    for (let x = x0 + 0.8; x < x1 - 1; x += 3.0) { g.fill(K.on('L', y1 + 0.02, x, x + 2.4, 0.4, 3.0), '#E9CF92'); g.fill(K.on('L', y1 + 0.02, x, x + 2.4, 3.2, 4.0), MAR); K.win(g, 'L', y1 + 0.02, x + 0.5, x + 1.9, 4.8, 6.8, { style: 'navy', arch: true }); }
+    for (let x = x0 + 0.8; x < x1 - 1; x += 3.0) { g.fill(K.on('L', y1 + 0.02, x, x + 2.4, 0.4, 3.0), '#E9CF92'); g.mark({ win: 1, nc: '#FFCB78', spill: true }); g.fill(K.on('L', y1 + 0.02, x, x + 2.4, 3.2, 4.0), MAR); K.win(g, 'L', y1 + 0.02, x + 0.5, x + 1.9, 4.8, 6.8, { style: 'navy', arch: true }); }
     // the arcade's entrance arch on the east end, maroon with a gilded dragon
     const ea = [K.pt('R', x1 + 0.02, y0 + 2.6, 0)]; for (let i = 0; i <= 10; i++) { const t = Math.PI * i / 10; ea.push(K.pt('R', x1 + 0.02, (y0 + y1) / 2 - Math.cos(t) * 1.9, 5.2 + Math.sin(t) * 1.9)); } ea.push(K.pt('R', x1 + 0.02, y1 - 2.6, 0));
-    g.fill(K.on('R', x1 + 0.01, y0 + 2.6, y1 - 2.6, 0, h + 2.6), MAR); g.fill(ea, '#4A3A30'); g.outline(K.on('R', x1 + 0.01, y0 + 2.6, y1 - 2.6, 0, h + 2.6), { w: 0.6, boil: false });
+    g.fill(K.on('R', x1 + 0.01, y0 + 2.6, y1 - 2.6, 0, h + 2.6), MAR); g.fill(ea, '#4A3A30'); g.mark({ nc: '#C08C56', spill: true }); g.outline(K.on('R', x1 + 0.01, y0 + 2.6, y1 - 2.6, 0, h + 2.6), { w: 0.6, boil: false });
     const dr = g.p(x1 + 0.03, (y0 + y1) / 2, h + 1.6); g.disc2(dr, 1.0, '#D9A93E'); K.text(g, 'R', x1 + 0.04, (y0 + y1) / 2, h + 0.1, 0.55, 'LEADENHALL MARKET', '#E0B54A', { center: true, w: 0.4 });
+    // at night: lanterns hang down the arcade, the entrance glows
+    for (let x = x0 + 2; x < x1 - 1; x += 4) g.glow('lamp', x, (y0 + y1) / 2, h - 0.8, { r: 1.5 });
+    g.glow('lantern', x1 + 0.6, (y0 + y1) / 2, h + 1.6, { r: 1.8, col: '#FFD27A' });
   }, { name: 'leadenhall' });
   // a cab rank on the east side of the cathedral: three black cabs waiting
   for (const [x, i] of [[12, 0], [22, 1]]) T.obj([x - 5, 18, x + 5, 23], (g) => g.at(x, 20.5, 0, (g2) => LK.cab(g2, 0)), { name: 'cab rank' });

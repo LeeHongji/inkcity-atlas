@@ -156,8 +156,8 @@ SF.tile('park', 100, 100, { rim: 46 }, function (T) {
     const SAND = { t: '#E3CFA8', l: '#D9BE92', r: '#C6A87B' }, Z = 2.6;
     K.box(g, 3, -24, 19, -19.5, 0, Z, SAND, { w: 0.85 });
     // the arcade: three round arches in the face, dark inside, the middle one behind the stair
-    for (const [a0, a1] of [[4.2, 7.4], [15, 18.2]]) { K.win(g, 'L', -19.48, a0, a1, 0, Z - 0.35, { style: 'dark', arch: true, w: 0.5 }); }
-    K.win(g, 'R', 19.02, -23.4, -20.2, 0, Z - 0.35, { style: 'dark', arch: true, w: 0.5 });
+    for (const [a0, a1] of [[4.2, 7.4], [15, 18.2]]) { g.lit({ nc: '#FBC76E' }, () => K.win(g, 'L', -19.48, a0, a1, 0, Z - 0.35, { style: 'dark', arch: true, w: 0.5 })); g.glow('lantern', (a0 + a1) / 2, -19.2, 1.2, { r: 2.0, col: '#FFC27A' }); }   // the arcade lit at night
+    g.lit({ nc: '#FBC76E' }, () => K.win(g, 'R', 19.02, -23.4, -20.2, 0, Z - 0.35, { style: 'dark', arch: true, w: 0.5 })); g.glow('lantern', 19.3, -21.8, 1.2, { r: 2.0, col: '#FFC27A' });
     // the balustrade along the edge, broken by the stair
     const bal = (a0, a1) => { K.box(g, a0, -19.9, a1, -19.5, Z, Z + 1.1, { t: '#EBDAB6', l: '#E3CFA8', r: '#CDB48A' }, { w: 0.45, boil: false }); const s = []; for (let a = a0 + 0.35; a < a1; a += 0.55) { const p0 = g.p(a, -19.45, Z + 0.15), p1 = g.p(a, -19.45, Z + 0.85); s.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(s, '#B39F7C', 0.35); };
     bal(3, 8); bal(14, 19);
@@ -188,6 +188,10 @@ SF.tile('park', 100, 100, { rim: 46 }, function (T) {
     g.fill2([s(1.0, -9.8), s(4.6, -11.4), s(4.8, -10.8), s(1.2, -8.8)], BR, true); g.disc2(s(5.1, -11.5), 0.65, '#E9E1CC');
     g.fill2([s(-1.0, -9.6), s(-2.0, -7.2), s(-1.4, -7.0), s(-0.6, -8.6)], BR, true);
     for (const pl of [wingL, wingR, robe]) g.line2(pl.concat([pl[0]]), { w: 0.4, c: INK, boil: false, wob: 0.2 });
+    // at night the fountain is lit: the water from below, the angel from her basin
+    NK.nmark(g, 0, { nc: (cc) => ({ '#B7D3E1': '#9CD2F0', '#A9CBDD': '#8CC8EC' })[cc] });
+    NK.nmark(g, 0, { nc: (cc) => ({ [BR]: '#A9CDB2', [BD]: '#7FA48C', '#E9E1CC': '#FFF4DA' })[cc] });
+    g.glow('lantern', x, y, 1.2, { r: 3.4, col: '#D6ECFF' }); g.glow('lantern', x, y, 6.5, { r: 3.0, col: '#FFF0D0' });
   }, { name: 'fountain' });
   // the falling water: a ring of drops from the upper basin into the pool, rings spreading
   T.actor({ sample: 5, period: 10, grow: false,
@@ -200,8 +204,8 @@ SF.tile('park', 100, 100, { rim: 46 }, function (T) {
         segs.push(top[0], top[1], lerp(top[0], bot[0], 0.5) + Math.cos(a) * 0.4, lerp(top[1], bot[1], 0.55), lerp(top[0], bot[0], 0.5) + Math.cos(a) * 0.4, lerp(top[1], bot[1], 0.55), bot[0], bot[1]);
         const k = ((i * 7 + st.f) % 6) / 6; drops.push([lerp(top[0], bot[0], k), lerp(top[1], bot[1], k)]);
       }
-      g.segs2(segs, 'rgba(236,246,250,0.85)', 0.75);
-      for (const d of drops) g.disc2(d, 0.45, '#F6FAFC');
+      g.segs2(segs, 'rgba(236,246,250,0.85)', 0.75); g.cmds[g.cmds.length - 1].nc = 'rgba(236,246,255,0.9)';   // lit at night
+      for (const d of drops) { g.disc2(d, 0.45, '#F6FAFC'); g.mark({ nc: true }); }
       const rr = 2.8 + (st.f / 6) * 1.2; g.line(K.arc(0, 0, 0.92, rr, 0, Math.PI, 14), { w: 0.4, c: 'rgba(246,250,252,0.9)', boil: false, wob: 0.3 });
     } });
 

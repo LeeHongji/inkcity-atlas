@@ -36,7 +36,10 @@ SF.tile('zanipolo', -100, -100, { rim: 4 }, function (T) {
     g.fill(VN.archPts('L', F + 0.01, -24.6, -21.4, 0, 6.8, 'round', 0), '#5A3E2E');
     for (const a of [-25.4, -20.6]) { const p0 = g.p(a, F + 0.02, 0), p1 = g.p(a, F + 0.02, 6.4); g.line2([p0, p1], { w: 0.9, c: '#D9B8A4', boil: false, ext: 0 }); }
     const rc = g.p(-23, F, 13.4); g.fill2(arcPts(rc[0], rc[1], 3.2, 0, TAU, 16).map((q) => [q[0], rc[1] + (q[1] - rc[1]) * 1.15 - (q[0] - rc[0]) * 0.52]), '#F0E9DD', true); g.fill2(arcPts(rc[0], rc[1], 2.3, 0, TAU, 16).map((q) => [q[0], rc[1] + (q[1] - rc[1]) * 1.15 - (q[0] - rc[0]) * 0.52]), '#4F5963', true);
-    for (const a of [-34, -29, -17, -12]) VN.win(g, 'L', F, a + 1.2, a + 2.6, 3.0, 8.4, { arch: 'gothic', sh: null, pane: '#4F5963' });
+    for (const a of [-34, -29, -17, -12]) VN.win(g, 'L', F, a + 1.2, a + 2.6, 3.0, 8.4, { arch: 'gothic', sh: null, pane: '#4F5963', lit: 0.5 });
+    // at night: the portal floodlit, the rose window glowing faintly from inside
+    g.mark({ nc: (c) => (c === '#F0E9DD' ? '#E8C89A' : c === '#D9B8A4' ? '#D9A47E' : c === '#4F5963' ? '#8E6A4C' : undefined) }, 0);
+    g.glow('lantern', -23, F + 1, 4.2, { r: 2.6, col: '#FFD39A' }); g.glow('lantern', -23, F + 1, 13.4, { r: 1.8, col: '#FFC27A' });
     for (const [x, z] of [[-29, 21], [-23, 24], [-17, 21], [x0 + 0.4, 13], [x1 - 0.4, 13]]) { const c = g.p(x, F, z); g.fill2([[c[0] - 0.6, c[1]], [c[0] + 0.6, c[1]], [c[0], c[1] - 3.4]], '#F0E9DD', true); g.disc2([c[0], c[1] - 3.6], 0.4, C.gold); }
   }, { name: 'santi giovanni e paolo' });
 
@@ -50,15 +53,18 @@ SF.tile('zanipolo', -100, -100, { rim: 4 }, function (T) {
     // coloured marble panels, the windows, the trompe-l'oeil arches with lions at the ground floor, the portal
     for (const [a, b] of [[x0 + 0.8, x0 + 6.8], [8.2, 14.2]]) { g.fill(K.on('L', F, a, b, 0.8, 5.4), '#C9D3C8'); g.fill(VN.archPts('L', F + 0.01, a + 0.6, b - 0.6, 1.2, 5.0, 'round', 0), '#A9B8B0'); const q = g.p((a + b) / 2, F + 0.02, 1.6); g.fill2([[q[0] - 2.2, q[1]], [q[0] + 1.8, q[1] - 0.6], [q[0] + 2.0, q[1] - 2.4], [q[0] + 0.6, q[1] - 3.2], [q[0] - 1.8, q[1] - 2.0]], '#E2D3BC', true); }
     VN.door(g, 'L', F, -0.6, 2.6, 6.0, { arch: 'round', col: '#4A3A30' });
-    for (const zf of [7.2]) for (const a of [-7.6, -4.6, 4.2, 7.6, 11.6]) VN.win(g, 'L', F, a, a + 1.4, zf, zf + 3.4, { arch: 'round', sh: null, pane: '#55606A', frameCol: '#F6F1E8' });
-    for (let a = -34; a < -19; a += 2.6) VN.win(g, 'R', x1 + 0.02, a, a + 1.2, 7.2, 10.4, { arch: 'round', sh: null, pane: '#55606A' });
-    K.sign(g, 'L', F + 0.01, -1.8, 3.8, 6.6, 7.0, '#F1ECE1', 'OSPEDALE', { ink: '#B5303A' });
+    for (const zf of [7.2]) for (const a of [-7.6, -4.6, 4.2, 7.6, 11.6]) VN.win(g, 'L', F, a, a + 1.4, zf, zf + 3.4, { arch: 'round', sh: null, pane: '#55606A', frameCol: '#F6F1E8', lit: 0.9 });
+    for (let a = -34; a < -19; a += 2.6) VN.win(g, 'R', x1 + 0.02, a, a + 1.2, 7.2, 10.4, { arch: 'round', sh: null, pane: '#55606A', lit: 0.9 });
+    { const i0 = g.cmds.length; K.sign(g, 'L', F + 0.01, -1.8, 3.8, 6.6, 7.0, '#F1ECE1', 'OSPEDALE', { ink: '#B5303A' }); g.mark({ nc: true }, i0); }
+    // at night the hospital's front is floodlit, its door lit (a hospital never sleeps)
+    g.mark({ nc: (c) => (c === '#F1ECE1' || c === '#E9E3D6' || c === '#DED7C9' || c === '#C9D3C8' || c === '#A9B8B0' || c === '#E2D3BC' ? VN.litStone(0.7)(c) : undefined) }, 0);
+    g.glow('lamp', 1, F + 0.7, 6.4, { r: 1.6 }); for (const a of [-5, 11]) g.glow('lantern', a, F + 1, 9.5, { r: 2.2, col: '#FFE2B0' });
   }, { name: 'scuola grande' });
   H({ x0: 17, y0: -37, x1: 27, y1: -24, n: 3, col: P[4], chim: [[21, -32]], shopL: [18.5, 25.5, '#3E5A44', 'FARMACIA'] });
-  H({ x0: 27, y0: -37, x1: 37, y1: -24, n: 3, z0: VN.WL, col: P[1], chim: [[31, -32], [34, -28, 'square']], altana: [32, -31, { wash: ['#F3F1EA', '#E6C24F', '#F3F1EA'] }] });
+  H({ x0: 27, y0: -37, x1: 37, y1: -24, n: 3, z0: VN.WL, dry: true, col: P[1], chim: [[31, -32], [34, -28, 'square']], altana: [32, -31, { wash: ['#F3F1EA', '#E6C24F', '#F3F1EA'] }] });
   H({ x0: -37, y0: -8, x1: -27, y1: 8, n: 3, col: P[6], chim: [[-32, -3]], shopR: [-6, 6, '#7A2E35', 'PASTICCERIA'] });
   H({ x0: -37, y0: 10, x1: -27, y1: 26, n: 4, col: P[0], chim: [[-32, 14], [-32, 21]], balcony: ['R', 18, ['#C9463E', '#E6C24F']] });
-  H({ x0: -37, y0: 28, x1: -24, y1: 37, n: 3, z0: VN.WL, col: P[2], roof: 'x', chim: [[-30, 32]] });
+  H({ x0: -37, y0: 28, x1: -24, y1: 37, n: 3, z0: VN.WL, dry: true, col: P[2], roof: 'x', chim: [[-30, 32]] });
 
   /* ---------- the Colleoni ---------- */
   T.obj([1, 3, 6, 9], function (g) {
@@ -90,7 +96,7 @@ SF.tile('zanipolo', -100, -100, { rim: 4 }, function (T) {
   for (const [y, ph] of [[12, 0], [24, 1]]) T.obj([37.6, y - 4.4, 40.4, y + 4.4], (g) => g.at(39, y, VN.WL, (g2) => VN.drawBoat(g2, 'ambulanza', Math.PI / 2, -99, 99, { seed: 1500 + y, flash: ph })), { name: 'moored ambulance' });
   for (const y of [5.5, 18, 30]) T.obj([37.4, y], (g) => VN.palina(g, 37.4, y, { c1: '#C9463E', c2: '#F3F1EA', h: 5.5 }), { name: 'palina' });
   for (const [x, y] of [[-14, 30], [8, 30]]) T.cast([x, y], function (g) {
-    VN.table(g, x, y, 0, { cups: ['#F3F1EA', '#5A3E2E'] });
+    VN.table(g, x, y, 0, { cups: ['#F3F1EA', '#5A3E2E'] }); VN.glowDry(g, 'lantern', x, y, 2.9, { r: 0.7, col: '#FFC870' });
     VN.person(g, x - 1.4, y - 0.8, 1.3, VN.who(1510 + Math.round(x), { dir: 0, pose: 'sit' })); VN.person(g, x + 1.5, y + 0.6, 1.3, VN.who(1520 + Math.round(x), { dir: 2, pose: 'sit' }));
   }, { name: 'café' });
   T.obj([-5, 20], (g) => VN.well(g, -5, 20), { name: 'well' });
@@ -126,7 +132,7 @@ SF.tile('zanipolo', -100, -100, { rim: 4 }, function (T) {
   Wk(1553, [[30, 34], [30, -16]], 1.2, 0.6); Wk(-1554, [[-14, -4], [12, -4], [12, -12], [-14, -12]], 0.8, 0.1, { kind: 'cape' });
   const dogW = VN.who(1555, { fedora: '#3B3F47' });
   VN.walker(T, dogW, [[-18, 14], [24, 14], [24, 26], [-18, 26]], 1.1, { phase: 0.3, extra: (g, st) => { const s = st.dir === 0 || st.dir === 3 ? 1 : -1, p = g.p(0, 0, 0), d = [p[0] + s * 4.6, p[1] + 1.2]; g.line2([[p[0] + s * 1.2, p[1] - 5.6], d], { w: 0.25, c: '#3A3530', boil: false, ext: 0 }); g.fill2([[d[0] - 1.4, d[1]], [d[0] + 1.4, d[1]], [d[0] + 1.6, d[1] - 1.6], [d[0] - 1.4, d[1] - 1.6]], '#C9A26B', true); g.disc2([d[0] + s * 1.6, d[1] - 2.0], 0.8, '#C9A26B'); } });
-  T.cast([-8, 6], (g) => { VN.person(g, -8.6, 5.4, 0, VN.carnival(1560, 'gown', { dir: 0, pose: 'hold' })); VN.person(g, -7.2, 6.8, 0, VN.carnival(1561, 'bauta', { dir: 0, pose: 'hold' })); const r = VN.person(g, -3.8, 7.6, 0, VN.who(1562, { dir: 2, pose: 'hold' })); const h = r.hands[0]; g.fill2([[h[0] - 1, h[1] - 1.8], [h[0] + 0.4, h[1] - 1.8], [h[0] + 0.4, h[1]], [h[0] - 1, h[1]]], '#2A2622', true); }, { name: 'selfie' });
+  T.cast([-8, 6], (g) => { VN.person(g, -8.6, 5.4, 0, VN.carnival(1560, 'gown', { dir: 0, pose: 'hold' })); VN.person(g, -7.2, 6.8, 0, VN.carnival(1561, 'bauta', { dir: 0, pose: 'hold' })); const r = VN.person(g, -3.8, 7.6, 0, VN.who(1562, { dir: 2, pose: 'hold' })); const h = r.hands[0]; g.fill2([[h[0] - 1, h[1] - 1.8], [h[0] + 0.4, h[1] - 1.8], [h[0] + 0.4, h[1]], [h[0] - 1, h[1]]], '#2A2622', true); g.mark({ nc: '#D6E8FF' }); g.glow2('neon', [h[0] - 0.3, h[1] - 0.9], [h[0] - 0.3, h[1] - 0.9], { r: 0.8, col: '#CFE4FF' }); }, { name: 'selfie' });
   T.cast([10, 18], (g) => { K.bench(g, 10, 18, { face: 'L', L: 3 }); VN.person(g, 9.2, 18, 1.3, VN.who(1570, { dir: 1, pose: 'sit', hair: '#8E8A84', fedora: '#3B3F47' })); VN.person(g, 10.9, 18.1, 1.3, VN.who(1571, { dir: 1, pose: 'sit', hair: '#B9B4AC', hairStyle: 'bun', dress: '#5A4A6A' })); }, { name: 'bench' });
   T.cast([20, 4], (g) => { VN.person(g, 19.4, 3.4, 0, VN.carnival(1572, 'medico', { dir: 1, pose: 'stand' })); VN.person(g, 21.2, 4.8, 0, VN.carnival(1573, 'gown', { dir: 2, pose: 'wave', ph: 0.2 })); VN.person(g, 22.6, 2.6, 0, VN.who(1574, { dir: 2, k: 0.74, pose: 'cheer', ph: 0.4 })); }, { name: 'masks' });
   for (let i = 0; i < 6; i++) { const hx = -10 + h1(i * 2.3) * 8, hy = 12 + h1(i * 4.1) * 6; T.actor({ sample: 5, period: 3, at(t) { const f = Math.floor(t * 2 + i) % 3; return { x: hx, y: hy, key: f, f }; }, draw(g, st) { VN.pigeon(g, g.p(0, 0, 0), st.f ? 'peck' : 'stand', 0, i % 2 ? 1 : -1); } }); }

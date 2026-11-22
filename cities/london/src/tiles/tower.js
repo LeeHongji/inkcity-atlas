@@ -12,6 +12,8 @@
    What moves: ravens hopping, walkers, the Union flag on the White Tower. */
 SF.tile('tower', 0, 0, { rim: 22 }, function (T) {
   const H = 37, RN = LT.RIV.N - 1.2, STONE = '#D8D1C0', WHITE = '#E9E4D8', GRASS = '#A6C97C';
+  // at night the Tower is floodlit warm white: the walls and towers along the moat and the wharf, the White Tower brightest
+  const FL = (g, k) => LK.flood(g, 0, k == null ? 0.7 : k, LK.FLOOD.warm, (c) => (c === LK.C.slate || c === LK.C.slateD || c === LK.C.lead ? mix(nightColour(c), '#C8945A', 0.15) : undefined));
   T.ground(function (g) {
     LK.ground(g, -H, -H, H, RN, '#E2DED3');
     // the moat: a ring of lawn on the three land sides
@@ -32,10 +34,10 @@ SF.tile('tower', 0, 0, { rim: 22 }, function (T) {
   }, { rim: true });
 
   /* ---------------- the outer wall, its bastions, St Thomas's Tower ---------------- */
-  const wall = (x0, y0, x1, y1, h) => T.obj([x0, y0, x1, y1], (g) => LK.keep(g, x0, y0, x1, y1, h, STONE, { w: 0.7 }), { name: 'wall' });
+  const wall = (x0, y0, x1, y1, h) => T.obj([x0, y0, x1, y1], (g) => { LK.keep(g, x0, y0, x1, y1, h, STONE, { w: 0.7 }); FL(g); if (y1 > 16 || x1 > 26) g.glow('lantern', (x0 + x1) / 2 + (x1 > 26 ? 0.6 : 0), y1 + 0.6, 1.6, { r: 2.2, col: '#FFE0AE' }); }, { name: 'wall' });
   wall(-27, -27, -25, -4); wall(-27, -4, -25, 17); wall(-25, -27, 0, -25); wall(0, -27, 25, -25); wall(25, -25, 27, -4); wall(25, -4, 27, 17);
   wall(-25, 17, -14, 19); wall(-14, 17, -6.5, 19); wall(3, 17, 14, 19); wall(14, 17, 25, 19);
-  for (const [x, y] of [[-26, -26], [26, -26], [-26, 18], [26, 18]]) T.obj([x - 3, y - 3, x + 3, y + 3], (g) => LK.roundTower(g, x, y, 2.9, 4.4, STONE), { name: 'bastion' });
+  for (const [x, y] of [[-26, -26], [26, -26], [-26, 18], [26, 18]]) T.obj([x - 3, y - 3, x + 3, y + 3], (g) => { LK.roundTower(g, x, y, 2.9, 4.4, STONE); FL(g); g.glow('lantern', x + 2.2, y + 2.2, 1.6, { r: 2.2, col: '#FFE0AE' }); }, { name: 'bastion' });
   // St Thomas's Tower over Traitors' Gate: a building on the wall with a dark water arch facing the wharf
   T.obj([-6.5, 15.5, 3, 20.5], (g) => {
     LK.keep(g, -6.5, 15.5, 3, 20.5, 6.2, STONE, { battle: false });
@@ -44,16 +46,17 @@ SF.tile('tower', 0, 0, { rim: 22 }, function (T) {
     for (const x of [-5.4, 2.2]) K.win(g, 'L', 20.52, x - 0.4, x + 0.4, 3.8, 5.4, { style: 'dark', arch: true, col: '#4A4E58', w: 0.3 });
     K.hip(g, -6.7, 15.3, 3.2, 20.7, 6.2, 2.0, LK.C.slate, { ridge: 5, c: '#4A515C', w: 0.6 });
     for (const x of [-6.0, 2.5]) { K.cyl(g, x, 20.0, 0.9, 0, 8.2, { t: '#CFC8B6', l: STONE, r: shade(STONE, 0.15) }, { w: 0.55, n: 8 }); K.cone(g, x, 20.0, 1.05, 8.2, 1.6, LK.C.lead); }
+    FL(g, 0.8); for (const x of [-4.4, 1.2]) g.glow('lantern', x, 21.1, 4.4, { r: 2.2, col: '#FFE0AE' });
   }, { name: 'st thomas' });
 
   /* ---------------- the inner wall and its towers ---------------- */
-  const iw = (x0, y0, x1, y1) => T.obj([x0, y0, x1, y1], (g) => LK.keep(g, x0, y0, x1, y1, 4.6, STONE, { w: 0.7 }), { name: 'inner wall' });
+  const iw = (x0, y0, x1, y1) => T.obj([x0, y0, x1, y1], (g) => { LK.keep(g, x0, y0, x1, y1, 4.6, STONE, { w: 0.7 }); FL(g, 0.55); }, { name: 'inner wall' });
   iw(-20.5, -20.5, -19, -8); iw(-20.5, -1, -19, 11); iw(-19, -20.5, 0, -19); iw(0, -20.5, 19, -19); iw(19, -19, 20.5, -6); iw(19, 0, 20.5, 11); iw(-19, 11, -12, 12.5); iw(-6, 11, 2, 12.5); iw(6, 11, 19, 12.5);
-  T.obj([-22, -8, -17.5, -1], (g) => { LK.keep(g, -22, -8, -17.5, -1, 6.6, STONE); for (const y of [-6, -3]) K.win(g, 'R', -17.48, y - 0.5, y + 0.5, 2.6, 4.4, { style: 'dark', arch: true, col: '#4A4E58', w: 0.3 }); }, { name: 'beauchamp' });
-  T.obj([17.5, -6, 22, 0], (g) => { LK.keep(g, 17.5, -6, 22, 0, 6.2, STONE); }, { name: 'constable' });
-  for (const [x, y, r, h] of [[-19.8, -19.8, 2.3, 6.0], [19.8, -19.8, 2.3, 6.4], [-19.8, 11.8, 2.4, 6.0], [19.8, 11.8, 2.4, 6.2], [-9, 11.8, 2.8, 6.8]]) T.obj([x - r, y - r, x + r, y + r], (g) => LK.roundTower(g, x, y, r, h, STONE), { name: 'round tower' });
+  T.obj([-22, -8, -17.5, -1], (g) => { LK.keep(g, -22, -8, -17.5, -1, 6.6, STONE); for (const y of [-6, -3]) K.win(g, 'R', -17.48, y - 0.5, y + 0.5, 2.6, 4.4, { style: 'dark', arch: true, col: '#4A4E58', w: 0.3 }); FL(g, 0.6); }, { name: 'beauchamp' });
+  T.obj([17.5, -6, 22, 0], (g) => { LK.keep(g, 17.5, -6, 22, 0, 6.2, STONE); FL(g, 0.6); }, { name: 'constable' });
+  for (const [x, y, r, h] of [[-19.8, -19.8, 2.3, 6.0], [19.8, -19.8, 2.3, 6.4], [-19.8, 11.8, 2.4, 6.0], [19.8, 11.8, 2.4, 6.2], [-9, 11.8, 2.8, 6.8]]) T.obj([x - r, y - r, x + r, y + r], (g) => { LK.roundTower(g, x, y, r, h, STONE); FL(g, 0.6); }, { name: 'round tower' });
   // the Bloody Tower gateway into the inner ward
-  T.obj([2, 10.5, 6, 13], (g) => { LK.keep(g, 2, 10.5, 6, 13, 7.0, STONE); const a = [K.pt('L', 13.02, 2.8, 0)]; for (let i = 0; i <= 8; i++) { const t = Math.PI * i / 8; a.push(K.pt('L', 13.02, 4 - 1.2 * Math.cos(t), 2.6 + 1.2 * Math.sin(t))); } a.push(K.pt('L', 13.02, 5.2, 0)); g.fill(a, '#4A4640'); }, { name: 'bloody tower' });
+  T.obj([2, 10.5, 6, 13], (g) => { LK.keep(g, 2, 10.5, 6, 13, 7.0, STONE); const a = [K.pt('L', 13.02, 2.8, 0)]; for (let i = 0; i <= 8; i++) { const t = Math.PI * i / 8; a.push(K.pt('L', 13.02, 4 - 1.2 * Math.cos(t), 2.6 + 1.2 * Math.sin(t))); } a.push(K.pt('L', 13.02, 5.2, 0)); g.fill(a, '#4A4640'); g.mark({ nc: '#B98A52', spill: true }); FL(g, 0.6); }, { name: 'bloody tower' });
 
   /* ---------------- inside: the White Tower, the Waterloo Block, the chapel ---------------- */
   T.obj([-7.5, -11, 7.5, 3.6], function (g) {
@@ -80,15 +83,21 @@ SF.tile('tower', 0, 0, { rim: 22 }, function (T) {
     K.cyl(g, x1 - 0.4, y0 + 0.4, 1.5, h, h + 3.0, tone, { w: 0.7, n: 10 }); LK.cupola(g, x1 - 0.4, y0 + 0.4, h + 3.0, 1.5);
     sq(x0 + 0.6, y1 - 0.6); sq(x1 - 0.6, y1 - 0.6);
     LK.pole(g, x1 - 0.4, y0 + 0.4, h + 3.0, 6.5);
+    // at night: floodlit from the inner ward, the brightest thing in the Tower
+    LK.flood(g, 0, 1, LK.FLOOD.warm, (c) => (c === '#A9855C' || c === '#8E6E4C' || c === '#7A5A3C' || c === '#6A4A30' ? undefined : c === LK.C.lead || c === shade(LK.C.lead, 0.15) ? mix(nightColour(c), '#C8945A', 0.3) : undefined));
+    for (const [x, z, r] of [[3.2, 3.5, 3.0], [3.2, 9, 2.4], [-6, 8, 2.2]]) g.glow('lantern', x, y1 + 0.7, z, { r, col: '#FFE6B8' });
+    for (const [y, z, r] of [[-7, 4, 2.6], [-3, 9, 2.2]]) g.glow('lantern', x1 + 0.7, y, z, { r, col: '#FFE6B8' });
   }, { name: 'white tower' });
   LK.flag(T, 6.1, -9.6, 11.5 + 3.0 + 6.5, { L: 3.6, H: 2.0, ph: 0.2 });
   T.obj([-2, -18.5, 17.5, -14.5], (g) => {
     K.box(g, -2, -18.5, 17.5, -14.5, 0, 6.2, { t: '#C9C2B0', l: '#DAD3C2', r: '#C3BBA8' }, { w: 0.8 });
     for (let x = -0.6; x < 17; x += 2.6) { if (x > 5.5 && x < 9.5) continue; K.win(g, 'L', -14.48, x, x + 1.0, 1.6, 3.4, { style: 'navy' }); K.win(g, 'L', -14.48, x, x + 1.0, 4.0, 5.4, { style: 'navy' }); }
-    g.fill(K.on('L', -14.46, 6.6, 8.8, 0, 3.4), '#3A3833'); g.fill(K.on('L', -14.44, 6.2, 9.2, 3.6, 4.4), '#C8372D');
+    g.fill(K.on('L', -14.46, 6.6, 8.8, 0, 3.4), '#3A3833'); g.mark({ nc: '#D9A860', spill: true }); g.fill(K.on('L', -14.44, 6.2, 9.2, 3.6, 4.4), '#C8372D');
     K.gable(g, -2.3, -18.8, 17.8, -14.2, 6.2, 2.0, 'x', { a: LK.C.slate, b: LK.C.slateD, e: '#DAD3C2' }, { w: 0.65, c: '#4A515C' });
+    FL(g, 0.4);
+    g.glow('lamp', 7.7, -14.0, 4.0, { r: 1.3 });                                                // the lamp over the Jewel House door
   }, { name: 'waterloo block' });
-  T.obj([-18, -18, -13, -14.5], (g) => { K.box(g, -18, -18, -13, -14.5, 0, 4.4, { t: '#C2B8A2', l: '#D0C5AE', r: '#B9AE96' }, { w: 0.7 }); K.win(g, 'L', -14.48, -16.6, -15.6, 1.2, 3.4, { style: 'dark', arch: 'gothic', col: '#4E5258', w: 0.35 }); K.gable(g, -18.2, -18.2, -12.8, -14.3, 4.4, 2.2, 'x', { a: LK.C.slate, b: LK.C.slateD, e: '#D0C5AE' }, { w: 0.6 }); K.box(g, -18.6, -17.6, -16.4, -15.4, 0, 7.4, { t: '#C2B8A2', l: '#D0C5AE', r: '#B9AE96' }, { w: 0.6 }); LK.battle(g, -18.6, -17.6, -16.4, -15.4, 7.4, '#D0C5AE', { mw: 0.5, st: 1.0, mh: 0.6 }); }, { name: 'chapel' });
+  T.obj([-18, -18, -13, -14.5], (g) => { K.box(g, -18, -18, -13, -14.5, 0, 4.4, { t: '#C2B8A2', l: '#D0C5AE', r: '#B9AE96' }, { w: 0.7 }); K.win(g, 'L', -14.48, -16.6, -15.6, 1.2, 3.4, { style: 'dark', arch: 'gothic', col: '#4E5258', w: 0.35 }); K.gable(g, -18.2, -18.2, -12.8, -14.3, 4.4, 2.2, 'x', { a: LK.C.slate, b: LK.C.slateD, e: '#D0C5AE' }, { w: 0.6 }); K.box(g, -18.6, -17.6, -16.4, -15.4, 0, 7.4, { t: '#C2B8A2', l: '#D0C5AE', r: '#B9AE96' }, { w: 0.6 }); LK.battle(g, -18.6, -17.6, -16.4, -15.4, 7.4, '#D0C5AE', { mw: 0.5, st: 1.0, mh: 0.6 }); FL(g, 0.6); }, { name: 'chapel' });
   // the sentry box and the guardsman at the Jewel House door
   T.obj([4.0, -14.2, 5.8, -12.6], (g) => { K.box(g, 4.0, -14.2, 5.8, -12.6, 0, 7.6, { t: '#2E3A33', l: '#3E4E44', r: '#2E3A33' }, { w: 0.55 }); g.fill(K.on('L', -12.58, 4.3, 5.5, 0, 6.6), '#2A2622'); K.gable(g, 3.8, -14.4, 6.0, -12.4, 7.6, 1.2, 'x', '#2E3A33', { w: 0.5 }); LK.person(g, 4.9, -12.9, 0, LK.guard(41, { dir: 1, rifle: false })); }, { name: 'sentry box' });
 
@@ -124,7 +133,7 @@ SF.tile('tower', 0, 0, { rim: 22 }, function (T) {
   LK.walker(T, LK.tourist(1311), [[34, 21.0], [-34, 21.0]], 1.6, { phase: 0.5 });
   LK.walker(T, LK.who(1312), [[-34, 27.2], [34, 27.2]], 1.3, { phase: 0.7 });
   LK.walker(T, LK.tourist(1313), [[-23, 14.4], [23, 14.4]], 1.5, { phase: 0.3 });
-  LK.walker(T, LK.beefeater(13), [[22, 15.2], [-22, 15.2]], 1.2, { phase: 0.6 });
+  LK.walker(T, LK.beefeater(13), [[22, 15.2], [-22, 15.2]], 1.2, { phase: 0.6, lantern: true });   // at night: the Ceremony of the Keys' lantern
   LK.walker(T, LK.tourist(1314), [[-35, 12], [-28, 12], [-28, 14.6], [-35, 14.6]], 1.3, { phase: 0.2 });
   LK.walker(T, LK.who(1315), [[7, -6], [16, -6], [16, 7], [7, 7]], 1.2, { phase: 0.4 });
   LK.walker(T, LK.tourist(1316), [[-2, 6], [16, 6]], 1.5, { phase: 0.8 });

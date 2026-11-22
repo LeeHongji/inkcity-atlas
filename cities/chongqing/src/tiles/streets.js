@@ -85,6 +85,10 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     g.segs2(rs, '#6A6358', 0.3);
     const tr = [[E0, -61], [-39, 39], [61, S.POD]].map(([a, b]) => [g.p(152.6, a, 1.5), g.p(152.6, b, 1.5)]).concat([[g.p(E0, 152.6, 1.5), g.p(S.POD, 152.6, 1.5)]]);
     for (const [a, b] of tr) g.line2([a, b], { w: 0.55, c: '#4E4840', boil: false, ext: 0 });
+    // at night: a lamp on every eighth railing post along the promenades, and lights set in the quay walls below them,
+    // laying columns of light on the rivers
+    for (let k = 0; k < railJ.length; k += 4) { const y = railJ[k]; if (k % 8 === 0) g.glow('lamp', 152.6, y, 1.6, { r: 0.9, base: 0 }); else g.glow('lantern', S.Q + 0.05, y, -1.6, { r: 0.75, col: '#FFC27A', base: S.SHZ }); }
+    for (let k = 0; k < railY.length; k += 4) { const x = railY[k]; if (k % 8 === 0) g.glow('lamp', x, 152.6, 1.6, { r: 0.9, base: 0 }); else g.glow('lantern', x, S.Q + 0.05, -1.6, { r: 0.75, col: '#FFC27A', base: S.SHZ }); }
     // the map's far ends are plain cut lines
     g.line([[137, E0, 0], [S.Q, E0, 0]], { w: 0.8, boil: false }); g.line([[E0, 137, 0], [E0, S.Q, 0]], { w: 0.8, boil: false });
     // river fog: soft layered bands lying low over the water and the foot of the quays, thinning away from the bank
@@ -103,8 +107,9 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
       const mat = K.rect(x0, y, x0 + 5.5, y + 4.5, 0); g.fill(mat, R.pick(['#3F6FA8', '#C8392E', '#E6B84A', '#3F8F5A', '#D9CDB4'])); g.outline(mat, { w: 0.35, c: '#5A564E', boil: false });
       for (let k = 0; k < 10; k++) { const p = g.p(x0 + 0.8 + (k % 5) * 1.0, y + 1.0 + Math.floor(k / 5) * 2.2, 0.3); g.disc2(p, 0.9, cols[k % 3]); }
       const b = g.p(x0 + 6.4, y + 3.6, 0); g.fill2([[b[0] - 1.6, b[1]], [b[0] + 1.6, b[1]], [b[0] + 1.9, b[1] - 2.2], [b[0] - 1.9, b[1] - 2.2]], '#B89A62', true); g.disc2([b[0], b[1] - 2.6], 1.5, cols[0]);
+      g.glow('lamp', x0 + 6.4, y + 3.6, 1.1, { r: 0.7 });                        // a stall lamp clipped to the basket (night)
     }
-    for (const y of [-26, -6, 14, 30, 80, 110, -90, -120]) { const c = []; for (let k = 0; k < 14; k++) { const a = TAU * k / 14; c.push([50 + Math.cos(a) * 4, y + Math.sin(a) * 4, 0]); } g.fill(c, '#B07A5A'); g.fill(c.map((p) => [50 + (p[0] - 50) * 0.8, y + (p[1] - y) * 0.8, 0.4]), '#7FA35E'); const R2 = RNG(y + 500); for (let k = 0; k < 16; k++) { const a = R2() * TAU, d = R2() * 2.8, p = g.p(50 + Math.cos(a) * d, y + Math.sin(a) * d, 0.5); g.disc2(p, 0.7, R2.pick(['#D9442F', '#F2C230', '#F1D5DD', '#F4F1E8', '#E08A3C'])); } }
+    for (const y of [-26, -6, 14, 30, 80, 110, -90, -120]) { const c = []; for (let k = 0; k < 14; k++) { const a = TAU * k / 14; c.push([50 + Math.cos(a) * 4, y + Math.sin(a) * 4, 0]); } g.fill(c, '#B07A5A'); g.fill(c.map((p) => [50 + (p[0] - 50) * 0.8, y + (p[1] - y) * 0.8, 0.4]), '#7FA35E'); g.glow('lamp', 50, y, 0.9, { r: 0.8 }); const R2 = RNG(y + 500); for (let k = 0; k < 16; k++) { const a = R2() * TAU, d = R2() * 2.8, p = g.p(50 + Math.cos(a) * d, y + Math.sin(a) * d, 0.5); g.disc2(p, 0.7, R2.pick(['#D9442F', '#F2C230', '#F1D5DD', '#F4F1E8', '#E08A3C'])); } }
   });
   for (let i = 0; i < 12; i++) {
     const side = i % 2, y = -34 + Math.floor(i / 2) * 11.5 + side * 4, x0 = side ? -45.5 : -60;
@@ -135,7 +140,12 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
         if (i === 2) { g.fill([[x1, c + 11, -1.4], [x1, c - 11, -1.4], [x1, c - 11, 0], [x1, c + 11, 0]], C.slabD); g.line([[x1, c + 11, 0], [x1, c + 11, -1.4], [x1, c - 11, -1.4], [x1, c - 11, 0]], { w: 0.8, boil: false }); }
         g.line([[x0, c + 11, 0], [x1, c + 11, 0]], { w: 0.8, boil: false }); g.line([[x0, c + 11, -1.4], [x1, c + 11, -1.4]], { w: 0.6, boil: false });
         // parapets: low rails both sides (the near one never hides a car: drawn with the deck)
+        const iR = g.cmds.length;
         CQ.rail(g, 'L', c - 10.6, x0, x1, 0, { h: 1.3, col: '#6A6358', sp: 1.2 }); CQ.rail(g, 'L', c + 10.6, x0, x1, 0, { h: 1.3, col: '#6A6358', sp: 1.2 });
+        // at night: the parapets are strings of amber light, and a row of amber points along the deck's edge (Qiansimen's
+        // trusses are lit with amber point lights) lays its reflection on the Jialing
+        CQ.nmark(g, iR, null, { nc: sail ? '#F2B24E' : '#E8A24A' }, true);
+        for (let x = x0 + 1.1; x < x1; x += 2.2) g.glow('lantern', x, c + 11.05, -0.7, { r: 0.55, col: '#FFB347', base: WL });
       }, { under: 0, name: 'bridge' });
     }
   };
@@ -146,9 +156,11 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     const c = 50, px = 172, py = c - 12.5, H = 34;
     K.box(g, px - 1.4, py - 1.2, px + 1.4, py + 1.2, WL, 0.2, '#D9D6CC', { w: 0.6 });
     const sailP = [[px - 1.2, py, 0], [px + 1.2, py, 0], [px + 2.6, py, H * 0.55], [px + 1.4, py, H], [px - 0.6, py, H * 0.92], [px - 1.6, py, H * 0.45]];
-    g.fill(sailP, '#F4F3EE'); g.fill([[px + 1.2, py, 0], [px + 1.2, py + 0.6, 0], [px + 2.6, py + 0.6, H * 0.55], [px + 1.4, py + 0.6, H], [px + 1.4, py, H], [px + 2.6, py, H * 0.55]], '#DAD8D0');
+    g.fill(sailP, '#F4F3EE'); g.mark({ nc: '#FFF0CF' }); g.fill([[px + 1.2, py, 0], [px + 1.2, py + 0.6, 0], [px + 2.6, py + 0.6, H * 0.55], [px + 1.4, py + 0.6, H], [px + 1.4, py, H], [px + 2.6, py, H * 0.55]], '#DAD8D0'); g.mark({ nc: '#E9BE7A' });   // floodlit at night
     g.outline(sailP, { w: 0.8 });
     const cs = []; for (let k = 0; k < 9; k++) { const z = H * (0.5 + k * 0.055), a = g.p(px + 0.6, py, z); for (const xx of [px - 13 + k * 0.9, px + 13 - k * 0.9]) { const b = g.p(xx, c - 10.6, 0.6); cs.push(a[0], a[1], b[0], b[1]); } } g.segs2(cs, '#8C8576', 0.28);
+    g.cmds[g.cmds.length - 1].nc = '#E8B466';                                    // the stay cables catch the light
+    for (const [z, r] of [[H * 0.18, 3.4], [H * 0.45, 3.0], [H * 0.72, 2.6], [H * 0.93, 2.0]]) g.glow('lantern', px + 0.6, py + 0.3, z, { r, col: '#FFE7B8', base: WL });
   }, { name: 'qiansimen pylon' });
 
   /* ---- traffic ---- */
@@ -185,7 +197,7 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   /* ---- life on the shoals and the promenades ---- */
   // anglers on the Jialing shoal, a kite flyer and a dog walker on the Yangtze shoal, winter swimmers
   const SHZ = S.SHZ - 0.3;
-  for (const [x, y, s, d] of [[156, -100, 11, 0], [156, -30, 12, 0], [156, 80, 13, 0]]) T.cast([x, y], (g) => { const r = K.person(g, x, y, SHZ, CQ.elder(s, { dir: d, pose: 'hold' })); const h = r.hands[0], e = g.p(x + 7, y - 2, WL + 0.2); g.fine2([[h[0], h[1]], [h[0] + 9, h[1] - 12], [e[0], e[1]]], { w: 0.3, c: '#4A4540' }); K.cyl(g, x - 0.8, y + 1.2, 0.6, SHZ, SHZ + 1.0, '#4F7FB8', { w: 0.35, n: 8 }); }, { on: true });
+  for (const [x, y, s, d] of [[156, -100, 11, 0], [156, -30, 12, 0], [156, 80, 13, 0]]) T.cast([x, y], (g) => { const r = K.person(g, x, y, SHZ, CQ.elder(s, { dir: d, pose: 'hold' })); const h = r.hands[0], e = g.p(x + 7, y - 2, WL + 0.2); g.fine2([[h[0], h[1]], [h[0] + 9, h[1] - 12], [e[0], e[1]]], { w: 0.3, c: '#4A4540' }); K.cyl(g, x - 0.8, y + 1.2, 0.6, SHZ, SHZ + 1.0, '#4F7FB8', { w: 0.35, n: 8 }); g.glow2('lantern', e, e, { r: 0.6, col: '#8CFF9E' }); }, { on: true });   // night fishing: a glowing float
   T.cast([-60, 155.5], (g) => { K.person(g, -60, 155.5, SHZ, CQ.who(21, { dir: 1, pose: 'cheer', ph: 0.3, k: 0.8 })); K.person(g, -57.5, 156, SHZ, CQ.who(22, { dir: 1, pose: 'hold' })); }, { on: true });
   T.actor({ sample: 5, period: 12, at(t) { const f = Math.floor(t * 4) % 8; return { x: -62, y: 166, z: 12 + Math.sin(t * 0.8) * 1.2, key: f, f }; }, draw(g, st) { const c = g.p(0, 0, 0), s = Math.sin(st.f * TAU / 8); g.fill2([[c[0], c[1] - 4], [c[0] + 3, c[1]], [c[0], c[1] + 4.5], [c[0] - 3, c[1]]], '#D9442F', true); g.fill2([[c[0], c[1] - 4], [c[0] + 3, c[1]], [c[0], c[1]]], '#E6C24F', true); g.fine2([[c[0], c[1] + 4.5], [c[0] + 1 + s, c[1] + 9], [c[0] - 1, c[1] + 14]], { w: 0.4, c: '#D9442F' }); const e = g.p(0, -10, -12 + 3); g.fine2([[c[0], c[1]], [e[0], e[1]]], { w: 0.2, c: '#5A564E' }); } });
   CQ.walk(T, CQ.who(23), [[-30, 155.5], [20, 155.5]], 1.4, { z: SHZ, phase: 0.2 });

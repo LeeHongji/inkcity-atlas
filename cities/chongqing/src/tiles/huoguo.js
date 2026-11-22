@@ -43,7 +43,7 @@ SF.tile('huoguo', -100, 0, { rim: 8 }, function (T) {
       seat(-3.2, 0, 0, seeds[0]); seat(0, -3.2, 1, seeds[1]);
       CQ.hotpot(g, x, y);
       seat(3.2, 0, 2, seeds[2]); if (i % 4 !== 3) seat(0, 3.2, 3, seeds[3]);
-      if (um) { const b = g.p(x, y, 2.4), t = g.p(x, y, 9.5); g.segs2([b[0], b[1], t[0], t[1]], '#5A564E', 0.5); g.fill2(arcPts(t[0], t[1] + 2.2, 11, Math.PI, TAU, 12).map((p) => [p[0], p[1] - (p[1] - t[1] - 2.2) * 0.45]), '#C8392E', true); g.line2(arcPts(t[0], t[1] + 2.2, 11, Math.PI, TAU, 12).map((p) => [p[0], p[1] - (p[1] - t[1] - 2.2) * 0.45]), { w: 0.5, c: '#7A1E18', boil: false }); }
+      if (um) { const b = g.p(x, y, 2.4), t = g.p(x, y, 9.5); g.segs2([b[0], b[1], t[0], t[1]], '#5A564E', 0.5); g.fill2(arcPts(t[0], t[1] + 2.2, 11, Math.PI, TAU, 12).map((p) => [p[0], p[1] - (p[1] - t[1] - 2.2) * 0.45]), '#C8392E', true); g.line2(arcPts(t[0], t[1] + 2.2, 11, Math.PI, TAU, 12).map((p) => [p[0], p[1] - (p[1] - t[1] - 2.2) * 0.45]), { w: 0.5, c: '#7A1E18', boil: false }); g.glow('lamp', x, y, 8.6, { r: 1.0 }); }   // a bulb hung under the umbrella (night)
     }, { name: 'table' });
     T.actor({ sample: 5, period: 10, at(t) { const ph = Math.floor(t * 5 + i * 1.7) % 8; return { x, y, z: 2.6, key: ph, ph }; }, draw(g, st) { CQ.steam2(g, st.ph, 1.25, 'rgba(226,150,128,0.62)'); } });
   });
@@ -57,10 +57,11 @@ SF.tile('huoguo', -100, 0, { rim: 8 }, function (T) {
     CQH.sign(g, 'L', 35, -31.6, -26.4, 0.6, 2.2, '#C8392E', '小面', { line: false });
     K.cyl(g, -27.6, 32.4, 1.0, 2.6, 3.8, { t: '#5A564E', l: '#9C9A94', r: '#7A7872' }, { w: 0.45, n: 10 });
     CQ.person(g, -29, 30.2, 0, CQ.who(1291, { dir: 1, top: '#F3F1EA', pose: 'hold' }));
+    g.glow('lamp', -30.5, 33, 3.0, { r: 0.9 });                                 // a bulb on the counter (night)
   }, { name: 'xiaomian' });
   CQ.steamActor(T, -27.6, 32.4, 4.2, 1);
   for (const [x, y, d, s] of [[-22, 32, 2, 1292], [-19, 33.5, 2, 1293], [-21, 35.5, 1, 1294]]) T.cast([x, y], (g) => { CQ.stool(g, x, y, '#4F7FB8'); CQ.person(g, x, y, 1.3, CQ.who(s, { dir: d, pose: 'sit', bowl: true, reach: [2.6, 3], k: s === 1294 ? 0.75 : 1 })); }, { name: 'noodle eater' });
-  T.obj([22, 31, 30, 35], (g) => K.stall(g, 26, 33, { face: 'L', L: 2.0, D: 1.6, a: '#3F7F4F', b: '#F3F1EA', goods: (g2, D, L) => { for (let i = 0; i < 8; i++) g2.disc2(g2.p(-D * 0.4 + (i % 2) * 0.8, -L + 0.6 + i * 0.5, 2.9), 0.9, ['#E08A3C', '#E6C24F', '#C8392E', '#8FBF73'][i % 4]); } }), { name: 'fruit' });
+  T.obj([22, 31, 30, 35], (g) => { K.stall(g, 26, 33, { face: 'L', L: 2.0, D: 1.6, a: '#3F7F4F', b: '#F3F1EA', goods: (g2, D, L) => { for (let i = 0; i < 8; i++) g2.disc2(g2.p(-D * 0.4 + (i % 2) * 0.8, -L + 0.6 + i * 0.5, 2.9), 0.9, ['#E08A3C', '#E6C24F', '#C8392E', '#8FBF73'][i % 4]); } }); g.glow('lamp', 26, 33, 5.8, { r: 1.0 }); }, { name: 'fruit' });   // a bulb under the canopy (night)
 
   /* ---- walkers: waiters on their rounds, passers-by ---- */
   const waiter = (seed, pts, ph) => CQ.walk(T, CQ.who(seed, { top: '#2F2A26', bot: '#2F2A26', jacket: '#C8392E' }), pts, 1.5, { phase: ph, draw: (g, w) => { const r = CQ.person(g, 0, 0, 0, Object.assign(w, { pose: 'walk' })); const h = r.hands[1]; g.fill2([[h[0] - 3, h[1] - 0.8], [h[0] + 3, h[1] - 0.8], [h[0] + 2.6, h[1] + 0.4], [h[0] - 2.6, h[1] + 0.4]], '#9C9A94', true); g.disc2([h[0], h[1] - 1.6], 1.2, '#C8392E'); } });

@@ -51,6 +51,7 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     g.fill(bed, '#8A6A4A'); g.outline(bed, { w: 0.55, c: '#5A4632', boil: false });
     // the quay at the square's end: coping
     g.fill(K.rect(IT.BOS.W - 1.0, 37, IT.BOS.W, 63), IS.C.quayTop);
+    IS.quayLights(g, [[IT.BOS.W - 0.6, 41], [IT.BOS.W - 0.6, 50], [IT.BOS.W - 0.6, 59]]);   // at night low lights along Sirkeci's quay
     // the Asian promenades: paving, coping on the water side
     g.fill(K.rect(IT.BOS.E, -63, EA, -37), '#E3DCCB'); IS.paving(g, IT.BOS.E, -63, EA, -37, { len: 2.6 });
     g.fill(K.rect(IT.BOS.E, -38, EA, -37), IS.C.quayTop);
@@ -73,12 +74,12 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   for (const [x, y] of [[-33, 40], [24, 40], [-33, 60], [24, 60]]) T.obj([x, y], (g) => IS.lamp(g, x, y), { name: 'lamp' });
   for (const x of [-26, 6]) T.obj([x, 62], (g) => IS.erguvan(g, x, 62, { r: 3.6 }), { name: 'erguvan' });
   // the Asian promenades: railings on the sea wall, benches, lamps, erguvan
-  for (let x = IT.BOS.E + 1; x < EA - 2; x += 13) { const x1 = Math.min(EA - 1, x + 12); T.obj([x, -38.7, x1, -37.3], (g) => K.box(g, x, -38.7, x1, -37.3, 0, 0.9, { t: '#E2DACA', l: '#D3CAB6', r: '#BFB6A2' }, { w: 0.6, boil: false }), { name: 'parapet' }); }
+  for (let x = IT.BOS.E + 1; x < EA - 2; x += 13) { const x1 = Math.min(EA - 1, x + 12); T.obj([x, -38.7, x1, -37.3], (g) => { K.box(g, x, -38.7, x1, -37.3, 0, 0.9, { t: '#E2DACA', l: '#D3CAB6', r: '#BFB6A2' }, { w: 0.6, boil: false }); g.glow('lamp', (x + x1) / 2, -38, 1.5, { r: 0.9 }); }, { name: 'parapet' }); }   // at night a lamp on each length of the sea wall
   for (const x of [84, 106, 126]) { T.obj([x, -61], (g) => IS.erguvan(g, x, -61, { r: 4 }), { name: 'erguvan' }); T.obj([x + 10, -61.5], (g) => IS.lamp(g, x + 10, -61.5), { name: 'lamp' }); }
   for (const x of [96, 128]) T.obj([x, 61.5], (g) => IS.plane(g, x, 61.5, { r: 4.0 }), { name: 'plane' });
   for (const x of [104, 140]) T.obj([x, 61.6], (g) => IS.lamp(g, x, 61.6), { name: 'lamp' });
   // the tram stop by the Kadıköy pier: a little shelter with a sign
-  T.obj([86, 55.5, 92, 57.5], (g) => { K.box(g, 86, 55.5, 92, 57.5, 0, 0.5, '#C9C1AE', { w: 0.5 }); for (const x of [86.4, 91.6]) { const a = g.p(x, 57.2, 0.5), b = g.p(x, 57.2, 5.4); g.line2([a, b], { w: 0.5, c: '#3F4A44', boil: false }); } g.fill(K.rect(85.6, 55.2, 92.4, 57.9, 5.4), '#3F6E5E'); g.outline(K.rect(85.6, 55.2, 92.4, 57.9, 5.4), { w: 0.55, boil: false }); K.sign(g, 'L', 57.9, 86.4, 91.6, 4.4, 5.4, '#F1E7CF', 'KADIKÖY', { w: 0.3 }); }, { name: 'tram stop' });
+  T.obj([86, 55.5, 92, 57.5], (g) => { K.box(g, 86, 55.5, 92, 57.5, 0, 0.5, '#C9C1AE', { w: 0.5 }); for (const x of [86.4, 91.6]) { const a = g.p(x, 57.2, 0.5), b = g.p(x, 57.2, 5.4); g.line2([a, b], { w: 0.5, c: '#3F4A44', boil: false }); } g.fill(K.rect(85.6, 55.2, 92.4, 57.9, 5.4), '#3F6E5E'); g.outline(K.rect(85.6, 55.2, 92.4, 57.9, 5.4), { w: 0.55, boil: false }); const j0 = g.cmds.length; K.sign(g, 'L', 57.9, 86.4, 91.6, 4.4, 5.4, '#F1E7CF', 'KADIKÖY', { w: 0.3 }); IS.litSign(g, j0); }, { name: 'tram stop' });
 
   /* ---- the traffic ---- */
   const CARC = ['#F1EFE8', '#8FA3B5', '#2F343B', '#C9584B', '#B9A27D', '#6C7A89'];
@@ -144,5 +145,5 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   IS.catWalk(T, [[96, 40], [130, 40], [130, 46], [96, 46]], { c: 4, speed: 1.0, sit: 8 });
   // people sitting on the Üsküdar sea wall with tea, an angler, a tea seller
   for (const [x, s] of [[90, 831], [92.4, 832], [122, 833], [134, 834]]) T.cast([x, -38], (g) => IS.person(g, x, -38, 0.9, IS.who(s, { dir: 1, pose: 'sit', cup: s % 2 === 0 })), { on: true });
-  T.cast([110, -39.6], (g) => { IS.person(g, 110, -39.6, 0, IS.who(835, { dir: 1, pose: 'hold', fcap: '#5A6B5A' })); const a = g.p(110, -39.2, 5.0), b = g.p(110, -33, 8.6), c = g.p(110, -31, IT.WL); g.line2([a, b], { w: 0.5, c: '#3A3530', boil: false, ext: 0 }); g.fine2([b, c], { w: 0.25, c: '#5A564E' }); }, { on: true });
+  T.cast([110, -39.6], (g) => { IS.person(g, 110, -39.6, 0, IS.who(835, { dir: 1, pose: 'hold', fcap: '#5A6B5A' })); const a = g.p(110, -39.2, 5.0), b = g.p(110, -33, 8.6), c = g.p(110, -31, IT.WL); g.line2([a, b], { w: 0.5, c: '#3A3530', boil: false, ext: 0 }); g.fine2([b, c], { w: 0.25, c: '#5A564E' }); IS.glowWet(g, 'lantern', 110, -33, 8.6, { r: 0.7, col: IS.N.tip }); }, { on: true });   // at night a glow stick on the rod tip
 });

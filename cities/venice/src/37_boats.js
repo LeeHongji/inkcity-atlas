@@ -76,15 +76,18 @@ VN.drawBoat = function (g, kind, ang, u0, u1, o) {
     if (cb) {
       const A = cb.A, B = cb.B, nv = F.nearV * W * 0.861, win = [];
       for (let u = -L * 0.68; u < L * 0.5; u += 1.55) { const a = Math.max(u, A), b = Math.min(u + 1.2, B); if (b - a < 0.15) continue; win.push([F.pt(a, nv, 2.3), F.pt(b, nv, 2.3), F.pt(b, nv, 3.7), F.pt(a, nv, 3.7)]); }
-      for (const q of win) { g.fill(q, '#5E6E7A'); }
+      for (const q of win) { g.fill(q, '#5E6E7A'); g.mark({ nc: '#FFEBC2' }); }   // at night the cabin is lit
       // heads inside behind the glass
       for (let u = -L * 0.6, i = 0; u < L * 0.45; u += 1.55, i++) if (u >= A && u + 0.5 < B && h1(i * 7 + (o.seed || 0)) < 0.7) { const p = g.p.apply(g, F.pt(u + 0.6, nv * 0.6, 2.75)); g.disc2(p, 0.95, SKIN[i % 5]); g.fill2([[p[0] - 1, p[1] - 0.3], [p[0] + 1, p[1] - 0.3], [p[0] + 0.9, p[1] - 1.2], [p[0] - 0.9, p[1] - 1.2]], HAIR[i % 6], true); }
       g.fill([F.pt(A, nv, 1.6), F.pt(B, nv, 1.6), F.pt(B, nv, 1.95), F.pt(A, nv, 1.95)], '#E6C24F');
+      if (o.night) VN.boatGlints(g, F, win.map((q) => [q[0][0] * F.ca + q[0][1] * F.sa, q[1][0] * F.ca + q[1][1] * F.sa]), F.nearV * W * 1.02, 2.3, 3.7, '255,226,160', o.seed || 0);
     }
     VN.pieceBox(g, F, L * 0.05, L * 0.45, u0, u1, W * 0.55, 4.1, 5.3, { t: '#DCDAD3', l: '#F4F2EC', r: '#D9D6CE' }, { w: 0.5 });
-    if (0.05 * L <= u1 && 0.45 * L >= u0) { const a = Math.max(L * 0.12, u0), b = Math.min(L * 0.4, u1); if (b > a) g.fill([F.pt(a, F.nearV * W * 0.551, 4.4), F.pt(b, F.nearV * W * 0.551, 4.4), F.pt(b, F.nearV * W * 0.551, 5.0), F.pt(a, F.nearV * W * 0.551, 5.0)], '#4E5E6A'); }
+    if (0.05 * L <= u1 && 0.45 * L >= u0) { const a = Math.max(L * 0.12, u0), b = Math.min(L * 0.4, u1); if (b > a) { g.fill([F.pt(a, F.nearV * W * 0.551, 4.4), F.pt(b, F.nearV * W * 0.551, 4.4), F.pt(b, F.nearV * W * 0.551, 5.0), F.pt(a, F.nearV * W * 0.551, 5.0)], '#4E5E6A'); g.mark({ nc: '#E9CF96' }); } }
     // the line number board on the wheelhouse
-    if (L * 0.3 >= u0 && L * 0.3 < u1 && o.line) { const a0 = L * 0.22, a1 = L * 0.38; g.fill([F.pt(a0, F.nearV * W * 0.56, 5.4), F.pt(a1, F.nearV * W * 0.56, 5.4), F.pt(a1, F.nearV * W * 0.56, 6.4), F.pt(a0, F.nearV * W * 0.56, 6.4)], '#E6C24F'); const rt = F.ca - F.sa > 0; K.textP(g, (a, z) => F.pt(rt ? a0 + 0.35 + a : a1 - 0.35 - a, F.nearV * W * 0.57, z), 0, 5.6, 0.7, String(o.line), '#2A2622'); }
+    if (L * 0.3 >= u0 && L * 0.3 < u1 && o.line) { const a0 = L * 0.22, a1 = L * 0.38; g.fill([F.pt(a0, F.nearV * W * 0.56, 5.4), F.pt(a1, F.nearV * W * 0.56, 5.4), F.pt(a1, F.nearV * W * 0.56, 6.4), F.pt(a0, F.nearV * W * 0.56, 6.4)], '#E6C24F'); g.mark({ nc: true, light: true }); const rt = F.ca - F.sa > 0; K.textP(g, (a, z) => F.pt(rt ? a0 + 0.35 + a : a1 - 0.35 - a, F.nearV * W * 0.57, z), 0, 5.6, 0.7, String(o.line), '#2A2622'); }
+    // at night: the white masthead light over the wheelhouse, the side light (green to starboard, red to port)
+    if (o.night && L * 0.3 >= u0 && L * 0.3 < u1) { VN.navLight(g, F.pt(L * 0.3, 0, 6.9), 0.5, '#FFF4D6'); VN.navLight(g, F.pt(L * 0.18, F.nearV * W * 0.6, 4.7), 0.38, F.nearV > 0 ? '#7CF0A0' : '#FF6A5A'); }
     // black fenders all round
     const fd = []; for (let u = Math.max(-L, u0); u < Math.min(L, u1); u += 0.7) { const a = g.p.apply(g, F.pt(u, F.nearV * wid(u), 0.9)); fd.push(a[0], a[1], a[0] + 0.01, a[1] + 1.2); }
     g.segs2(fd, '#1F2226', 1.2);
@@ -124,13 +127,14 @@ VN.drawBoat = function (g, kind, ang, u0, u1, o) {
       const cb = VN.pieceBox(g, F, -1.8, 1.4, u0, u1, W * 0.82, spec.sheer - 0.1, spec.sheer + 1.7, amb ? { t: '#E9E4D8', l: '#F6F4EE', r: '#DDD8CC' } : { t: '#E9DFC2', l: '#F1E9D2', r: '#D9CFB4' }, { w: 0.5 });
       if (cb) {
         const nv = F.nearV * W * 0.821;
-        g.fill([F.pt(cb.A, nv, spec.sheer + 0.6), F.pt(cb.B, nv, spec.sheer + 0.6), F.pt(cb.B, nv, spec.sheer + 1.4), F.pt(cb.A, nv, spec.sheer + 1.4)], '#4E5E6A');
+        g.fill([F.pt(cb.A, nv, spec.sheer + 0.6), F.pt(cb.B, nv, spec.sheer + 0.6), F.pt(cb.B, nv, spec.sheer + 1.4), F.pt(cb.A, nv, spec.sheer + 1.4)], '#4E5E6A'); g.mark({ nc: amb ? '#E6F0FF' : '#FFDFA6' });
+        if (o.night) VN.boatGlints(g, F, [[cb.A + 0.2, cb.B - 0.2]], F.nearV * W * 1.05, 0.9, 1.5, amb ? '220,232,255' : '255,214,150', (o.seed || 0) + 3);
         if (amb) g.fill([F.pt(cb.A, nv, spec.sheer + 0.1), F.pt(cb.B, nv, spec.sheer + 0.1), F.pt(cb.B, nv, spec.sheer + 0.45), F.pt(cb.A, nv, spec.sheer + 0.45)], '#D9542F');
       }
       if (has(0)) {
         const p = g.p.apply(g, F.pt(0, 0, spec.sheer + 1.7));
-        if (amb) { const on = o.flash ? '#5F8FFF' : '#3F5F9F'; g.fill2([[p[0] - 0.8, p[1]], [p[0] + 0.8, p[1]], [p[0] + 0.6, p[1] - 1.2], [p[0] - 0.6, p[1] - 1.2]], on, true); if (o.flash) g.segs2([p[0] - 2.4, p[1] - 0.9, p[0] - 1.2, p[1] - 0.7, p[0] + 1.2, p[1] - 0.7, p[0] + 2.4, p[1] - 0.9, p[0], p[1] - 1.6, p[0], p[1] - 2.8], '#9DB8FF', 0.4); }
-        else { g.fill2([[p[0] - 1.6, p[1]], [p[0] + 1.6, p[1]], [p[0] + 1.6, p[1] - 1.2], [p[0] - 1.6, p[1] - 1.2]], '#E6C24F', true); g.segs2([p[0] - 1.1, p[1] - 0.6, p[0] + 1.1, p[1] - 0.6], '#2A2622', 0.4); }
+        if (amb) { const on = o.flash ? '#5F8FFF' : '#3F5F9F'; g.fill2([[p[0] - 0.8, p[1]], [p[0] + 0.8, p[1]], [p[0] + 0.6, p[1] - 1.2], [p[0] - 0.6, p[1] - 1.2]], on, true); if (o.flash) { g.mark({ nc: '#8FB4FF', light: true }); g.glow2('neon', [p[0], p[1] - 0.6], [p[0], -1e6], { r: 1.6, col: '#7FA6FF' }); } if (o.flash) g.segs2([p[0] - 2.4, p[1] - 0.9, p[0] - 1.2, p[1] - 0.7, p[0] + 1.2, p[1] - 0.7, p[0] + 2.4, p[1] - 0.9, p[0], p[1] - 1.6, p[0], p[1] - 2.8], '#9DB8FF', 0.4); }
+        else { g.fill2([[p[0] - 1.6, p[1]], [p[0] + 1.6, p[1]], [p[0] + 1.6, p[1] - 1.2], [p[0] - 1.6, p[1] - 1.2]], '#E6C24F', true); g.mark({ nc: '#FFD45A', light: true }); g.segs2([p[0] - 1.1, p[1] - 0.6, p[0] + 1.1, p[1] - 0.6], '#2A2622', 0.4); }
       }
     });
     add(-2.8, 0, () => VN.aboard(g, F, -2.8, 0, spec.sheer - 0.2, o.who || VN.who((o.seed || 3) + 2, amb ? { top: '#D9542F', beanie: null, colombina: null, scarf: null } : { top: '#F3F1EA', bot: '#2F3A55', fedora: null, beanie: null, colombina: null }), { pose: 'stand' }));
@@ -148,6 +152,35 @@ VN.drawBoat = function (g, kind, ang, u0, u1, o) {
   items.sort((p, q) => { const A = F.pt(p[0], p[1], 0), B = F.pt(q[0], q[1], 0); return (A[0] + A[1]) - (B[0] + B[1]); });
   for (const it of items) it[2]();
   H.near();
+  // at night: a sandolo carries a lantern on its bow (the old feral); the motor boats their masthead light
+  if (o.night) {
+    if (kind === 'sandolo') { if (has(L * 0.8)) VN.feral(g, F, L * 0.8, sheer(L * 0.8)); }
+    else { const cab = kind === 'taxi' || kind === 'ambulanza', u = cab ? -1.3 : -L * 0.8; if (has(u)) VN.navLight(g, F.pt(u, 0, spec.sheer + (cab ? 2.2 : 2.0)), 0.42, '#FFF4D6'); }
+  }
+};
+/* ---------- boats at night (drawn only in their night poses) ---------- */
+/* a small bright light (a masthead or side light) at a point of the boat's frame */
+VN.navLight = function (g, pt, r, col) { const c = g.p(pt[0], pt[1], pt[2]); g.disc2(c, r, col); g.mark({ nc: true, light: true }); };
+/* the gondola's lantern on its iron stalk at the bow (u along the boat, z its gunwale there) */
+VN.feral = function (g, F, u, z) {
+  const b = g.p.apply(g, F.pt(u, 0, z)), t = g.p.apply(g, F.pt(u, 0, z + 1.6));
+  g.line2([b, t], { w: 0.35, c: '#2A2622', boil: false, ext: 0 });
+  const q = [[t[0] - 0.75, t[1] - 0.2], [t[0] + 0.75, t[1] - 0.2], [t[0] + 0.6, t[1] - 2.0], [t[0] - 0.6, t[1] - 2.0]];
+  g.fill2(q, '#FFD27A', true); g.mark({ nc: true, light: true });
+  g.fill2([[t[0] - 0.95, t[1] - 2.0], [t[0] + 0.95, t[1] - 2.0], [t[0], t[1] - 2.9]], '#2A2622', true);
+  g.line2(q, { w: 0.25, c: '#2A2622', boil: false, close: true });
+};
+/* broken streaks of a lit window row reflected in the water beside the hull: spans [[u0, u1], ...], on the near side
+   v, mirrored from z0..z1 above the water */
+VN.boatGlints = function (g, F, spans, v, z0, z1, rgb, seed) {
+  for (let i = 0; i < spans.length; i++) {
+    const [a, b] = spans[i], n = 4;
+    for (let k = 0; k < n; k++) {
+      const z = -lerp(z0, z1, (k + 0.5) / n), j = (h1(seed * 7 + i * 5 + k) - 0.5) * 0.5, sh = 0.18 + 0.12 * (k % 2), A = Math.min(a, b) + j + 0.1 * k, B = Math.max(a, b) + j - 0.1 * k;
+      if (B - A < 0.1) continue;
+      g.fill([F.pt(A, v, z), F.pt(B, v, z), F.pt(B, v, z - sh), F.pt(A, v, z - sh)], 'rgba(' + rgb + ',' + (0.62 - k * 0.12).toFixed(2) + ')'); g.mark({ nc: true });
+    }
+  }
 };
 
 /* a gondola: the long black asymmetric hull rising at both ends, the steel ferro at the bow, a red seat with riders,
@@ -169,6 +202,7 @@ VN.gondola = function (g, F, u0, u1, o) {
   }
   if (o.rider && a < -1.0 && b > -2.4) VN.aboard(g, F, -1.6, 0, 0.6, o.rider, { pose: 'sit', back: false, x: { noLegs: true } });
   H.near();
+  if (o.night && !o.moored && L * 0.82 >= a && L * 0.82 < b) VN.feral(g, F, L * 0.82, sheer(L * 0.82));   // at night: the feral on the bow
   if (b >= L * 0.96) {   // the ferro
     const b0 = g.p.apply(g, F.pt(L * 0.97, 0, sheer(L * 0.97))), b1 = g.p.apply(g, F.pt(L * 1.05, 0, 3.4));
     g.line2([b0, b1], { w: 0.85, c: '#C9CCD0', boil: false, ext: 0 });
@@ -216,11 +250,12 @@ VN.boatActors = function (T, kind, path, o) {
       at(t) {
         const s = path(t); if (!s) return null;
         const ca = Math.cos(s.ang), sa = Math.sin(s.ang), ue = ca + sa > 0 ? Math.min(u1, L) : Math.max(u0, -L);
-        return { x: s.x + ue * ca, y: s.y + ue * sa, z: VN.WL, key: Math.round(s.ang * 100) + '.' + keyOf(s), ue, ang: s.ang, s2: s, alpha: s.alpha != null && s.alpha < 1 ? s.alpha : null };
+        const n = LOOK.night;                                                 // a night pose of its own (its lights), the day's untouched
+        return { x: s.x + ue * ca, y: s.y + ue * sa, z: VN.WL, key: Math.round(s.ang * 100) + '.' + keyOf(s) + (n ? 'n' : ''), ue, ang: s.ang, s2: s, n, alpha: s.alpha != null && s.alpha < 1 ? s.alpha : null };
       },
       draw(g, st) {
         const ca = Math.cos(st.ang), sa = Math.sin(st.ang);
-        g.at(-st.ue * ca, -st.ue * sa, 0, (g2) => VN.drawBoat(g2, kind, st.ang, u0, u1, Object.assign({}, o.draw || {}, o.drawOf ? o.drawOf(st.s2) : {})));
+        g.at(-st.ue * ca, -st.ue * sa, 0, (g2) => VN.drawBoat(g2, kind, st.ang, u0, u1, Object.assign({}, o.draw || {}, o.drawOf ? o.drawOf(st.s2) : {}, st.n ? { night: true } : {})));
       } });
   }
 };

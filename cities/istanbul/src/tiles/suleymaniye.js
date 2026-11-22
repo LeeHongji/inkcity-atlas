@@ -38,6 +38,7 @@ SF.tile('suleymaniye', -100, 0, { rim: 8, order: -1.2 }, function (T) {
     for (let i = 0; i < 4; i++) K.box(g, TX1, 7 + i * 0.01, TX1 + 4 - i, 12, 0, TZ * (i + 1) / 4, { t: '#E2DACA', l: '#D3CAB6', r: '#BFB6A2' }, { w: 0.5 });
     // the parapet along the north edge (people lean on it, looking at the Horn)
     g.fill(K.rect(TX0, TY0, TX1, TY0 + 0.8, TZ + 1.0), '#DCD3BE'); g.line([[TX0, TY0 + 0.8, TZ + 1.0], [TX1, TY0 + 0.8, TZ + 1.0]], { w: 0.5, boil: false });
+    for (const x of [-31, -18, -4, 12]) g.glow('lamp', x, TY0 + 0.4, TZ + 1.6, { r: 0.9, base: TZ });   // at night lamps on the parapet
   }, { name: 'terrace' });
 
   /* ---- the mosque and its courtyard (the courtyard on the near side, so it can be seen) ---- */
@@ -49,16 +50,18 @@ SF.tile('suleymaniye', -100, 0, { rim: 8, order: -1.2 }, function (T) {
   }
   // the medrese row along the west edge: cells with a little dome each, chimneys
   T.obj([-34, -22, -28, 20], function (g) {
+    const i0 = g.cmds.length;
     K.box(g, -34, -22, -28, 20, TZ, TZ + 3.4, S, { w: 0.7 });
     for (let y = -20.5; y < 19; y += 3) { K.win(g, 'R', -27.98, y + 0.8, y + 1.8, TZ + 0.8, TZ + 2.4, { style: 'dark', arch: true, col: '#4E5866', w: 0.3 }); IS.dome(g, -31, y + 1.3, 1.25, TZ + 3.4, { drum: 0.2, win: 0, h: 1.0, ribs: 0, alem: false, w: 0.45 }); }
     for (const y of [-14, -2, 11]) K.box(g, -33.6, y, -33, y + 0.6, TZ + 3.4, TZ + 5.2, '#CDC3AE', { w: 0.4 });
+    IS.flood(g, i0, 0.55);   // at night softly floodlit with the mosque
   }, { on: true, name: 'medrese' });
   // Süleyman's tomb: an octagon with a dome and a portico, cypresses, gravestones
-  T.obj([12, -18, 20, -10], (g) => g.at(0, 0, TZ, (g2) => {
+  T.obj([12, -18, 20, -10], (g) => g.at(0, 0, TZ, (g2) => IS.floodlit(g2, 0.62, null, () => {
     K.cyl(g2, 16, -14, 3.4, 0, 6.2, S, { n: 8, w: 0.75, nt: true });
     for (let i = 0; i < 4; i++) { const a = A_L + (A_R - A_L) * (i + 0.5) / 4, q = []; for (const [dz, da] of [[1.4, -0.12], [1.4, 0.12], [4.6, 0.12], [4.6, -0.12]]) q.push([16 + 3.42 * Math.cos(a + da), -14 + 3.42 * Math.sin(a + da), dz]); g2.fill(q, '#4E5866'); }
     IS.dome(g2, 16, -14, 3.1, 6.2, { drum: 0.6, win: 0, h: 2.8, ribs: 10 });
-  }), { on: true, name: 'tomb' });
+  })), { on: true, name: 'tomb' });
   for (const [x, y] of [[11.5, -5], [21.5, -20], [22, -6], [12, 1.5], [20, 2]]) T.obj([x, y], (g) => K.cypress(g, x, y, { h: 10, r: 1.5, z: TZ }), { on: true, name: 'cypress' });
   T.cast([16, -4], (g) => { const R = RNG(55); for (let i = 0; i < 9; i++) { const x = 12 + (i % 3) * 3.4 + R() * 0.6, y = -6 + Math.floor(i / 3) * 3 + R() * 0.6, b = g.p(x, y, TZ), t = g.p(x, y, TZ + 2.2 + R() * 0.6); g.fill2([[b[0] - 0.6, b[1]], [b[0] + 0.6, b[1]], [t[0] + 0.5, t[1]], [t[0] - 0.5, t[1]]], '#EDE7DA', true); if (i % 2) g.disc2([t[0], t[1] - 0.6], 0.9, '#EDE7DA'); g.outline2([[b[0] - 0.6, b[1]], [t[0] - 0.5, t[1]], [t[0] + 0.5, t[1]], [b[0] + 0.6, b[1]]], { w: 0.3, c: '#8C8576', boil: false }); } }, { on: true, name: 'gravestones' });
   for (const [x, y] of [[-33, -21], [-20, -21], [3, -21]]) T.obj([x, y], (g) => IS.plane(g, x, y, { r: 3.6, h: 4.5, z: TZ }), { on: true, name: 'plane' });

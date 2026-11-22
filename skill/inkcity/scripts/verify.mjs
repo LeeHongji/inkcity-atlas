@@ -17,7 +17,7 @@ await withBrowser(async (browser) => {
   if (S.err) ok(false, 'page errors: ' + S.err);
   await page.evaluate(`window.H = (n) => { SF.seek(n); const d = SF.app.ctx.getImageData(0, 0, 1920, 1080).data; let h = 2166136261; for (let i = 0; i < d.length; i++) { h ^= d[i]; h = Math.imul(h, 16777619); } return h >>> 0; };
     window.D = (a, b) => { SF.seek(a); const x = SF.app.ctx.getImageData(0, 0, 1920, 1080).data; SF.seek(b); const y = SF.app.ctx.getImageData(0, 0, 1920, 1080).data; let n = 0; for (let i = 0; i < x.length; i += 4) if (Math.abs(x[i] - y[i]) + Math.abs(x[i + 1] - y[i + 1]) + Math.abs(x[i + 2] - y[i + 2]) > 24) n++; return n; };
-    window.CON = (n) => { SF.seek(n); const d = SF.app.ctx.getImageData(0, 0, 1920, 1080).data; let s = 0, c = 0; for (let i = 0; i < d.length; i += 4 * 7) { s += Math.abs(d[i] - 242) + Math.abs(d[i + 1] - 237) + Math.abs(d[i + 2] - 228); c++; } return s / c; };`);
+    window.CON = (n) => { SF.seek(n); const P = SF.look && SF.look.night ? SF.paper() : [242, 237, 228], d = SF.app.ctx.getImageData(0, 0, 1920, 1080).data; let s = 0, c = 0; for (let i = 0; i < d.length; i += 4 * 7) { s += Math.abs(d[i] - P[0]) + Math.abs(d[i + 1] - P[1]) + Math.abs(d[i + 2] - P[2]); c++; } return s / c; };`);
   // 1) seeks in a scrambled order, every frame visited at least twice
   const pick = [15, 45, 90, ...S.cuts.map((a) => a + 20), S.hold];
   const order = []; for (let r = 0; r < 2; r++) for (let i = 0; i < pick.length; i++) order.push(pick[(i * 7 + r * 3) % pick.length]);

@@ -36,6 +36,10 @@ SF.tile('trafalgar', 0, -100, { rim: 14 }, function (T) {
     K.cyl(g, -1, y0 + 3.5, 2.6, h + 0.7, h + 3.0, PS, { w: 0.6, n: 12 }); K.dome(g, -1, y0 + 3.5, 2.6, h + 3.0, 3.2, '#8E9AA3', { shadow: '#76828C' });
     for (const x of [-22, 20]) { K.cyl(g, x, y0 + 3.5, 1.3, h + 0.7, h + 2.2, PS, { w: 0.5, n: 8 }); K.dome(g, x, y0 + 3.5, 1.3, h + 2.2, 1.5, '#8E9AA3'); }
     for (const x of [-20, 18]) LK.pole(g, x, y1 - 1, h + 0.7, 5);
+    // at night: the portico floodlit, the front washed warm
+    LK.flood(g, 0, 0.75, LK.FLOOD.warm, (c) => (c === '#8E9AA3' || c === '#76828C' ? mix(nightColour(c), '#C8945A', 0.2) : c === '#C9C1AC' ? '#C9A878' : undefined));
+    for (const [x, z, r] of [[-1, 4, 3.2], [-1, 9, 2.6], [-5.5, 6, 2.2], [3.5, 6, 2.2]]) g.glow('lantern', x, y1 + 3.8, z, { r, col: '#FFDCA8' });
+    for (const x of [-26, -16, 12, 22]) g.glow('lantern', x, y1 + 0.6, 3.5, { r: 2.0, col: '#FFDCA8' });
   }, { name: 'national gallery' });
   for (const x of [-20, 18]) LK.flag(T, x, -30, 16.2, { L: 2.6, H: 1.5, ph: x * 0.03 });
   // the North Terrace: a raised walk with a balustrade, steps down in the middle
@@ -50,7 +54,7 @@ SF.tile('trafalgar', 0, -100, { rim: 14 }, function (T) {
   T.obj([25, -36, 36, -16], function (g) {
     g.boilP = 0.3;
     K.box(g, 27, -34, 36, -18, 0, 9.5, PS, { w: 0.85 });
-    for (let x = 28.4; x < 35; x += 2.4) { K.win(g, 'L', -17.98, x, x + 1.1, 1.4, 3.6, { style: 'navy', arch: true }); K.win(g, 'L', -17.98, x, x + 1.1, 4.8, 8.0, { style: 'navy', arch: true }); }
+    for (let x = 28.4; x < 35; x += 2.4) { K.win(g, 'L', -17.98, x, x + 1.1, 1.4, 3.6, { style: 'navy', arch: true, lit: 0.9 }); K.win(g, 'L', -17.98, x, x + 1.1, 4.8, 8.0, { style: 'navy', arch: true, lit: 0.9 }); }   // (a concert by candlelight tonight)
     K.gable(g, 26.8, -34.2, 36.2, -17.8, 9.5, 3.0, 'x', { a: '#8E979E', b: '#7C858C', e: PS.l }, { w: 0.75 });
     K.box(g, 25, -32, 27, -20, 0, 10.4, PS, { w: 0.7, nohid: true });
     const cl = []; for (let y = -31.4; y <= -20.5; y += 1.8) { const a = g.p(25.1, y, 0.6), b = g.p(25.1, y, 9.6); cl.push(a[0], a[1], b[0], b[1]); } g.segs2(cl, '#F3EFE4', 1.5);
@@ -61,6 +65,9 @@ SF.tile('trafalgar', 0, -100, { rim: 14 }, function (T) {
     K.box(g, 28.3, -27.3, 30.3, -24.7, 15.5, 18.5, PS, { w: 0.6, nohid: true }); K.win(g, 'L', -24.68, 28.8, 29.8, 16.0, 18.0, { style: 'dark', arch: true, col: '#4A4E58', w: 0.3 });
     K.cyl(g, 29.3, -26, 1.0, 18.5, 20.5, PS, { w: 0.5, n: 8 });
     const sb = g.p(29.3, -26, 20.5), st = g.p(29.3, -26, 26.5); g.fill2([[sb[0] - 1.6, sb[1]], [sb[0] + 1.6, sb[1]], [st[0], st[1]]], '#F0EBDF'); g.fill2([[sb[0] + 0.2, sb[1]], [sb[0] + 1.6, sb[1]], [st[0], st[1]]], '#D6CFBF'); g.line2([[sb[0] - 1.6, sb[1]], [st[0], st[1]], [sb[0] + 1.6, sb[1]]], { w: 0.5, boil: false }); g.disc2([st[0], st[1] - 0.6], 0.45, '#D9A93E');
+    // at night: the steeple and the portico floodlit
+    LK.flood(g, 0, 0.9, LK.FLOOD.warm, (c) => (c === '#8E979E' || c === '#7C858C' ? mix(nightColour(c), '#C8945A', 0.18) : undefined));
+    for (const [x, y, z, r] of [[24.4, -26, 4, 2.6], [24.4, -26, 9, 2.2], [29.3, -23.8, 12.5, 2.0], [29.3, -23.8, 17, 1.8], [29.3, -25.2, 22, 1.6]]) g.glow('lantern', x, y, z, { r, col: '#FFE2B4' });
   }, { name: 'st martin' });
 
   /* ---------------- Admiralty Arch ---------------- */
@@ -72,6 +79,9 @@ SF.tile('trafalgar', 0, -100, { rim: 14 }, function (T) {
     for (let y = 9.4; y < 33; y += 2.2) K.win(g, 'R', -28.98, y, y + 1.0, 7.0, 8.8, { style: 'navy' });
     K.box(g, -37.2, 7.8, -28.8, 34.2, 10, 10.7, '#E6E0D0', { w: 0.5, nohid: true, boil: false });
     for (const y of [11, 31]) { const s = g.p(-28.6, y, 10.7); g.fill2([[s[0] - 1.2, s[1]], [s[0] + 1.2, s[1]], [s[0] + 0.8, s[1] - 4.4], [s[0] - 0.8, s[1] - 4.4]], '#5E6B60', true); }
+    // at night: floodlit, lamps in the three arches
+    LK.flood(g, 0, 0.7, LK.FLOOD.warm);
+    for (const a of [13, 21, 29]) g.glow('lamp', -28.4, a, a === 21 ? 5.4 : 4.4, { r: 1.4 });
   }, { name: 'admiralty arch' });
 
   /* ---------------- Nelson's Column, the lions, the fountains, the fourth plinth ---------------- */
@@ -86,9 +96,12 @@ SF.tile('trafalgar', 0, -100, { rim: 14 }, function (T) {
     const fl = []; for (const a of [-0.2, 0.4, 1.0, 1.6, 2.2]) { const b = g.p(cx + Math.cos(a) * 1.05, cy + Math.sin(a) * 1.05, 7.4), t = g.p(cx + Math.cos(a) * 1.05, cy + Math.sin(a) * 1.05, 30.6); fl.push(b[0], b[1], t[0], t[1]); } g.segs2(fl, '#C9C2B2', 0.35);
     K.box(g, cx - 1.5, cy - 1.5, cx + 1.5, cy + 1.5, 31, 32.6, { t: '#5E6B60', l: '#6E7B70', r: '#4E5A50' }, { w: 0.6, nohid: true });
     LK.person(g, cx, cy, 32.6, { skin: '#6E7B70', hair: '#5E6B60', top: '#5E6B60', bot: '#5E6B60', shoe: '#4E5A50', hairStyle: 'bald', dir: 1, k: 1.0, ink: '#2E3630', cap: '#4E5A50' });
+    // at night: the column floodlit white up its whole height
+    LK.flood(g, 0, 1, LK.FLOOD.white);
+    for (const [z, r] of [[3, 3.0], [10, 2.2], [18, 2.0], [26, 1.8]]) g.glow('lantern', cx + 1.3, cy + 1.3, z, { r, col: '#F2F0FF' });
   }, { name: "nelson's column" });
   const lion = (x, y, f) => T.obj([x - 2.4, y - 1.6, x + 2.4, y + 1.6], (g) => {
-    K.box(g, x - 2.3, y - 1.4, x + 2.3, y + 1.4, 0, 2.2, { t: '#D9D4C8', l: '#E2DDD0', r: '#C9C2B2' }, { w: 0.6 });
+    K.box(g, x - 2.3, y - 1.4, x + 2.3, y + 1.4, 0, 2.2, { t: '#D9D4C8', l: '#E2DDD0', r: '#C9C2B2' }, { w: 0.6 }); LK.flood(g, 0, 0.5, LK.FLOOD.white);
     // a recumbent bronze lion: long low body, paws stretched forward, the head raised in a heavy mane
     const p = g.p(x, y, 2.2), s = (u, v) => [p[0] + f * u, p[1] + v], B = '#4A4E48', BD = '#363A35', BL = '#62675F';
     const body = K.curve([s(-6.8, 0), s(-7.0, -2.2), s(-5.4, -3.4), s(-1.0, -3.8), s(2.4, -3.6), s(3.4, -1.6), s(3.0, 0)], 3, true);
@@ -105,14 +118,15 @@ SF.tile('trafalgar', 0, -100, { rim: 14 }, function (T) {
   const fountain = (x, y) => { T.obj([x - 5, y - 4, x + 5, y + 4], (g) => {
     const rim = []; for (let i = 0; i < 28; i++) { const a = TAU * i / 28; rim.push([x + Math.cos(a) * 5, y + Math.sin(a) * 3.6, 0]); }
     const top = rim.map((p) => [p[0], p[1], 1.1]); g.fill(rim.filter((p, i) => i < 15).concat(top.filter((p, i) => i < 15).reverse()), '#C9C2B2');
-    g.fill(top, '#E2DDD0'); g.fill(top.map((p) => [x + (p[0] - x) * 0.86, y + (p[1] - y) * 0.86, 0.9]), '#A9C6CC');
+    g.fill(top, '#E2DDD0'); g.fill(top.map((p) => [x + (p[0] - x) * 0.86, y + (p[1] - y) * 0.86, 0.9]), '#A9C6CC'); g.mark({ nc: '#86CDE0' });   // lit from under the water at night
     g.water(top.map((p) => [x + (p[0] - x) * 0.7, y + (p[1] - y) * 0.7, 0.9]), { dens: 1.4, c: '#7FA0A6' }); g.outline(top, { w: 0.6, boil: false });
     K.cyl(g, x, y, 1.6, 0.9, 2.6, { t: '#D9D4C8', l: '#E2DDD0', r: '#C9C2B2' }, { w: 0.5, n: 10 }); K.cyl(g, x, y, 0.5, 2.6, 4.4, { t: '#D9D4C8', l: '#E2DDD0', r: '#C9C2B2' }, { w: 0.45, n: 8 });
     for (const [dx, dy] of [[-3, -1.4], [3, -1.4], [0, 2.6]]) { const p = g.p(x + dx, y + dy, 1.0); g.fill2([[p[0] - 1.4, p[1]], [p[0], p[1] - 1.6], [p[0] + 1.4, p[1]], [p[0], p[1] + 0.8]], '#5E6B60', true); }
+    g.glow('neon', x, y, 2.4, { r: 4.0, col: '#9FE2F4' });
   }, { name: 'fountain' });
     T.actor({ sample: 5, period: 10, at(t) { const f = Math.floor(t * 8) % 4; return { x, y: y + 0.01, z: 0, key: f, f }; },
       draw(g, st) { const c = g.p(0, 0, 4.4), b = g.p(0, 0, 0.9); const h = 14 + st.f; const arcs = []; for (let i = 0; i < 8; i++) { const a = TAU * i / 8 + st.f * 0.2, dx = Math.cos(a) * 9, dy = Math.sin(a) * 3.6; const pts = []; for (let k = 0; k <= 8; k++) { const u = k / 8; pts.push([c[0] + dx * u, c[1] - h * 4 * u * (1 - u) * 0.55 + (b[1] - c[1] + dy) * u * u]); } g.line2(pts, { w: 0.5, c: '#E9F2F4', boil: false, wob: 0.2 }); arcs.push(pts[8]); }
-        g.line2([[c[0], c[1]], [c[0], c[1] - h]], { w: 1.1, c: '#F3F8FA', boil: false, ext: 0 }); for (const p of arcs) g.disc2(p, 0.5, '#F3F8FA'); } });
+        g.line2([[c[0], c[1]], [c[0], c[1] - h]], { w: 1.1, c: '#F3F8FA', boil: false, ext: 0 }); for (const p of arcs) g.disc2(p, 0.5, '#F3F8FA'); g.disc2([c[0], c[1] - h + 1.2], 0.55, 'rgba(243,248,250,0)'); g.mark({ nc: '#DDF6FF', light: true }); } });   // (the last disc: night only, the lit jet's crown)
   };
   fountain(-13, -9); fountain(12, -9);
   T.obj([-28, -12, -24, -8], (g) => {
@@ -124,6 +138,7 @@ SF.tile('trafalgar', 0, -100, { rim: 14 }, function (T) {
     g.fill2([s(4.6, -15.2), s(5.4, -17.2), s(6.0, -15.6), s(6.8, -17.0), s(6.8, -15.0)], '#2F4FB4', true); g.fill2([s(5.8, -13.8), s(7.8, -13.2), s(5.9, -12.6)], '#2F4FB4', true);
     g.line2([s(-5, 0), s(-6.4, -6), s(-10.4, -14.6), s(-8.6, -15.4), s(-5.0, -11.4), s(-3.4, -9.6), s(1.8, -8.4), s(2.6, -14.2), s(4.6, -15.2), s(5.8, -13.6), s(4.4, -10.4), s(3.6, -4.6), s(2.8, 0)], { w: 0.5, c: '#18285A', boil: false });
     g.line2([s(-1, 0), s(-1.2, 3.2)], { w: 0.6, c: '#18285A', boil: false, ext: 0 });
+    LK.flood(g, 0, 0.6, LK.FLOOD.white, (c) => (c === '#2F4FB4' ? '#4466D8' : c === '#24408F' ? '#3654B8' : undefined)); g.glow('lantern', -24, -8, 3, { r: 2.4, col: '#E6ECFF' });
   }, { name: 'fourth plinth' });
   for (const [x, y] of [[-35, -18], [34, -6], [34, 8], [-20, 33], [10, 33]]) T.obj([x, y], (g) => LK.plane(g, x, y, { r: 4.4 }), { name: 'tree' });
   for (const [x, y] of [[-26, 22], [24, 22], [-26, -21], [24, -21]]) T.obj([x, y], (g) => LK.lamp(g, x, y, { h: 9.6 }), { name: 'lamp' });

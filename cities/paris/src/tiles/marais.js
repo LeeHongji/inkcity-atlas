@@ -35,7 +35,8 @@ SF.tile('marais', 0, 100, { rim: 40 }, function (T) {
     for (const face of ['L', 'R']) {
       const p = face === 'L' ? y1 : x1, A0 = face === 'L' ? x0 : y0, A1 = face === 'L' ? x1 : y1, n = Math.max(1, Math.round((A1 - A0) / 2.6)), bw = (A1 - A0) / n;
       // the arcade: stone arches over a shadowed walk
-      for (let k = 0; k < n; k++) { const m = A0 + bw * (k + 0.5), hw = bw * 0.38, ar = [K.pt(face, p + 0.03, m - hw, 0), K.pt(face, p + 0.03, m + hw, 0)]; for (let j = 0; j <= 6; j++) { const t = Math.PI * j / 6; ar.push(K.pt(face, p + 0.03, m + Math.cos(t) * hw, 2.8 + Math.sin(t) * hw)); } g.fill(ar, '#7A5E4E'); g.line(ar.slice(2), { w: 0.4, c: '#F1E8D6', boil: false }); }
+      for (let k = 0; k < n; k++) { const m = A0 + bw * (k + 0.5), hw = bw * 0.38, ar = [K.pt(face, p + 0.03, m - hw, 0), K.pt(face, p + 0.03, m + hw, 0)]; for (let j = 0; j <= 6; j++) { const t = Math.PI * j / 6; ar.push(K.pt(face, p + 0.03, m + Math.cos(t) * hw, 2.8 + Math.sin(t) * hw)); } g.fill(ar, '#7A5E4E'); g.mark({ nc: '#A8744C' }); g.line(ar.slice(2), { w: 0.4, c: '#F1E8D6', boil: false });
+        const lp = K.pt(face, p - 0.3, m, 2.9); g.glow('lantern', lp[0], lp[1], lp[2], { r: 0.75, col: '#FFD27A' }); }   // at night a lantern hangs in every arch of the arcade
       g.fill(K.on(face, p + 0.02, A0, A1, 0, 0.4), '#E9E0CB');
       g.line([K.pt(face, p + 0.03, A0, 4.4), K.pt(face, p + 0.03, A1, 4.4)], { w: 0.45, c: '#F1E8D6', boil: false });
       // two floors of tall windows in white stone frames; stone quoins at the corners
@@ -45,7 +46,7 @@ SF.tile('marais', 0, 100, { rim: 40 }, function (T) {
     // the steep slate roof, a hip with dormers, two tall brick chimneys
     K.hip(g, x0 - 0.3, y0 - 0.3, x1 + 0.3, y1 + 0.3, Z, king ? 7.5 : 6.0, SLATE, { ridge: Math.max(0, Math.abs((x1 - x0) - (y1 - y0)) * 0.95), c: '#3A4048' });
     const sl = []; for (let a = x0; a < x1; a += 0.7) { const p0 = g.p(a, y1 + 0.3, Z), p1 = g.p(lerp(a, (x0 + x1) / 2, 0.3), lerp(y1, (y0 + y1) / 2, 0.45), Z + 2.6); sl.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(sl, '#4E555E', 0.25);
-    for (const face of ['L', 'R']) { const p = face === 'L' ? y1 - 0.8 : x1 - 0.8, A0 = face === 'L' ? x0 : y0, A1 = face === 'L' ? x1 : y1, m = (A0 + A1) / 2; for (const d of [-2.2, 2.2]) { const fr = K.on(face, p, m + d - 0.55, m + d + 0.55, Z + 0.6, Z + 2.2); g.fill(fr, '#F1E8D6'); g.fill(K.on(face, p + 0.02, m + d - 0.35, m + d + 0.35, Z + 0.8, Z + 1.9), '#5E6B76'); } }
+    for (const face of ['L', 'R']) { const p = face === 'L' ? y1 - 0.8 : x1 - 0.8, A0 = face === 'L' ? x0 : y0, A1 = face === 'L' ? x1 : y1, m = (A0 + A1) / 2; for (const d of [-2.2, 2.2]) { const fr = K.on(face, p, m + d - 0.55, m + d + 0.55, Z + 0.6, Z + 2.2); g.fill(fr, '#F1E8D6'); g.fill(K.on(face, p + 0.02, m + d - 0.35, m + d + 0.35, Z + 0.8, Z + 1.9), '#5E6B76'); g.mark({ win: 0.5 }); } }
     for (const [cx, cy] of [[x0 + 1.2, (y0 + y1) / 2], [(x0 + x1) / 2, y0 + 1.2]]) K.box(g, cx - 0.3, cy - 0.55, cx + 0.3, cy + 0.55, Z + 2, Z + (king ? 4.8 : 4.2), BRICK, { w: 0.45, boil: false, nohid: true });
   }, { name: 'pavilion ' + i });
   // the far side along x (y -36..-28) and the left side along y (x -36..-28); the King's pavilion in the middle of one
@@ -80,7 +81,7 @@ SF.tile('marais', 0, 100, { rim: 40 }, function (T) {
     PA.shop(g, 'L', 22.5, x0 + 0.6, x1 - 0.6, 4.6, sc, kind === 'cafe' ? 'cafe' : 'shop', 700 + i);
     const n = Math.max(1, Math.round((x1 - x0) / 2.8)); for (let k = 0; k < n; k++) { const m = x0 + (x1 - x0) * (k + 0.5) / n; for (const z0 of [5.4, 8.2]) { PA.win(g, 'L', 22.5, m - 0.5, m + 0.5, z0, z0 + 2.0, { pane: '#5E6B76', rail: true }); for (const s of [-1, 1]) g.fill(K.on('L', 22.53, m + s * 0.55, m + s * 1.05, z0, z0 + 2.0), ['#4F7A5E', '#5E7E9A', '#8A5A3A'][i % 3]); } }
     PA.mansard(g, x0, 16.5, x1, 22.5, Z, { h: 2.4, d: 1.0, h2: 0.4, dormers: 3.2, chim: [[x0 + 0.6, 19.5, 'y', 2]] });
-    if (kind === 'falafel') { const q = K.on('L', 22.6, x0 + 1.5, x1 - 1.5, 4.7, 5.6); g.fill(q, '#E6C24F'); const c = g.p((x0 + x1) / 2, 22.62, 5.15); PA.letters2(g, c, 18, 1.4, '#2F5D4B', "L'AS DU FALLAFEL", 0.35, PA.dirOf('L')); }
+    if (kind === 'falafel') { const q = K.on('L', 22.6, x0 + 1.5, x1 - 1.5, 4.7, 5.6); g.fill(q, '#E6C24F'); g.mark({ nc: '#FFD45A' }); const c = g.p((x0 + x1) / 2, 22.62, 5.15); PA.letters2(g, c, 18, 1.4, '#2F5D4B', "L'AS DU FALLAFEL", 0.35, PA.dirOf('L')); g.glow2('lantern', c, c, { r: 2.4, col: '#FFD86A' }); }   // its sign lit
   }, { name: 'rosiers ' + kind }));
   // the café terrace on the lane and its waiter; the falafel queue; the bakery's customer with a baguette
   PA.waiter(T, PA.terrace(T, 'L', 22.5, -2.6, 8.6, { seed: 41, z: 4.9, out: 2.2, sp: 2.4 }), 7, {});

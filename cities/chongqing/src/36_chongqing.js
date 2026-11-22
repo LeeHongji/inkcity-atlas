@@ -19,6 +19,26 @@ const CQC = {
 };
 CQ.SHOPS = [['火锅', CQC.red], ['小面', '#E6B84A'], ['茶馆', '#3F6B4E'], ['重庆', '#2F4A6B'], ['火锅', '#B8322A'], ['小面', '#D9732F']];
 
+/* ---------------- night: what lights up (none of this draws anything by day) ---------------- */
+CQ.LIT = '#FFE3A6';                     // a lit pane: train, cabin and boat windows
+CQ.GOLD = '#FFCF6A';                    // a line of gold light along an eave, a rail, a deck edge
+/* set o on one drawing command, as g.mark does (nc: a colour, true = its own colour, or a function of it) */
+CQ.nset = function (d, o) { for (const key in o) { const v = o[key]; if (key !== 'nc') { d[key] = v; continue; } const c = v === true ? (d.c || d.col) : typeof v === 'function' ? v(d.c || d.col) : v; if (c) d.nc = c; } };
+/* the fills (strokes: true: the pen lines and marks) drawn since command i0, of day colour `day` (null: any), take o */
+CQ.nmark = function (g, i0, day, o, strokes) {
+  const key = day && day.toLowerCase();
+  for (let k = i0; k < g.cmds.length; k++) {
+    const d = g.cmds[k], fill = d.k === K_FILL || d.k === K_DISC || d.k === K_TRIS;
+    if (fill === !strokes && (!key || String(d.c || d.col).toLowerCase() === key)) CQ.nset(d, o);
+  }
+};
+/* small lamps on the posts of a rail or a parapet, world points a -> b (z: the lamp), one every `sp` u; o.base the
+   ground under them, o.kind 'lamp' (a pool on the ground) or 'lantern' (a halo in o.col) */
+CQ.railLamps = function (g, a, b, sp, o) {
+  o = o || {}; const L = Math.hypot(b[0] - a[0], b[1] - a[1]), n = Math.max(1, Math.round(L / sp));
+  for (let i = 0; i <= n; i++) { if (o.ends === false && (i === 0 || i === n)) continue; const t = i / n; g.glow(o.kind || 'lamp', lerp(a[0], b[0], t), lerp(a[1], b[1], t), a[2], { r: o.r || 1.0, base: o.base == null ? a[2] : o.base, col: o.col }); }
+};
+
 /* ---------------- ground, walls, stairs ---------------- */
 /* paving scuffs in a rectangle at height z */
 CQ.paving = function (g, x0, y0, x1, y1, z, o) {
@@ -91,7 +111,9 @@ CQ.stepZ = (z0, z1, t) => z0 + (z1 - z0) * clamp(t, 0, 1);
 CQ.block = function (g, d) {
   const z0 = d.z || 0, z1 = z0 + d.h, col = d.col || CQC.plaster, R = RNG(d.seed || Math.round(d.x0 * 7 + d.y1 * 13));
   g.boilP = 0.2;
+  const i0 = g.cmds.length;
   K.box(g, d.x0, d.y0, d.x1, d.y1, z0, z1, { t: shade(col, -0.12), l: col, r: shade(col, 0.12) }, { w: 0.85 });
+  if (d.crown) CQ.nmark(g, i0, null, { nc: d.crown }, true);                   // at night its edges are traced in light
   const st = d.st || 3.0, gf = d.gf == null ? 3.6 : d.gf, faces = [['L', d.y1, d.x0, d.x1], ['R', d.x1, d.y0, d.y1]];
   const wins = [], cages = [], acs = [], laundry = [];
   for (const [f, p, a0, a1] of faces) {
@@ -109,7 +131,7 @@ CQ.block = function (g, d) {
       }
     }
   }
-  for (const q of wins) g.fill(q, d.win || CQC.win);
+  for (const q of wins) { g.fill(q, d.win || CQC.win); if (d.lit != null) g.mark({ win: d.lit }); }   // at night most flats are lit (SCENE.night)
   const cs = [];
   for (const [f, p, a0, a1, za, zb] of cages) {
     const q = K.on(f, p + 0.45, a0, a1, za, zb); g.fill(q, 'rgba(120,124,124,0.35)');
@@ -131,7 +153,7 @@ CQ.block = function (g, d) {
     const aw = d.awning == null ? CQ.AWN[Math.abs(Math.round(a0 * 7 + (d.seed || 0))) % CQ.AWN.length] : d.awning;
     if (aw) CQ.awning(g, f, p, a0 + 0.6, a1 - 0.6, z0 + gf - 1.15, 1.8, aw[0], aw[1]);
     if (d.lanterns !== false) for (let a = a0 + 1.4; a < a1 - 1; a += 2.6) CQ.lantern2(g, g.p.apply(g, K.pt(f, p + 2.0, a, z0 + gf - 2.3)), 0.75);
-    else g.fill(K.on(f, p + 0.05, a0 + 0.4, a1 - 0.4, z0 + gf - 1.1, z0 + gf - 0.05), s[1]);
+    else { g.fill(K.on(f, p + 0.05, a0 + 0.4, a1 - 0.4, z0 + gf - 1.1, z0 + gf - 0.05), s[1]); g.mark({ nc: true }); }
   }
   // rooftop: a parapet line, a water tank, sometimes a little garden of pots
   const rt = (x, y) => g.p(x, y, z1);
@@ -164,6 +186,8 @@ CQ.oldhouse = function (g, d) {
   }
   g.segs2(fr, CQC.timberD, 0.4);
   if (d.sign) { const f = d.signFace || 'L', p = f === 'L' ? d.y1 : d.x1, a0 = f === 'L' ? d.x0 : d.y0, a1 = f === 'L' ? d.x1 : d.y1; CQH.sign(g, f, p + 0.1, a0 + 0.8, a1 - 0.8, z0 + st - 0.55, z0 + st + 0.75, d.sign[1], d.sign[0]); }
+  // a lamp on a bracket over the shop door on each open front (only at night)
+  if (d.open !== false) for (const [f, p, a0, a1] of [['L', d.y1, d.x0, d.x1], ['R', d.x1, d.y0, d.y1]]) { const q = K.pt(f, p + 0.5, (a0 + a1) / 2 + (f === 'L' ? -1.2 : 1.2), z0 + st - 0.75); g.glow('lantern', q[0], q[1], q[2], { r: 0.9, col: '#FFC27A' }); }
   CQ.tileRoof(g, d.x0, d.y0, d.x1, d.y1, z1, d.rh || 2.6, d.ridge || ((d.x1 - d.x0) >= (d.y1 - d.y0) ? 'x' : 'y'));
   return z1;
 };
@@ -245,15 +269,17 @@ CQ.noodleStall = function (g, x, y, z, seed, o) {
     K.box(g2, -1.6, -1.4, 1.6, 1.4, 0, 2.6, { t: '#D9D3C4', l: o.col || '#C9463E', r: shade(o.col || '#C9463E', 0.15) }, { w: 0.6 });
     CQH.sign(g2, 'L', 1.4, -1.4, 1.4, 0.6, 2.2, '#E6B84A', '小面', { line: false });
     K.cyl(g2, 0.6, -0.4, 0.9, 2.6, 3.6, { t: '#5A564E', l: '#9C9A94', r: '#7A7872' }, { w: 0.45, n: 10 });
+    g2.glow('lamp', -0.9, 0.6, 3.0, { r: 0.9 });                               // a bare bulb on the counter, lit at night
     CQ.person(g2, 2.6, -0.6, 0, CQ.who(seed, { dir: 2, pose: 'hold', top: '#F3F1EA', cap: '#F3F1EA' }));
     eat(-1, 3.4, 3, seed + 2); eat(2.2, 3.6, 2, seed + 3); eat(4.6, 2.2, 2, seed + 4);
   });
 };
 /* a red paper lantern at wide-px point c */
-CQ.lantern2 = function (g, c, r, col) {
+CQ.lantern2 = function (g, c, r, col, o) {
   col = col || CQC.lantern; const rx = r * 0.82, pts = [];
   for (let i = 0; i < 12; i++) { const t = TAU * i / 12; pts.push([c[0] + Math.cos(t) * rx, c[1] + Math.sin(t) * r]); }
-  g.fill2(pts, col, true);
+  g.fill2(pts, col, true); g.mark({ nc: (c) => mix(c, '#FF9A5A', 0.25) });     // at night a light burns inside
+  g.glow2('lantern', c, c, { r: r * ((o && o.halo) || 1.05), col: '#FF6A42' });
   g.fill2([[c[0] - rx * 0.55, c[1] - r - 0.25], [c[0] + rx * 0.55, c[1] - r - 0.25], [c[0] + rx * 0.55, c[1] - r + 0.15], [c[0] - rx * 0.55, c[1] - r + 0.15]], '#3A2A22', true);
   g.fill2([[c[0] - rx * 0.55, c[1] + r - 0.15], [c[0] + rx * 0.55, c[1] + r - 0.15], [c[0] + rx * 0.55, c[1] + r + 0.25], [c[0] - rx * 0.55, c[1] + r + 0.25]], '#3A2A22', true);
   g.segs2([c[0], c[1] + r + 0.25, c[0], c[1] + r + 1.0], CQC.gold, 0.35);
@@ -276,9 +302,15 @@ CQ.fig = function (g, x, y, o) {
     });
   const lf = []; for (let i = 0; i < 22; i++) { const a = R() * TAU, d = R() * r * 0.8, px = top[0] + Math.cos(a) * d, py = cy + Math.sin(a) * d * 0.7 - r * 0.1; lf.push(px - 0.6, py + 0.3, px + 0.6, py - 0.3); }
   g.segs2(lf, lt, 0.8);
+  g.glow2('tree', [top[0], cy], f, { r: r * 0.9, col: o.glow });                // at night: a faint aura, motes drifting up
 };
-/* a blossoming tree (plum / magnolia in March) */
-CQ.bloom = function (g, x, y, o) { o = o || {}; CQ.fig(g, x, y, Object.assign({ r: 3.2, h: 3.6, col: o.col || CQC.blossom, light: '#FBF6F4' }, o)); };
+/* a blossoming tree (plum / magnolia in March); at night the pale blossom catches the lamplight */
+CQ.bloom = function (g, x, y, o) {
+  o = o || {}; const i0 = g.cmds.length;
+  CQ.fig(g, x, y, Object.assign({ r: 3.2, h: 3.6, col: o.col || CQC.blossom, light: '#FBF6F4', glow: '#FFC9DA' }, o));
+  const bl = (o.col || CQC.blossom).toLowerCase();
+  for (let k = i0; k < g.cmds.length; k++) { const d = g.cmds[k]; if (d.k === K_FILL && (String(d.c).toLowerCase() === bl || String(d.c).toLowerCase() === shade(bl, 0.16).toLowerCase())) CQ.nset(d, { nc: (c) => mix(nightColour(c), c, 0.3) }); }
+};
 
 /* ---------------- people ---------------- */
 const CQ_TOPS = ['#3B3F47', '#5A6B7A', '#8E8A84', '#B9A27D', '#2F3A4F', '#E7E2D6', '#6E7F5E', '#C9584B', '#D98AA4', '#7FA9C9', '#E6C24F', '#F3F1EA', '#4A5A78', '#A4C66B', '#9C6B5A', '#E08A5C'];
@@ -307,7 +339,7 @@ CQ.person = function (g, x, y, z, w) {
     if (w.bird) g.disc2([c[0] + 0.3, c[1] - 1.5 * k], 0.6 * k, w.bird); }
   if (w.bowl) { const c = [hd[0], hd[1] - 0.4]; g.fill2(arcPts(c[0], c[1], 1.1 * k, 0, Math.PI, 6), '#F3F1EA', true); g.segs2([c[0] + 0.4, c[1] - 0.4, c[0] + 1.6 * k, c[1] - 2.6 * k], '#8A6446', 0.25); }
   if (w.bag) { const b = r.hands[1] || hd; g.fill2([[b[0] - 1.3, b[1] + 0.2], [b[0] + 1.3, b[1] + 0.2], [b[0] + 1.5, b[1] + 3.6], [b[0] - 1.5, b[1] + 3.6]], w.bag, true); g.segs2([b[0] - 0.7, b[1] + 0.2, b[0], b[1] - 0.8, b[0], b[1] - 0.8, b[0] + 0.7, b[1] + 0.2], shade(w.bag, 0.4), 0.3); }
-  if (w.phone) g.fill2([[hd[0] - 0.45, hd[1] - 1.1], [hd[0] + 0.45, hd[1] - 1.1], [hd[0] + 0.45, hd[1] + 0.3], [hd[0] - 0.45, hd[1] + 0.3]], '#2A2622', true);
+  if (w.phone) { g.fill2([[hd[0] - 0.45, hd[1] - 1.1], [hd[0] + 0.45, hd[1] - 1.1], [hd[0] + 0.45, hd[1] + 0.3], [hd[0] - 0.45, hd[1] + 0.3]], '#2A2622', true); g.mark({ nc: '#D9EEFF', light: true }); g.glow2('lantern', [hd[0], hd[1] - 0.4], null, { r: 0.7, col: '#BFE2FF' }); }   // a lit screen at night
   if (w.umbrella) { const c = [hd[0], hd[1] - 13 * k]; g.segs2([hd[0], hd[1], c[0], c[1]], '#3A3530', 0.35); g.fill2(arcPts(c[0], c[1] + 0.8, 4.2 * k, Math.PI, TAU, 10), w.umbrella, true); }
   return r;
 };
@@ -352,6 +384,7 @@ CQ.steam2 = function (g, ph, k, col) {
     const t = ((ph / 8) + i / 4) % 1, r = (1.0 + t * 2.4) * k, c = [o[0] + Math.sin((t + i) * 4.2) * 1.3 * k + t * 2.2 * k, o[1] - t * 11 * k];
     const pts = []; for (let q = 0; q < 8; q++) { const a = TAU * q / 8; pts.push([c[0] + Math.cos(a) * r * (0.9 + 0.2 * Math.sin(q * 2.3 + i)), c[1] + Math.sin(a) * r * 0.75]); }
     g.fill2(pts, col.replace(/[\d.]+\)$/, (1 - t) * parseFloat(col.match(/[\d.]+\)$/)[0]) + ')'), true);
+    g.mark({ nc: (c) => c.replace(/^rgba\(\d+,\s*(\d+),[^,]*,\s*([\d.]+)\)$/, (m, gg, a) => 'rgba(255,' + (+gg < 200 ? 178 : 226) + ',' + (+gg < 200 ? 140 : 196) + ',' + (a * 0.55).toFixed(3) + ')') });   // lit by the lamps below
   }
 };
 /* a steam actor at (x, y, z) in tile T */
@@ -370,6 +403,7 @@ CQ.hotpot = function (g, x, y, o) {
   g.fill2(arcPts(top[0], top[1] - 0.8, pr * 0.42, 0, TAU, 10).map((p) => [p[0], top[1] - 0.8 + (p[1] - top[1] + 0.8) * 0.55]), '#E9D9B0', true);
   const dots = []; for (let i = 0; i < 7; i++) { const a = i * 0.9, d = pr * 0.62; dots.push(top[0] + Math.cos(a) * d - 0.3, top[1] - 0.8 + Math.sin(a) * d * 0.5, top[0] + Math.cos(a) * d + 0.3, top[1] - 0.8 + Math.sin(a) * d * 0.5); } g.segs2(dots, '#7A1E18', 0.55);
   const pl = []; for (let i = 0; i < 5; i++) { const a = 0.5 + i * 1.25, c = [top[0] + Math.cos(a) * r * 2.6, top[1] + Math.sin(a) * r * 1.3]; pl.push(c); } for (const c of pl) g.fill2(arcPts(c[0], c[1], 0.9, 0, TAU, 8).map((p) => [p[0], c[1] + (p[1] - c[1]) * 0.55]), '#F6F3EA', true);
+  g.glow('lantern', x, y, h + 0.3, { r: 1.5, col: '#FF8A48' });               // at night the burner glows under the bubbling pot
 };
 /* a low stool (round, plastic red or blue) at (x, y) */
 CQ.stool = function (g, x, y, col) { K.cyl(g, x, y, 0.75, 0, 1.3, { t: shade(col || '#C9463E', -0.15), l: col || '#C9463E', r: shade(col || '#C9463E', 0.2) }, { w: 0.4, n: 8 }); };
@@ -389,9 +423,9 @@ CQ.mahjong = function (g, x, y, seeds, o) {
 
 /* ---------------- vehicles ---------------- */
 /* a Chongqing taxi: yellow, a green roof sign */
-CQ.taxi = function (g, ang, o) { o = o || {}; K.car(g, ang, { col: o.col || '#E8C23C', L: 5.0, W: 2.45, roof: (gg, cab) => K.rbox(gg, cab.cx, cab.cy, 0.5, 1.0, ang + Math.PI / 2, 4.8, 5.5, '#F4F1E6', { w: 0.45, nb: true }) }); };
+CQ.taxi = function (g, ang, o) { o = o || {}; K.car(g, ang, { col: o.col || '#E8C23C', L: 5.0, W: 2.45, roof: (gg, cab) => gg.lit({ nc: true, light: true }, () => K.rbox(gg, cab.cx, cab.cy, 0.5, 1.0, ang + Math.PI / 2, 4.8, 5.5, '#F4F1E6', { w: 0.45, nb: true })) }); };   // the roof sign lit at night
 /* a city bus: white with a red or blue band */
-CQ.bus = function (g, ang, o) { o = o || {}; K.bus(g, ang, { band: o.band || '#C8392E', L: 7.2 }); };
+CQ.bus = function (g, ang, o) { o = o || {}; const i0 = g.cmds.length; K.bus(g, ang, { band: o.band || '#C8392E', L: 7.2 }); CQ.nmark(g, i0, C.glass, { nc: CQ.LIT }); };   // lit windows at night
 /* a motorbike with its rider (a moto-taxi), heading ang */
 CQ.moto = function (g, ang, o) {
   o = o || {}; const ca = Math.cos(ang), sa = Math.sin(ang), col = o.col || '#C9463E', pt = (u, z) => g.p(u * ca, u * sa, z);
@@ -420,7 +454,7 @@ CQ.monoCar = function (g, ang, o) {
   for (const f of ['pv', 'nv']) if (B.vis[f]) {
     g.fill(B.quad(f, -1, 1, z0, z0 + 0.9), '#B9BDBB');
     g.fill(B.quad(f, -1, 1, 0.5, 1.0), band);
-    for (const [a, b] of (o.half ? [[-0.7, 0.55]] : [[-0.86, -0.56], [-0.42, -0.12], [0.02, 0.32], [0.46, 0.76]])) K.rwin(g, B, f, a, b, 1.3, 2.9, { col: '#9FB8C6' });
+    for (const [a, b] of (o.half ? [[-0.7, 0.55]] : [[-0.86, -0.56], [-0.42, -0.12], [0.02, 0.32], [0.46, 0.76]])) g.lit({ nc: CQ.LIT, light: true }, () => K.rwin(g, B, f, a, b, 1.3, 2.9, { col: '#9FB8C6' }));   // lit at night
     if (!o.half) for (const d of [-0.49, 0.39]) { const q = B.quad(f, d - 0.05, d + 0.05, 0.0, 3.0); g.fill(q, '#C9CDCB'); }
     if (o.half && o.gw) { const e = o.gw === 'pu' ? 1 : -1; g.fill(B.quad(f, e > 0 ? 0.9 : -1, e > 0 ? 1 : -0.9, z0 + 0.5, z1 - 0.3), '#4A4E50'); }
     if (o.half) for (const d of [-0.15]) { const q = B.quad(f, d - 0.04, d + 0.04, 0.0, 3.0); g.fill(q, '#C9CDCB'); }
@@ -436,10 +470,10 @@ CQ.cabin = function (g, ang, o) {
   o = o || {}; const col = o.col || '#C23B2F', top = g.p(0, 0, 0), hang = 3.2;
   const ca = Math.cos(ang), sa = Math.sin(ang);
   const B = K.rbox(g, 0, 0, 2.6, 1.6, ang, -hang - 4.4, -hang, { t: '#F1ECE0', l: col, r: shade(col, 0.15) }, { w: 0.75 });
-  for (const f of ['pv', 'nv', 'pu', 'nu']) if (B.vis[f]) { const a = f[0] === 'p' && f[1] === 'u' || f === 'nu' ? [-0.75, 0.75] : [-0.85, 0.85]; K.rwin(g, B, f, a[0], a[1], -hang - 2.6, -hang - 0.5, { col: '#C9DCE4' }); g.fill(B.quad(f, -1, 1, -hang - 4.4, -hang - 3.9), '#F1ECE0'); }
+  for (const f of ['pv', 'nv', 'pu', 'nu']) if (B.vis[f]) { const a = f[0] === 'p' && f[1] === 'u' || f === 'nu' ? [-0.75, 0.75] : [-0.85, 0.85]; g.lit({ nc: CQ.LIT, light: true }, () => K.rwin(g, B, f, a[0], a[1], -hang - 2.6, -hang - 0.5, { col: '#C9DCE4' })); g.fill(B.quad(f, -1, 1, -hang - 4.4, -hang - 3.9), '#F1ECE0'); }   // lit at night
   const b = g.p(0, 0, -hang); g.segs2([top[0], top[1], b[0], b[1]], '#3A3530', 0.6);
   g.fill2([[top[0] - 1.2, top[1] - 0.4], [top[0] + 1.2, top[1] - 0.4], [top[0] + 1.0, top[1] + 0.9], [top[0] - 1.0, top[1] + 0.9]], '#4A4540', true);
-  if (o.riders) { const ps = o.riders; for (let i = 0; i < ps.length; i++) { const p = B.pt(-1.2 + i * 1.3, 0.2, -hang - 4.4); K.person(g, p[0], p[1], p[2], Object.assign({}, ps[i], { dir: (ca + sa > 0) ? 1 : 3, noLegs: true, k: 0.82 })); } K.rwin(g, B, 'pv', -0.85, 0.85, -hang - 2.6, -hang - 0.5, { col: 'rgba(201,220,228,0.45)', glint: true }); }
+  if (o.riders) { const ps = o.riders; for (let i = 0; i < ps.length; i++) { const p = B.pt(-1.2 + i * 1.3, 0.2, -hang - 4.4); K.person(g, p[0], p[1], p[2], Object.assign({}, ps[i], { dir: (ca + sa > 0) ? 1 : 3, noLegs: true, k: 0.82 })); } g.lit({ nc: 'rgba(255,227,166,0.3)' }, () => K.rwin(g, B, 'pv', -0.85, 0.85, -hang - 2.6, -hang - 0.5, { col: 'rgba(201,220,228,0.45)', glint: true })); }
 };
 /* a river boat around the origin, bow to ang. kind 'cruise' (white, three decks), 'barge' (dark hull, a load of sand
    or containers), 'ferry' (small, a cabin), 'fish' (a little sampan). L half-length */
@@ -452,20 +486,22 @@ CQ.boat = function (g, ang, o) {
     const B = K.rbox(g, -L * 0.15 * ca, -L * 0.15 * sa, L * 0.6, Wd * 0.75, ang, 1.4, 2.6, o.load === 'box' ? { t: '#D9734A', l: '#C9584B', r: '#A9483B' } : { t: '#D9C9A4', l: '#C9B48A', r: '#B39D72' }, { w: 0.6 });
     if (o.load === 'box') for (const f of ['pv', 'nv']) if (B.vis[f]) for (const a of [-0.5, 0, 0.5]) g.fine([B.quad(f, a, a, 1.4, 2.6)[0], B.quad(f, a, a, 1.4, 2.6)[3]], { w: 0.3, c: '#7A3A2E' });
     const h = K.rbox(g, -L * 0.88 * ca, -L * 0.88 * sa, L * 0.1, Wd * 0.7, ang, 1.4, 4.2, { t: '#E9E6DE', l: '#F3F1EA', r: '#D9D6CC' }, { w: 0.6 });
-    K.rwin(g, h, 'pu', -0.7, 0.7, 3.2, 3.9); K.rwin(g, h, 'pv', -0.6, 0.6, 3.2, 3.9); K.rwin(g, h, 'nv', -0.6, 0.6, 3.2, 3.9);
+    g.lit({ nc: CQ.LIT, light: true }, () => { K.rwin(g, h, 'pu', -0.7, 0.7, 3.2, 3.9); K.rwin(g, h, 'pv', -0.6, 0.6, 3.2, 3.9); K.rwin(g, h, 'nv', -0.6, 0.6, 3.2, 3.9); });   // the wheelhouse lit at night
   } else if (kind === 'cruise') {
     const zs = [1.4, 3.4, 5.2, 6.8];
     for (let i = 0; i < 3; i++) {
       const f = 1 - i * 0.14, cx = -L * (0.12 + i * 0.05);
-      const D = K.rbox(g, cx * ca, cx * sa, L * 0.72 * f, Wd * (0.86 - i * 0.05), ang, zs[i], zs[i + 1], { t: '#E6E3DA', l: '#F5F3EC', r: '#DEDBD2' }, { w: 0.6, nb: true });
-      for (const fc of ['pv', 'nv']) if (D.vis[fc]) { const n = 10 - i * 2; for (let k = 0; k < n; k++) { const a = -0.92 + 1.84 * k / n; g.fill(D.quad(fc, a + 0.03, a + 1.84 / n - 0.03, zs[i] + 0.45, zs[i + 1] - 0.45), i === 0 ? '#3F5F8F' : '#5F7FA8'); } }
-      for (const fc of ['pu', 'nu']) if (D.vis[fc]) g.fill(D.quad(fc, -0.8, 0.8, zs[i] + 0.45, zs[i + 1] - 0.45), '#5F7FA8');
+      const iD = g.cmds.length, D = K.rbox(g, cx * ca, cx * sa, L * 0.72 * f, Wd * (0.86 - i * 0.05), ang, zs[i], zs[i + 1], { t: '#E6E3DA', l: '#F5F3EC', r: '#DEDBD2' }, { w: 0.6, nb: true });
+      CQ.nmark(g, iD, null, { nc: CQ.GOLD }, true);                                // at night every deck is traced in strings of light
+      for (const fc of ['pv', 'nv']) if (D.vis[fc]) { const n = 10 - i * 2; for (let k = 0; k < n; k++) { const a = -0.92 + 1.84 * k / n; g.fill(D.quad(fc, a + 0.03, a + 1.84 / n - 0.03, zs[i] + 0.45, zs[i + 1] - 0.45), i === 0 ? '#3F5F8F' : '#5F7FA8'); g.mark({ nc: CQ.LIT }); } }
+      for (const fc of ['pu', 'nu']) if (D.vis[fc]) { g.fill(D.quad(fc, -0.8, 0.8, zs[i] + 0.45, zs[i + 1] - 0.45), '#5F7FA8'); g.mark({ nc: CQ.LIT, light: true }); }
+      for (const u of [-0.85, 0, 0.85]) { const q = D.pt(u * L * 0.72 * f, 0, zs[i + 1]); g.glow('lantern', q[0], q[1], q[2], { r: 1.6, col: '#FFD27A', base: 0 }); }   // (a moored ship: its lights on the water)
     }
     const fn = K.rbox(g, -L * 0.45 * ca, -L * 0.45 * sa, 0.8, 0.7, ang, zs[3], zs[3] + 2.2, { t: '#2F343B', l: '#C23B2F', r: '#A3322A' }, { w: 0.5 });
     void fn;
   } else {
     const h = K.rbox(g, -L * 0.1 * ca, -L * 0.1 * sa, L * 0.55, Wd * 0.8, ang, 1.4, 3.8, { t: '#D9D6CC', l: '#F3F1EA', r: '#DEDBD2' }, { w: 0.6 });
-    for (const f of ['pv', 'nv']) for (const [a, b] of [[-0.8, -0.35], [-0.2, 0.25], [0.4, 0.8]]) K.rwin(g, h, f, a, b, 2.2, 3.3);
+    g.lit({ nc: CQ.LIT, light: true }, () => { for (const f of ['pv', 'nv']) for (const [a, b] of [[-0.8, -0.35], [-0.2, 0.25], [0.4, 0.8]]) K.rwin(g, h, f, a, b, 2.2, 3.3); });   // lit at night
   }
 };
 /* a gull or egret flying, at wide-px point c, wings phase ph 0..3 */

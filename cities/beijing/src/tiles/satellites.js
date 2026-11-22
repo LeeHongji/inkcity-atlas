@@ -62,13 +62,16 @@
       const b = g.p(-11, -24, 0), pts = []; for (let k = 0; k <= 16; k++) { const t = k / 16; pts.push([b[0] + (t - 0.5) * 92, b[1] - Math.pow(Math.sin(Math.PI * t), 1.1) * 52]); } for (let k = 1; k < 12; k++) { const a = Math.PI * k / 12; pts.push([b[0] + Math.cos(a) * 46, b[1] + Math.sin(a) * 14]); }
       g.fill2(pts, '#8EA06A'); g.line2(pts.slice(0, 17), { w: 0.8, c: '#4E6A3A' });
       const R = RNG(9); for (let k = 0; k < 18; k++) { const t = 0.1 + R() * 0.8, x = b[0] + (t - 0.5) * 92, yt = b[1] - Math.pow(Math.sin(Math.PI * t), 1.1) * 48, y = lerp(yt, b[1] + 10, 0.15 + R() * 0.6), r = 3 + R() * 3; g.fill2(arcPts(x, y, r, 0, TAU, 9).map((q) => [q[0], y + (q[1] - y) * 0.8]), R.pick(['#D45A38', '#E0A040', '#5E7A4E', '#4E6E4B', '#C9A040']), true); }
-      const tz = 15, cx = -11, cy = -24;
+      const tz = 15, cx = -11, cy = -24, iT = g.cmds.length;
       BJ.terrace(g, cx - 4.2, cy - 4.2, cx + 4.2, cy + 4.2, tz - 1, tz + 1, { col: { t: '#D9C9A8', l: '#C9B48A', r: '#B5A078' }, rail: false, steps: '' });
       BJ.roundBody(g, cx, cy, 3.0, tz + 1, tz + 5, { n: 8 });
       let z = BJ.roundRoof(g, cx, cy, 4.2, tz + 5, 3.0, { top: 0.42, col: BC.yellow, lift: 0 });
       BJ.roundBody(g, cx, cy, 2.6, z, z + 2.2, { n: 8, doors: false }); z = BJ.roundRoof(g, cx, cy, 3.6, z + 2.2, 2.6, { top: 0.42, col: '#4F8F6A' });
       BJ.roundBody(g, cx, cy, 2.2, z, z + 1.8, { n: 8, doors: false }); z = BJ.roundRoof(g, cx, cy, 3.2, z + 1.8, 4.2, { col: BC.yellow });
       const f = g.p(cx, cy, z); g.disc2([f[0], f[1] - 1.4], 1.0, BC.gold);
+      // at night the Tower of Buddhist Incense is lit gold over the dark hill and the lake
+      BN.flood(g, iT, 0.8, '#FFD59A', { lines: 0.25 });
+      for (const [zz, r] of [[tz + 2.5, 2.6], [tz + 7, 2.4], [tz + 11, 2.0]]) g.glow2('lantern', g.p(cx + 2.4, cy + 2.4, zz), g.p(cx + 4, cy + 9, 0), { r, col: '#FFC47A' });
     }, { name: 'longevity hill' });
     // the Seventeen-Arch Bridge to the island (with its little temple)
     T.obj([4, 8, 27, 12], function (g) {
@@ -78,6 +81,8 @@
       for (let k = 0; k < n; k++) { const t = (k + 0.5) / n, x = lerp(x0, x1, t), zt = 0.3 + Math.sin(Math.PI * t) * 1.5, r = (x1 - x0) / n * 0.36; const a = []; for (let j = 0; j <= 6; j++) { const th = Math.PI * j / 6; a.push([x - Math.cos(th) * r, y + 2.02, -0.8 + Math.sin(th) * (zt + 0.5)]); } g.fill(a, '#6E8EA8'); under.push(a); }
       const top = pts.map((p) => [p[0], p[1] - 4, p[2]]); g.fill(pts.concat(top.slice().reverse()), '#E6E1D5');
       K.box(g, 24, 7, 28, 12, 0, 3.6, { t: '#C9B7A0', l: BC.red, r: shade(BC.red, 0.12) }, { w: 0.6 }); BJ.roof(g, 24, 7, 28, 12, 3.6, 2.2, { type: 'xie', col: BC.yellow, over: 0.8 });
+      // at night small lamps along the parapet, their light lying on the lake
+      for (let k = 0; k <= 6; k++) { const t = k / 6, x = lerp(x0, x1, t), zz = 0.8 + Math.sin(Math.PI * t) * 1.6; g.glow2('lantern', g.p(x, y + 2, zz + 0.9), g.p(x, y + 2.6, -0.8), { r: 0.9, col: '#FFD08A' }); }
     }, { name: 'seventeen-arch bridge' });
     // the Marble Boat by the near shore, and a dragon boat on the lake
     T.obj([-24, 12, -14, 17], function (g) { g.at(-19, 14.6, -0.6, (g2) => { K.boat(g2, 0, { kind: 'row', L: 5, W: 2.2, hull: '#EDE9E0' }); K.rbox(g2, 0, 0, 3.6, 1.6, 0, 1.6, 4.6, { t: '#E3DED2', l: '#F2EFE7', r: '#DAD5C8' }, { w: 0.6 }); K.rbox(g2, 0, 0, 3.0, 1.4, 0, 4.6, 6.6, { t: '#C9B48A', l: '#E9E4D8', r: '#D6D0C4' }, { w: 0.5 }); }); }, { name: 'marble boat' });
@@ -93,8 +98,8 @@
     T.obj([-26, -24, 8, 8], function (g) {
       const cx = -9, cy = -8, ra = 16, rb = 14, n = 32, zb = (a) => 9.5 + 1.6 * Math.cos(2 * a);
       const ring = (k, zf) => { const p = []; for (let i = 0; i <= n; i++) { const a = TAU * i / n; p.push([cx + Math.cos(a) * ra * k, cy + Math.sin(a) * rb * k, zf(a)]); } return p; };
-      const outerTop = ring(1, zb), outerBot = ring(1, () => 0), innerTop = ring(0.66, (a) => zb(a) - 0.6);
-      g.fill(innerTop, '#C9382E');
+      const outerTop = ring(1, zb), outerBot = ring(1, () => 0), innerTop = ring(0.66, (a) => zb(a) - 0.6), i0 = g.cmds.length;
+      g.fill(innerTop, '#C9382E'); g.mark({ nc: '#FF4A36' });          // (night: the bowl lit red from within)
       const bowl = ring(0.45, () => 1.2); g.fill(bowl, '#7FA05E');
       // the back half of the shell (seen inside), then the front half outside
       const front = [], back = [];
@@ -107,17 +112,24 @@
       g.segs2(sg, '#5E5A52', 0.6);
       g.line(outerTop.filter((p, i) => { const a = TAU * i / n; return Math.cos(a) + Math.sin(a) > -0.6; }), { w: 0.9 });
       g.line(outerBot.filter((p, i) => { const a = TAU * i / n; return Math.cos(a) + Math.sin(a) > -0.6; }), { w: 0.9 });
+      // at night the stadium glows red from within: the light shows through the grey steel, which stands dark against it
+      BN.each(g, i0, (c, f) => (f && c === '#9A968E' ? { nc: '#A83226' } : f && c !== '#7FA05E' && c !== '#C9382E' ? { nc: BN.mixA(nightColour(c), '#E0483A', 0.5) } : undefined));
+      for (const [a, zz, r] of [[0.4, 6, 2.4], [1.2, 6, 2.4], [-0.5, 6, 2.2], [0.8, 11, 2.8]]) g.glow('lantern', cx + Math.cos(a) * ra * 0.92, cy + Math.sin(a) * rb * 0.92, zz, { r, col: '#FF5A40' });
     }, { name: 'birds nest' });
     // the Water Cube
     T.obj([10, -26, 30, -6], function (g) {
       K.box(g, 10, -26, 30, -6, 0, 7, { t: '#BFD9EC', l: '#9CC6E6', r: '#86B4D8' }, { w: 0.9 });
       const R = RNG(13); for (const [f, p, a0, a1] of [['L', -6, 10, 30], ['R', 30, -26, -6]]) for (let i = 0; i < 40; i++) { const c = g.p.apply(g, K.pt(f, p + 0.03, a0 + 0.6 + R() * (a1 - a0 - 1.2), 0.5 + R() * 6)); g.ring2(c, 0.6 + R() * 1.3, { w: 0.3, c: '#E9F3F9' }); }
+      // at night the Water Cube's bubble skin glows blue (its LEDs)
+      const WC = { '#BFD9EC': '#2E5E96', '#9CC6E6': '#3F98E8', '#86B4D8': '#2F7ECC', '#E9F3F9': '#BFEAFF' };
+      BN.each(g, 0, (c) => (WC[c] ? { nc: WC[c] } : undefined));
+      for (const [x, y] of [[15, -6], [25, -6], [30, -11], [30, -21]]) g.glow('lantern', x + 0.1, y + 0.1, 3.5, { r: 2.4, col: '#58B4FF' });
     }, { name: 'water cube' });
     // kites and their flyers on the plaza
     [[-12, 22, '#D23A2E', 0], [8, 23, '#2E6FB0', 2]].forEach(([fx, fy, col, ph0], i) => {
       T.cast([fx, fy], (g) => BJ.person(g, fx, fy, 0, BJ.who(1220 + i, { dir: 3, pose: 'hold', reach: [0.6, -8.8] })), { on: false });
       T.actor({ layer: 'top', sample: 5, period: 12, grow: false, at(t) { const w = Math.floor(t * 4 + i * 3) % 12, bob = Math.sin(t * 0.9 + ph0) * 1.2; return { x: fx + 6, y: fy - 12, z: 26 + bob, key: 'k' + w, w, bob }; },
-        draw(g, st) { const o = g.p(0, 0, 0), hand = g.p(-6, 12, 4.4 - (26 + st.bob)); const pts = []; for (let k = 0; k <= 10; k++) { const t = k / 10; pts.push([lerp(o[0], hand[0], t), lerp(o[1], hand[1], t) + Math.sin(Math.PI * t) * 5]); } g.fine2(pts, { w: 0.25, c: '#6E6658' }); BJ.kite2(g, [o[0], o[1] - 3], 3.2, col, st.w * TAU / 12); } });
+        draw(g, st) { const o = g.p(0, 0, 0), hand = g.p(-6, 12, 4.4 - (26 + st.bob)); const pts = []; for (let k = 0; k <= 10; k++) { const t = k / 10; pts.push([lerp(o[0], hand[0], t), lerp(o[1], hand[1], t) + Math.sin(Math.PI * t) * 5]); } g.fine2(pts, { w: 0.25, c: '#6E6658' }); BJ.kite2(g, [o[0], o[1] - 3], 3.2, col, st.w * TAU / 12, i ? '#7FD8FF' : '#FFB04A'); } });   // (night: LED kites)
     });
     K.walker(T, BJ.who(1225), [[-24, 21], [22, 21]], 1.2, { phase: 0.1 });
     K.walker(T, BJ.who(1226), [[22, 24.6], [-24, 24.6]], 1.0, { phase: 0.5 });
@@ -129,7 +141,7 @@
     // the CCTV tower: two leaning towers, joined by a bridge at the base and a cantilevered overhang at the top
     T.obj([-22, -22, 4, 2], function (g) {
       g.boilP = 0.25;
-      const GL = { t: '#B9C3C9', l: '#C9D3D9', r: '#A9B5BD' }, lean = 6, Z = 30;
+      const GL = { t: '#B9C3C9', l: '#C9D3D9', r: '#A9B5BD' }, lean = 6, Z = 30, i0 = g.cmds.length;
       const tower = (x0, y0, x1, y1, dx, dy) => {   // a box whose top is shifted by (dx, dy): drawn as its two visible faces and top
         const A = [x0, y1, 0], B = [x1, y1, 0], Cc = [x1, y0, 0], A1 = [x0 + dx, y1 + dy, Z], B1 = [x1 + dx, y1 + dy, Z], C1 = [x1 + dx, y0 + dy, Z], D1 = [x0 + dx, y0 + dy, Z];
         g.fill([A, B, B1, A1], GL.l); g.fill([B, Cc, C1, B1], GL.r); g.fill([A1, B1, C1, D1], GL.t);
@@ -143,10 +155,15 @@
       // the overhang at the top: an L-shaped bridge from one tower top to the other
       K.box(g, -22, -14, 0, -8, Z - 6, Z, GL, { w: 0.9 });
       const sg = []; for (let x = -21; x < 0; x += 2.2) { const a = g.p(x, -8, Z - 6), b = g.p(x + 1.1, -8, Z); sg.push(a[0], a[1], b[0], b[1]); } g.segs2(sg, '#7E8E98', 0.35);
+      // at night the offices are lit: warm floors behind the dark glass, the grid of the skin traced in light
+      BN.each(g, i0, (c, f, d) => (f ? (c === GL.t ? undefined : { nc: BN.mixA(nightColour(c), '#1C2440', 0.25) }) : d.k === K_SEGS ? { nc: '#FFD890' } : undefined));
+      for (const [x, y, z] of [[-16, -2, 10], [-16, -2, 20], [0, -4, 12], [-8, -8, 27]]) g.glow('lantern', x, y, z, { r: 2.6, col: '#FFD9A0' });
     }, { name: 'cctv' });
     // China World tower and the Citic tower (the vase)
-    T.obj([10, -26, 18, -18], (g) => { K.box(g, 10, -26, 18, -18, 0, 26, { t: '#C9D6DF', l: '#B9C9D6', r: '#9FB2C2' }, { w: 0.9 }); for (let z = 3; z < 26; z += 2.4) { g.fine([[10, -18.02, z], [18, -18.02, z]], { w: 0.3, c: '#8EA7B6' }); g.fine([[18.02, -26, z], [18.02, -18, z]], { w: 0.3, c: '#8EA7B6' }); } K.box(g, 11, -25, 17, -19, 26, 28, '#9FB2C2', { w: 0.6 }); }, { name: 'china world' });
-    T.obj([20, -28, 30, -18], (g) => { const cx = 25, cy = -23; let z = 0; for (let k = 0; k < 4; k++) { const r = [4.0, 3.3, 3.2, 3.8][k], hh = [7, 9, 9, 7][k]; K.cyl(g, cx, cy, r, z, z + hh, { t: '#DCE6EC', l: '#C9D8E2', r: '#AFC2D0' }, { w: 0.6, n: 16, nt: k < 3 }); z += hh; } for (let zz = 2; zz < 31; zz += 2) { const pts = K.arc(cx, cy, zz, 3.2 + (zz < 7 || zz > 25 ? 0.6 : 0.05), A_L, A_R, 10); g.fine(pts, { w: 0.25, c: '#8EA7B6' }); } }, { name: 'citic tower' });
+    T.obj([10, -26, 18, -18], (g) => { K.box(g, 10, -26, 18, -18, 0, 26, { t: '#C9D6DF', l: '#B9C9D6', r: '#9FB2C2' }, { w: 0.9 }); for (let z = 3; z < 26; z += 2.4) { g.fine([[10, -18.02, z], [18, -18.02, z]], { w: 0.3, c: '#8EA7B6' }); g.fine([[18.02, -26, z], [18.02, -18, z]], { w: 0.3, c: '#8EA7B6' }); } K.box(g, 11, -25, 17, -19, 26, 28, '#9FB2C2', { w: 0.6 });
+      BN.each(g, 0, (c, f, d) => (f ? (c === '#C9D6DF' ? undefined : { nc: BN.mixA(nightColour(c), '#1C2440', 0.25) }) : d.k === K_STROKE && c === '#8EA7B6' ? { nc: '#FFDC98' } : undefined)); g.glow('lantern', 14, -17.9, 14, { r: 2.6, col: '#FFDCA8' }); g.glow('lantern', 18, -18, 27.5, { r: 1.4, col: '#FF6A50' }); }, { name: 'china world' });   // (night: lit floors; a red light on the roof)
+    T.obj([20, -28, 30, -18], (g) => { const cx = 25, cy = -23; let z = 0; for (let k = 0; k < 4; k++) { const r = [4.0, 3.3, 3.2, 3.8][k], hh = [7, 9, 9, 7][k]; K.cyl(g, cx, cy, r, z, z + hh, { t: '#DCE6EC', l: '#C9D8E2', r: '#AFC2D0' }, { w: 0.6, n: 16, nt: k < 3 }); z += hh; } for (let zz = 2; zz < 31; zz += 2) { const pts = K.arc(cx, cy, zz, 3.2 + (zz < 7 || zz > 25 ? 0.6 : 0.05), A_L, A_R, 10); g.fine(pts, { w: 0.25, c: '#8EA7B6' }); }
+      BN.each(g, 0, (c, f, d) => (f ? (c === '#DCE6EC' ? undefined : { nc: BN.mixA(nightColour(c), '#1C2440', 0.25) }) : d.k === K_STROKE && c === '#8EA7B6' ? { nc: '#FFE6B0' } : undefined)); g.glow('lantern', 28, -19.5, 16, { r: 2.6, col: '#FFE6C0' }); g.glow('lantern', 25, -23, 31.5, { r: 1.4, col: '#FF6A50' }); }, { name: 'citic tower' });   // (night: lit floors; a red light on the top)
     // traffic on the road in front (East Third Ring)
     for (let k = 0; k < 3; k++) T.actor({ sample: 0.3, period: 48 / 14,
       at(t) { const s = ((t * 14 + k * 16) % 48 + 48) % 48 - 24, a = Math.min(1, (22 - Math.abs(s)) / 4); if (a <= 0.03) return null; return { x: k === 1 ? -s : s, y: k === 1 ? 16 : 20, key: 'c' + k, alpha: a < 1 ? a : null, ang: k === 1 ? Math.PI : 0 }; },

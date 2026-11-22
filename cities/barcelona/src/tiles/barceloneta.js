@@ -63,9 +63,14 @@ SF.tile('barceloneta', 100, -100, { rim: 36 }, function (T) {
     K.box(g, 8.5, -1.5, 13, 4, 0, 3.2, { t: '#C9A26B', l: '#D9B57E', r: '#B58F58' }, { w: 0.7 });
     g.fill(K.on('L', 4.02, 9, 12.5, 2.2, 3.0), '#3F6FA8'); K.text(g, 'L', 4.06, 10.75, 2.35, 0.55, 'XIRINGUITO', '#F6F1E4', { center: true });
     for (const [x, y] of [[8.2, -1.8], [15, -1.8], [15, 5.8], [8.2, 5.8]]) { const a = g.p(x, y, 0), b = g.p(x, y, 6); g.segs2([a[0], a[1], b[0], b[1]], '#8A6A4A', 0.6); }
-    const roof = [[7.6, -2.4, 6], [15.6, -2.4, 6], [15.6, 6.4, 5.4], [7.6, 6.4, 5.4]]; g.fill(roof, '#F3F1EA');
+    const iR = g.cmds.length, roof = [[7.6, -2.4, 6], [15.6, -2.4, 6], [15.6, 6.4, 5.4], [7.6, 6.4, 5.4]]; g.fill(roof, '#F3F1EA');
     for (let i = 0; i < 8; i += 2) g.fill([[7.6 + i, -2.4, 6], [8.6 + i, -2.4, 6], [8.6 + i, 6.4, 5.4], [7.6 + i, 6.4, 5.4]], '#E07A5A');
     g.outline(roof, { w: 0.6, boil: false });
+    // at night the beach bar is open late: the bar lit, a string of bulbs round the eaves lighting its striped canvas
+    BC.nightCol(g, 0, (c, fill) => (!fill ? undefined : c === '#3F6FA8' ? c : c === '#D9B57E' ? '#FFC874' : BC.floodCol(c, 0.6, '#FFD49A')), { to: iR }); BC.nightCol(g, 0, (c, fill) => (!fill && c === '#F6F1E4' ? '#FFF6E0' : undefined), { lines: true, to: iR });
+    BC.nightCol(g, iR, (c, fill) => (fill ? BC.floodCol(c, 0.55, '#FFD08A') : undefined));
+    for (let i = 0; i <= 6; i++) { g.glow('lantern', lerp(7.8, 15.4, i / 6), 6.3, lerp(5.45, 5.4, i / 6) - 0.3, { r: 0.6, col: '#FFD27A' }); g.glow('lantern', 15.5, lerp(6.2, -2.2, i / 6), lerp(5.4, 6, i / 6) - 0.3, { r: 0.6, col: '#FFD27A' }); }
+    g.glow('lamp', 11, 4.4, 4.6, { r: 1.2 });
   }, { name: 'chiringuito' });
   // stools and drinkers at the bar's counter (drawn as one piece so the stools never cover them)
   T.cast([13.6, 4.8], (g) => { for (const [x, y, s] of [[10, 4.9, 1420], [11.8, 4.9, 1421], [13.6, 4.9, 1422]]) { const a = g.p(x, y, 0), b = g.p(x, y, 1.6); g.segs2([a[0], a[1], b[0], b[1]], '#5A4632', 0.5); g.fill2(arcPts(b[0], b[1], 1.2, 0, TAU, 8).map((q) => [q[0], b[1] + (q[1] - b[1]) * 0.45]), '#C9584B', true); const r = BC.person(g, x, y, 1.6, BC.who(s, { dir: 2, pose: 'sit', shorts: true, bare: true })); void r; } }, {});
@@ -87,6 +92,9 @@ SF.tile('barceloneta', 100, -100, { rim: 36 }, function (T) {
     const lat = []; for (let i = 0; i < 14; i++) { const a = P(-10 + i * 1.5, 3), b = P(-8 + i * 1.5, 11); lat.push(a[0], a[1], b[0], b[1]); } g.segs2(lat, '#B8913A', 0.35);
     g.line2(body.concat([body[0]]), { w: 0.6, c: '#8A6A2C', boil: false }); g.line2(tail, { w: 0.5, c: '#8A6A2C', boil: false });
     for (const [u, v] of [[-6, 3.5], [0, 2.9], [6, 3.3]]) { const a = P(u, 0), b = P(u, v); g.segs2([a[0], a[1], b[0], b[1]], '#8A8A84', 0.6); }
+    // at night the golden fish is lit from its podium
+    BC.nightCol(g, 0, (c, fill) => (fill && (c === '#D8AE48' || c === '#E2BA5A') ? BC.mixA(nightColour(c), c, 0.75) : undefined)); BC.nightCol(g, 0, (c, fill) => (!fill && c === '#B8913A' ? '#E0B04C' : undefined), { lines: true });
+    g.glow('lantern', 26, -32, 9, { r: 3.4, col: '#FFD27A' }); g.glow('lantern', 18, -32, 9, { r: 1.8, col: '#FFD27A' });
   }, { name: 'el peix' });
 
   /* ---- people on the sand ---- */

@@ -8,7 +8,9 @@
    back. Out in the river the Torre de Belém on its bastion: turrets with ribbed domes, a balcony, crenellations with
    shields, a little footbridge back to the shore.
    Who: the queue for pastéis de nata and people eating them on the kerb; tourists photographing the tower from the
-   footbridge; a guide's group at the Padrão; a family at the fountain; a man selling cork hats; kite flying. */
+   footbridge; a guide's group at the Padrão; a family at the fountain; a man selling cork hats; kite flying.
+   At night: the Jerónimos front, the Padrão and the Torre de Belém floodlit warm white, the tower doubled in the river;
+   Pastéis de Belém lit under its awnings; the palms and lawns glowing. */
 SF.tile('belem', -100, 100, { rim: 48 }, function (T) {
   const H = 37, W = { t: '#ECE6D6', l: '#F5F0E2', r: '#E0D8C4' }, TW = { t: '#ECE6D4', l: '#F6F0DE', r: '#E2D9C2' };
   T.ground(function (g) {
@@ -36,6 +38,10 @@ SF.tile('belem', -100, 100, { rim: 48 }, function (T) {
     K.win(g, 'L', -26, -33.4, -30.6, 13, 16.4, { style: 'dark', arch: true }); K.win(g, 'R', -27, -32.8, -30.2, 13, 16.4, { style: 'dark', arch: true });
     K.dome(g, -32, -31.5, 4.6, 18, 4.6, '#D9D3C4', { w: 0.7, band: true });
     const fn = g.p(-32, -31.5, 22.6); g.line2([fn, [fn[0], fn[1] - 3.4]], { w: 0.45, c: '#8C8576', boil: false });
+    // night: the limestone front floodlit, the south portal brightest (its roof left dark)
+    LX.flood(g, 0, 0.8, LX.FLOOD.warm, (c) => (['#B9B4AA', shade('#B9B4AA', 0.16), shade('#B9B4AA', -0.04), shade('#B9B4AA', -0.1), shade('#B9B4AA', 0.1)].indexOf(c) >= 0 ? nightColour(c) : undefined));
+    for (let x = -32; x < 18; x += 8) g.glow('lantern', x, -23.2, 2.4, { r: 2.0, col: '#FFDDA6' });
+    g.glow('lantern', -4.5, -23.2, 9, { r: 2.6, col: '#FFE2B0' }); g.glow('lantern', -31.5, -25.4, 14, { r: 2.2, col: '#FFDDA6' }); g.glow('lantern', -32, -31.5, 21.5, { r: 2.4, col: '#FFE2B0' });
   }, { name: 'jeronimos' });
 
   /* ---------------- the garden: palms, the fountain ---------------- */
@@ -52,7 +58,8 @@ SF.tile('belem', -100, 100, { rim: 48 }, function (T) {
   T.obj([24, -22, 36, -6], function (g) {
     LX.house(g, { x0: 24, y0: -22, x1: 36, y1: -6, n: 2, col: '#F4F0E6', seed: 1310, faces: 'LR', bal: 0.3 });
     for (let i = 0; i < 4; i++) { const y0 = lerp(-21, -7, i / 4) + 0.3, y1 = lerp(-21, -7, (i + 1) / 4) - 0.3, P = (y, d, z) => [36 + d, y, z]; const q = [P(y0, 0, 4.4), P(y1, 0, 4.4), P(y1, 1.8, 3.3), P(y0, 1.8, 3.3)]; g.fill(q, '#2F5FA8'); g.fill([P(y0, 1.8, 3.3), P(y1, 1.8, 3.3), P(y1, 1.8, 2.8), P(y0, 1.8, 2.8)], '#264E8A'); g.outline(q, { w: 0.45, c: '#1E3A66', boil: false }); }
-    K.sign(g, 'R', 36, -20, -8, 4.8, 5.8, '#2F5FA8', 'PASTÉIS DE BELÉM', { ink: '#F7F1DC' });
+    { const i0 = g.cmds.length; K.sign(g, 'R', 36, -20, -8, 4.8, 5.8, '#2F5FA8', 'PASTÉIS DE BELÉM', { ink: '#F7F1DC' }); g.mark({ nc: '#3F6FC0' }, i0); }
+    for (let i = 0; i < 4; i++) g.glow('lamp', 37.2, lerp(-21, -7, (i + 0.5) / 4), 3.1, { r: 1.3, base: 0 });   // night: lamps under the blue awnings
   }, { name: 'pasteis' });
   for (let i = 0; i < 9; i++) { const y = -4 + i * 2.2, x = 31.5 + (i % 2) * 0.6; T.cast([x, y], (g) => LX.person(g, x, y, 0, LX.who(1320 + i, { dir: 3, pose: i % 3 === 2 ? 'hold' : 'stand', phone: i % 4 === 1 }))); }
   T.cast([28, 14], (g) => { LX.person(g, 27.4, 14, 0, LX.who(1335, { dir: 1, pose: 'hold', reach: [1, -9] })); LX.person(g, 29.6, 15.2, 0, LX.who(1336, { dir: 1, pose: 'hold' })); const c = g.p(28.4, 14.4, 2.6); g.fill2([[c[0] - 1.6, c[1]], [c[0] + 1.6, c[1]], [c[0] + 1.2, c[1] - 0.9], [c[0] - 1.2, c[1] - 0.9]], '#E8B04A', true); });
@@ -71,6 +78,9 @@ SF.tile('belem', -100, 100, { rim: 48 }, function (T) {
     g.line([[10.4, 44, 1.2], [9, 50, 1.2], [9, 44, 14]], { w: 0.8, boil: false }); void prow;
     for (let k = 0; k < 7; k++) { const t = k / 7, y = lerp(49, 44.4, t), z = lerp(2.0, 12, t), p = g.p(10.3, y, z); g.fill2([[p[0] - 1.1, p[1]], [p[0] + 1.1, p[1]], [p[0] + 0.8, p[1] - 3.6], [p[0] - 0.8, p[1] - 3.6]], '#E2DCCE', true); g.disc2([p[0], p[1] - 4.3], 0.8, '#E2DCCE'); g.outline2([[p[0] - 1.1, p[1]], [p[0] + 1.1, p[1]], [p[0] + 0.8, p[1] - 3.6], [p[0] - 0.8, p[1] - 3.6]], { w: 0.3, c: '#9C9484', boil: false }); }
     const hp = g.p(9.4, 48.6, 2.4); g.fill2([[hp[0] - 1.4, hp[1]], [hp[0] + 1.4, hp[1]], [hp[0] + 1.0, hp[1] - 5.6], [hp[0] - 1.0, hp[1] - 5.6]], '#E2DCCE', true); g.disc2([hp[0], hp[1] - 6.4], 0.95, '#E2DCCE'); g.line2([[hp[0] + 1.0, hp[1] - 4.6], [hp[0] + 2.4, hp[1] - 1.0]], { w: 0.6, c: '#9C9484', boil: false });
+    // night: floodlit from the quay, the prow and its navigators white against the river
+    LX.flood(g, 0, 1, LX.FLOOD.white);
+    for (const [x, y, z, r] of [[11, 47.5, 2.4, 2.4], [11, 44.6, 8, 2.2], [11, 41.5, 18, 2.4], [8, 46.6, 3, 1.8]]) g.glow('lantern', x, y, z, { r, col: '#FFEED0', base: LS.wz });
   }, { name: 'padrao' });
   T.cast([0, 42], (g) => { const r = LX.person(g, 1.6, 40.6, 0, LX.who(1340, { top: '#E2483D', dir: 0, pose: 'hold', reach: [1, -14] })); const h = r.hands[0]; g.segs2([h[0], h[1], h[0] + 0.6, h[1] - 8], '#3A3530', 0.4); g.fill2([[h[0] + 0.6, h[1] - 8], [h[0] + 4, h[1] - 7.2], [h[0] + 0.6, h[1] - 6]], '#F2C230', true); for (let i = 1; i < 6; i++) LX.person(g, -1.6 - (i % 3) * 1.8, 39.4 + Math.floor(i / 3) * 2.6 + (i % 2) * 0.6, 0, LX.who(1340 + i, { dir: i % 2 ? 0 : 3, pose: i === 2 ? 'hold' : 'stand', phone: i === 2 })); });
 
@@ -80,6 +90,7 @@ SF.tile('belem', -100, 100, { rim: 48 }, function (T) {
     K.box(g, -29, 44, -26, 54, 0.1, 0.6, { t: '#9C7A52', l: '#8A6A44', r: '#7A5A3A' }, { w: 0.5 });
     const p = []; for (let y = 46; y < 54; y += 2.6) for (const x of [-28.8, -26.2]) { const a = g.p(x, y, WZ), b = g.p(x, y, 0.1); p.push(a[0], a[1], b[0], b[1]); } g.segs2(p, '#6E5A44', 0.5);
     g.line([[-26, 44, 1.5], [-26, 54, 1.5]], { w: 0.35, c: '#6E5A44', boil: false });
+    for (const y of [45, 53]) g.glow('lamp', -26, y, 2.1, { r: 1.0, base: 0.6 });               // night: a lamp on the rail at each end
   }, { name: 'footbridge' });
   T.obj([TX - 8, TY - 6, TX + 8, TY + 7], function (g) {
     g.boilP = 0.35;
@@ -102,6 +113,9 @@ SF.tile('belem', -100, 100, { rim: 48 }, function (T) {
     for (let x = TX - 5.6; x < TX + 1; x += 1.4) K.box(g, x, TY + 0.4, x + 0.8, TY + 1, 24, 25.2, TW, { w: 0.35, boil: false, nohid: true });
     for (let y = TY - 5.6; y < TY + 1; y += 1.4) K.box(g, TX + 0.4, y, TX + 1, y + 0.8, 24, 25.2, TW, { w: 0.35, boil: false, nohid: true });
     for (const [x, y] of [[TX + 1, TY + 1], [TX - 6, TY + 1], [TX + 1, TY - 6]]) { K.cyl(g, x, y, 0.8, 22, 24.6, TW, { n: 8, w: 0.5 }); K.dome(g, x, y, 0.9, 24.6, 1.4, '#F6F0DE', { w: 0.5, ribs: 6, ribCol: '#C9BFA6' }); }
+    // night: floodlit warm white from the bastion and the water, laid again in the river below
+    LX.flood(g, 0, 1, LX.FLOOD.warm);
+    for (const [x, y, z, r] of [[TX - 2.5, TY + 2.8, 6, 2.6], [TX - 2.5, TY + 2.8, 17, 2.4], [TX + 1.8, TY - 2.5, 9, 2.4], [TX + 1.8, TY - 2.5, 19, 2.0], [TX + 3, TY + 6.6, 1.5, 2.2], [TX - 4, TY + 6.6, 1.5, 2.2], [TX + 8.6, TY, 1.5, 2.2]]) g.glow('lantern', x, y, z, { r, col: '#FFDCA0', base: WZ });
   }, { name: 'torre de belem' });
   T.cast([-27.5, 49], (g) => { LX.person(g, -27.6, 48.2, 0.6, LX.who(1350, { dir: 1, pose: 'hold', reach: [0.4, -12.5], phone: true })); LX.person(g, -27.0, 51.6, 0.6, LX.who(1351, { dir: 3, pose: 'hold', reach: [0.4, -12.5], phone: true })); }, { on: true });
   T.cast([-22, 64.5], (g) => { LX.person(g, -21, 64.4, 4.2, LX.who(1352, { dir: 1, pose: 'hold' })); LX.person(g, -18, 63.8, 4.2, LX.who(1353, { dir: 0, phone: true, pose: 'hold', reach: [0.4, -12.5] })); }, { on: true });

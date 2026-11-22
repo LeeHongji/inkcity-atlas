@@ -21,14 +21,18 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
 
   /* ---------------- ground ---------------- */
   T.ground(function (g) {
-    K.slab(g, 37, { top: '#E4DED0' });
+    K.slab(g, 37, { top: '#E4DED0' }); const iA = g.cmds.length;
     g.fill(K.rect(-37, AV0, 37, AV1), '#CFCABE');
     g.scuff(K.rect(-37, AV0, 37, AV1), { dir: Math.atan2(AY, AX), len: 8, c: '#DBD6CB', dens: 0.45, w: 0.5, spread: 0.05 });
     g.line([[-37, AV0 + 0.4, 0], [37, AV0 + 0.4, 0]], { w: 0.7, c: '#F6F3EA', boil: false }); g.line([[-37, AV1 - 0.4, 0], [37, AV1 - 0.4, 0]], { w: 0.7, c: '#F6F3EA', boil: false });
     for (let i = 0; i < 4; i++) { const x = -30 + i * 18; K.textP(g, (a, z) => [x + a, AV1 - 1.6 - z, 0], 0, 0, 1.6, String(i + 1), '#F6F3EA', { center: true, w: 0.6 }); }
+    RJ.lit(g, iA, 0.72);                                                    // (night: the avenue under the floodlights, bright as day)
     // the service road and the Apoteose plaza on the near side
+    const iS = g.cmds.length;
     g.fill(K.rect(-37, 16.4, 37, 22), '#D3CDC0');
     g.fill(K.rect(27, -6, 37, 16.4), '#EAE3D2'); RJ.mosaic(g, 27, -6, 37, 16.4, { sp: 2.4 });
+    RJ.lit(g, iS, 0.38);
+    RJ.lit(g, 0, 0.28);
   }, { rim: true });
 
   /* ---------------- the grandstand: 12 tiers in four pieces ---------------- */
@@ -52,6 +56,9 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
       g.fill(K.on('L', Y0 + 0.02, x0, x1, 0.2, Z0 - 0.15), GREEN);
       if (pi === 1 || pi === 2) K.text(g, 'L', Y0 + 0.06, pi === 1 ? -9.25 : 9.25, 0.35, 1.0, pi === 1 ? 'PASSARELA' : 'SAPUCAÍ', WHITE, { center: true, w: 0.55 });
       if (pi === 0 || pi === 3) for (let k = 0; k < 4; k++) g.fill(K.on('L', Y0 + 0.05, x0 + 2 + k * 4.2, x0 + 4.4 + k * 4.2, 0.45, 1.4), [GOLD, PINK, WHITE, PINK][k]);
+      // at night the stand is full under the floodlights: everything seen in the white light; a rail of lamps along the front
+      RJ.lit(g, 0, 0.6);
+      for (let x = x0 + 2.3; x < x1; x += 4.6) { if (Math.round((x - x0) / 4.6) % 2) g.glow2('lamp', g.p(x, Y0 + 0.2, Z0 + 0.2), g.p(x, Y0 + 3.5, 0), { r: 0.9 }); else g.glow2('lantern', g.p(x, Y0 + 0.2, Z0 + 0.2), g.p(x, Y0 + 1.5, 0), { r: 1.0, col: '#FFF2D0' }); }
     }, { name: 'grandstand' });
   });
   // floodlight masts behind the stand
@@ -59,8 +66,11 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
     const b = g.p(x, -35.5, 0), t = g.p(x, -35.5, 30);
     g.fill2([[b[0] - 1.0, b[1]], [b[0] + 1.0, b[1]], [t[0] + 0.5, t[1]], [t[0] - 0.5, t[1]]], '#9EA1A0'); g.line2([[b[0] - 1.0, b[1]], [t[0] - 0.5, t[1]]], { w: 0.5, c: '#5A564E', boil: false });
     const q = [[t[0] - 6, t[1] - 5], [t[0] + 6, t[1] - 5], [t[0] + 6, t[1] + 1], [t[0] - 6, t[1] + 1]]; g.fill2(q, '#5A5F64', true);
-    for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) g.disc2([t[0] - 4.5 + c * 3, t[1] - 3.2 + r * 2.7], 1.0, '#F6EFC8');
+    for (let r = 0; r < 2; r++) for (let c = 0; c < 4; c++) { g.disc2([t[0] - 4.5 + c * 3, t[1] - 3.2 + r * 2.7], 1.0, '#F6EFC8'); g.mark({ nc: '#FFFCEE' }); }
     g.outline2(q, { w: 0.5, boil: false });
+    // at night the floodlights are on, thrown over the stand and the avenue
+    g.glow2('lantern', [t[0], t[1] - 2], b, { r: 2.8, col: '#FFF8E6' });
+    for (const [dx, y] of [[-9, 0], [9, 4]]) g.glow2('lamp', [t[0] + dx * 0.2, t[1] - 2.4], g.p(x + dx, y, 0), { r: 1.8 });
   }, { name: 'mast' });
 
   /* ---------------- the near side: frisas, judges, the Apoteose ---------------- */
@@ -68,12 +78,13 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
   FRISA.forEach(([a, b], i) => T.obj([a, 11.4, b, 14.2], function (g) {
     K.box(g, a, 11.4, b, 14.2, 0, 1.0, { t: '#E9E4D8', l: '#F1EEE6', r: '#D7D1C4' }, { w: 0.6 });
     g.fill(K.on('L', 14.22, a + 0.3, b - 0.3, 0.2, 0.8), i % 2 ? PINK : GREEN);
+    RJ.lit(g, 0, 0.6); for (const x of [a + 1.5, b - 1.5]) g.glow2('lamp', g.p(x, 11.6, 1.5), g.p(x, 8, 0), { r: 1.0 });   // (night: lit)
   }, { name: 'frisa' }));
   // fans in the frisas, standing at the rail with their backs to us, some waving
   const FANS = [[-33.5, 12.4], [-30.8, 12.6], [-28.4, 12.2], [-23.6, 12.5], [-20.4, 12.3], [-9.4, 12.5], [-6.2, 12.4], [0.6, 12.6], [3.8, 12.3], [10.8, 12.5], [14.2, 12.4]];
   FANS.forEach(([x, y], i) => { const w = RJ.who(5300 + i); T.actor({ sample: 5, period: 4,
     at(t) { const ph = Math.floor(((t * 1.2 + i * 0.37) % 1) * 4); return { x, y, z: 0, key: i % 3 === 0 ? 'w' + ph : 's', ph: ph / 4 }; },
-    draw(g, st) { RJ.person(g, 0, 0, 0, Object.assign({}, w, { dir: i % 2 ? 2 : 3, pose: i % 3 === 0 ? 'cheer' : 'stand', ph: st.ph || 0 })); } }); });
+    draw(g, st) { RJ.person(g, 0, 0, 0, Object.assign({}, w, { dir: i % 2 ? 2 : 3, pose: i % 3 === 0 ? 'cheer' : 'stand', ph: st.ph || 0 })); RJ.lit(g, 0, 0.6); } }); });
   // the judges' booths: glass boxes with two judges at a desk
   for (const x of [-15.5, 21.5]) T.obj([x - 2.2, 11.2, x + 2.2, 15.2], function (g) {
     K.box(g, x - 2.2, 11.2, x + 2.2, 15.2, 0, 1.8, '#E9E4D8', { w: 0.6 });
@@ -83,6 +94,7 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
     const gr = [[x + 2.2, 11.2, 1.8], [x + 2.2, 15.2, 1.8], [x + 2.2, 15.2, 5.0], [x + 2.2, 11.2, 5.0]]; g.fill(gr, 'rgba(180,210,222,0.45)'); g.outline(gr, { w: 0.5, boil: false });
     K.box(g, x - 2.5, 10.9, x + 2.5, 15.5, 5.0, 5.6, '#F1EEE6', { w: 0.6 });
     K.text(g, 'L', 15.53, x, 5.1, 0.42, 'JURADOS', '#2E9A5E', { center: true, w: 0.36 });
+    RJ.lit(g, 0, 0.6); g.glow('lantern', x, 13.2, 4.4, { r: 2.0, col: '#FFF2D8', base: 1.8 });   // (night: the judges' booth lit)
   }, { name: 'booth' });
   // the Apoteose "M" at the end of the avenue: two parabolic arches of white concrete joined in the middle; the
   // parade has dispersed (faded) before it reaches the arch, so nothing passes under it
@@ -99,6 +111,10 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
     }
     const c = [[xb, ym - 2.6, mid + 4], [xb, ym + 2.6, mid + 4], [xb, ym, mid]]; g.fill(c, '#F6F4EE'); g.outline(c, { w: 0.6, boil: false });
     for (const y of [ya, yb]) K.box(g, xa, y - 0.9, xb, y + 0.9, 0, 1.2, '#D9D3C6', { w: 0.6 });
+    // at night Niemeyer's arch is floodlit white from its feet
+    RJ.flood(g, 0, 1.3, '#EEF2FF');
+    for (const y of [ya, yb]) g.glow2('lantern', g.p(xb + 0.6, y, 1.4), g.p(xb + 2, y, 0), { r: 2.4, col: '#F2F4FF' });
+    g.glow('lantern', xb, ym, mid + 2, { r: 2.8, col: '#F2F4FF' });
   }, { name: 'apoteose' });
   T.obj([31, 30], (g) => { const f = g.p(31, 30, 0); g.segs2([f[0], f[1], f[0], f[1] - 26], '#6E6A60', 0.5); }, { name: 'flagpole' });
 
@@ -106,11 +122,12 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
   for (const [x, y, a, b, word] of [[-30, 26, PINK, WHITE, 'CHURRASCO'], [-12, 28, GOLD, GREEN, 'CERVEJA'], [6, 26, GREEN, WHITE, 'PIPOCA']]) {
     T.obj([x - 3, y - 2, x + 3, y + 2], function (g) {
       K.box(g, x - 3, y - 1.6, x + 3, y + 1.6, 0, 2.8, { t: '#D9B57E', l: '#E6C893', r: '#C9A26B' }, { w: 0.7 });
-      K.sign(g, 'L', y + 1.6, x - 2.6, x + 2.6, 1.3, 2.5, a, word);
+      RJ.litSign(g, 'L', y + 1.6, x - 2.6, x + 2.6, 1.3, 2.5, a, word);
       const posts = []; for (const [px, py] of [[x - 3, y + 1.6], [x + 3, y + 1.6], [x + 3, y - 1.6], [x - 3, y - 1.6]]) { const p0 = g.p(px, py, 2.8), p1 = g.p(px, py, 6.4); posts.push(p0[0], p0[1], p1[0], p1[1]); }
       g.segs2(posts, '#6E5A44', 0.5);
       for (let i = 0; i < 6; i++) g.fill([[x - 3.5 + i, y - 2.1, 7], [x - 2.5 + i, y - 2.1, 7], [x - 2.5 + i, y + 2.3, 6.2], [x - 3.5 + i, y + 2.3, 6.2]], i % 2 ? b : a);
       g.outline([[x - 3.5, y - 2.1, 7], [x + 2.5, y - 2.1, 7], [x + 2.5, y + 2.3, 6.2], [x - 3.5, y + 2.3, 6.2]], { w: 0.6, boil: false });
+      RJ.lit(g, 0, 0.45); for (const dx of [-1.8, 1.8]) RJ.bulb(g, x + dx, y + 1.2, 6.0, { r: 1.2 });   // (night: bulbs under the awning)
     }, { name: 'stall' });
   }
   const crowdOut = [[-27, 30.5, 1], [-25.6, 31.2, 1], [-9.2, 31.5, 1], [-7.8, 30.4, 0], [8.8, 30.2, 1], [-34, 33, 0], [12, 33.5, 1], [15.5, 18.6, 1], [-2, 33, 0], [24, 22, 1], [33, 20, 2]];
@@ -131,6 +148,8 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
   T.obj([-36.5, 21.5, -33.5, 24.5], function (g) {
     K.box(g, -36.5, 21.5, -33.5, 24.5, 0, 3.6, '#E9E4D8', { w: 0.6 }); g.fill(K.on('R', -33.48, 22, 24, 1.6, 3.0), '#9FB9C4');
     K.box(g, -36.9, 21.1, -33.1, 24.9, 3.6, 4.2, GREEN, { w: 0.5 }); K.text(g, 'R', -33.06, 23, 3.7, 0.42, 'PORTÃO 7', WHITE, { center: true, w: 0.36 });
+    RJ.nightEach(g, 0, (c, d) => (d.k !== K_FILL ? (c === WHITE ? '#FFF8E6' : undefined) : c === '#9FB9C4' ? '#FFE4A4' : RJ.litCol(c, 0.6)));   // (night: the gate lit)
+    g.glow('neon', -33, 23, 3.9, { r: 4, col: '#9FF0C0' }); RJ.wallLamp(g, 'R', -33.5, 21.6, 3.3, 1.2);
   }, { name: 'gate' });
   for (let i = 0; i < 6; i++) { const x = -31.6 + i * 1.7, y = 22.5 + (i % 2) * 0.4; T.cast([x, y], (g) => RJ.person(g, x, y, 0, Object.assign(RJ.who(5440 + i), { dir: 2, pose: i === 2 ? 'hold' : 'stand', phone: i === 2, top: i % 2 ? GREEN : PINK })), {}); }
   /* ---------------- the parade ---------------- */
@@ -156,6 +175,7 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
           else if (step === 'drum') { pose = L.drum === 'tamborim' ? 'wave' : 'hold'; ph = (q % 2) * 0.5; extra = { ph: (q % 2) * 0.5 }; }
           RJ.person(g, 0, dy, 0, Object.assign({}, L, { dir: 0, pose, ph }, extra));
         }
+        RJ.lit(g, 0, 0.66);                                                   // (night: the school under the floodlights)
       } });
   };
   // the costumes
@@ -176,6 +196,7 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
       RJ.person(g, 0, -4.4, 0, Object.assign({}, ms, { dir: st.sp < 4 ? 0 : 1, pose: st.sp % 4 === 2 ? 'wave' : 'stand', ph: 0.3 }));
       const pb = RJ.who(5521, { carnaval: false, set: { top: PINK, hairStyle: 'bun', crown: GOLD } });
       RJ.portaBandeira(g, 0, 0, pb, st.sp, GREEN, PINK, GOLD);
+      RJ.lit(g, 0, 0.66);
     } });
   // the opening float
   RJ.floatActor(T, head, 16, LOOP / V, 'sun', { GREEN, PINK, GOLD, WHITE });
@@ -184,7 +205,7 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
   // the drum queen, then the bateria: tamborins in front, caixas, surdos at the back
   T.actor({ sample: 0.25, period: LOOP / V,
     at(t) { const x = head(t) - 67; if (x < -37 || x > 31) return null; const a = fade(x, -37, 31); if (a <= 0.02) return null; const q = Math.floor(((t * 2.6) % 1) * 4); return { x, y: 2.6, key: q, q, alpha: a < 1 ? a : null }; },
-    draw(g, st) { const w = RJ.who(5560, { carnaval: false }); RJ.person(g, 0, 0, 0, Object.assign(w, { top: w.skin, bikini: GOLD, bot: w.skin, shorts: true, dress: undefined, costeiro: [GOLD, WHITE, GOLD, PINK], costeiroR: 14, crown: GOLD, hairStyle: 'long', fem: true, dir: 0, pose: st.q % 2 ? 'cheer' : 'walk', ph: st.q / 4, glitter: GOLD })); } });
+    draw(g, st) { const w = RJ.who(5560, { carnaval: false }); RJ.person(g, 0, 0, 0, Object.assign(w, { top: w.skin, bikini: GOLD, bot: w.skin, shorts: true, dress: undefined, costeiro: [GOLD, WHITE, GOLD, PINK], costeiroR: 14, crown: GOLD, hairStyle: 'long', fem: true, dir: 0, pose: st.q % 2 ? 'cheer' : 'walk', ph: st.q / 4, glitter: GOLD })); RJ.lit(g, 0, 0.72); } });
   const DRUMS = ['tamborim', 'caixa', 'caixa', 'surdo', 'surdo'];
   DRUMS.forEach((d, r) => row(71 + r * 3.5, L4, mk((s) => ritmo(s, d), 5570 + r * 4, 4), { step: 'drum' }));
   for (let r = 0; r < 3; r++) row(91 + r * 3.5, L4, mk(ala2, 5600 + r * 4, 4), { step: 'samba' });
@@ -214,8 +235,37 @@ SF.tile('sambodromo', -100, 100, { rim: 34 }, function (T) {
         }
         g.segs2(arms, '#C08A5E', 1.1);
         for (const [x, y, c] of flags) g.fill2([[x, y], [x + 4.5, y + 0.6 + st.ph], [x, y + 3]], c, true);
+        RJ.lit(g, 0, 0.6);
       } });
   }
+
+  /* ---- night only (made last of all: RJ.late) ---- */
+  RJ.late(-100, 100, (A) => {
+    // phones held up and camera flashes twinkling all over the stand, a section at a time
+    PIECES.forEach(([x0, x1], pi) => A.actor({ sample: 5, period: 30, grow: false,
+      at(t) { if (!LOOK.night) return null; const f = Math.floor(t * 5) % 10; return { x: (x0 + x1) / 2, y: Y0 - 0.5, key: f, f }; },
+      draw(g, st) {
+        const xc = (x0 + x1) / 2, ay = Y0 - 0.5;
+        for (let i = 0; i < NT; i++) for (const s of SEATS[i]) {
+          if (s.x < x0 || s.x >= x1) continue;
+          const hh = h2(Math.round(s.x * 10) + pi * 7, i * 13 + 5), p = g.p(s.x - xc, tierY(i) - 0.9 - ay, tierZ(i));
+          if (hh < 0.07) { g.fill2([[p[0] + 1.6, p[1] - 9.6], [p[0] + 2.6, p[1] - 9.6], [p[0] + 2.6, p[1] - 7.8], [p[0] + 1.6, p[1] - 7.8]], 'rgba(255,255,255,0)'); g.mark({ nc: '#DCEEFF', light: true }); }
+          else if (hh < 0.095 && h2(Math.round(s.x * 10), i * 31 + st.f) < 0.45) { g.disc2([p[0] + 1.8, p[1] - 8.4], 0.7, 'rgba(255,255,255,0)'); g.mark({ nc: '#FFFFFF', light: true }); }
+        }
+      } }));
+    // fireworks over the Apoteose as a school enters the avenue: a few bursts that open, fall and fade
+    const sh2 = SCENE.shots.find((q) => q.name === 'sambodromo'), T0 = sh2 ? sh2.a / 30 + 1.2 : 0, FP = 24;
+    for (let k = 0; k < 3; k++) A.actor({ layer: 'top', sample: 5, period: FP, grow: false,
+      at(t) { if (!LOOK.night) return null; const u = ((((t - T0 - k * 0.9) % FP) + FP) % FP) / 2.2; if (u >= 1) return null; const q = Math.floor(u * 11); return { x: 18 - k * 13, y: -15 + k * 3, z: 30 + k * 5, key: q, q }; },
+      draw(g, st) {
+        const c = g.p(0, 0, 0), u = (st.q + 0.5) / 11, R = 7 + 23 * Math.sqrt(u), fall = 7 * u * u, n = 18, col = ['#FFD45A', '#FF7AB0', '#9FF0C0'][k];
+        for (let i = 0; i < n; i++) {
+          const a = TAU * i / n + k * 0.4, e = [c[0] + Math.cos(a) * R, c[1] + Math.sin(a) * R * 0.9 + fall], m = [c[0] + Math.cos(a) * R * 0.72, c[1] + Math.sin(a) * R * 0.65 + fall * 0.7];
+          g.fill2([[m[0], m[1] - 0.25], [e[0], e[1] - 0.25], [e[0], e[1] + 0.25], [m[0], m[1] + 0.25]], 'rgba(255,255,255,0)'); g.mark({ nc: u < 0.75 ? col : mix(col, '#2A2A40', (u - 0.75) * 2.4) });
+          if (i % 2 === 0 && u < 0.8) { g.disc2(e, 0.55, 'rgba(255,255,255,0)'); g.mark({ nc: '#FFF6DC', light: true }); }
+        }
+      } });
+  });
 });
 
 /* ---------------- parade helpers ---------------- */
@@ -280,9 +330,9 @@ RJ.floatActor = function (T, head, s, period, kind, P) {
         // the sun at the back: a golden disc facing the near side, its rays turning, a crown on top
         const sc_ = C(-HL + 4.5, 0, 9.5), R = 5.2, rays = [], rot = st.q / 6 * (TAU / 12);
         for (let i = 0; i < 12; i++) { const a = rot + TAU * i / 12, b = a + 0.16, c = a - 0.16; rays.push([sc_[0] + Math.cos(a) * R * 1.75, 0, sc_[2] + Math.sin(a) * R * 1.75], [sc_[0] + Math.cos(b) * R * 0.9, 0, sc_[2] + Math.sin(b) * R * 0.9], [sc_[0] + Math.cos(c) * R * 0.9, 0, sc_[2] + Math.sin(c) * R * 0.9]); }
-        for (let i = 0; i < 12; i++) { const tri = rays.slice(i * 3, i * 3 + 3).map((p) => [p[0], cy, p[2]]); g.fill(tri, i % 2 ? '#F2C94E' : '#E39A2A'); g.outline(tri, { w: 0.4, c: '#9A6A1E', boil: false }); }
+        for (let i = 0; i < 12; i++) { const tri = rays.slice(i * 3, i * 3 + 3).map((p) => [p[0], cy, p[2]]); g.fill(tri, i % 2 ? '#F2C94E' : '#E39A2A'); g.mark({ nc: i % 2 ? '#FFD45A' : '#FFA838' }); g.outline(tri, { w: 0.4, c: '#9A6A1E', boil: false }); }
         const disc = []; for (let i = 0; i < 24; i++) { const a = TAU * i / 24; disc.push([sc_[0] + Math.cos(a) * R, cy, sc_[2] + Math.sin(a) * R]); }
-        g.fill(disc, '#F2C94E'); g.outline(disc, { w: 0.8, c: '#9A6A1E', boil: false });
+        g.fill(disc, '#F2C94E'); g.mark({ nc: '#FFD45A', light: true }); g.outline(disc, { w: 0.8, c: '#9A6A1E', boil: false });   // (night: the sun shines)
         const fc = g.p(sc_[0], cy, sc_[2]); g.disc2([fc[0] - 3.2, fc[1] - 2], 0.9, '#7A4A1E'); g.disc2([fc[0] + 3.4, fc[1] + 1.6], 0.9, '#7A4A1E');
         g.line2(arcPts(fc[0] + 0.3, fc[1] + 1, 5, 0.4, 2.0, 6), { w: 0.6, c: '#7A4A1E', boil: false });
         const ct = g.p(sc_[0], cy, sc_[2] + R + 0.4); g.fill2([[ct[0] - 6, ct[1] + 1], [ct[0] + 6, ct[1] + 1], [ct[0] + 7, ct[1] - 6], [ct[0] + 3, ct[1] - 2.5], [ct[0], ct[1] - 8], [ct[0] - 3, ct[1] - 2.5], [ct[0] - 7, ct[1] - 6]], P.GOLD, true);
@@ -304,5 +354,8 @@ RJ.floatActor = function (T, head, s, period, kind, P) {
       RJ.person(g, cx + 2.6, cy - 2.2, 4.4, Object.assign({}, looks[1], { dir: 0, pose: 'wave', ph: st.d * 0.5 }));
       RJ.person(g, cx + 2.6, cy + 2.2, 4.4, Object.assign({}, looks[2], { dir: 0, pose: 'cheer', ph: st.d * 0.5 }));
       for (let i = 0; i < 3; i++) RJ.person(g, cx + 6.5, cy - 3 + i * 3, 2.2, Object.assign({}, looks[3 + i], { dir: 0, pose: (i + st.d) % 2 ? 'cheer' : 'walk', ph: st.d * 0.5, costeiro: undefined }));
+      // at night the float is a blaze of light: everything lit, bulbs along its gold skirt (clear by day), the colours kept
+      RJ.lit(g, 0, 0.74);
+      for (let k = 0; k < 7; k++) { const u = -HL + 1.3 + k * (2 * HL - 2.6) / 6; RJ.navLight(g, g.p.apply(g, C(u, HW + 0.06, 2.0)), k % 2 ? '#FFE9A0' : '#FFF6DC', 0.42); }
     } });
 };

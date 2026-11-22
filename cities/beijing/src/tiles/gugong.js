@@ -35,20 +35,23 @@ SF.tile('gugong', 0, 0, { rim: 30 }, function (T) {
     g.fill([[-H, 34.4, 0], [H, 34.4, 0], [H, 35.6, 0], [-H, 35.6, 0]], '#EDE9E0');
     g.line([[-H, 34.4, 0], [H, 34.4, 0]], { w: 0.6, c: '#9C9686', boil: false }); g.line([[-H, 31, 0], [H, 31, 0]], { w: 0.6, c: '#9C9686', boil: false });
     // five bridges over it, the middle one widest (the guard's)
+    const iB = g.cmds.length;
     for (const [x, w] of [[-14, 2.6], [-7, 3.0], [0, 4.0], [7, 3.0], [14, 2.6]]) {
       const q = [[x - w, 30.6, 0], [x + w, 30.6, 0], [x + w, 34.8, 0], [x - w, 34.8, 0]];
       g.fill(q, '#F4F1EA'); g.fill([[x - w, 34.4, 0], [x + w, 34.4, 0], [x + w, 34.4, -1.2], [x - w, 34.4, -1.2]], '#E6E1D5'); g.outline(q, { w: 0.5, c: '#9C9686', boil: false });
     }
+    BN.flood(g, iB, 0.55, BN.WHITE, { fall: 0 });                           // (night: the white marble lit by the gate's floodlights)
     // the courtyard behind the gate: a grey brick path on the axis
     g.fill(K.rect(-3.5, 2, 3.5, 17), '#DCD5C6');
   }, { rim: true });
 
   /* ---------------- the palace walls, its gate and the corner tower ---------------- */
-  T.obj([-36.5, -36.5, 28.4, -35.2], (g) => BJ.wall(g, -36.5, -36.5, 28.4, -35.3, 6), { name: 'palace wall' });
-  T.obj([-36.5, -35.2, -35.2, 0.6], (g) => BJ.wall(g, -36.5, -35.2, -35.3, 0.6, 6), { name: 'palace wall' });
-  T.obj([27.2, -35.2, 28.4, -5], (g) => BJ.wall(g, 27.2, -35.2, 28.4, -5, 7), { name: 'palace wall' });
-  T.obj([-35.2, -0.6, -6, 0.6], (g) => BJ.wall(g, -35.2, -0.6, -6, 0.6, 7), { name: 'palace wall' });
-  T.obj([6, -0.6, 23, 0.6], (g) => BJ.wall(g, 6, -0.6, 23, 0.6, 7), { name: 'palace wall' });
+  // (night: the palace behind the gate is closed and dark, its walls and halls a shade darker than the moon makes them)
+  T.obj([-36.5, -36.5, 28.4, -35.2], (g) => { BJ.wall(g, -36.5, -36.5, 28.4, -35.3, 6); BN.crown(g, 0, -0.25); }, { name: 'palace wall' });
+  T.obj([-36.5, -35.2, -35.2, 0.6], (g) => { BJ.wall(g, -36.5, -35.2, -35.3, 0.6, 6); BN.crown(g, 0, -0.25); }, { name: 'palace wall' });
+  T.obj([27.2, -35.2, 28.4, -5], (g) => { BJ.wall(g, 27.2, -35.2, 28.4, -5, 7); BN.flood(g, 0, 0.55, '#FFD08A'); for (const y of [-29, -19, -10]) g.glow2('lantern', g.p(28.5, y, 2.5), g.p(31, y, 0), { r: 2.0, col: '#FFC872' }); }, { name: 'palace wall' });   // (night: lit along the moat)
+  T.obj([-35.2, -0.6, -6, 0.6], (g) => { BJ.wall(g, -35.2, -0.6, -6, 0.6, 7); BN.crown(g, 0, -0.2); }, { name: 'palace wall' });
+  T.obj([6, -0.6, 23, 0.6], (g) => { BJ.wall(g, 6, -0.6, 23, 0.6, 7); BN.crown(g, 0, -0.2); }, { name: 'palace wall' });
   // the gate in the south wall (the Gate of Supreme Harmony, simplified): a red gatehouse with a yellow roof
   T.obj([-6, -2.2, 6, 2.2], function (g) {
     K.box(g, -6, -2.2, 6, 2.2, 0, 7.2, { t: '#C9B7A0', l: BC.red, r: shade(BC.red, 0.12) }, { w: 0.8 });
@@ -56,9 +59,10 @@ SF.tile('gugong', 0, 0, { rim: 30 }, function (T) {
     g.fill(pts, '#3A2A24'); g.line(pts, { w: 0.5, c: '#5E1E16', boil: false });
     g.fill(K.on('L', 2.22, -6, 6, 6.2, 7.2), BC.band);
     BJ.roof(g, -6, -2.2, 6, 2.2, 7.2, 3.4, { type: 'xie', col: BC.yellow, over: 1.4, lift: 0.6 });
+    BN.crown(g, 0, -0.2);
   }, { name: 'palace gate' });
   T.obj([23, -5, 33, 5], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     K.box(g, 23, -5, 33, 5, 0, 7, { t: '#C9B7A0', l: BC.red, r: shade(BC.red, 0.12) }, { w: 0.9 });
     K.box(g, 23, -5, 33, 5, 0, 0.8, { t: '#B9B6AE', l: '#A9A69E', r: '#97948D' }, { w: 0.5, boil: false, nohid: true, faces: "lr" });
     BJ.rail(g, 23, -5, 33, 5, 7, { h: 0.8 });
@@ -69,6 +73,9 @@ SF.tile('gugong', 0, 0, { rim: 30 }, function (T) {
     BJ.roof(g, 24.4, -1.6, 31.6, 1.6, 13.8, 4.2, { type: 'xie', col: BC.yellow, over: 1.2, lift: 0.7, ridge: 'x' });
     BJ.roof(g, 26.4, -3.6, 29.6, 3.6, 13.8, 4.2, { type: 'xie', col: BC.yellow, over: 1.2, lift: 0.7, ridge: 'y' });
     const f = g.p(28, 0, 18.2); g.disc2([f[0], f[1] - 1.2], 1.1, BC.gold); g.ring2([f[0], f[1] - 1.2], 1.1, { w: 0.35, c: '#7A5A20' });
+    // at night the corner tower is floodlit gold, its golden roofs and red walls doubled in the moat below
+    BN.flood(g, i0, 0.92, '#FFD08A', { lines: 0.3, fall: 0.3 });
+    for (const [x, y, z, r, gx, gy] of [[33, 3, 3.5, 2.4, 33.2, 5.2], [31, 5, 3.5, 2.4, 31, 5.3], [30.6, 2.4, 9.5, 3.0, 32.6, 5.3], [28.4, 1.4, 15.4, 2.2, 30.2, 5.4], [33, -2.4, 4.0, 2.2, 33.4, -2.4]]) g.glow2('lantern', g.p(x, y, z), g.p(gx, gy, 0), { r, col: '#FFC872' });
   }, { name: 'corner tower' });
 
   /* ---------------- the Hall of Supreme Harmony on its three terraces ---------------- */
@@ -83,12 +90,13 @@ SF.tile('gugong', 0, 0, { rim: 30 }, function (T) {
     BJ.hallBody(g, -14.5, -24.5, 6.5, -15.5, 14.4, 15.8, { doors: false, bx: 7, by: 3 });
     BJ.roof(g, -14.5, -24.5, 6.5, -15.5, 15.8, 7.0, { type: 'hip', col: BC.yellow, over: 2.2, lift: 0.9, rw: 2.0 });
     const b = K.on('L', -15.3, -5.6, -2.4, 14.0, 15.6); g.fill(b, '#3E5E9E'); g.outline(b, { w: 0.5, c: '#C9A23A', boil: false });
+    BN.crown(g, 0, -0.25);
   }, { name: 'hall of supreme harmony' });
 
   /* ---------------- the Tiananmen gate ---------------- */
   T.obj([-19, 17, 19, 29.4], function (g) {
     g.boilP = 0.3;
-    const x0 = -19, x1 = 19, y0 = 17, y1 = 29.4, PZ = 9;
+    const x0 = -19, x1 = 19, y0 = 17, y1 = 29.4, PZ = 9, i0 = g.cmds.length;
     K.box(g, x0, y0, x1, y1, 0, PZ, { t: '#C9B7A0', l: BC.red, r: shade(BC.red, 0.12) }, { w: 1 });
     K.box(g, x0, y0, x1, y1, 0, 1.0, { t: '#C9C3B5', l: '#D7D1C3', r: '#BDB7A9' }, { w: 0.6, boil: false, nohid: true, faces: "lr" });
     // five arched doorways on the front, the middle one the tallest
@@ -103,15 +111,20 @@ SF.tile('gugong', 0, 0, { rim: 30 }, function (T) {
     BJ.hallBody(g, -13.5, y0 + 3.2, 13.5, y1 - 3.2, PZ + 7.85, PZ + 9.0, { doors: false, bx: 7, by: 2 });
     BJ.roof(g, -13.5, y0 + 3.2, 13.5, y1 - 3.2, PZ + 9.0, 6.0, { type: 'xie', col: BC.yellow, over: 2.0, lift: 0.9, rw: 1.9 });
     // eight red lanterns under the lower eave (National Day)
-    for (let i = 0; i < 8; i++) { const x = -12.6 + i * 3.6, c = g.p(x, y1 - 1.0, PZ + 4.6); TB_lantern2(g, c, 1.9); }
+    for (let i = 0; i < 8; i++) { const x = -12.6 + i * 3.6, c = g.p(x, y1 - 1.0, PZ + 4.6); TB_lantern2(g, c, 1.9, g.p(x, y1 + 0.6, 0)); }
     // flags at the ends of the podium
     for (const x of [-17.6, 17.6]) { const b = g.p(x, y1 - 0.8, PZ), t = g.p(x, y1 - 0.8, PZ + 6); g.segs2([b[0], b[1], t[0], t[1]], '#6E5A44', 0.4); BJ.flag2(g, [t[0], t[1]], 7, 4.6, 1.1 + x * 0.1); }
+    // at night the gate is floodlit: the red walls glow, the yellow roofs turn gold, the doorways stay dark; its lights
+    // lie on the Golden Water River in front
+    BN.flood(g, i0, 0.9, '#FFD49A', { lines: 0.3, fall: 0.25 });
+    for (const [x, z, r] of [[-12, 4.5, 3.2], [0, 4.5, 3.6], [12, 4.5, 3.2], [-7, 12.5, 3.0], [7, 12.5, 3.0], [0, 17.5, 2.8]]) g.glow2('lantern', g.p(x, y1 + 0.2, z), g.p(x, y1 + 0.6, 0), { r, col: '#FFC27A' });
+    for (const x of [-16, -6, 6, 16]) g.glow2('lantern', g.p(x, y1 + 0.5, 0.5), g.p(x, y1 + 0.6, 0), { r: 1.0, col: '#FFE2B0' });
   }, { name: 'tiananmen' });
   // stone lions either side of the middle bridges, the two huabiao columns on the pavement
   for (const x of [-24, 24]) T.obj([x, 36], (g) => TB_huabiao(g, x, 36), { name: 'huabiao' });
   // bridge railings (low marble posts) either side of each bridge
   for (const [x, w] of [[-14, 2.6], [-7, 3.0], [0, 4.0], [7, 3.0], [14, 2.6]]) for (const s of [-1, 1]) {
-    const xx = x + s * w; T.obj([xx - 0.2, 30.8, xx + 0.2, 34.6], (g) => { const segs = [], dots = []; for (let y = 30.9; y <= 34.6; y += 1.2) { const a = g.p(xx, y, 0), b = g.p(xx, y, 1.2); segs.push(a[0], a[1], b[0], b[1]); dots.push(b); } const a = g.p(xx, 30.9, 0.9), b = g.p(xx, 34.6, 0.9); segs.push(a[0], a[1], b[0], b[1]); g.segs2(segs, '#A9A394', 0.5); for (const d of dots) g.disc2([d[0], d[1] - 0.3], 0.42, '#F7F5EF'); }, { name: 'bridge rail' });
+    const xx = x + s * w; T.obj([xx - 0.2, 30.8, xx + 0.2, 34.6], (g) => { const segs = [], dots = []; for (let y = 30.9; y <= 34.6; y += 1.2) { const a = g.p(xx, y, 0), b = g.p(xx, y, 1.2); segs.push(a[0], a[1], b[0], b[1]); dots.push(b); } const a = g.p(xx, 30.9, 0.9), b = g.p(xx, 34.6, 0.9); segs.push(a[0], a[1], b[0], b[1]); g.segs2(segs, '#A9A394', 0.5); for (const d of dots) g.disc2([d[0], d[1] - 0.3], 0.42, '#F7F5EF'); BN.flood(g, 0, 0.62, BN.WHITE, { lines: 0.6, fall: 0 }); }, { name: 'bridge rail' });   // (night: lit by the gate's floodlights)
   }
   // the traffic lights for the guard's crossing on the kerb
   for (const x of [-6.5, 6.5]) T.actor({ sample: 5, period: 10, grow: false, cast: false,
@@ -153,13 +166,17 @@ SF.tile('gugong', 0, 0, { rim: 30 }, function (T) {
 });
 
 /* small Tiananmen props (shared with the square) */
-function TB_lantern2(g, c, r) {
+function TB_lantern2(g, c, r, gp) {
   g.segs2([c[0], c[1] - r * 1.6, c[0], c[1] - r], '#5A4A3C', 0.3);
-  const pts = []; for (let i = 0; i < 14; i++) { const t = TAU * i / 14; pts.push([c[0] + Math.cos(t) * r * 0.95, c[1] + Math.sin(t) * r * 0.8]); }
+  const pts = [], i0 = g.cmds.length; for (let i = 0; i < 14; i++) { const t = TAU * i / 14; pts.push([c[0] + Math.cos(t) * r * 0.95, c[1] + Math.sin(t) * r * 0.8]); }
   g.fill2(pts, '#D8322A', true); g.fill2(pts.slice(0, 8).concat([[c[0] + r * 0.2, c[1]]]), '#B92A22', true);
   g.fill2([[c[0] - r * 0.45, c[1] - r * 0.95], [c[0] + r * 0.45, c[1] - r * 0.95], [c[0] + r * 0.45, c[1] - r * 0.7], [c[0] - r * 0.45, c[1] - r * 0.7]], '#E2B13A', true);
   g.fill2([[c[0] - r * 0.45, c[1] + r * 0.7], [c[0] + r * 0.45, c[1] + r * 0.7], [c[0] + r * 0.45, c[1] + r * 0.95], [c[0] - r * 0.45, c[1] + r * 0.95]], '#E2B13A', true);
   g.segs2([c[0], c[1] + r * 0.95, c[0], c[1] + r * 1.7, c[0] - 0.3, c[1] + r * 0.95, c[0] - 0.4, c[1] + r * 1.6, c[0] + 0.3, c[1] + r * 0.95, c[0] + 0.4, c[1] + r * 1.6], '#E2B13A', 0.3);
+  // at night a light burns inside: the silk glows red-orange, the gold caps and tassels shine; gp: the ground under it
+  const LN = { '#D8322A': '#F25A3A', '#B92A22': '#D23E26', '#E2B13A': '#F6C64E' };
+  BN.each(g, i0, (cc) => (LN[cc] ? { nc: LN[cc] } : undefined));
+  g.glow2('lantern', c, gp || c, { r: Math.max(1.5, r * 1.15), col: BN.LANT });
 }
 function TB_lion(g, x, y, s) {
   K.box(g, x - 1.2, y - 1.0, x + 1.2, y + 1.0, 0, 1.6, K.STONE, { w: 0.6 });
@@ -170,12 +187,15 @@ function TB_lion(g, x, y, s) {
   g.disc2(P(2.6, -7.4), 0.25, '#2A2622');
 }
 function TB_huabiao(g, x, y) {
+  const i0 = g.cmds.length;
   K.box(g, x - 1.4, y - 1.4, x + 1.4, y + 1.4, 0, 1.2, K.STONE, { w: 0.6 });
   K.cyl(g, x, y, 0.7, 1.2, 11, { t: '#F4F1EA', l: '#F3F0E8', r: '#DAD5C8' }, { w: 0.6, n: 8 });
   const a = g.p(x, y, 8.6); g.fill2([[a[0] - 3.4, a[1] - 0.6], [a[0] + 3.4, a[1] - 1.4], [a[0] + 3.4, a[1] + 0.4], [a[0] - 3.4, a[1] + 1.2]], '#F4F1EA', true); g.outline2([[a[0] - 3.4, a[1] - 0.6], [a[0] + 3.4, a[1] - 1.4], [a[0] + 3.4, a[1] + 0.4], [a[0] - 3.4, a[1] + 1.2]], { w: 0.4, c: '#8C8576', boil: false });
   K.cyl(g, x, y, 1.2, 11, 11.6, K.STONE, { w: 0.5, n: 8 });
   const t = g.p(x, y, 11.6); g.fill2([[t[0] - 0.8, t[1]], [t[0] + 0.8, t[1]], [t[0] + 0.5, t[1] - 2.2], [t[0] - 0.3, t[1] - 2.4]], '#E9E5DC', true);
   const sp = []; for (let z = 2; z < 10.5; z += 1.1) { const q = g.p(x, y + 0.7, z), r = g.p(x + 0.7, y, z + 0.5); sp.push(q[0], q[1], r[0], r[1]); } g.segs2(sp, '#B9B3A4', 0.3);
+  // at night the marble column is floodlit from its base
+  BN.flood(g, i0, 0.8, BN.WHITE, { lines: 0.4 }); g.glow('lantern', x, y, 5.5, { r: 2.0, col: '#FFE6BE' }); g.glow('lantern', x + 1.6, y + 1.6, 0.4, { r: 0.8, col: '#FFF0D0' });
 }
 /* a traffic light on a pole (wide-px drawing at the actor's origin): car heads facing both ways, red or green */
 function TB_signal(g, red) {
@@ -183,5 +203,6 @@ function TB_signal(g, red) {
   g.fill2([[b[0] - 0.4, b[1]], [b[0] + 0.4, b[1]], [t[0] + 0.3, t[1]], [t[0] - 0.3, t[1]]], '#5E5A52');
   const h = [t[0] - 1.2, t[1] + 0.5];
   g.fill2([[h[0] - 1.3, h[1] - 4.4], [h[0] + 1.3, h[1] - 4.4], [h[0] + 1.3, h[1] + 0.6], [h[0] - 1.3, h[1] + 0.6]], '#3A3530', true);
-  g.disc2([h[0], h[1] - 3.4], 0.75, red ? '#E0503E' : '#5A544A'); g.disc2([h[0], h[1] - 1.7], 0.75, '#5A544A'); g.disc2([h[0], h[1] - 0.0], 0.75, red ? '#5A544A' : '#5FC07A');
+  g.disc2([h[0], h[1] - 3.4], 0.75, red ? '#E0503E' : '#5A544A'); if (red) g.mark({ nc: true, light: true });
+  g.disc2([h[0], h[1] - 1.7], 0.75, '#5A544A'); g.disc2([h[0], h[1] - 0.0], 0.75, red ? '#5A544A' : '#5FC07A'); if (!red) g.mark({ nc: true, light: true });   // the lit lamp shines at night
 }

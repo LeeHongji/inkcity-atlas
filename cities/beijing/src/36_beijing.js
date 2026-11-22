@@ -100,7 +100,9 @@ BJ.roof = function (g, x0, y0, x1, y1, z, h, o) {
   }
   // lines: the eave fronts (and a pale eave edge), the hips, the ridge
   const e0F = edge(0, 'F'), e0E = edge(0, 'E');
+  const iE = g.cmds.length;
   g.line(e0F, lo); if (ends.length) g.line(e0E, lo); else g.line([e0F[N], edge(0, 'B')[0]], lo);
+  if (o.eave) BN.litLines(g, iE, o.eave);                    // at night a string of lights along the eaves
   if (ends.length) {
     for (const [s, c0] of [['F', 0], ['F', N], ['B', 0]]) {   // hips from the eave corners
       const pts = []; for (let k = 0; k <= K_; k++) { if (type === 'xie' && prof[k][0] > dg + 1e-6) break; pts.push(edge(k, s)[c0 === 0 ? 0 : (s === 'F' || s === 'B' ? N : 5)]); }
@@ -250,6 +252,8 @@ BJ.greyWall = function (g, x0, y0, x1, y1, h, o) {
   g.segs2(segs, '#9E9C95', 0.2);
   const alongX = (x1 - x0) >= (y1 - y0);
   BJ.roof(g, x0, y0, x1, y1, h, 0.8, { type: 'gable', col: BC.grey, over: 0.35, lift: 0, ridge: alongX ? 'x' : 'y', tiles: false, curl: 0, rw: 0.9, w: 0.55, gcol: BC.brick });
+  // o.lamp: at night a lamp on a bracket at the top of the wall, over the lane (on the face we see)
+  if (o.lamp) { if (alongX) g.glow('lamp', (x0 + x1) / 2, y1 + 0.5, h - 0.2, { r: 0.9 }); else g.glow('lamp', x1 + 0.5, (y0 + y1) / 2, h - 0.2, { r: 0.9 }); }
 };
 
 /* ---------------- courtyard houses ---------------- */
@@ -266,7 +270,7 @@ BJ.wing = function (g, x0, y0, x1, y1, o) {
       for (let i = 0; i < nb; i++) {
         const b0 = a0 + i * bw + 0.3, b1 = a0 + (i + 1) * bw - 0.3, door = i === Math.floor(nb / 2);
         const q = K.on(f, p + 0.03, b0, b1, door ? 0.15 : 1.1, h - 0.55); g.fill(q, door ? '#8E3A2C' : '#A54A36');
-        const inner = K.on(f, p + 0.05, b0 + 0.25, b1 - 0.25, door ? 2.6 : 1.6, h - 0.85); g.fill(inner, '#E8E2CF');
+        const inner = K.on(f, p + 0.05, b0 + 0.25, b1 - 0.25, door ? 2.6 : 1.6, h - 0.85); g.fill(inner, '#E8E2CF'); g.mark({ win: door ? 0.6 : 0.8 });   // at night the paper glows from the room behind
         const segs = []; for (let a = b0 + 0.6; a < b1 - 0.3; a += 0.55) { const P0 = g.p.apply(g, K.pt(f, p + 0.06, a, door ? 2.6 : 1.6)), P1 = g.p.apply(g, K.pt(f, p + 0.06, a, h - 0.85)); segs.push(P0[0], P0[1], P1[0], P1[1]); }
         for (let zz = (door ? 2.6 : 1.6) + 0.5; zz < h - 0.9; zz += 0.55) { const P0 = g.p.apply(g, K.pt(f, p + 0.06, b0 + 0.25, zz)), P1 = g.p.apply(g, K.pt(f, p + 0.06, b1 - 0.25, zz)); segs.push(P0[0], P0[1], P1[0], P1[1]); }
         g.segs2(segs, '#A54A36', 0.2);
@@ -277,10 +281,16 @@ BJ.wing = function (g, x0, y0, x1, y1, o) {
       g.segs2(segs, '#8E3A2C', 0.9);
       g.fill(K.on(f, p + 0.05, a0, a1, h - 0.5, h), o.band || '#4C7E78');
     } else if (o.back !== false) {
-      const am = (a0 + a1) / 2; g.fill(K.on(f, p + 0.03, am - 0.9, am + 0.9, h - 1.6, h - 0.7), '#5F5A52');
+      const am = (a0 + a1) / 2; g.fill(K.on(f, p + 0.03, am - 0.9, am + 0.9, h - 1.6, h - 0.7), '#5F5A52'); g.mark({ win: 0.45 });
     }
   }
   BJ.roof(g, x0, y0, x1, y1, h, rh, { type: 'gable', col: o.roof || BC.grey, over: 0.7, lift: 0.15, ridge: alongX ? 'x' : 'y', rw: 1.4, gcol: '#B5B3AC', curl: 0.6 });
+  // at night red lanterns hang under the eave along a long blank wall: the lanes of the old city lit for the evening
+  if (o.lanterns !== false) for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) {
+    if (f === o.front || (f === 'L') !== alongX || a1 - a0 < 9) continue;
+    const am = (a0 + a1) / 2;                                 // in pairs either side of the little window in the middle
+    for (let d = 2.3; am + d < a1 - 1.2; d += 5) for (const a of [am - d, am + d]) BN.lantern2(g, g.p.apply(g, K.pt(f, p + 0.6, a, h - 1.0)), 1.6, g.p.apply(g, K.pt(f, p + 0.7, a, 0)));
+  }
   return h;
 };
 /* a red courtyard gate (on a wall face): a little gatehouse with its own roof, red double doors with brass knockers, two
@@ -299,6 +309,8 @@ BJ.gate = function (g, face, p, a, o) {
   // two stone drums at the foot
   for (const s of [-1, 1]) { const c = face === 'L' ? [a + s * w * 0.42, fp + 0.6] : [fp + 0.6, a + s * w * 0.42]; K.cyl(g, c[0], c[1], 0.45, 0, 1.0, { t: '#D9D5CB', l: '#C9C5BA', r: '#B5B1A6' }, { w: 0.4, n: 8 }); }
   BJ.roof(g, box[0], box[1], box[2], box[3], h, 1.6, { type: 'gable', col: BC.grey, over: 0.5, lift: 0.3, ridge: face === 'L' ? 'x' : 'y', rw: 1.1, curl: 0.5, gcol: '#B5B3AC' });
+  // at night: a red lantern either side of the doors, under the eave
+  for (const s of [-1, 1]) { const q = K.pt(face, fp + 0.55, a + s * w * 0.4, h - 1.85); BN.lantern2(g, g.p.apply(g, q), 1.75, g.p.apply(g, K.pt(face, fp + 0.6, a + s * w * 0.4, 0))); }
 };
 /* a red diamond with 福 (good fortune) on it, as on doors at the new year (wide px centre c, half-diagonal s) */
 BJ.fu2 = function (g, c, s) {
@@ -318,7 +330,7 @@ BJ.ginkgo = function (g, x, y, o) {
   const top = f[1] - h * VZ, cx = f[0], cy = top - r * 0.95, col = o.col || BC.ginkgo, ink = BC.ginkgoInk;
   g.fill2([[f[0] - 0.9, f[1]], [f[0] + 0.9, f[1]], [f[0] + 0.55, top - r * 0.2], [f[0] - 0.55, top - r * 0.2]], '#8A7A66');
   g.fill2([[f[0] + 0.1, f[1]], [f[0] + 0.9, f[1]], [f[0] + 0.55, top - r * 0.2], [f[0] + 0.1, top - r * 0.2]], '#6E604E');
-  const n = 11, pts = [], a0 = -Math.PI / 2;
+  const n = 11, pts = [], a0 = -Math.PI / 2, i0 = g.cmds.length;
   for (let i = 0; i < n; i++) { const a = a0 + TAU * i / n, rr = (0.9 + R() * 0.2), ey = Math.sin(a) < 0 ? 1.32 : 1.0; pts.push([cx + Math.cos(a) * r * rr * 0.92, cy + Math.sin(a) * r * rr * ey]); }
   g.fill2(pts, col);
   const sh = pts.filter((p) => (p[0] - cx) * 0.6 + (p[1] - cy) > -r * 0.05); if (sh.length >= 2) { sh.push([cx + r * 0.1, cy + r * 0.1]); g.fill2(sortAround(sh), shade(col, 0.12)); }
@@ -328,6 +340,9 @@ BJ.ginkgo = function (g, x, y, o) {
   g.segs2(mk, ink, 0.5);
   const fl = []; for (let i = 0; i < 9; i++) { const a = R() * TAU, d = Math.sqrt(R()) * r * 0.75, px = cx + Math.cos(a) * d * 0.8, py = cy + Math.sin(a) * d * 1.1; fl.push(px - 0.4, py, px + 0.4, py - 0.2); }
   g.segs2(fl, '#FBE89A', 0.7);
+  // at night the gold crown keeps some of its colour (lit from below), a warm aura, gold motes drifting up
+  BN.crown(g, i0, o.lit == null ? -0.2 : o.lit); BN.each(g, i0, (c, f, d) => (d.k === K_SEGS && c === '#FBE89A' ? { nc: '#FFE58A' } : undefined));
+  g.glow2('tree', [cx, cy], f, { r: r * 0.9, col: '#FFD050' });
 };
 /* fallen ginkgo leaves on the ground round a tree (world), a scatter of yellow flecks */
 BJ.leaves = function (g, x, y, r, seed, col) {
@@ -336,7 +351,7 @@ BJ.leaves = function (g, x, y, r, seed, col) {
 };
 /* a persimmon (or jujube) tree: a crooked trunk, a sparse crown of autumn leaves and orange fruit hanging all over */
 BJ.persimmon = function (g, x, y, o) {
-  o = o || {}; const r = (o.r || 3.8) * 3.3, h = o.h == null ? 4.6 : o.h, f = g.p(x, y, o.z || 0), R = RNG(o.seed || Math.round(x * 13 + y * 29 + 1));
+  o = o || {}; const r = (o.r || 3.8) * 3.3, h = o.h == null ? 4.6 : o.h, f = g.p(x, y, o.z || 0), R = RNG(o.seed || Math.round(x * 13 + y * 29 + 1)), i0 = g.cmds.length;
   const top = [f[0] + 1.2, f[1] - h * VZ];
   g.line2([f, [f[0] + 0.6, f[1] - h * VZ * 0.5], top], { w: 1.6, c: '#5E4636', boil: false });
   g.line2([[top[0], top[1] + 2], [top[0] - r * 0.5, top[1] - r * 0.45]], { w: 0.9, c: '#5E4636', boil: false });
@@ -348,8 +363,12 @@ BJ.persimmon = function (g, x, y, o) {
   }
   const br = []; for (let i = 0; i < 6; i++) { const a = -Math.PI / 2 + (R() - 0.5) * 2.4, l = r * (0.4 + R() * 0.4); br.push(top[0], top[1], top[0] + Math.cos(a) * l, cy + Math.sin(a) * l * 0.6); }
   g.segs2(br, '#5E4636', 0.45);
-  const fruit = o.fruit || BC.persimmon;
+  BN.crown(g, i0, 0.15);                                      // (night: the leaves keep a little colour)
+  const fruit = o.fruit || BC.persimmon, i1 = g.cmds.length;
   for (let i = 0; i < (o.n || 16); i++) { const a = R() * TAU, d = Math.sqrt(R()) * r * 0.85, p = [top[0] + Math.cos(a) * d, cy + Math.sin(a) * d * 0.75]; g.disc2(p, o.fr || 0.95, fruit); g.disc2([p[0] - 0.3, p[1] - 0.3], 0.3, '#F7B07A'); }
+  // at night the fruit glow like the little lanterns they are likened to
+  BN.each(g, i1, (c, f) => (f ? { nc: c === fruit ? mix(c, '#FFB070', 0.25) : '#FFD9B0' } : undefined));
+  g.glow2('tree', [top[0], cy], f, { r: r * 0.85, col: '#FFA050' });
 };
 /* a weeping willow by the lake: a leaning trunk, a rounded head and long hanging strands, autumn yellow-green */
 BJ.willow = function (g, x, y, o) {
@@ -358,7 +377,7 @@ BJ.willow = function (g, x, y, o) {
   g.line2([f, [f[0] + lean * 0.8, f[1] - h * VZ * 0.5], top], { w: 1.8, c: '#6A5644', boil: false });
   const col = o.col || BC.willow, cy = top[1] - r * 0.15;
   // the head: an arch; the curtain: strands falling to a ragged hem well above the ground
-  const head = []; for (let k = 0; k <= 10; k++) { const a = Math.PI + Math.PI * k / 10, q = r * (0.92 + R() * 0.16); head.push([top[0] + Math.cos(a) * q, cy + Math.sin(a) * q * 0.62]); }
+  const i0 = g.cmds.length, head = []; for (let k = 0; k <= 10; k++) { const a = Math.PI + Math.PI * k / 10, q = r * (0.92 + R() * 0.16); head.push([top[0] + Math.cos(a) * q, cy + Math.sin(a) * q * 0.62]); }
   const hem = []; for (let k = 0; k <= 8; k++) { const t = k / 8, xx = top[0] + r * 1.02 - 2.04 * r * t; hem.push([xx, cy + r * (0.95 + 0.35 * Math.sin(Math.PI * t)) + (R() - 0.5) * 3]); }
   const shape = head.concat(hem);
   g.fill2(shape, col);
@@ -367,6 +386,8 @@ BJ.willow = function (g, x, y, o) {
   const st = []; for (let i = 0; i < 22; i++) { const t = R(), xx = top[0] + r * (0.95 - 1.9 * t), y0 = cy - r * 0.35 * Math.sin(Math.PI * t), l = r * (0.9 + R() * 0.5); st.push(xx, y0, xx + 0.4, y0 + l); }
   g.segs2(st, BC.willowD, 0.45);
   const fl = []; for (let i = 0; i < 10; i++) { const xx = top[0] + (R() - 0.5) * r * 1.8, yy = cy + (R() - 0.3) * r; fl.push(xx, yy, xx + 0.2, yy + 1.4); } g.segs2(fl, '#E9DE8A', 0.55);
+  // at night the curtain keeps a little of its yellow-green, lit by the lakeside lamps; motes drift through it
+  BN.crown(g, i0, -0.22); g.glow2('tree', [top[0], cy + r * 0.3], f, { r: r * 0.9 });
 };
 /* an old pine / cypress (Temple of Heaven, Jingshan): a leaning trunk, a dense dark crown with flat layered edges */
 BJ.pine = function (g, x, y, o) {
@@ -384,6 +405,7 @@ BJ.pine = function (g, x, y, o) {
   }
   g.outline2(pts, { c: BC.pineD, w: 0.7, ext: 0.3 });
   const mk = []; for (let k = 0; k < 7; k++) { const px = top[0] + (R() - 0.5) * r * 1.5, py = cy + (R() - 0.6) * r * 0.8; mk.push(px, py, px + 1.6, py - 0.2); } g.segs2(mk, '#7FA07A', 0.45);
+  g.glow2('tree', [top[0], cy], f, { r: r * 0.9 });              // at night: a faint aura, motes rising over the dark crown
 };
 /* a maple in red (Fragrant Hills, the Great Wall slopes): a rounded crown in reds and oranges */
 BJ.maple = function (g, x, y, o) { o = o || {}; K.tree(g, x, y, Object.assign({ col: o.col || BC.maple, ink: '#8E3424', r: 3.2, h: 3.6 }, o)); };
@@ -433,7 +455,7 @@ BJ.person = function (g, x, y, z, w) {
     const pts = [hd]; for (let i = 0; i <= 6; i++) { const a = a0 + i * 0.32; pts.push([hd[0] + Math.cos(a) * 3.6 * k, hd[1] + Math.sin(a) * 3.6 * k]); }
     g.fill2(pts, w.fan, true); g.segs2([hd[0], hd[1], pts[4][0], pts[4][1]], '#F2D06A', 0.2);
   }
-  if (w.phone) { const hd = r.hands[0]; g.fill2([[hd[0] - 0.45, hd[1] - 1.2], [hd[0] + 0.45, hd[1] - 1.2], [hd[0] + 0.45, hd[1] + 0.25], [hd[0] - 0.45, hd[1] + 0.25]], '#2A2622', true); }
+  if (w.phone) { const hd = r.hands[0]; g.fill2([[hd[0] - 0.45, hd[1] - 1.2], [hd[0] + 0.45, hd[1] - 1.2], [hd[0] + 0.45, hd[1] + 0.25], [hd[0] - 0.45, hd[1] + 0.25]], '#2A2622', true); g.mark({ nc: '#D9EEFF', light: true }); g.glow2('lantern', [hd[0], hd[1] - 0.5], null, { r: 0.6, col: '#BFE2FF' }); }   // a lit screen at night
   if (w.flag) {   // a little hand flag (red with yellow stars), stick up from the hand
     const hd = r.hands[w.flagHand || 0], t = [hd[0], hd[1] - 5 * k];
     g.segs2([hd[0], hd[1], t[0], t[1]], '#6E5A44', 0.25);
@@ -461,8 +483,8 @@ BJ.flag2 = function (g, a, w, h, ph) {
   g.line2(pts, { w: 0.35, c: '#7A1E18', close: true, boil: false, wob: 0.3 });
 };
 /* a swallow kite (sha yan), the Beijing classic: wide swept wings, a forked tail, painted black, white and red */
-BJ.kite2 = function (g, c, s, col, ph) {
-  const fl = Math.sin(ph) * 0.12, P = (u, v) => [c[0] + u * s, c[1] + v * s];
+BJ.kite2 = function (g, c, s, col, ph, lit) {
+  const fl = Math.sin(ph) * 0.12, P = (u, v) => [c[0] + u * s, c[1] + v * s], i0 = g.cmds.length;
   const wing = [P(0, -1.1), P(1.6, -1.6 - fl), P(2.3, -0.9 - fl), P(0.7, -0.1), P(0, 0.2), P(-0.7, -0.1), P(-2.3, -0.9 + fl), P(-1.6, -1.6 + fl)];
   g.fill2(wing, '#F6F2E6', true);
   g.fill2([P(0.5, -1.2), P(1.6, -1.6 - fl), P(2.3, -0.9 - fl), P(1.4, -0.75)], '#2A2622', true); g.fill2([P(-0.5, -1.2), P(-1.6, -1.6 + fl), P(-2.3, -0.9 + fl), P(-1.4, -0.75)], '#2A2622', true);
@@ -470,6 +492,8 @@ BJ.kite2 = function (g, c, s, col, ph) {
   g.fill2([P(-0.4, 0.5), P(0, 0.9), P(0.4, 0.5), P(0.9, 2.1), P(0.2, 1.3), P(0, 1.4), P(-0.2, 1.3), P(-0.9, 2.1)], '#2A2622', true);
   g.disc2(P(0, -1.75), 0.38 * s, '#2A2622');
   g.outline2(wing, { w: 0.3, c: '#3A3128', boil: false });
+  // lit: at night the kite is strung with LEDs (the night kites of the Olympic Green): its panels shine in their colours
+  if (lit) BN.each(g, i0, (cc, f, d) => (f ? (cc === '#F6F2E6' ? { nc: '#DFF3FF', light: d === g.cmds[i0] } : cc === '#2A2622' ? { nc: lit } : { nc: mix(cc, '#FFFFFF', 0.2), light: true }) : undefined));
 };
 /* a pigeon in flight (wide px), wings up or down */
 BJ.pigeon2 = function (g, c, s, up, col) {
@@ -495,11 +519,14 @@ BJ.taxi = function (g, ang, o) {
   K.rwin(g, cab, 'pv', -0.82, -0.06, 3.1, 4.4); K.rwin(g, cab, 'pv', 0.06, 0.82, 3.1, 4.4);
   K.rwin(g, cab, 'nv', -0.82, -0.06, 3.1, 4.4); K.rwin(g, cab, 'nv', 0.06, 0.82, 3.1, 4.4);
   K.rwin(g, cab, 'pu', -0.8, 0.8, 3.1, 4.4); K.rwin(g, cab, 'nu', -0.8, 0.8, 3.1, 4.4);
-  K.rbox(g, cab.cx, cab.cy, 0.45, 1.0, ang, 4.7, 5.4, '#F3F1EA', { w: 0.45, nb: true });
+  const iS = g.cmds.length; K.rbox(g, cab.cx, cab.cy, 0.45, 1.0, ang, 4.7, 5.4, '#F3F1EA', { w: 0.45, nb: true });
+  BN.each(g, iS, (c, f) => (f ? { nc: BN.mixA(nightColour(c), '#FFE39A', 0.72) } : undefined));   // the roof sign lit at night (its top shines)
+  for (let k = g.cmds.length - 1; k >= iS; k--) if (BN_FILL(g.cmds[k])) { g.cmds[k].light = true; break; }
 };
 /* a Beijing city bus: white with a red skirt (o.band), a big front window, route number box */
 BJ.bus = function (g, ang, o) {
-  o = o || {}; K.bus(g, ang, { col: '#F3F1EA', band: o.band || '#C9463E', L: o.L || 6.8, W: 2.6, h: 5.8, n: 5 });
+  o = o || {}; const i0 = g.cmds.length; K.bus(g, ang, { col: '#F3F1EA', band: o.band || '#C9463E', L: o.L || 6.8, W: 2.6, h: 5.8, n: 5 });
+  BN.each(g, i0, (c, f) => (f && c === C.glass ? { nc: BN.LIT } : undefined));   // the windows lit at night
 };
 /* an electric delivery tricycle: the rider on the front wheel, a closed box (or a flat bed with cargo) behind */
 BJ.tri = function (g, ang, o) {
@@ -573,11 +600,11 @@ BJ.court = function (T, o) {
   const gw = 1.9;
   if (east === 'wall') {
     const ys = gate === 'E' ? [[y0 + nd, o.ga - gw], [o.ga + gw, y1]] : [[y0 + nd, y1]];
-    for (const [a, b] of ys) if (b - a > 0.5) T.obj([ex, a, x1, b], (g) => BJ.greyWall(g, ex, a, x1, b, 3.4), { name: 'wall' });
+    for (const [a, b] of ys) if (b - a > 0.5) T.obj([ex, a, x1, b], (g) => BJ.greyWall(g, ex, a, x1, b, 3.4, { lamp: b - a > 9 }), { name: 'wall' });
   }
   if (south === 'wall') {
     const xs = gate === 'S' ? [[x0, o.ga - gw], [o.ga + gw, east === 'wall' ? ex : x1]] : [[x0, east === 'wall' ? ex : x1]];
-    for (const [a, b] of xs) if (b - a > 0.5) T.obj([a, sy, b, y1], (g) => BJ.greyWall(g, a, sy, b, y1, 3.4), { name: 'wall' });
+    for (const [a, b] of xs) if (b - a > 0.5) T.obj([a, sy, b, y1], (g) => BJ.greyWall(g, a, sy, b, y1, 3.4, { lamp: b - a > 9 }), { name: 'wall' });
   } else T.obj([x0, sy, x1, y1], (g) => BJ.wing(g, x0, sy, x1, y1, { front: null, h: 4.6, rh: 2.6 }), { name: 'house' });
   if (gate === 'S') T.obj([o.ga - gw, y1 - 1.4, o.ga + gw, y1 + 0.4], (g) => BJ.gate(g, 'L', y1, o.ga, { fu: o.fu !== false }), { name: 'gate' });
   else T.obj([x1 - 1.4, o.ga - gw, x1 + 0.4, o.ga + gw], (g) => BJ.gate(g, 'R', x1, o.ga, { fu: o.fu !== false }), { name: 'gate' });
@@ -612,7 +639,7 @@ BJ.sidewalk = function (T, sides, o) {
       if (skip.some(([s0, s1]) => a > s0 && a < s1)) continue;
       const p = P(side, a, 1.5), seed = Math.round(p[0] * 7 + p[1] * 13);
       T.ground((g) => BJ.leaves(g, p[0], p[1], 3.4, seed));
-      T.obj([p[0], p[1]], (g) => BJ.ginkgo(g, p[0], p[1], { r: 3.1, h: 4.6, seed }), { name: 'ginkgo' });
+      T.obj([p[0], p[1]], (g) => { BJ.ginkgo(g, p[0], p[1], { r: 3.1, h: 4.6, seed, lit: -0.12 }); g.glow('spill', p[0], p[1], 0.4, { r: 5 }); }, { name: 'ginkgo' });   // (night: an uplight in the paving lights the crown)
     }
   }
   for (const [side, a, n] of (o.bikes || [])) {
@@ -631,7 +658,8 @@ BJ.jianbing = function (g, x, y, o) {
   K.box(g, x - 2.6, y - 1.3, x + 2.6, y + 1.3, 1.0, 3.6, { t: '#E9E6DE', l: '#F2F0EA', r: '#D9D6CC' }, { w: 0.6, boil: false });
   K.box(g, x - 2.6, y - 1.3, x + 2.6, y + 1.3, 3.6, 5.6, { t: 'rgba(220,235,240,0.5)', l: 'rgba(214,232,238,0.55)', r: 'rgba(200,220,228,0.55)' }, { w: 0.45, boil: false });
   BJ.sign(g, 'L', y + 1.3, x - 2.4, x + 2.4, 1.4, 3.2, '#D8322A', o.word || '煎饼', { ink: '#FBF4DE' });
-  const gr = g.p(x + 0.8, y, 3.62); g.fill2(arcPts(gr[0], gr[1], 3.2, 0, TAU, 14).map((q) => [q[0], gr[1] + (q[1] - gr[1]) * 0.5]), '#3A3530', true); g.fill2(arcPts(gr[0], gr[1], 2.4, 0, TAU, 14).map((q) => [q[0], gr[1] + (q[1] - gr[1]) * 0.5]), '#E9C47A', true);
+  const gr = g.p(x + 0.8, y, 3.62); g.fill2(arcPts(gr[0], gr[1], 3.2, 0, TAU, 14).map((q) => [q[0], gr[1] + (q[1] - gr[1]) * 0.5]), '#3A3530', true); g.fill2(arcPts(gr[0], gr[1], 2.4, 0, TAU, 14).map((q) => [q[0], gr[1] + (q[1] - gr[1]) * 0.5]), '#E9C47A', true); g.mark({ nc: '#FFD27A' });
+  g.glow('lamp', x + 0.8, y, 5.3, { r: 1.1 });               // at night a bare bulb in the glass box over the griddle
   for (const dx of [-2.2, 2.2]) { const w = g.p(x + dx, y + 1.35, 0.8); g.ring2(w, 2.6, { w: 0.5, c: '#3A3632' }); }
 };
 /* a round hall body (the Temple of Heaven): a red drum with columns and lattice doors on its front half, the painted
@@ -680,25 +708,29 @@ BJ.shop = function (g, x0, y0, x1, y1, o) {
   const p = f === 'L' ? y1 : x1, a0 = f === 'L' ? x0 : y0, a1 = f === 'L' ? x1 : y1, n = Math.max(2, Math.round((a1 - a0) / 3.4)), bw = (a1 - a0) / n;
   // the shop floor: open bays with goods, red posts
   g.fill(K.on(f, p + 0.03, a0 + 0.3, a1 - 0.3, 0.2, gf - 0.4), '#4A3428');
+  g.mark({ win: 1, spill: true, nc: ['#FFD98A', '#FBC76E', '#FFCF7C', '#F6BA64'][(o.seed || 3) % 4] });   // at night the shop is open and lit, its light on the paving
   const R = RNG(o.seed || 3), dots = [];
   for (let i = 0; i < 14; i++) { const c = g.p.apply(g, K.pt(f, p + 0.05, a0 + 0.8 + R() * (a1 - a0 - 1.6), 0.8 + R() * 2.2)); dots.push(c); }
-  for (const c of dots) g.disc2(c, 0.9, R.pick(o.goods || ['#E2B13A', '#C9584B', '#F3E3B8', '#8FBF73', '#E08A3C']));
+  for (const c of dots) { g.disc2(c, 0.9, R.pick(o.goods || ['#E2B13A', '#C9584B', '#F3E3B8', '#8FBF73', '#E08A3C'])); g.mark({ nc: true }); }
   for (let i = 0; i <= n; i++) { const c0 = g.p.apply(g, K.pt(f, p + 0.06, a0 + i * bw, 0)), c1 = g.p.apply(g, K.pt(f, p + 0.06, a0 + i * bw, h - 0.6)); g.fill2([[c0[0] - 0.5, c0[1]], [c0[0] + 0.5, c0[1]], [c1[0] + 0.5, c1[1]], [c1[0] - 0.5, c1[1]]], col, true); }
   // the upper floor: a lattice front
-  const up = K.on(f, p + 0.03, a0 + 0.3, a1 - 0.3, gf + 1.2, h - 0.9); g.fill(up, o.lat || '#5E8A6A');
+  const up = K.on(f, p + 0.03, a0 + 0.3, a1 - 0.3, gf + 1.2, h - 0.9); g.fill(up, o.lat || '#5E8A6A'); g.mark({ win: o.upLit || 0.75 });   // the room upstairs, often lit
   const segs = []; for (let a = a0 + 0.8; a < a1 - 0.4; a += 0.6) { const P0 = g.p.apply(g, K.pt(f, p + 0.05, a, gf + 1.3)), P1 = g.p.apply(g, K.pt(f, p + 0.05, a, h - 1.0)); segs.push(P0[0], P0[1], P1[0], P1[1]); } g.segs2(segs, shade(o.lat || '#5E8A6A', 0.35), 0.25);
   g.fill(K.on(f, p + 0.04, a0, a1, h - 0.9, h), BC.band);
   // a little tiled eave between the floors, then the signboard on it
   const P = (a, d, z) => f === 'L' ? [a, p + d, z] : [p + d, a, z];
-  const ev = [P(a0 - 0.3, 0, gf + 1.1), P(a1 + 0.3, 0, gf + 1.1), P(a1 + 0.3, 1.4, gf + 0.1), P(a0 - 0.3, 1.4, gf + 0.1)]; g.fill(ev, BC.grey); g.outline(ev, { w: 0.5, c: '#4A4E56', boil: false });
+  const ev = [P(a0 - 0.3, 0, gf + 1.1), P(a1 + 0.3, 0, gf + 1.1), P(a1 + 0.3, 1.4, gf + 0.1), P(a0 - 0.3, 1.4, gf + 0.1)]; g.fill(ev, BC.grey); const iv = g.cmds.length; g.outline(ev, { w: 0.5, c: '#4A4E56', boil: false });
+  BN.litLines(g, iv, BN.GOLD);                                // at night the little eave is traced in lights
   if (o.word) BJ.sign(g, f, p + 0.1, a0 + (a1 - a0) * 0.18, a1 - (a1 - a0) * 0.18, gf + 1.5, gf + 3.4, o.board || '#2A2420', o.word, { ink: o.ink || '#E9C55A', c: '#C9A23A' });
   const alongX = (x1 - x0) >= (y1 - y0);
-  BJ.roof(g, x0, y0, x1, y1, h, 2.6, { type: 'gable', col: BC.grey, over: 0.6, lift: 0.2, ridge: alongX ? 'x' : 'y', rw: 1.3, curl: 0.5, gcol: '#B5B3AC' });
+  BJ.roof(g, x0, y0, x1, y1, h, 2.6, { type: 'gable', col: BC.grey, over: 0.6, lift: 0.2, ridge: alongX ? 'x' : 'y', rw: 1.3, curl: 0.5, gcol: '#B5B3AC', eave: BN.GOLD });
+  // at night a red lantern hangs under the little eave in every bay
+  if (o.lanterns !== false) for (let i = 0; i < n; i++) { const a = a0 + (i + 0.5) * bw; BN.lantern2(g, g.p.apply(g, P(a, 1.35, gf - 0.75)), 1.85, g.p.apply(g, P(a, 1.4, 0))); }
 };
 /* a memorial archway (pailou): posts, painted beams and little roofs over each bay. Spans [a0, a1] along x (face 'L',
    plane y = p) or along y (face 'R', plane x = p); o.word on the middle board; o.bays 3 or 5 */
 BJ.pailou = function (g, face, p, a0, a1, o) {
-  o = o || {}; const nb = o.bays || 3, h = o.h || 9, bw = (a1 - a0) / nb, post = o.post || '#B33A2F';
+  o = o || {}; const nb = o.bays || 3, h = o.h || 9, bw = (a1 - a0) / nb, post = o.post || '#B33A2F', i0 = g.cmds.length;
   const P = (a, d, z) => face === 'L' ? [a, p + d, z] : [p + d, a, z];
   for (let i = 0; i <= nb; i++) { const a = a0 + i * bw; K.box(g, ...(face === 'L' ? [a - 0.4, p - 0.4, a + 0.4, p + 0.4] : [p - 0.4, a - 0.4, p + 0.4, a + 0.4]), 0, h - (i === 0 || i === nb ? 1.6 : 0), { t: shade(post, -0.1), l: post, r: shade(post, 0.15) }, { w: 0.5, boil: false }); const b = face === 'L' ? [a - 0.8, p - 0.8, a + 0.8, p + 0.8] : [p - 0.8, a - 0.8, p + 0.8, a + 0.8]; K.box(g, b[0], b[1], b[2], b[3], 0, 1.2, K.STONE, { w: 0.4, boil: false }); }
   for (let i = 0; i < nb; i++) {
@@ -709,4 +741,105 @@ BJ.pailou = function (g, face, p, a0, a1, o) {
     BJ.roof(g, r0[0], r0[1], r0[2], r0[3], zt - 0.4, 1.8, { type: 'xie', col: o.roof || BC.yellow, over: 0.5, lift: 0.5, ridge: face === 'L' ? 'x' : 'y', tiles: false, rw: 1.0, curl: 0.6 });
     if (mid && o.word) BJ.sign(g, face, p + 0.5, b0 + bw * 0.22, b1 - bw * 0.22, zt - 2.5, zt - 0.5, o.board || '#2E4E8E', o.word, { ink: '#F2C94C', c: '#C9A23A' });
   }
+  // at night the archway is floodlit from its feet, its painted beams and roofs warm against the dark
+  BN.flood(g, i0, 0.7, BN.FLOOD, { lines: 0.25 });
+  for (let i = 0; i < nb; i++) { const q = P(a0 + (i + 0.5) * bw, 0.6, (i === Math.floor(nb / 2) ? h : h - 1.6) - 1.5); g.glow('lantern', q[0], q[1], q[2], { r: 1.7, col: '#FFC27A', base: 0 }); }
+  for (let i = 0; i <= nb; i++) { const q = P(a0 + i * bw, 0.9, 0.6); g.glow('lantern', q[0], q[1], q[2], { r: 0.7, col: '#FFE0A6', base: 0 }); }
 };
+
+/* ---------------- night ----------------
+   Everything in this section, and every night line in the helpers above and in the tiles, is night-only
+   (cities/BRIEF-NIGHT.md): a night colour (nc) on what is already drawn, lights (g.glow), and the bodies of the red
+   lanterns that are hung out only for the evening, drawn in a colour with no alpha by day and appended after the rest
+   of an object (so by day they neither show, nor regroup its paint, nor move its box). Nothing here draws a visible
+   mark, moves or uses a random number by day, so the day is the same picture. */
+const BN = {
+  LIT: '#FFE3A6',                       // a lit pane: tram, bus and boat windows
+  GOLD: '#FFCF6A',                      // a line of gold light along an eave, an arch
+  LANT: '#FF6A42',                      // the halo of a red paper lantern
+  FLOOD: '#FFC98A',                     // warm floodlight on stone and timber
+  WHITE: '#FFE4C0',                     // warm-white floodlight on white marble
+  NONE: 'rgba(0,0,0,0)',                // a night-only body: no paint by day
+};
+const BN_FILL = (d) => d.k === K_FILL || d.k === K_DISC || d.k === K_TRIS;
+const BN_LINE = (d) => d.k === K_SEGS || d.k === K_RIB || d.k === K_STROKE || d.k === K_RING;
+/* set o on one drawing command, as g.mark does (nc: a colour, true = its own colour, or a function of it) */
+BN.set = function (d, o) { for (const key in o) { const v = o[key]; if (key !== 'nc') { d[key] = v; continue; } const c = v === true ? (d.c || d.col) : typeof v === 'function' ? v(d.c || d.col) : v; if (c) d.nc = c; } };
+/* every command drawn since i0 (to i1) gets fn(colour, isFill, d): an o for BN.set, or undefined (moonlit as usual) */
+BN.each = function (g, i0, fn, i1) {
+  for (let k = i0; k < (i1 == null ? g.cmds.length : i1); k++) {
+    const d = g.cmds[k]; if (!d) continue;
+    const f = BN_FILL(d); if (!f && !BN_LINE(d)) continue;
+    const c = f ? d.c : d.col; if (typeof c !== 'string') continue;
+    const o = fn(c, f, d); if (o) BN.set(d, o);
+  }
+};
+/* the marks (lettering, light strings) drawn since i0 shine in their own colour, or in col */
+BN.litMarks = (g, i0, col) => BN.each(g, i0, (c, f, d) => (d.k === K_SEGS ? { nc: col || true } : undefined));
+/* the pen lines drawn since i0 (to i1) shine in col: an eave or an arch traced in light */
+BN.litLines = (g, i0, col, i1) => BN.each(g, i0, (c, f, d) => (d.k === K_RIB || d.k === K_STROKE ? { nc: col } : undefined), i1);
+/* a colour mixed towards another, keeping the first one's alpha (mix() takes only #hex) */
+BN.mixA = function (a, b, t) { const A = parseCol(a), B = parseCol(b); if (!A || !B) return undefined; return fmtCol(lerp(A[0], B[0], t), lerp(A[1], B[1], t), lerp(A[2], B[2], t), A[3]); };
+/* a colour under a floodlight: its day colour times the light, mixed into its moonlit colour by k */
+BN.floodCol = function (c, k, light) {
+  const A = typeof c === 'string' ? parseCol(c) : null, L = parseCol(light || BN.FLOOD); if (!A) return undefined;
+  return BN.mixA(nightColour(c), fmtCol(A[0] * L[0] / 255, A[1] * L[1] / 255, A[2] * L[2] / 255, A[3]), k);
+};
+/* floodlight what was drawn since i0: its fills by k, its ink by k * o.lines (none if not given). Window panes and
+   anything already given a night colour (lanterns, signs) keep theirs. The light comes from below: it falls off up the
+   object's drawing by o.fall (0.45; 0 = even), so the roofs catch less of it than the walls */
+BN.flood = function (g, i0, k, light, o) {
+  o = o || {}; const b = g.bb, H = Math.max(1, b[3] - b[1]), fall = o.fall == null ? 0.45 : o.fall;
+  const kAt = (d) => {
+    if (!fall) return k;
+    let y; if (d.k === K_DISC) y = d.y; else { const p = d.p; let sy = 0; for (let i = 1; i < p.length; i += 2) sy += p[i]; y = sy / (p.length / 2); }
+    return k * (1 - fall * (1 - clamp((y - b[1]) / H, 0, 1)));
+  };
+  BN.each(g, i0, (c, f, d) => {
+    if (d.nc || d.win != null) return undefined;
+    if (f) return { nc: BN.floodCol(c, kAt(d), light) };
+    if (o.lines) return { nc: BN.floodCol(c, k * o.lines, light) };
+    return undefined;
+  }, o.to);
+};
+/* the leaves of a crown at night, from command i0: t > 0 keeps that much of their day colour (lit from below), t < 0
+   darkens them that much towards the night sky */
+BN.crown = (g, i0, t) => BN.each(g, i0, (c, f) => (f ? { nc: t >= 0 ? BN.mixA(nightColour(c), c, t) : BN.mixA(nightColour(c), '#262A48', -t) } : undefined));
+/* a red paper lantern hung out for the evening at wide-px point c (radius r): a lit body that is there only at night,
+   with a halo; gp: the ground under it (its reflection on water starts below that). Append it after everything else
+   in an object; it is left out where it would reach outside the object's drawing. Returns whether it was hung.
+   o.light: in an actor's drawing (a boat), the body itself casts the halo */
+BN.lantern2 = function (g, c, r, gp, o) {
+  o = o || {}; const b = g.bb, rx = r * 0.92, ry = r * 0.78;
+  if (c[0] - rx < b[0] + 0.3 || c[0] + rx > b[2] - 0.3 || c[1] - r * 1.1 < b[1] + 0.3 || c[1] + r * 1.9 > b[3] - 0.3) return false;
+  const pts = []; for (let i = 0; i < 14; i++) { const t = TAU * i / 14; pts.push([c[0] + Math.cos(t) * rx, c[1] + Math.sin(t) * ry]); }
+  g.fill2(pts, BN.NONE, true); g.mark({ nc: o.col || '#EC4A30', light: !!o.light });
+  g.fill2(pts.slice(10).concat(pts.slice(0, 5), [[c[0] + rx * 0.3, c[1]]]), BN.NONE, true); g.mark({ nc: o.dk || '#BE2E1E' });
+  const cap = (y) => [[c[0] - rx * 0.45, y - r * 0.12], [c[0] + rx * 0.45, y - r * 0.12], [c[0] + rx * 0.45, y + r * 0.12], [c[0] - rx * 0.45, y + r * 0.12]];
+  g.fill2(cap(c[1] - ry), BN.NONE, true); g.mark({ nc: '#F4C24C' }); g.fill2(cap(c[1] + ry), BN.NONE, true); g.mark({ nc: '#F4C24C' });
+  g.segs2([c[0], c[1] + ry, c[0], c[1] + r * 1.8], BN.NONE, 0.3); g.cmds[g.cmds.length - 1].nc = '#E9B23E';
+  g.glow2('lantern', c, gp || c, { r: r * 0.85, col: BN.LANT });
+  return true;
+};
+/* a lit sign: the board keeps its day colour, its lettering shines (commands since i1), a soft light round it. The
+   halo takes the board's colour, or the letters' on a dark board */
+BN.litSign = function (g, i0, i1, face, p, a0, a1, z0, z1, col, ink, o) {
+  o = o || {};
+  g.mark({ nc: true }, i0); BN.litMarks(g, i1);
+  const W = Math.abs(a1 - a0), H = z1 - z0, light = hex2rgb(col).reduce((x, y) => x + y) > 300 ? col : ink;
+  const along = Math.max(W, H), n = Math.max(1, Math.round(along / (Math.min(W, H) * 2.2 + 2)));
+  for (let i = 0; i < n; i++) {
+    const t = (i + 0.5) / n, a = W >= H ? lerp(a0, a1, t) : (a0 + a1) / 2, z = W >= H ? (z0 + z1) / 2 : lerp(z0, z1, t);
+    const c = g.p.apply(g, K.pt(face, p + 0.12, a, z));
+    g.glow2('neon', c, o.gpD != null ? g.p.apply(g, K.pt(face, p + o.gpD, a, 0)) : c, { r: Math.min(o.rmax || 2.4, 0.3 * (along / n) * 3.2), col: light });
+  }
+};
+/* K.sign (Latin lettering) lit at night */
+BN.kSign = function (g, face, p, a0, a1, z0, z1, col, word, o) {
+  const i0 = g.cmds.length; K.sign(g, face, p, a0, a1, z0, z1, col, word, o);
+  BN.each(g, i0, (c, f, d) => (f ? { nc: true } : d.k === K_SEGS ? { nc: true } : undefined));
+  const light = hex2rgb(col).reduce((x, y) => x + y) > 300 ? col : ((o && o.ink) || '#FBF8EE'), W = Math.abs(a1 - a0), n = Math.max(1, Math.round(W / 4.5));
+  for (let i = 0; i < n; i++) { const a = lerp(a0, a1, (i + 0.5) / n), c = g.p.apply(g, K.pt(face, p + 0.12, a, (z0 + z1) / 2)); g.glow2('neon', c, (o && o.gpD != null) ? g.p.apply(g, K.pt(face, p + o.gpD, a, 0)) : c, { r: Math.min(2.2, (z1 - z0) * 1.3), col: light }); }
+};
+/* a shop window (K.win) always lit at night, throwing its light on the pavement */
+BN.shopWin = function (g, face, p, a0, a1, z0, z1, o) { const i0 = g.cmds.length; K.win(g, face, p, a0, a1, z0, z1, Object.assign({ lit: 1 }, o || {})); g.mark({ spill: true }, i0); };

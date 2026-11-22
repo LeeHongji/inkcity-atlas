@@ -27,4 +27,7 @@ const SCENE = {
   visit: ['parkguell', 'sagrada', 'barceloneta', 'gracia', 'passeig', 'gotic', 'montjuic', 'rambla', 'port'],
   dive: { rambla: 'boqueria', gotic: 'aleta' },
   bounds: { z: [0.6, 10], cx: [0, 2000], cy: [-80, 1180] },
+  // at night: two windows in three lit; the sea along the coast and in Port Vell's basin, the Magic Fountain's basin and
+  // the pond at Glòries hold the lights' reflections; fireflies hang over the lawns and Park Güell's hillside
+  night: { lit: 0.66, water: ['#93C6CB', '#9FC9D2', '#AACBE3'], grass: ['#B7CC8E', '#BCD093', '#C9D39A'] },
 };

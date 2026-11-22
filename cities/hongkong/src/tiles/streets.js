@@ -60,17 +60,19 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
       HK.rail(g, [x0 + 0.3, y0 + 0.2], [x1 - 0.3, y0 + 0.2], { h: 1.6 }); HK.rail(g, [x0 + 0.3, y1 - 0.2], [x1 - 0.3, y1 - 0.2], { h: 1.6 });
       const s = []; for (const x of [mx - 3.4, mx + 3.4]) { const a = g.p(x, yc, 0), b = g.p(x, yc, 6.4); s.push(a[0], a[1], b[0], b[1]); } g.segs2(s, '#2F5B44', 0.5);
       const r = [[mx - 4.6, y0 - 0.3, 6.4], [mx + 4.6, y0 - 0.3, 6.4], [mx + 4.6, y1 + 0.3, 6.6], [mx - 4.6, y1 + 0.3, 6.6]]; g.fill(r, '#3E7A5A'); g.outline(r, { w: 0.45, c: '#1F3A2C', boil: false });
-      K.sign(g, 'L', y1 - 0.4, mx - 1.8, mx + 1.8, 2.4, 4.4, '#F3F1EA', 'TRAM', { w: 0.3 });
+      const i0 = g.cmds.length; K.sign(g, 'L', y1 - 0.4, mx - 1.8, mx + 1.8, 2.4, 4.4, '#F3F1EA', 'TRAM', { w: 0.3 }); HK.nite(g, i0, { nc: true });
       HK.board(g, 'L', y1 - 0.38, mx - 1.4, mx + 1.4, 4.5, 5.9, '#2F6B4A', '電車', { w: 0.3 });
+      for (const x of [mx - 2.4, mx + 2.4]) g.glow('lamp', x, yc, 6.2, { r: 1.2 });          // night: the lamps under the shelter roof
     }, { name: 'tram stop' });
   }
   /* ---- tram poles on both kerbs, span wires across, the two contact wires along (each pole carries its own stretch) ---- */
   const PX = [-158, -136, -114, -92, -71, -29, -6, 16, 34.4, 65.6, 88, 110, 132, 154];
   const WZ = 12.0;
   PX.forEach((x, i) => {
-    T.obj([x, -62.4], (g) => HK.tramPole(g, x, -62.4, WZ + 1.2), { name: 'tram pole' });
+    // at night every pole carries its street lamp
+    T.obj([x, -62.4], (g) => { HK.tramPole(g, x, -62.4, WZ + 1.2); g.glow('lamp', x, -61.6, WZ - 0.4, { r: 1.3 }); }, { name: 'tram pole' });
     T.obj([x, -37.6], (g) => {
-      HK.tramPole(g, x, -37.6, WZ + 1.2);
+      HK.tramPole(g, x, -37.6, WZ + 1.2); g.glow('lamp', x, -38.4, WZ - 0.4, { r: 1.3 });
       g.fine([[x, -62.4, WZ + 0.8], [x, -50, WZ + 0.35], [x, -37.6, WZ + 0.8]], { w: 0.28, c: '#3A3530' });
       if (i + 1 < PX.length) for (const yt of [HT.LANES.TW.c, HT.LANES.TE.c]) g.fine([[x, yt, WZ], [PX[i + 1], yt, WZ]], { w: 0.3, c: '#3A3530' });
     }, { name: 'tram pole' });
@@ -93,7 +95,7 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     K.box(g, -63, I - 12, -37, I, 0, 6.6, C0, { w: 0.9 });
     g.fill(K.rect(-62, I - 11, -38, I - 1, 6.62), '#C7D1AE'); g.grass(K.rect(-62, I - 11, -38, I - 1, 6.62), { dens: 0.5 });
     for (const x of [-60, -52, -44]) { const c = g.p(x + 2, I - 6, 6.6); g.disc2([c[0], c[1] - 2.2], 2.6, '#8FB868'); }
-    K.sign(g, 'L', I, -61, -39, 3.6, 5.2, '#2F4F6E', 'CROSS-HARBOUR TUNNEL', { w: 0.35 });
+    const i0 = g.cmds.length; K.sign(g, 'L', I, -61, -39, 3.6, 5.2, '#2F4F6E', 'CROSS-HARBOUR TUNNEL', { w: 0.35 }); HK.nite(g, i0, { nc: true }); HK.signGlow(g, 'L', I, -61, -39, 3.6, 5.2, '#8FB8E0', 0.2);
     g.fill(K.on('R', -37, I - 11.5, I - 0.5, 0.3, 3.2), '#C9C3B5');
   }, { name: 'tunnel portal', under: 6 });
   T.obj([-63, Kw, -37, Kw + 12], (g) => {
@@ -103,10 +105,11 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     // the two mouths facing us, dark inside, a lit strip on the ceiling
     for (const xc of [HT.LANES.S.c, HT.LANES.N.c]) {
       const m = [[xc - 4.4, y1 + 0.02, 0], [xc + 4.4, y1 + 0.02, 0]]; for (let k = 0; k <= 10; k++) { const t = Math.PI * k / 10; m.push([xc + 4.4 * Math.cos(t), y1 + 0.02, 3.4 + 1.4 * Math.sin(t)]); }
-      g.fill(m, '#2E2B28'); g.line([[xc - 3, y1 + 0.03, 4.2], [xc + 3, y1 + 0.03, 4.2]], { w: 0.5, c: '#F4D58A', boil: false });
+      g.fill(m, '#2E2B28'); g.mark({ nc: '#6A4C2E' }); g.line([[xc - 3, y1 + 0.03, 4.2], [xc + 3, y1 + 0.03, 4.2]], { w: 0.5, c: '#F4D58A', boil: false }); HK.nite(g, g.cmds.length - 1, { nc: '#FFD27A' });   // the tunnel lit amber inside at night
       g.outline(m, { w: 0.6, boil: false });
+      g.glow('lantern', xc, y1 + 0.1, 3.0, { r: 3.2, col: '#FFB45C' });
     }
-    K.sign(g, 'L', y1, -61, -39, 5.3, 6.3, '#2F4F6E', 'CROSS-HARBOUR TUNNEL', { w: 0.3 });
+    const i0 = g.cmds.length; K.sign(g, 'L', y1, -61, -39, 5.3, 6.3, '#2F4F6E', 'CROSS-HARBOUR TUNNEL', { w: 0.3 }); HK.nite(g, i0, { nc: true }); HK.signGlow(g, 'L', y1, -61, -39, 5.3, 6.3, '#8FB8E0', 0.2);
   }, { name: 'tunnel portal', under: 6.5 });
 
   /* ---- traffic ---- */

@@ -56,7 +56,7 @@ SF.tile('katharine', 100, 0, { rim: 26 }, function (T) {
     g.boilP = 0.35;
     const x0 = -35, y0 = -12, x1 = -25, y1 = 2, TIM = '#5A3A26', PL = '#F1E8D2', BR = '#B9654C';
     K.box(g, x0, y0, x1, y1, 0, 4.4, { t: '#A9583F', l: BR, r: shade(BR, 0.12) }, { w: 0.85 });
-    for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) { for (let a = a0 + 0.8; a < a1 - 1; a += 2.6) K.win(g, f, p + 0.02, a, a + 1.4, 0.9, 3.0, { style: 'glass' }); K.text(g, f, p + 0.03, (a0 + a1) / 2, 3.35, 0.7, 'DICKENS INN', '#E0B54A', { center: true, w: 0.45 }); }
+    for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) { for (let a = a0 + 0.8; a < a1 - 1; a += 2.6) { const i1 = g.cmds.length; K.win(g, f, p + 0.02, a, a + 1.4, 0.9, 3.0, { style: 'glass' }); g.mark({ win: 1, nc: '#FFCB78', spill: true }, i1); } K.text(g, f, p + 0.03, (a0 + a1) / 2, 3.35, 0.7, 'DICKENS INN', '#E0B54A', { center: true, w: 0.45 }); }
     // timber-framed upper floors: plaster panels between dark posts and braces
     K.box(g, x0 - 0.4, y0 - 0.4, x1 + 0.4, y1 + 0.4, 4.4, 12.4, { t: '#E2D6BC', l: PL, r: '#DED2B8' }, { w: 0.85, nohid: true });
     for (const [f, p, a0, a1] of [['L', y1 + 0.42, x0 - 0.4, x1 + 0.4], ['R', x1 + 0.42, y0 - 0.4, y1 + 0.4]]) {
@@ -64,7 +64,7 @@ SF.tile('katharine', 100, 0, { rim: 26 }, function (T) {
       for (const z of [4.4, 8.4, 12.4]) { const b = g.p.apply(g, K.pt(f, p, a0, z)), t = g.p.apply(g, K.pt(f, p, a1, z)); s.push(b[0], b[1], t[0], t[1]); }
       for (let a = a0; a < a1 - 1; a += 3.2) { const b = g.p.apply(g, K.pt(f, p, a, 4.4)), t = g.p.apply(g, K.pt(f, p, a + 1.6, 8.4)); s.push(b[0], b[1], t[0], t[1]); }
       g.segs2(s, TIM, 0.75);
-      for (let a = a0 + 0.8; a < a1 - 0.5; a += 3.2) { K.win(g, f, p + 0.03, a, a + 1.0, 5.4, 7.4, { style: 'glass', w: 0.35 }); K.win(g, f, p + 0.03, a, a + 1.0, 9.4, 11.4, { style: 'glass', w: 0.35 }); }
+      for (let a = a0 + 0.8; a < a1 - 0.5; a += 3.2) { K.win(g, f, p + 0.03, a, a + 1.0, 5.4, 7.4, { style: 'glass', w: 0.35, lit: 0.9 }); K.win(g, f, p + 0.03, a, a + 1.0, 9.4, 11.4, { style: 'glass', w: 0.35, lit: 0.8 }); }
     }
     // wooden balconies on both visible sides with baskets of flowers
     for (const z of [4.4, 8.4]) {
@@ -72,10 +72,13 @@ SF.tile('katharine', 100, 0, { rim: 26 }, function (T) {
       const rl = []; for (let x = x0; x <= x1 + 0.4; x += 0.7) { const a = g.p(x, y1 + 2.0, z), b = g.p(x, y1 + 2.0, z + 1.3); rl.push(a[0], a[1], b[0], b[1]); } g.segs2(rl, TIM, 0.4); g.line([[x0, y1 + 2.0, z + 1.3], [x1 + 0.4, y1 + 2.0, z + 1.3]], { w: 0.5, c: TIM, boil: false });
       K.blooms(g, x0 + 0.3, y1 + 1.4, x1, y1 + 2.0, z + 0.9, ['#E0503E', '#F3F1EA', '#D98AA4', '#E6C24F', '#B24A9E'], { sp: 0.7, r: 0.7 });
       for (let x = x0 + 1; x < x1; x += 2.6) LK.basket2(g, g.p(x, y1 + 1.9, z - 1.6), 0.9);
+      for (let x = x0 + 2.3; x < x1; x += 5.2) g.glow('lamp', x, y1 + 1.8, z - 0.5, { r: 0.8 });       // lanterns under the balconies at night
     }
     // a steep tiled roof, the pub sign
     K.gable(g, x0 - 0.7, y0 - 0.7, x1 + 0.7, y1 + 0.7, 12.4, 4.2, 'y', { a: '#8E4A38', b: '#7A3E2E', e: PL }, { w: 0.8, c: '#5A2E22' });
-    const c = g.p(x1 + 1.6, y1 + 2.6, 6.4); g.line2([g.p(x1 + 0.4, y1 + 0.4, 8.0), [c[0], c[1] - 3]], { w: 0.5, c: '#2E2A26', boil: false, ext: 0 }); g.fill2([[c[0] - 1.8, c[1] - 2.6], [c[0] + 1.8, c[1] - 2.6], [c[0] + 1.8, c[1] + 1.6], [c[0] - 1.8, c[1] + 1.6]], '#2E3A33', true); g.fill2([[c[0] - 1.2, c[1] - 1.8], [c[0] + 1.2, c[1] - 1.8], [c[0] + 1.2, c[1] + 0.9], [c[0] - 1.2, c[1] + 0.9]], '#E0B54A', true);
+    const c = g.p(x1 + 1.6, y1 + 2.6, 6.4); g.line2([g.p(x1 + 0.4, y1 + 0.4, 8.0), [c[0], c[1] - 3]], { w: 0.5, c: '#2E2A26', boil: false, ext: 0 }); g.fill2([[c[0] - 1.8, c[1] - 2.6], [c[0] + 1.8, c[1] - 2.6], [c[0] + 1.8, c[1] + 1.6], [c[0] - 1.8, c[1] + 1.6]], '#2E3A33', true); g.mark({ nc: '#3E5A48' }); g.fill2([[c[0] - 1.2, c[1] - 1.8], [c[0] + 1.2, c[1] - 1.8], [c[0] + 1.2, c[1] + 0.9], [c[0] - 1.2, c[1] + 0.9]], '#E0B54A', true); g.mark({ nc: true });
+    g.glow2('lantern', [c[0], c[1] - 3.0], g.p(x1 + 1.6, y1 + 2.6, 0), { r: 1.8, col: '#FFD27A' });
+    for (const [f, p, a] of [['L', y1 + 0.6, x0 + 1.5], ['L', y1 + 0.6, x1 - 1.5], ['R', x1 + 0.6, y0 + 1.5]]) g.glow('lamp', ...K.pt(f, p, a, 3.8), { r: 1.3, base: 0 });
   }, { name: 'dickens inn' });
 
   /* ---------------- moored boats ---------------- */
@@ -85,6 +88,7 @@ SF.tile('katharine', 100, 0, { rim: 26 }, function (T) {
     g2.line2([m, t], { w: 0.5, c: '#5A544C', boil: false, ext: 0 }); g2.fine2([t, bow], { w: 0.25, c: '#6B6458' }); g2.fine2([t, g2.p(-3.6 * ca, -3.6 * sa, 1.5)], { w: 0.22, c: '#6B6458' });
     const bm = [[m[0], m[1] - 5.2], [bo[0], bo[1]]]; g2.line2(bm, { w: 0.9, c: cover, boil: false, ext: 0 });
     const R = RNG(seed), b = [t[0], t[1] + 0.4]; g2.fill2([[b[0], b[1]], [b[0] + 2.2, b[1] + 0.5], [b[0], b[1] + 1.0]], R.pick(['#C8372D', '#26314F', '#E6C24F']), true);
+    const al = [t[0], t[1] + 0.6]; g2.disc2(al, 0.4, 'rgba(255,255,255,0)'); g2.mark({ nc: '#FFF6DE' }); g2.glow2('lantern', al, g2.p(0, 0, 0), { r: 0.9, col: '#FFF6DE' });   // the anchor light at night
   }), { name: 'yacht' });
   [[-9, -20.5, 0.03, '#F3F1EA', '#3F5F8F'], [-3, -20.8, -0.02, '#F3F1EA', '#2F343B'], [3.5, -20.4, 0.05, '#E9E2CF', '#3F6B4E'], [9.5, -20.6, 0, '#F3F1EA', '#3F5F8F'],
     [-8, -11.0, 0, '#F3F1EA', '#2B3A55'], [-1.5, -11.2, 0.04, '#26314F', '#E9E6DE'], [10, -11.0, -0.03, '#F3F1EA', '#3F5F8F'], [-6, -3.6, 0, '#F3F1EA', '#3F6B4E'], [6, -3.4, 0.02, '#E9E2CF', '#2F343B']]
@@ -97,6 +101,7 @@ SF.tile('katharine', 100, 0, { rim: 26 }, function (T) {
     g2.fill2([[m[0] - 0.9, m[1] - 4], [m[0] + 0.9, m[1] - 4], [t[0] + 0.9, t[1] + 2.5], [t[0] - 0.6, t[1] + 2.5]], '#A9502E', true);
     g2.line2([[m[0] - 0.9, m[1] - 4], [t[0] - 0.6, t[1] + 2.5]], { w: 0.4, c: '#6E3420', boil: false });
     const lb = g2.p(1.6, 1.0, 0.8); g2.fill2([[lb[0] - 1.6, lb[1] - 0.8], [lb[0] + 1.6, lb[1] + 0.2], [lb[0] + 1.4, lb[1] + 1.4], [lb[0] - 1.4, lb[1] + 0.6]], '#3A2A1E', true);
+    const al = [t[0], t[1] + 1.0]; g2.disc2(al, 0.4, 'rgba(255,255,255,0)'); g2.mark({ nc: '#FFF6DE' }); g2.glow2('lantern', al, g2.p(0, 0, 0), { r: 0.9, col: '#FFF6DE' });
   }), { name: 'barge' });
   // the lifting footbridge over the lock (down)
   T.obj([LX0 - 0.6, 20.4, LX1 + 0.6, 25.6], (g) => { K.box(g, LX0 - 0.6, 20.4, LX1 + 0.6, 25.6, -0.4, 0.1, { t: '#B9C9D6', l: '#7FA6C6', r: '#5F86A8' }, { w: 0.55 }); for (const y of [20.5, 25.5]) { const rl = []; for (let x = LX0 - 0.6; x <= LX1 + 0.6; x += 0.6) { const a = g.p(x, y, 0.1), b = g.p(x, y, 1.2); rl.push(a[0], a[1], b[0], b[1]); } g.segs2(rl, '#2F4A63', 0.3); g.line([[LX0 - 0.6, y, 1.2], [LX1 + 0.6, y, 1.2]], { w: 0.45, c: '#2F4A63', boil: false }); } }, { name: 'footbridge' });
@@ -106,6 +111,7 @@ SF.tile('katharine', 100, 0, { rim: 26 }, function (T) {
     K.cyl(g, x, y, 0.9, 0, 1.9, { t: '#E9E6DE', l: '#D9D4C8', r: '#BDB6A6' }, { w: 0.4, n: 8 });
     const t = g.p(x, y, 5.6), b = g.p(x, y, 1.9); g.line2([b, t], { w: 0.45, c: '#5A544C', boil: false, ext: 0 });
     const cn = arcPts(t[0], t[1] + 1.4, 9.0, 0, TAU, 12).map((q) => [q[0], t[1] + 1.4 + (q[1] - t[1] - 1.4) * 0.42]); g.fill2(cn.concat(), '#F3F1EA', true); g.fill2(cn.slice(0, 7).concat([[t[0], t[1] - 0.8]]), '#2E4A3A', true); g.line2(cn, { w: 0.4, c: '#5A544C', close: true, boil: false });
+    g.glow('lamp', x, y, 4.6, { r: 1.0 });                                                          // a lamp under the parasol at night
   }, { name: 'parasol' });
   for (const [x, y] of [[-30, 12], [-14, 13], [24, 9], [33, 15], [33, -30]]) T.obj([x, y], (g) => LK.plane(g, x, y, { r: 4.6 }), { name: 'tree' });
   for (const x of [-24, 2, 30]) T.obj([x, 27.2], (g) => LK.lamp(g, x, 27.2), { name: 'lamp' });

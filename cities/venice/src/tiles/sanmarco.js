@@ -21,8 +21,12 @@
    the arcades in it; waders go on in boots, the costumes keep posing knee-deep, the café keeps serving; the pigeons
    take refuge on the cornice. Then the tide falls, the pools shrink back into the drains, the boards empty and
    people come back out of the arcades. */
-/* Piazza San Marco's shared numbers: the drains, the passerelle, the tide */
+/* Piazza San Marco's shared numbers: the drains, the passerelle, the tide, the lights the flood reflects at night */
 const SM = {
+  // x, y, z of the light, its colour: the Molo's lamps, the lanterns in the Procuratie's arches, the floodlit campanile,
+  // the saint's column, the basilica's middle portal
+  LIGHTS: [[34.5, 8, 5.4, '255,214,150'], [34.5, 18, 5.4, '255,214,150'], [4.15, -8.85, 12, '255,206,140'], [4.15, -8.85, 22, '255,206,140'],
+    [32, -0.5, 12.5, '255,214,160'], [-15.5, -19.2, 3.6, '255,208,138']].concat([-12.7, -8.3, -3.9, 0.5, 4.9, 9.3, 12.3, 16.7, 21.1, 25.5, 29.9, 34.3].map((y) => [-28.4, y, 3.9, '255,200,130'])),
   DRAINS: [[-22, -12], [-12, -4], [-22, 8], [-9, 16], [-20, 27], [-6, 31], [6, -8], [16, -12], [9, 6], [20, 4], [3, 24], [30, 14], [-12, -16]],
   PT: 60,                        // the tide cycle (s)
 };
@@ -30,6 +34,9 @@ const SM = {
 SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
   const MARBLE = { t: '#EADFCF', l: '#F2E8DA', r: '#DDD0BE' }, GOLD = '#D9AE4A', MOS = '#C9A13A';
   const ST = VN.istria, STD = VN.istriaD;
+  // at night the square's monuments are floodlit: pale stone warm gold, the mosaics and gilding glowing
+  const FL = VN.litStone(1), FL2 = VN.litStone(0.25), litGold = (c) => (c === GOLD || c === MOS ? '#F2C35A' : c === '#C9A44A' || c === '#E9D9A0' ? '#F6D27A' : undefined);
+  const floodlit = (k) => (c) => litGold(c) || (k === 2 ? FL2 : FL)(c);
 
   /* ---------------- ground ---------------- */
   T.ground(function (g) {
@@ -115,6 +122,10 @@ SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
     const lc = g.p(-15.5, BY1 - 0.97, 11.6); g.fill2(arcPts(lc[0], lc[1], 2.0, 0, TAU, 10).map((q) => [q[0], lc[1] + (q[1] - lc[1]) * 0.8]), '#2F4F8F', true); g.fill2([[lc[0] - 1.3, lc[1] + 0.6], [lc[0] + 1.2, lc[1] + 0.3], [lc[0] + 0.6, lc[1] - 1.2], [lc[0] - 0.4, lc[1] - 0.6]], GOLD, true);
     const sc = g.p(-15.5, BY1 - 0.97, 14.3); g.fill2([[sc[0] - 0.6, sc[1]], [sc[0] + 0.6, sc[1]], [sc[0] + 0.4, sc[1] - 2.6], [sc[0] - 0.4, sc[1] - 2.6]], '#F6F1E4', true); g.disc2([sc[0], sc[1] - 3.0], 0.55, GOLD);
     g.line([[BX0, BY1, 0], [BX1, BY1, 0]], { w: 0.9 });
+    // at night: floodlit, the lunettes' gold mosaics glowing, the bronze doors dark, the domes dim over it; light up the front
+    const DOME = new Set(['#B3BBBD', '#97A1A5', '#D9CBB6', '#CDBFAA', '#C9BCA6', '#E2D5C2']);
+    g.mark({ nc: (c) => (DOME.has(c) ? mix(nightColour(c), '#C8945A', 0.22) : floodlit(1)(c)) }, 0);
+    for (const [a, z, r] of [[-24.2, 3.2, 2.4], [-15.5, 3.6, 3.0], [-6.8, 3.2, 2.4], [-20, 8.6, 2.4], [-11, 8.6, 2.4], [-15.5, 12.4, 2.8]]) g.glow('lantern', a, BY1 + 0.8, z, { r, col: '#FFD08A' });
   }, { name: 'basilica' });
   // the Porta della Carta between the basilica and the palace
   T.obj([-4, -37, -2.5, -20], (g) => {
@@ -122,6 +133,7 @@ SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
     g.fill(VN.archPts('L', -19.98, -3.75, -2.75, 0, 7.6, 'gothic', 0), '#5A4A3E');
     for (let z = 8.5; z < 13; z += 1.4) { const p = g.p(-3.25, -19.97, z); g.fill2([[p[0] - 0.8, p[1]], [p[0] + 0.8, p[1]], [p[0], p[1] - 1.2]], '#E8D9C2', true); }
     const t = g.p(-3.25, -20, 13.5); g.fill2([[t[0] - 0.8, t[1]], [t[0] + 0.8, t[1]], [t[0], t[1] - 3.2]], '#EFE5D6', true); g.disc2([t[0], t[1] - 3.4], 0.5, GOLD);
+    g.mark({ nc: floodlit(1) }, 0);
   }, { name: 'porta della carta' });
 
   /* ---------------- Torre dell'Orologio and the Procuratie Vecchie ---------------- */
@@ -145,6 +157,9 @@ SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
     K.box(g, -36.5, -19.5, -29.5, -14.5, 17.5, 18.1, { t: '#C9C2B4', l: '#E2DCCF', r: '#CFC8BA' }, { w: 0.55 });
     const bl = g.p(-33, -17, 20.8); g.fill2(arcPts(bl[0], bl[1] + 1.4, 3.0, Math.PI, TAU, 10).concat([[bl[0] + 3.2, bl[1] + 3.4], [bl[0] - 3.2, bl[1] + 3.4]]), '#7A6A3E', true); g.disc2([bl[0], bl[1] - 1.4], 0.6, '#5E5030');
     const posts = []; for (const [x, y] of [[-36, -19], [-30, -19], [-30, -15], [-36, -15]]) { const p0 = g.p(x, y, 18.1), p1 = g.p(x, y, 21.6); posts.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(posts, '#5E5A52', 0.4);
+    // at night: floodlit, the blue-and-gold clock face lit
+    g.mark({ nc: (c) => (c === '#2F4F8F' ? '#3F67B8' : floodlit(1)(c)) }, 0);
+    g.glow('lantern', -28.4, -17, 9.8, { r: 3.0, col: '#FFD890' }); g.glow('lantern', -28.4, -17, 15.6, { r: 2.2, col: '#FFD890' });
   }, { name: 'torre dell orologio' });
   // the Procuratie Vecchie in two pieces (people walk in front of it and beside it)
   const procur = (y0, y1, nm) => T.obj([-37, y0, -29, y1], function (g) {
@@ -153,20 +168,24 @@ SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
     K.box(g, -37, y0, -29, y1, 0, H, { t: '#E9E3D6', l: '#EFEAE0', r: '#E3DDD0' }, { w: 0.85, nohid: true });
     const ar = []; for (let a = y0 + 0.2; a < y1 - 1.6; a += 2.2) ar.push(a);
     for (const a of ar) {
-      g.fill(VN.archPts('R', -28.99, a + 0.35, a + 1.85, 0, 4.4, 'round', 0), '#6E5E50');
-      const sp = g.P(VN.archPts('R', -28.985, a + 0.35, a + 1.85, 2.6, 4.2, 'round', 0)); g.fill2(sp, '#E9C98A', true);
-      for (const zf of [5.4, 9.2]) for (const s of [0, 1]) g.fill(VN.archPts('R', -28.99, a + 0.25 + s * 1.0, a + 1.0 + s * 1.0, zf, zf + 2.8, 'round', 0), '#59636B');
+      const lamp = Math.round((a - y0) / 2.2) % 2 === 0;
+      g.fill(VN.archPts('R', -28.99, a + 0.35, a + 1.85, 0, 4.4, 'round', 0), '#6E5E50'); g.mark({ nc: '#B9824C', spill: lamp });     // at night the arcade glows
+      const sp = g.P(VN.archPts('R', -28.985, a + 0.35, a + 1.85, 2.6, 4.2, 'round', 0)); g.fill2(sp, '#E9C98A', true); g.mark({ nc: '#FFD98A' });
+      for (const zf of [5.4, 9.2]) for (const s of [0, 1]) { g.fill(VN.archPts('R', -28.99, a + 0.25 + s * 1.0, a + 1.0 + s * 1.0, zf, zf + 2.8, 'round', 0), '#59636B'); g.mark({ win: 0.55 }); }
+      if (lamp && a + 1.1 > 28) VN.glowDry(g, 'lamp', -28.4, a + 1.1, 3.9, { r: 1.1 });                       // (the Vallaresso stop and the Salute stand over these two's reflections)
+      else if (lamp) g.glow('lamp', -28.4, a + 1.1, 3.9, { r: 1.1 });                                           // a lantern hangs in every other arch
     }
     for (const z of [5.0, 8.8, H - 0.5]) g.fill(K.on('R', -28.97, y0, y1, z, z + 0.35), '#DCD5C7');
     // the crest of little merlons
     const mer = []; for (let a = y0 + 0.4; a < y1; a += 1.1) { const p = g.p(-29, a, H); mer.push(p[0] - 0.6, p[1], p[0] + 0.6, p[1], p[0], p[1] - 2.2); } g.tris2(mer, '#F3EFE6');
     g.fill(K.rect(-37, y0, -29, y1, H), '#C9BFAE');
     g.line([[-29, y0, H], [-29, y1, H]], { w: 0.8 });
-    if (y1 >= 36) { g.fill(K.on('L', 37, -37, -29, 0, 4.4), '#E9E3D6'); g.fill(VN.archPts('L', 37.01, -35, -31, 0, 4.2, 'round', 0), '#6E5E50'); }
+    if (y1 >= 36) { g.fill(K.on('L', 37, -37, -29, 0, 4.4), '#E9E3D6'); g.fill(VN.archPts('L', 37.01, -35, -31, 0, 4.2, 'round', 0), '#6E5E50'); g.mark({ nc: '#B9824C' }); }
+    g.mark({ nc: (c) => (c === '#E3DDD0' || c === '#DCD5C7' ? FL2(c) : undefined) }, 0);                         // the front washed by the arcade's light
   }, { name: nm });
   procur(-14, 11, 'procuratie a'); procur(11, 37, 'procuratie b');
   // Caffè Quadri's sign under the arcade
-  T.obj([-29.4, 4, -29, 12], (g) => K.sign(g, 'R', -28.96, 4.6, 11.4, 4.45, 5.0, '#2E4A3A', 'GRAN CAFFÈ QUADRI', { ink: '#E9D9A0' }), { name: 'quadri sign' });
+  T.obj([-29.4, 4, -29, 12], (g) => { K.sign(g, 'R', -28.96, 4.6, 11.4, 4.45, 5.0, '#2E4A3A', 'GRAN CAFFÈ QUADRI', { ink: '#E9D9A0' }); g.mark({ nc: '#3F6A52' }, 0); }, { name: 'quadri sign' });
 
   /* ---------------- the Campanile and the Loggetta ---------------- */
   T.obj([-1, -14, 4.5, -8.5], function (g) {
@@ -192,11 +211,16 @@ SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
     g.fill([base[0], base[1], apex], '#6F9A86'); g.fill([base[1], base[2], apex], '#5A8270');
     g.line([base[0], apex, base[2]], { w: 0.75 }); g.line([base[1], apex], { w: 0.55 }); g.line([base[0], base[1], base[2]], { w: 0.6 });
     const an = g.p(cx, cy, zt); g.fill2([[an[0] - 0.6, an[1]], [an[0] + 0.6, an[1]], [an[0] + 0.4, an[1] - 3.0], [an[0] - 0.4, an[1] - 3.0]], GOLD, true); g.fill2([[an[0], an[1] - 2.4], [an[0] + 2.6, an[1] - 3.8], [an[0] + 0.4, an[1] - 1.6]], GOLD, true); g.disc2([an[0], an[1] - 3.5], 0.6, GOLD);
+    // at night: floodlit from below, the belfry lit warm inside, the golden angel shining over the city
+    const BRK = { '#C47454': '#D98A5C', '#A65E44': '#B06A48', '#B5674C': '#C47C56', '#9E5440': '#A8603F' }, SP = { '#6F9A86': '#7FA88E', '#5A8270': '#5E8672' };
+    g.mark({ nc: (c) => BRK[c] || SP[c] || (c === '#4A3E34' ? '#C9894A' : floodlit(1)(c)) }, 0);
+    for (const [z, r] of [[4, 2.4], [12, 2.2], [20, 2.2], [H + 2.8, 2.8], [H + 7.4, 2.0], [zt - 1, 1.4]]) g.glow('lantern', cx + 2.4, cy + 2.4, z, { r, col: z > H && z < H + 5 ? '#FFC872' : '#FFD39A' });
   }, { name: 'campanile', tall: true });
   T.obj([-0.6, -8.5, 4.1, -6.6], function (g) {          // the Loggetta at the campanile's foot
     K.box(g, -0.6, -8.5, 4.1, -6.6, 0, 4.6, { t: '#E9DDCB', l: '#E8C9B6', r: '#D9B8A4' }, { w: 0.7 });
     for (let i = 0; i < 3; i++) { const a = -0.3 + i * 1.5; g.fill(VN.archPts('L', -6.58, a + 0.25, a + 1.2, 0.4, 3.4, 'round', 0), '#5A4A3E'); }
     g.fill(K.rect(-0.8, -8.7, 4.3, -6.4, 4.6), '#F2E8DA'); g.line([[-0.8, -6.4, 4.6], [4.3, -6.4, 4.6], [4.3, -8.7, 4.6]], { w: 0.55, boil: false });
+    g.mark({ nc: floodlit(1) }, 0);
   }, { name: 'loggetta' });
 
   /* ---------------- the Doge's Palace ---------------- */
@@ -226,7 +250,11 @@ SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
       if (f === 'R') { g.fill(VN.archPts('R', PX1 + 0.05, -28.6, -25.8, 10, 14.6, 'gothic', 0.6), white); g.fill(VN.archPts('R', PX1 + 0.06, -28.4, -26, 10.4, 14.2, 'gothic', 0), '#4F5963'); K.box(g, PX1, -29.2, PX1 + 1.0, -25.2, 9.4, 9.8, ST, { w: 0.45, nohid: true }); const s = g.p(PX1 + 0.1, -27.2, 15.0); g.fill2([[s[0] - 0.7, s[1]], [s[0] + 0.7, s[1]], [s[0] + 0.5, s[1] - 2.6], [s[0] - 0.5, s[1] - 2.6]], white, true); }
       // the crenellation
       const mer = []; for (let a = a0 + 0.3; a < a1; a += 1.0) { const c = g.p.apply(g, K.pt(f, p, a, PH)); mer.push(c[0] - 0.7, c[1], c[0] + 0.7, c[1], c[0], c[1] - 2.0); } g.tris2(mer, white);
+      // at night: lanterns light the arcades, floodlights the wall (on the Molo they shine in the Bacino)
+      for (let a = a0 + 2.6; a < a1 - 1; a += 5.0) g.glow('lantern', ...K.pt(f, p + 0.8, a, 3.4), { r: 1.8, col: '#FFC27A', base: 0 });
+      for (let a = a0 + 4; a < a1 - 2; a += 9.0) if (f === 'R' || a > 6) g.glow('lantern', ...K.pt(f, p + 0.8, a, 11.6), { r: 2.7, col: '#FFD9A6', base: 0 });   // (none behind the campanile)
     }
+    g.mark({ nc: (c) => (c === '#5E4E42' ? '#A8703F' : c === '#4F5963' ? undefined : FL(c)) }, 0);
     K.hip(g, x0 + 0.5, PY0 + 0.5, x1 - 0.5, PY1 - 0.5, PH, 2.4, '#9AA0A3', { ridge: Math.max(0, (x1 - x0) - (PY1 - PY0)) * 0.8, c: '#5E6468' });
   }, { name: nm });
   palace(PX0, 12, 'palazzo ducale a'); palace(12, PX1, 'palazzo ducale b');
@@ -239,6 +267,8 @@ SF.tile('sanmarco', 100, 0, { rim: 36 }, function (T) {
     const c = g.p(x, y, 14.2);
     if (top === 'lion') { g.fill2([[c[0] - 3.2, c[1]], [c[0] + 2.8, c[1]], [c[0] + 3.2, c[1] - 2.8], [c[0] + 1.8, c[1] - 3.8], [c[0] - 2.4, c[1] - 2.6]], '#4A5248', true); g.fill2([[c[0] - 1.0, c[1] - 2.6], [c[0] - 4.6, c[1] - 7.4], [c[0] + 0.6, c[1] - 3.4]], '#5A6258', true); g.fill2([[c[0] + 0.4, c[1] - 2.8], [c[0] + 1.4, c[1] - 7.8], [c[0] + 1.8, c[1] - 3.2]], '#4A5248', true); }
     else { g.fill2([[c[0] - 2.8, c[1]], [c[0] + 2.8, c[1]], [c[0] + 2.2, c[1] - 0.9], [c[0] - 2.2, c[1] - 0.9]], '#C9C2B4', true); g.fill2([[c[0] - 0.7, c[1] - 0.6], [c[0] + 0.7, c[1] - 0.6], [c[0] + 0.5, c[1] - 4.8], [c[0] - 0.5, c[1] - 4.8]], '#F3EFE6', true); g.disc2([c[0], c[1] - 5.4], 0.7, '#F3EFE6'); g.line2([[c[0] + 0.8, c[1] - 1], [c[0] + 1.4, c[1] - 6.4]], { w: 0.35, c: '#8E877A', boil: false, ext: 0 }); }
+    g.mark({ nc: (c) => (c === '#C9B7AE' || c === '#B9A9A0' || c === '#A8988F' ? mix(c, '#FFB45E', 0.25) : FL(c)) }, 0);   // floodlit at night
+    VN.glowDry(g, 'lantern', x + 1, y + 1, 12.5, { r: 2.0, col: '#FFD39A' });
   }, { name: 'column', tall: true });
   column(31, -11.5, 'lion'); column(31, -1.5, 'saint');
   // the Giardini Reali: hedges, a pergola, trees

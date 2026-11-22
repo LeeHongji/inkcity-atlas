@@ -34,6 +34,10 @@ SF.tile('port', 100, 100, { rim: 60 }, function (T) {
     // bollards along the quay edges
     const bol = []; for (let y = -18; y < 27; y += 4) bol.push(g.p(-5.6, y, 0)); for (let x = -3; x < 37; x += 4.5) bol.push(g.p(x, -20.6, 0));
     for (const p of bol) { g.fill2([[p[0] - 0.7, p[1]], [p[0] + 0.7, p[1]], [p[0] + 0.6, p[1] - 2.0], [p[0] - 0.6, p[1] - 2.0]], '#4A4540', true); }
+    // at night: low lamps along the quays round the basin, their light on the water
+    for (let y = -16; y < 27; y += 8) g.glow('lamp', -5.5, y, 1.3, { r: 0.9 });
+    for (let x = 1; x < 37; x += 9) g.glow('lamp', x, -20.5, 1.3, { r: 0.9 });
+    for (let x = -1; x < 8; x += 8) g.glow('lamp', x, 28.5, 1.3, { r: 0.9 });
   }, { rim: true });
 
   /* ---- the Duana on the far quay ---- */
@@ -41,14 +45,18 @@ SF.tile('port', 100, 100, { rim: 60 }, function (T) {
     g.boilP = 0.2;
     const ST = { t: '#F0E4CC', l: '#E9D7B4', r: '#D3BF98' }, y1 = -24;
     K.box(g, -2, -37, 30, y1, 0, 11, ST, { w: 0.9 });
-    for (let x = 0; x < 29; x += 2.6) { K.win(g, 'L', y1, x, x + 1.3, 1.2, 4.0, { style: 'navy', arch: true }); K.win(g, 'L', y1, x, x + 1.3, 6.0, 9.0, { style: 'navy' }); }
+    for (let x = 0; x < 29; x += 2.6) { K.win(g, 'L', y1, x, x + 1.3, 1.2, 4.0, { style: 'navy', arch: true, lit: 0.45 }); K.win(g, 'L', y1, x, x + 1.3, 6.0, 9.0, { style: 'navy', lit: 0.35 }); }
     K.box(g, -2.3, -37.3, 30.3, y1 + 0.3, 11, 11.6, ST, { w: 0.6, nohid: true });
     for (const x of [1.5, 26.5]) {
       K.box(g, x - 3, -36, x + 3, y1 + 0.6, 0, 14, ST, { w: 0.85, nohid: true });
       K.dome(g, x, -30, 3.0, 14, 3.6, '#9DB0A8', { w: 0.7, shadow: '#7F948C' });
       const t = g.p(x, -30, 17.6); g.fill2([[t[0] - 2.8, t[1] - 1], [t[0], t[1] - 4], [t[0] + 2.8, t[1] - 1], [t[0] + 0.8, t[1]], [t[0] - 0.8, t[1]]], '#5E6A62', true);   // a winged griffin
     }
+    const iT = g.cmds.length;
     K.text(g, 'L', y1 + 0.65, 14, 11.9, 1.0, 'PORT DE BARCELONA', '#7A5A2C', { center: true });
+    // at night the old customs house is floodlit over the basin (its lights lie on the water), its name lit
+    BC.flood(g, 0, 0.76); BC.litLines(g, iT, '#FFD27A');
+    for (const [x, z, r] of [[1.5, 8, 2.6], [26.5, 8, 2.6], [14, 5, 3.2], [1.5, 16, 1.6], [26.5, 16, 1.6]]) g.glow('lantern', x, y1 + 0.8, z, { r, col: '#FFDDA6' });
   }, { name: 'duana' });
   for (let x = -1; x <= 35; x += 6) T.obj([x, -22.2], (g) => K.palm(g, x, -22.2, { h: 12, r: 4.4, lean: (h1(x * 7) - 0.5) * 0.6 }), { name: 'palm' });
 
@@ -72,6 +80,10 @@ SF.tile('port', 100, 100, { rim: 60 }, function (T) {
     g.fill2(body, '#4E4A40', true); g.disc2([st[0], st[1] - 15.4], 1.5, '#4E4A40');
     g.line2([[st[0] + 1.0, st[1] - 12.4], [st[0] + 6.6, st[1] - 10.2]], { w: 1.1, c: '#4E4A40', boil: false, ext: 0 });   // the arm pointing out to sea
     g.fill2([[st[0] - 1.6, st[1]], [st[0] - 2.6, st[1] - 9], [st[0] - 1.3, st[1] - 13]], '#3E3A32', true);   // the cloak
+    // at night the monument is floodlit: warm on the stone plinth and the bronze, Columbus himself lit at the top
+    BC.nightCol(g, 0, (c, fill) => (fill ? { '#6e6a5c': '#B48E60', '#5e5a4e': '#9C7A52', '#4e4a40': '#86684A', '#3e3a32': '#6E5640', '#4a463c': '#8A6C4C', '#5a564a': '#9A7A56' }[c.toLowerCase()] : undefined));   // the iron and bronze in warm light
+    BC.flood(g, 0, 0.8, '#FFD9A6');
+    for (const [z, r] of [[5, 4.0], [12, 2.0], [37, 1.8], [41, 2.6]]) g.glow('lantern', cx + 1.4, cy + 1.4, z, { r, col: '#FFD6A0' });
   }, { name: 'columbus' });
 
   /* ---- the Rambla de Mar: the fixed spans (the swing span is an actor) ---- */
@@ -102,15 +114,15 @@ SF.tile('port', 100, 100, { rim: 60 }, function (T) {
     } });
 
   /* ---- the near quay: the Maremagnum's glass front, moored sailboats ---- */
-  T.obj([8, 30, 34, 36.5], function (g) { K.box(g, 8, 30, 34, 36.5, 0, 6.5, { t: '#D9DEE0', l: '#BFD3DC', r: '#A8BECB' }, { w: 0.8 }); const gr = []; for (let x = 10; x < 34; x += 2) { const a = g.p(x, 30, 0), b = g.p(x, 30, 6.5); gr.push(a[0], a[1], b[0], b[1]); } g.segs2(gr, '#8EA7B6', 0.3); g.fill([[7, 29, 6.5], [35, 29, 6.5], [35, 37, 6.5], [7, 37, 6.5]], '#C9392E'); g.outline([[7, 29, 6.5], [35, 29, 6.5], [35, 37, 6.5], [7, 37, 6.5]], { w: 0.6, boil: false }); K.text(g, 'R', 34.05, 33.2, 2.4, 1.0, 'MAREMAGNUM', '#3F5F8F', { center: true }); }, { name: 'maremagnum' });
-  for (let i = 0; i < 4; i++) { const x = 18 + i * 4.6, y = 24.5; T.cast([x - 1.6, y - 4, x + 1.6, y + 1], (g) => g.at(x, y, WZ, (g2) => K.boat(g2, -Math.PI / 2, { kind: 'sail', L: 3.6, W: 1.3, hull: ['#F3F1EA', '#2F4A63', '#F3F1EA', '#8E3A36'][i], mast: 9 + i % 2 })), { name: 'moored' }); }
+  T.obj([8, 30, 34, 36.5], function (g) { K.box(g, 8, 30, 34, 36.5, 0, 6.5, { t: '#D9DEE0', l: '#BFD3DC', r: '#A8BECB' }, { w: 0.8 }); g.cmds[0].nc = '#FFD98A'; g.cmds[0].win = 1; g.cmds[0].spill = true; g.cmds[1].nc = '#F6C574'; g.cmds[1].win = 1; /* at night the shops lit behind the glass */ const gr = []; for (let x = 10; x < 34; x += 2) { const a = g.p(x, 30, 0), b = g.p(x, 30, 6.5); gr.push(a[0], a[1], b[0], b[1]); } g.segs2(gr, '#8EA7B6', 0.3); g.fill([[7, 29, 6.5], [35, 29, 6.5], [35, 37, 6.5], [7, 37, 6.5]], '#C9392E'); g.outline([[7, 29, 6.5], [35, 29, 6.5], [35, 37, 6.5], [7, 37, 6.5]], { w: 0.6, boil: false }); const iT = g.cmds.length; K.text(g, 'R', 34.05, 33.2, 2.4, 1.0, 'MAREMAGNUM', '#3F5F8F', { center: true }); BC.litLines(g, iT, '#9FD8FF'); g.glow('neon', 34.4, 33.2, 3, { r: 2.2, col: '#BFE4FF' }); for (let x = 11; x < 34; x += 6) g.glow('lamp', x, 29.4, 6.0, { r: 0.9 }); }, { name: 'maremagnum' });
+  for (let i = 0; i < 4; i++) { const x = 18 + i * 4.6, y = 24.5; T.cast([x - 1.6, y - 4, x + 1.6, y + 1], (g) => { g.at(x, y, WZ, (g2) => K.boat(g2, -Math.PI / 2, { kind: 'sail', L: 3.6, W: 1.3, hull: ['#F3F1EA', '#2F4A63', '#F3F1EA', '#8E3A36'][i], mast: 9 + i % 2 })); g.glow('lantern', x, y, 9 + i % 2, { r: 0.7, col: '#FFF4DA', base: WZ }); }, { name: 'moored' }); }   // a white anchor light at each masthead
 
   /* ---- people ---- */
   // round the column: tourists, a balloon seller, a painter
   for (const [x, y, s, d] of [[-14.5, 6, 6100, 2], [-15.6, 7.4, 6101, 3], [-30, 7, 6102, 3], [-12.4, -4, 6103, 2]]) T.cast([x, y], (g) => BC.person(g, x, y, 0, BC.who(s, { dir: d, pose: s === 6101 ? 'hold' : 'stand', phone: s === 6101 })), {});
   T.cast([-31, -7], (g) => { const r = BC.person(g, -31, -7, 0, BC.who(6110, { dir: 0, pose: 'stand', hands: [[2, -17], [1, -10]] })); const h = r.hands[0]; const cols = ['#C9392E', '#E6C24F', '#4F8FBF', '#7DBF9A', '#D98AA4']; cols.forEach((c, i) => { const b = [h[0] - 4 + i * 2, h[1] - 14 - (i % 2) * 3]; g.segs2([h[0], h[1], b[0], b[1] + 2], '#6E6A60', 0.2); g.disc2(b, 2.0, c); }); }, {});
   // the golondrinas' kiosk and its queue at the quay
-  T.obj([-10, 7, -7, 10], (g) => { K.box(g, -10, 7, -7, 10, 0, 4.5, { t: '#2F6A8C', l: '#F1EFE8', r: '#D9D5CA' }, { w: 0.6 }); K.box(g, -10.4, 6.6, -6.6, 10.4, 4.5, 5.1, { t: '#2F6A8C', l: '#3F7A9C', r: '#2F5A7C' }, { w: 0.5, nohid: true }); K.sign(g, 'L', 10, -9.8, -7.2, 3.0, 4.2, '#2F6A8C', 'GOLONDRINES', { line: false }); }, { name: 'kiosk' });
+  T.obj([-10, 7, -7, 10], (g) => { K.box(g, -10, 7, -7, 10, 0, 4.5, { t: '#2F6A8C', l: '#F1EFE8', r: '#D9D5CA' }, { w: 0.6 }); K.box(g, -10.4, 6.6, -6.6, 10.4, 4.5, 5.1, { t: '#2F6A8C', l: '#3F7A9C', r: '#2F5A7C' }, { w: 0.5, nohid: true }); const iS = g.cmds.length; K.sign(g, 'L', 10, -9.8, -7.2, 3.0, 4.2, '#2F6A8C', 'GOLONDRINES', { line: false }); g.mark({ nc: true }, iS); BC.litLines(g, iS); g.glow('lamp', -8.5, 10.6, 4.4, { r: 1.0 }); }, { name: 'kiosk' });
   for (let i = 0; i < 6; i++) { const x = -9 + (i % 2) * 0.6, y = 11.5 + i * 1.5; T.cast([x, y], (g) => BC.person(g, x, y, 0, BC.who(6120 + i, { dir: 3, pose: 'stand' })), {}); }
   // fishermen on the far quay edge
   for (const [x, s] of [[4, 6130], [24, 6131]]) T.cast([x, -21.2], (g) => { const r = BC.person(g, x, -21.2, 0, BC.who(s, { dir: 1, pose: 'stand', hands: [[3, -11], [2, -9.5]], cap: '#3F5F8F' })); const h = r.hands[0]; g.line2([h, [h[0] - 9, h[1] + 9]], { w: 0.4, c: '#5A4A3C', boil: false, ext: 0 }); g.segs2([h[0] - 9, h[1] + 9, h[0] - 9.6, h[1] + 16], '#9A9488', 0.15); }, {});
@@ -137,4 +149,8 @@ SF.tile('port', 100, 100, { rim: 60 }, function (T) {
   for (let i = 0; i < 5; i++) { const x = -18 + (i % 3) * 1.3, y = 9 + Math.floor(i / 3) * 1.1; T.actor({ sample: 5, period: 2, at(t) { const f = Math.floor(t * 2 + i) % 2; return { x, y, key: f, f }; }, draw(g, st) { const c = g.p(0, 0, 0); g.fill2([[c[0] - 1.2, c[1] - 0.6], [c[0] + 0.8, c[1] - 1.0], [c[0] + 1.2, c[1] - 0.2], [c[0] - 0.8, c[1]]], '#9AA0A8', true); g.disc2([c[0] + (st.f ? 1.4 : 1.2), c[1] - (st.f ? 0.4 : 1.2)], 0.5, '#7A808A'); } }); }
 
   BC.block(T, { corners: { nn: 'bins', np: 'motos' }, noTrees: ['x+'] });
+
+  // the night-only actors of the whole city, made after every other actor so no seed moves (see BC.late). Tiles are
+  // built in draw order (streets, satellites, then the places by cx + cy); this one, at (100, 100), is built last.
+  BC.runLate(T);
 });

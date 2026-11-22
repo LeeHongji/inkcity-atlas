@@ -25,4 +25,12 @@ const SCENE = {
   visit: ['estrela', 'arraial', 'graca', 'bica', 'rossio', 'castelo', 'belem', 'comercio', 'alfama'],
   dive: { arraial: 'sardines' },
   bounds: { z: [0.65, 10], cx: [-200, 1800], cy: [60, 1260] },
+  // at night (the 12th of June, Santo António): the Tagus, the ponds and fountain basins and the Oceanário's water carry
+  // the lights' reflections; the sardine braziers' embers keep their glow; motes over the lawns; most windows lit
+  night: {
+    water: ['#8DBFC3', '#A8CDD0'],
+    glow: ['#F07A2A'],
+    grass: ['#B4CC86', '#B5CF8E', '#95B16B', '#C6DBA0'],
+    lit: 0.68,
+  },
 };

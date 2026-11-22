@@ -42,7 +42,7 @@ SF.tile('tiananmen', 0, 100, { rim: 40 }, function (T) {
 
   /* ---------------- the flower basket ---------------- */
   T.obj([-6, 0, 6, 12], function (g) {
-    const c = [0, 6];
+    const c = [0, 6], i0 = g.cmds.length;
     K.cyl(g, c[0], c[1], 5.6, 0, 1.2, { t: '#E7DCC2', l: '#D9C9A2', r: '#C4B38A' }, { w: 0.6, n: 20 });
     K.cyl(g, c[0], c[1], 4.6, 1.2, 4.6, { t: '#E2B13A', l: '#D9A63A', r: '#B98A2A' }, { w: 0.8, n: 20 });
     // the woven basket: diagonal strands
@@ -58,11 +58,15 @@ SF.tile('tiananmen', 0, 100, { rim: 40 }, function (T) {
     g.fill2([[top[0] - 1.4, top[1] - 24], [top[0] + 1.4, top[1] - 24], [top[0] + 5, top[1] - 30], [top[0] + 2, top[1] - 22], [top[0] - 2, top[1] - 22], [top[0] - 5, top[1] - 30]], '#D8322A', true);
     for (const s of [-1, 1]) { g.disc2([top[0] + s * 8, top[1] - 6], 3.2, '#F7A6A0'); g.disc2([top[0] + s * 8 - 0.8, top[1] - 6.8], 1.2, '#FBD3C8'); }
     g.segs2([top[0] - 1, top[1] - 22, top[0] - 4, top[1] - 4, top[0] + 1, top[1] - 22, top[0] + 4, top[1] - 4], '#D8322A', 0.7);
+    // at night the flower basket is floodlit: every flower in its own colour, the ribbons and peaches bright
+    BN.flood(g, i0, 0.95, '#FFF0DC', { lines: 0.5, fall: 0.15 });
+    for (const [dx, dy, r] of [[0, -10, 2.8], [-9, -5, 2.0], [9, -5, 2.0]]) g.glow2('lantern', [top[0] + dx, top[1] + dy], g.p(c[0], c[1] + 6, 0), { r, col: '#FFD9A8' });
+    for (const a of [0.6, 1.6, 2.6]) { const q = g.p(c[0] + Math.cos(a) * 6, c[1] + Math.sin(a) * 6, 0.3); g.glow2('lantern', q, q, { r: 0.9, col: '#FFF0D0' }); }
   }, { name: 'flower basket' });
 
   /* ---------------- the Monument to the People's Heroes ---------------- */
   T.obj([-8, 19, 8, 35], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     BJ.terrace(g, -8, 19, 8, 35, 0, 1.4, { sw: 4, steps: 'LR' });
     BJ.terrace(g, -5.5, 21.5, 5.5, 32.5, 1.4, 2.8, { sw: 3, steps: 'L' });
     K.box(g, -2.4, 24.6, 2.4, 29.4, 2.8, 5.2, { t: '#E9E5DC', l: '#EFEBE3', r: '#D9D4C8' }, { w: 0.7 });
@@ -71,11 +75,14 @@ SF.tile('tiananmen', 0, 100, { rim: 40 }, function (T) {
     K.box(g, -1.3, 25.7, 1.3, 28.3, 5.2, 21, { t: '#EDE9E0', l: '#F3F0E9', r: '#DCD7CB' }, { w: 0.85 });
     g.fill(K.on('L', 28.32, -0.6, 0.6, 9, 18.6), '#D9C9A0');
     BJ.roof(g, -1.3, 25.7, 1.3, 28.3, 21, 1.4, { type: 'hip', col: '#D9D4C8', over: 0.4, lift: 0.1, tiles: false, curl: 0, rw: 0.9 });
+    // at night the Monument is floodlit white from its terraces
+    BN.flood(g, i0, 0.74, BN.WHITE, { lines: 0.3 });
+    for (const [x, y, z, r] of [[0, 28.4, 8, 2.4], [0, 28.4, 15, 2.2], [1.4, 27, 20, 1.6], [0, 33, 1.8, 1.6], [6.6, 27, 1.8, 1.6]]) g.glow('lantern', x, y, z, { r, col: '#FFF0D8' });
   }, { name: 'monument' });
 
   /* ---------------- the Great Hall of the People (west side) ---------------- */
   T.obj([-37, -26, -28, 26], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     K.box(g, -37, -26, -28, 26, 0, 1.6, { t: '#D9D1C0', l: '#E3DCCB', r: '#CFC7B5' }, { w: 0.7 });
     K.box(g, -36.5, -25.5, -30, 25.5, 1.6, 13, { t: '#E9E2D2', l: '#F2ECDF', r: '#DDD5C4' }, { w: 0.9 });
     // the colonnade on the front (R face): tall columns before a dark recess
@@ -84,16 +91,20 @@ SF.tile('tiananmen', 0, 100, { rim: 40 }, function (T) {
     for (const a of cs) { const b = [a[0], a[1] - 9.4 * VZ]; g.fill2([[a[0] - 0.9, a[1]], [a[0] + 0.9, a[1]], [b[0] + 0.9, b[1]], [b[0] - 0.9, b[1]]], '#F4EFE4', true); g.line2([[a[0] + 0.9, a[1]], [b[0] + 0.9, b[1]]], { w: 0.4, c: '#9A9080', boil: false }); }
     K.box(g, -36.5, -15, -29.2, 15, 11, 12.2, { t: '#E9E2D2', l: '#F2ECDF', r: '#E4DCCB' }, { w: 0.7 });
     // windows in rows on the side wings
-    for (const [a0, a1] of [[-25, -16], [16, 25]]) for (const z of [3, 6.5, 9.5]) for (let a = a0; a < a1 - 1; a += 2.2) K.win(g, 'R', -30, a, a + 1.2, z, z + 2, { style: 'navy' });
+    for (const [a0, a1] of [[-25, -16], [16, 25]]) for (const z of [3, 6.5, 9.5]) for (let a = a0; a < a1 - 1; a += 2.2) K.win(g, 'R', -30, a, a + 1.2, z, z + 2, { style: 'navy', lit: 0.8 });
     // a band of green-and-yellow glazed tile round the roof edge
     for (const [f, p, a0, a1] of [['R', -30, -25.5, 25.5], ['L', 25.5, -36.5, -30]]) { g.fill(K.on(f, p + 0.03, a0, a1, 12.2, 13), '#D9B24A'); g.fill(K.on(f, p + 0.03, a0, a1, 12.6, 13), '#5E9A6E'); }
     const fl = g.p(-33, 0, 13); g.segs2([fl[0], fl[1], fl[0], fl[1] - 14], '#6E5A44', 0.4); BJ.flag2(g, [fl[0], fl[1] - 14], 9, 6, 0.6);
+    // at night the Great Hall is floodlit for National Day: the cream colonnade warm, the glazed roof band gold
+    BN.flood(g, i0, 0.64, BN.FLOOD, { lines: 0.2 });
+    for (let y = -12; y <= 12; y += 6) g.glow('lantern', -29.2, y, 6.5, { r: 2.6, col: '#FFDCA8' });
+    for (const y of [-21, 21]) g.glow('lantern', -29.8, y, 12.6, { r: 1.8, col: '#FFE6B0' });
   }, { name: 'great hall' });
 
   /* ---------------- the subway entrance ---------------- */
   T.obj([22, -33, 32, -25], function (g) {
     K.box(g, 22, -33, 32, -25, 0, 4.6, { t: '#CFD8DE', l: '#DCE6EC', r: '#BFCBD3' }, { w: 0.8 });
-    g.fill(K.on('L', -24.97, 23, 31, 0, 3.6), '#3F4A55'); K.win(g, 'R', 32, -32, -26, 0.6, 3.6, { style: 'glass' });
+    g.fill(K.on('L', -24.97, 23, 31, 0, 3.6), '#3F4A55'); g.mark({ nc: '#DCEBF6', win: 1, spill: true }); BN.shopWin(g, 'R', 32, -32, -26, 0.6, 3.6, { style: 'glass' });   // (night: lit white inside)
     BJ.sign(g, 'L', -25, 23.2, 30.8, 3.7, 4.55, '#2E5E9E', '地铁天安门');
     K.box(g, 21.6, -33.4, 32.4, -24.6, 4.6, 5.2, { t: '#9AA7B0', l: '#AAB6BE', r: '#8E9AA3' }, { w: 0.6 });
     BJ.sign(g, 'R', 32, -31.6, -28.4, 2.2, 3.4, '#2F8F5A', '出口');

@@ -39,12 +39,19 @@ SF.tile('choihung', -100, 100, { rim: 24 }, function (T) {
       for (let x = x0 + 0.8; x < x1 - 0.5; x += 1.5) { const q0 = g.p(x, y1 + 0.05, z + 1.05), q1 = g.p(x, y1 + 0.05, z + 1.95); d.push(q0[0], q0[1], q1[0], q1[1]); }
       for (let y = y0 + 0.8; y < y1 - 0.5; y += 1.6) { const q0 = g.p(x1 + 0.05, y, z + 1.0), q1 = g.p(x1 + 0.05, y, z + 1.9); d.push(q0[0], q0[1], q1[0], q1[1]); }
     }
-    g.segs2(s, '#F6F3EA', 0.45); g.segs2(d, '#5A6470', 0.9);
+    g.segs2(s, '#F6F3EA', 0.45); HK.nite(g, g.cmds.length - 1, { nc: '#E4F0FF' }); g.segs2(d, '#5A6470', 0.9);   // at night the access corridors are lit cool white
     // laundry on poles from some windows
     const R = RNG(x0 * 3 + 7); for (let k = 0; k < 9; k++) { const x = lerp(x0 + 1, x1 - 2, R()), z = 4 + R() * (h - 8), q0 = g.p(x, y1 + 0.05, z), q1 = g.p(x + 0.6, y1 + 2.0, z); g.fine2([q0, q1], { w: 0.22, c: '#6E675C' }); for (let i = 0; i < 3; i++) { const m = [lerp(q0[0], q1[0], (i + 0.6) / 3.2), lerp(q0[1], q1[1], (i + 0.6) / 3.2)]; g.fill2([[m[0] - 0.4, m[1]], [m[0] + 0.4, m[1]], [m[0] + 0.4, m[1] + 1.5], [m[0] - 0.4, m[1] + 1.5]], ['#F3F1EA', '#E06A8A', '#5F8FC9', '#E6C24F'][(i + k) % 4], true); } }
     // the stair tower at the near end, the roof tanks
     K.box(g, x1 - 2.4, y1, x1, y1 + 2.0, 0, h + 1.6, { t: '#DAD4C6', l: '#E6E1D5', r: '#CFC9BC' }, { w: 0.6 });
     for (let x = x0 + 4; x < x1 - 4; x += 10) K.box(g, x, (y0 + y1) / 2 - 1, x + 2.6, (y0 + y1) / 2 + 1, h, h + 1.6, { t: '#CFD6D9', l: '#B9C3C7', r: '#A5AFB4' }, { w: 0.4, boil: false });
+    // at night lamps over the ground-floor lobbies light the court and the paths
+    for (let x = x0 + 4; x < x1 - 4; x += 8) g.glow('lamp', x, y1 + 0.3, 2.1, { r: 1.0 });
+    // at night most windows are lit too (invisible by day; drawn last, clear of the stair tower)
+    for (let z = 2.4; z + 1.95 < h - 0.4; z += 2.2) {
+      for (let x = x0 + 0.8; x < x1 - 2.9; x += 1.5) { g.fill(K.on('L', y1 + 0.06, x - 0.36, x + 0.36, z + 1.05, z + 1.95), HK.NONE); g.mark({ win: 0.64 }); }
+      for (let y = y0 + 0.8; y < y1 - 0.5; y += 1.6) { g.fill(K.on('R', x1 + 0.06, y - 0.36, y + 0.36, z + 1.0, z + 1.9), HK.NONE); g.mark({ win: 0.6 }); }
+    }
   }, { name: 'estate block' });
   slab(-35, -3, -21, -13, 28, 0);
   slab(3, 35, -23, -15, 23, 2);
@@ -99,6 +106,7 @@ SF.tile('choihung', -100, 100, { rim: 24 }, function (T) {
     const c = g.p(24, 8.2, 2.62); for (let k = 0; k < 12; k++) { const a = TAU * k / 12; g.fill2([[c[0] + Math.cos(a) * 3.4 - 0.4, c[1] + Math.sin(a) * 1.6 - 0.3], [c[0] + Math.cos(a) * 3.4 + 0.4, c[1] + Math.sin(a) * 1.6 - 0.3], [c[0] + Math.cos(a) * 3.4 + 0.4, c[1] + Math.sin(a) * 1.6 + 0.3], [c[0] + Math.cos(a) * 3.4 - 0.4, c[1] + Math.sin(a) * 1.6 + 0.3]], '#F6F1DE', true); }
     tb(26.2, 8.4, 2, 9533); tb(24, 10.4, 3, 9534);
     const rf = [[17.4, 1.4, 6.6], [30.6, 1.4, 6.6], [30.6, 14.6, 6.6], [17.4, 14.6, 6.6]]; K.hip(g, 17.4, 1.4, 30.6, 14.6, 6.6, 2.4, '#3E8A4E', { w: 0.6 }); void rf;
+    g.glow('lamp', 24, 8, 6.2, { r: 1.4, base: 0.4 });                                  // night: the lamp under the pavilion's roof
   }, { name: 'pavilion' });
   // elders stretching in the evening
   for (const [x, y, s] of [[-28, 22, 9541], [-24, 25, 9542], [-31, 26, 9543]]) T.actor({ sample: 0.5, period: 4,

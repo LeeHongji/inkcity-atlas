@@ -21,17 +21,18 @@ SF.tile('yonghegong', 100, -100, { rim: 26 }, function (T) {
   BJ.sidewalk(T, ['s', 'w'], { sp: 12, skip: { s: [[-7, 7]] }, bikes: [['w', 26, 5]] });
 
   /* ---------------- the precinct walls ---------------- */
-  T.obj([-31, -36, 31, -34.8], (g) => BJ.wall(g, -31, -36, 31, -34.8, 6), { name: 'wall' });
-  T.obj([-31, -34.8, -29.8, 17.2], (g) => BJ.wall(g, -31, -34.8, -29.8, 17.2, 6), { name: 'wall' });
-  T.obj([29.8, -34.8, 31, 17.2], (g) => BJ.wall(g, 29.8, -34.8, 31, 17.2, 6), { name: 'wall' });
-  T.obj([-31, 16, -9, 17.2], (g) => BJ.wall(g, -31, 16, -9, 17.2, 6), { name: 'wall' });
-  T.obj([9, 16, 31, 17.2], (g) => BJ.wall(g, 9, 16, 31, 17.2, 6), { name: 'wall' });
+  T.obj([-31, -36, 31, -34.8], (g) => { BJ.wall(g, -31, -36, 31, -34.8, 6); BN.crown(g, 0, -0.2); }, { name: 'wall' });
+  T.obj([-31, -34.8, -29.8, 17.2], (g) => { BJ.wall(g, -31, -34.8, -29.8, 17.2, 6); BN.crown(g, 0, -0.2); }, { name: 'wall' });
+  T.obj([29.8, -34.8, 31, 17.2], (g) => { BJ.wall(g, 29.8, -34.8, 31, 17.2, 6); BN.crown(g, 0, -0.2); }, { name: 'wall' });
+  T.obj([-31, 16, -9, 17.2], (g) => { BJ.wall(g, -31, 16, -9, 17.2, 6); BN.crown(g, 0, -0.2); }, { name: 'wall' });
+  T.obj([9, 16, 31, 17.2], (g) => { BJ.wall(g, 9, 16, 31, 17.2, 6); BN.crown(g, 0, -0.2); }, { name: 'wall' });
 
   /* ---------------- the gate hall ---------------- */
   T.obj([-9, 12, 9, 19.6], function (g) {
     BJ.terrace(g, -9, 12, 9, 19.6, 0, 0.8, { rail: false, sw: 5 });
     BJ.hallBody(g, -7.4, 13, 7.4, 18.6, 0.8, 7.4, { bx: 5, by: 2 });
     BJ.roof(g, -7.4, 13, 7.4, 18.6, 7.4, 4.6, { type: 'xie', col: BC.yellow, over: 1.6, lift: 0.7 });
+    BN.crown(g, 0, -0.2);                                       // (night: the temple is closed and dark)
   }, { name: 'gate hall' });
   // the archway on the avenue
   T.obj([-8, 29.4, 8, 30.6], (g) => BJ.pailou(g, 'L', 30, -8, 8, { bays: 3, h: 9.4 }), { name: 'archway' });
@@ -39,8 +40,8 @@ SF.tile('yonghegong', 100, -100, { rim: 26 }, function (T) {
   for (const [x, y] of [[-6.4, 22.6], [6.4, 23.4], [-6.4, 34.6], [6.4, 35]]) T.obj([x, y], (g) => BJ.ginkgo(g, x, y, { r: 3.6, h: 5.4, seed: Math.round(x * 3 + y) }), { name: 'ginkgo' });
 
   /* ---------------- the courtyard ---------------- */
-  T.obj([-28, -13, -20, 10], (g) => { BJ.hallBody(g, -28, -13, -21, 10, 0, 6.2, { bx: 2, by: 6 }); BJ.roof(g, -28, -13, -21, 10, 6.2, 3.4, { type: 'xie', col: BC.yellow, over: 1.2, lift: 0.5 }); }, { name: 'side hall' });
-  T.obj([21, -13, 28, 10], (g) => { BJ.hallBody(g, 21, -13, 28, 10, 0, 6.2, { bx: 2, by: 6 }); BJ.roof(g, 21, -13, 28, 10, 6.2, 3.4, { type: 'xie', col: BC.yellow, over: 1.2, lift: 0.5 }); }, { name: 'side hall' });
+  T.obj([-28, -13, -20, 10], (g) => { BJ.hallBody(g, -28, -13, -21, 10, 0, 6.2, { bx: 2, by: 6 }); BJ.roof(g, -28, -13, -21, 10, 6.2, 3.4, { type: 'xie', col: BC.yellow, over: 1.2, lift: 0.5 }); BN.crown(g, 0, -0.2); }, { name: 'side hall' });
+  T.obj([21, -13, 28, 10], (g) => { BJ.hallBody(g, 21, -13, 28, 10, 0, 6.2, { bx: 2, by: 6 }); BJ.roof(g, 21, -13, 28, 10, 6.2, 3.4, { type: 'xie', col: BC.yellow, over: 1.2, lift: 0.5 }); BN.crown(g, 0, -0.2); }, { name: 'side hall' });
   T.obj([-16, 4], (g) => BJ.ginkgo(g, -16, 4, { r: 4.6, h: 6.8, seed: 21 }), { name: 'ginkgo' });
   T.obj([16, -2], (g) => BJ.ginkgo(g, 16, -2, { r: 4.4, h: 6.6, seed: 22 }), { name: 'ginkgo' });
   // the bronze incense burner: a tripod with a little roof, smoking
@@ -53,12 +54,13 @@ SF.tile('yonghegong', 100, -100, { rim: 26 }, function (T) {
     const t = [c[0], c[1] - 9]; g.fill2([[t[0] - 1.8, t[1] + 1.8], [t[0] + 1.8, t[1] + 1.8], [t[0] + 1.4, t[1] - 1.4], [t[0] - 1.4, t[1] - 1.4]], B, true);
     g.fill2([[t[0] - 3.6, t[1] - 1.2], [t[0] + 3.6, t[1] - 1.2], [t[0] + 0.6, t[1] - 4.2], [t[0] - 0.6, t[1] - 4.2]], '#C9A23A', true);
     g.disc2([t[0], t[1] - 4.8], 0.8, '#C9A23A');
+    g.glow2('lantern', [c[0], c[1] - 6.4], c, { r: 1.6, col: '#FF8A40' });   // at night the embers of the incense glow in the bowl
   }, { name: 'burner' });
   T.actor({ layer: 'top', sample: 5, period: 4, grow: false,
     at(t) { const u = (t % 4) / 4; return { x: 0, y: 4, z: 9 + u * 9, key: 's' + Math.floor(u * 16), u }; },
     draw(g, st) { const o = g.p(0, 0, 0); for (let k = 0; k < 3; k++) { const v = (st.u + k / 3) % 1, c = [o[0] + Math.sin(v * 5 + k) * 2.4, o[1] + (0.5 - v) * 30]; const r = 2.2 + v * 3.6; g.fill2(arcPts(c[0], c[1], r, 0, TAU, 12), `rgba(140,146,156,${(0.7 * (1 - v)).toFixed(2)})`, true); g.fill2(arcPts(c[0] - r * 0.25, c[1] - r * 0.25, r * 0.6, 0, TAU, 10), `rgba(214,218,224,${(0.75 * (1 - v)).toFixed(2)})`, true); } } });
   // worshippers with incense round the burner
-  [[-4.6, 7, 3], [4.2, 7.6, 3], [-1.2, 9.2, 3], [5.6, 2.6, 2]].forEach(([x, y, d], i) => T.cast([x, y], (g) => { const r = BJ.person(g, x, y, 0, BJ.who(1100 + i, { dir: d, pose: 'hold', reach: [0, -12] })); const hd = r.hands[0]; g.segs2([hd[0] - 0.4, hd[1], hd[0] - 0.8, hd[1] - 4.2, hd[0], hd[1], hd[0], hd[1] - 4.4, hd[0] + 0.4, hd[1], hd[0] + 0.8, hd[1] - 4.2], '#C9584B', 0.3); for (const dx of [-0.8, 0, 0.8]) g.disc2([hd[0] + dx, hd[1] - 4.4], 0.3, '#F2A33A'); }, { on: false }));
+  [[-4.6, 7, 3], [4.2, 7.6, 3], [-1.2, 9.2, 3], [5.6, 2.6, 2]].forEach(([x, y, d], i) => T.cast([x, y], (g) => { const r = BJ.person(g, x, y, 0, BJ.who(1100 + i, { dir: d, pose: 'hold', reach: [0, -12] })); const hd = r.hands[0]; g.segs2([hd[0] - 0.4, hd[1], hd[0] - 0.8, hd[1] - 4.2, hd[0], hd[1], hd[0], hd[1] - 4.4, hd[0] + 0.4, hd[1], hd[0] + 0.8, hd[1] - 4.2], '#C9584B', 0.3); for (const dx of [-0.8, 0, 0.8]) { g.disc2([hd[0] + dx, hd[1] - 4.4], 0.3, '#F2A33A'); g.mark({ nc: '#FF9A40' }); } g.glow2('lantern', [hd[0], hd[1] - 4.4], [hd[0], hd[1] - 4.4], { r: 0.5, col: '#FF8A40' }); }, { on: false }));   // (night: the glowing tips of the incense)
 
   /* ---------------- the Hall of Harmony and Peace ---------------- */
   T.obj([-15, -22, 15, -8], function (g) {
@@ -66,6 +68,7 @@ SF.tile('yonghegong', 100, -100, { rim: 26 }, function (T) {
     BJ.terrace(g, -15, -22, 15, -8, 0, 1.4, { sw: 6 });
     BJ.hallBody(g, -12, -20, 12, -10.4, 1.4, 9.4, { bx: 7, by: 3 });
     BJ.roof(g, -12, -20, 12, -10.4, 9.4, 5.6, { type: 'xie', col: BC.yellow, over: 2.0, lift: 0.8 });
+    BN.crown(g, 0, -0.2);
   }, { name: 'main hall' });
   // kneeling worshippers on cushions before the hall
   [[-7, -6.4], [-4, -6], [5, -6.2]].forEach(([x, y], i) => T.cast([x, y], (g) => { const c = g.p(x, y + 0.6, 0); g.fill2(arcPts(c[0], c[1], 1.8, 0, TAU, 10).map((q) => [q[0], c[1] + (q[1] - c[1]) * 0.5]), '#C9A23A', true); BJ.person(g, x, y, 0, BJ.who(1110 + i, { dir: 3, pose: 'kneel', hands: [[-0.4, -10], [0.4, -10]] })); }, { on: false }));
@@ -81,6 +84,7 @@ SF.tile('yonghegong', 100, -100, { rim: 26 }, function (T) {
     BJ.roof(g, -6.4, -32, 6.4, -26, 15.6, 3.4, { type: 'hip', col: BC.yellow, top: 0.42, over: 1.8, lift: 0.6 });
     BJ.hallBody(g, -5.6, -31.4, 5.6, -26.6, 17.0, 21.6, { bx: 3, by: 2 });
     BJ.roof(g, -5.6, -31.4, 5.6, -26.6, 21.6, 5.6, { type: 'xie', col: BC.yellow, over: 1.8, lift: 0.8 });
+    BN.crown(g, 0, -0.2);
   }, { name: 'wanfu pavilion' });
 
   /* ---------------- shops on the avenue outside the wall ---------------- */

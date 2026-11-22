@@ -32,16 +32,16 @@ SF.tile('louvre', 0, 0, { rim: 20 }, function (T) {
   // a stretch of wing: face 'R' (towards +x) for the river wing, 'L' (towards +y) for the far wing
   const wing = (x0, y0, x1, y1, o) => T.obj([x0, y0, x1, y1], function (g) {
     g.boilP = 0.25; o = o || {};
-    const Z = o.z || 10.6;
+    const Z = o.z || 10.6, i0 = g.cmds.length;
     K.box(g, x0, y0, x1, y1, 0, Z, STN, { w: 0.9 });
     for (const face of ['L', 'R']) {
       const p = face === 'L' ? y1 : x1, A0 = face === 'L' ? x0 : y0, A1 = face === 'L' ? x1 : y1, n = Math.max(1, Math.round((A1 - A0) / 2.6)), bw = (A1 - A0) / n;
       const pil = [];
       for (let i = 0; i < n; i++) {
         const m = A0 + bw * (i + 0.5);
-        PA.win(g, face, p, m - 0.55, m + 0.55, 0.8, 3.6, { pane: '#5E6B76' });
+        PA.win(g, face, p, m - 0.55, m + 0.55, 0.8, 3.6, { pane: '#5E6B76', lit: 0.12 });
         const ar = []; for (let k = 0; k <= 6; k++) { const t = Math.PI * k / 6; ar.push(K.pt(face, p + 0.05, m - Math.cos(t) * 0.55, 3.6 + Math.sin(t) * 0.55)); } g.fill(ar, '#5E6B76');
-        PA.win(g, face, p, m - 0.6, m + 0.6, 5.0, 8.2, { pane: '#5E6B76', rail: true });
+        PA.win(g, face, p, m - 0.6, m + 0.6, 5.0, 8.2, { pane: '#5E6B76', rail: true, lit: 0.2 });
         const pd = [K.pt(face, p + 0.06, m - 0.85, 8.45), K.pt(face, p + 0.06, m + 0.85, 8.45), K.pt(face, p + 0.06, m, i % 2 ? 9.2 : 9.0)]; g.fill(pd, '#F6F0E2'); g.outline(pd, { w: 0.3, c: '#B5A684', boil: false, ext: 0 });
         const a = g.p.apply(g, K.pt(face, p + 0.04, A0 + bw * i, 0.4)), b = g.p.apply(g, K.pt(face, p + 0.04, A0 + bw * i, Z - 0.6)); pil.push(a[0], a[1], b[0], b[1]);
       }
@@ -53,24 +53,27 @@ SF.tile('louvre', 0, 0, { rim: 20 }, function (T) {
     const bal = []; for (let a = x0; a <= x1; a += 0.5) { const q = g.p(a, y1 + 0.2, Z + 0.5), r = g.p(a, y1 + 0.2, Z + 1.2); bal.push(q[0], q[1], r[0], r[1]); } for (let a = y0; a <= y1; a += 0.5) { const q = g.p(x1 + 0.2, a, Z + 0.5), r = g.p(x1 + 0.2, a, Z + 1.2); bal.push(q[0], q[1], r[0], r[1]); }
     g.segs2(bal, '#CDBF9E', 0.4);
     // the steep slate roof with round dormers
-    const top = PA.mansard(g, x0 + 0.4, y0 + 0.4, x1 - 0.4, y1 - 0.4, Z + 1.2, { h: 3.6, d: 1.6, h2: 0.6, col: SLATE, seam: '#5A626C', dormers: 3.4, chim: o.chim || [] });
+    const iR = g.cmds.length;
+    const top = PA.mansard(g, x0 + 0.4, y0 + 0.4, x1 - 0.4, y1 - 0.4, Z + 1.2, { h: 3.6, d: 1.6, h2: 0.6, col: SLATE, seam: '#5A626C', dormers: 3.4, chim: o.chim || [], dlit: 0.15 });
     void top;
+    PA.flood(g, i0, 0.62, PN.flood, { to: iR });                     // at night the façades are floodlit warm
   }, { name: o && o.name || 'wing' });
   // a pavilion: taller, with a square imperial dome and a lantern
   const pavilion = (x0, y0, x1, y1, name) => T.obj([x0, y0, x1, y1], function (g) {
     g.boilP = 0.3;
-    const Z = 12.4, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+    const Z = 12.4, cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, i0 = g.cmds.length;
     K.box(g, x0, y0, x1, y1, 0, Z, STN, { w: 1.0 });
     for (const face of ['L', 'R']) {
       const p = face === 'L' ? y1 : x1, A0 = face === 'L' ? x0 : y0, A1 = face === 'L' ? x1 : y1, m = (A0 + A1) / 2;
       // a great arched window over a door, paired columns, sculpture in the pediment
       const ar = [K.pt(face, p + 0.04, m - 1.2, 0)]; for (let k = 0; k <= 8; k++) { const t = Math.PI * k / 8; ar.push(K.pt(face, p + 0.04, m - Math.cos(t) * 1.2, 4.0 + Math.sin(t) * 1.2)); } ar.push(K.pt(face, p + 0.04, m + 1.2, 0));
-      g.fill(ar, '#5E6B76');
+      g.fill(ar, '#5E6B76'); g.mark({ nc: '#FFD58A', win: 1 });
       for (const s of [-1, 1]) for (const d of [1.7, 2.4]) { const a = g.p.apply(g, K.pt(face, p + 0.08, m + s * d, 0.4)), b = g.p.apply(g, K.pt(face, p + 0.08, m + s * d, Z - 0.8)); g.segs2([a[0], a[1], b[0], b[1]], '#D2C4A2', 0.9); }
-      PA.win(g, face, p, m - 0.7, m + 0.7, 6.4, 9.6, { pane: '#5E6B76', rail: true });
+      PA.win(g, face, p, m - 0.7, m + 0.7, 6.4, 9.6, { pane: '#5E6B76', rail: true, lit: 0.3 });
       const pd = [K.pt(face, p + 0.06, m - 2.8, 10.6), K.pt(face, p + 0.06, m + 2.8, 10.6), K.pt(face, p + 0.06, m, 12.0)]; g.fill(pd, '#F6F0E2'); g.outline(pd, { w: 0.4, c: '#A99A7B', boil: false });
     }
     K.box(g, x0 - 0.3, y0 - 0.3, x1 + 0.3, y1 + 0.3, Z, Z + 0.6, STN, { w: 0.6, nohid: true });
+    const iD = g.cmds.length;
     // the dome: a steep curved square roof rising to a lantern
     const d = 0.4, h = 6.0, lv = 5;
     for (let k = 0; k < lv; k++) {
@@ -88,6 +91,9 @@ SF.tile('louvre', 0, 0, { rim: 20 }, function (T) {
     K.cone(g, cx, cy, 0.9, zt + 1.6, 1.6, SLATE); const f = g.p(cx, cy, zt + 3.2); g.disc2(f, 0.4, PC.gold);
     // gilded crests along the dome's ridges
     for (const [sx, sy] of [[1, 1], [-1, 1], [1, -1]]) { const pr = prof(sx, sy); for (let k = 2; k < pr.length; k += 3) g.disc2(g.p.apply(g, pr[k]), 0.35, PC.gold); }
+    // at night: the pavilion floodlit, its dome catching the light, the great window lit, the gilt shining
+    PA.flood(g, i0, 0.72, PN.flood, { to: iD }); PA.flood(g, iD, 0.3);
+    for (const face of ['L', 'R']) { const p = face === 'L' ? y1 : x1, m = face === 'L' ? cx : cy; g.glow.apply(g, ['lantern'].concat(K.pt(face, p + 0.3, m, 5.5), [{ r: 2.4, col: '#FFDDA6' }])); }
   }, { name });
   wing(-31, -23, -23, -6, { name: 'denon 1', chim: [[-27, -15, 'x', 3]] });
   wing(-31, 6, -23, 21, { name: 'denon 2', chim: [[-27, 14, 'x', 3]] });
@@ -100,8 +106,10 @@ SF.tile('louvre', 0, 0, { rim: 20 }, function (T) {
   pavilion(23, -32, 33, -22, 'pavillon end 2');
 
   /* ---------------- the pyramid ---------------- */
+  // at night the pyramid is lit from within: the glass glows pale gold, its lattice a deeper gold
+  const PYR_N = { 'rgba(170,196,206,0.55)': 'rgba(242,206,140,0.6)', 'rgba(176,202,212,0.55)': 'rgba(236,196,128,0.6)', 'rgba(200,222,230,0.80)': 'rgba(255,232,178,0.84)', 'rgba(178,204,214,0.85)': 'rgba(250,214,150,0.86)', '#7E95A0': '#C9944A', '#4A5A62': '#9A6A34', '#3A464C': '#8A5C2C', [C.white]: '#FFF6DC' };
   const pyr = (cx, cy, b, h, name, big) => T.obj([cx - b, cy - b, cx + b, cy + b], function (g) {
-    const A = [cx, cy, h], c = [[cx - b, cy - b, 0], [cx + b, cy - b, 0], [cx + b, cy + b, 0], [cx - b, cy + b, 0]];
+    const A = [cx, cy, h], c = [[cx - b, cy - b, 0], [cx + b, cy - b, 0], [cx + b, cy + b, 0], [cx - b, cy + b, 0]], i0 = g.cmds.length;
     // the back faces through the glass, then the two front faces
     g.fill([c[0], c[1], A], 'rgba(170,196,206,0.55)'); g.fill([c[3], c[0], A], 'rgba(176,202,212,0.55)');
     g.fill([c[3], c[2], A], 'rgba(200,222,230,0.80)'); g.fill([c[2], c[1], A], 'rgba(178,204,214,0.85)');
@@ -119,6 +127,8 @@ SF.tile('louvre', 0, 0, { rim: 20 }, function (T) {
     }
     g.line([c[3], c[2], c[1]], { w: 0.75, c: '#4A5A62', boil: false }); g.line([c[3], A, c[1]], { w: 0.7, c: '#4A5A62', boil: false }); g.line([c[2], A], { w: 0.8, c: '#3A464C', boil: false });
     g.line([c[0], A], { w: 0.35, c: '#7E95A0', boil: false });
+    PA.nightCol(g, i0, (cc) => PYR_N[cc], { lines: true });
+    g.glow('lantern', cx, cy, h * 0.3, { r: big ? 6 : 1.6, col: '#FFE2A8' }); if (big) g.glow('lantern', cx, cy, h * 0.7, { r: 2.2, col: '#FFEBC0' });
   }, { name });
   pyr(PX, PY, PB, PZ, 'pyramid', true);
   pyr(PX, PY - 14.5, 1.8, 2.2, 'pyramidion 1'); pyr(PX + 14.5, PY, 1.8, 2.2, 'pyramidion 2'); pyr(PX - 13.5, PY, 1.8, 2.2, 'pyramidion 3');
@@ -132,11 +142,11 @@ SF.tile('louvre', 0, 0, { rim: 20 }, function (T) {
   // fountain jets in the pools
   [[-16, 17], [-12, 18.5], [17, -16], [18.5, -12]].forEach(([x, y], i) => T.actor({ sample: 5, period: 10, grow: false,
     at(t) { const f = Math.floor(t * 6 + i * 2) % 6; return { x, y, z: -0.3, key: f, f }; },
-    draw(g, st) { const b = g.p(0, 0, 0), h = 9 + [0, 1, 2, 1.5, 0.5, 1][st.f]; g.fill2([[b[0] - 0.5, b[1]], [b[0] + 0.5, b[1]], [b[0] + 0.25, b[1] - h], [b[0] - 0.25, b[1] - h]], '#E6F1F3', true); g.fill2(arcPts(b[0], b[1] - h, 1.4, 0, TAU, 8), '#F2F8F8', true); const sp = []; for (let k = 0; k < 6; k++) { const a = TAU * k / 6 + st.f; sp.push(b[0] + Math.cos(a) * 2.2, b[1] + Math.sin(a) * 0.9, b[0] + Math.cos(a) * 2.8, b[1] + Math.sin(a) * 1.1 - 0.4); } g.segs2(sp, '#FBFDFD', 0.5); } }));
+    draw(g, st) { const b = g.p(0, 0, 0), h = 9 + [0, 1, 2, 1.5, 0.5, 1][st.f]; g.fill2([[b[0] - 0.5, b[1]], [b[0] + 0.5, b[1]], [b[0] + 0.25, b[1] - h], [b[0] - 0.25, b[1] - h]], '#E6F1F3', true); g.mark({ nc: '#F2F8FF' }); g.fill2(arcPts(b[0], b[1] - h, 1.4, 0, TAU, 8), '#F2F8F8', true); g.mark({ nc: '#FFFFFF', light: true }); const sp = []; for (let k = 0; k < 6; k++) { const a = TAU * k / 6 + st.f; sp.push(b[0] + Math.cos(a) * 2.2, b[1] + Math.sin(a) * 0.9, b[0] + Math.cos(a) * 2.8, b[1] + Math.sin(a) * 1.1 - 0.4); } g.segs2(sp, '#FBFDFD', 0.5); } }));
 
   /* ---------------- the Arc du Carrousel ---------------- */
   T.obj([20.4, 17.6, 28.4, 20.6], function (g) {
-    g.boilP = 0.35;
+    g.boilP = 0.35; const i0 = g.cmds.length;
     const x0 = 20.4, x1 = 28.4, y0 = 17.6, y1 = 20.6, Z = 7.2, PINK = { t: '#EBD3C6', l: '#E7C6B6', r: '#D2AE9D' };
     K.box(g, x0, y0, x1, y1, 0, Z, PINK, { w: 0.85 });
     const arch = (face, p, m, hw, zs) => { const pts = [K.pt(face, p + 0.03, m - hw, 0), K.pt(face, p + 0.03, m + hw, 0)]; for (let i = 0; i <= 10; i++) { const t = Math.PI * i / 10; pts.push(K.pt(face, p + 0.03, m + Math.cos(t) * hw, zs + Math.sin(t) * hw)); } return pts; };
@@ -148,6 +158,7 @@ SF.tile('louvre', 0, 0, { rim: 20 }, function (T) {
     g.fill2([[c[0] - 6, c[1]], [c[0] + 6, c[1]], [c[0] + 5.6, c[1] - 1.2], [c[0] - 5.6, c[1] - 1.2]], '#8E8063', true);
     for (let k = 0; k < 4; k++) { const hx = c[0] - 4.6 + k * 3.0, hy = c[1] - 1.2; g.fill2([[hx - 1.2, hy], [hx + 1.2, hy], [hx + 1.6, hy - 2.6], [hx + 0.6, hy - 3.6], [hx - 1.4, hy - 2.4]], k % 2 ? '#B89A4E' : '#A6883E', true); }
     g.fill2([[c[0] - 1.4, c[1] - 2.4], [c[0] + 1.4, c[1] - 2.4], [c[0] + 0.9, c[1] - 6.4], [c[0] - 0.9, c[1] - 6.4]], '#C9A955', true); g.disc2([c[0], c[1] - 7.0], 0.8, '#C9A955');
+    PA.flood(g, i0, 0.72); g.glow('lantern', 24.4, 20.6, 3.5, { r: 2.4, col: '#FFDDA6' });   // floodlit at night
   }, { name: 'arc du carrousel' });
 
   /* ---------------- the quai: parapet, bouquinistes ---------------- */

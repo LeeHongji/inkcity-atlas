@@ -38,6 +38,11 @@
       g.fill(outer.concat(inner.slice().reverse()), '#D9463B');
       g.fill(outer.concat(outer.slice().reverse().map((p) => [p[0], p[1], p[2] - 0.9])), '#B3352C');
       g.line(outer, { w: 0.7, boil: false }); g.line(inner, { w: 0.5, boil: false });
+      // at night the saucer is floodlit white from below over its pool, the glazed band lit, the red ramp lit
+      RJ.nightEach(g, 0, (c, d) => (d.k !== K_FILL ? (c === '#6E7C88' ? '#E9D2A0' : undefined) : c === '#3F4A54' ? '#F2D69A' : c === '#D9463B' || c === '#B3352C' ? RJ.litCol(c, 0.75) : RJ.floodCol(c, 1.1, '#E2ECFF')));
+      for (let i = 0; i < 6; i++) { const a = -Math.PI / 4 + Math.PI * (i + 0.5) / 6; g.glow('lantern', Math.cos(a) * 12.4, Math.sin(a) * 12.4, 10.3, { r: 1.6, col: '#FFE0A8', base: -0.3 }); }
+      for (const a of [0.2, 0.9, 1.6]) g.glow2('lantern', g.p(Math.cos(a) * 6, Math.sin(a) * 6, 5.4), g.p(Math.cos(a) * 9, Math.sin(a) * 9, -0.3), { r: 2.6, col: '#DCE8FF' });
+      for (let k = 0; k <= 20; k += 5) { const p = outer[k]; g.glow('lantern', p[0], p[1], p[2] + 0.9, { r: 0.8, col: '#FFD6A0', base: p[2] }); }
     }, { name: 'mac niterói' });
     for (const [x, y, s, d] of [[16, 16, 8901, 3], [19, 12, 8902, 2], [-16, 14, 8903, 1], [-20, -4, 8904, 0]]) T.cast([x, y], (g) => RJ.person(g, x, y, 0, Object.assign(RJ.who(s), { dir: d, pose: s % 2 ? 'hold' : 'stand', phone: s % 2 === 1 })), {});
   });
@@ -50,6 +55,10 @@
       g.water(K.curve(isle.map((p) => [p[0] * 1.35, p[1] * 1.35, -0.6]), 5, true), { dens: 0.6 });
       g.fill(K.curve(isle.map((p) => [p[0], p[1], 0]), 5, true), '#B5CF8E'); g.outline(K.curve(isle.map((p) => [p[0], p[1], 0]), 5, true), { w: 0.6, c: '#5E7A3E', boil: false });
       g.fill(K.rect(10, 4, 18, 6.4, 0.2), '#C9A26B');
+      // (night: the open water on the near side of the islet, where the palace's light falls: a clear fill)
+      const cr = []; for (let k = 0; k <= 16; k++) { const a = lerp(-Math.PI * 0.4, Math.PI * 0.9, k / 16); cr.push([Math.cos(a) * 18.2, Math.sin(a) * 18.2, -0.6]); }
+      for (let k = 16; k >= 0; k--) { const a = lerp(-Math.PI * 0.4, Math.PI * 0.9, k / 16); cr.push([Math.cos(a) * 15.6, Math.sin(a) * 15.6, -0.6]); }
+      g.fill(cr, RP.WMASK);
     });
     T.obj([-6, -6, 6, 6], function (g) {
       const GR = { t: '#B9D9C4', l: '#8CC4A4', r: '#72AA8A' };
@@ -59,6 +68,9 @@
       K.cone(g, 0, 0, 2.6, 11.2, 5.4, '#2F6A55');
       for (const [x, y] of [[-6, 6], [6, 6], [6, -6]]) K.cone(g, x, y, 1.1, 6.4, 3.4, '#2F6A55');
       K.gable(g, -6.4, -6.4, 6.4, 6.4, 6.4, 2.0, 'x', '#3F7F66');
+      // at night the little palace is floodlit warm over the bay, its windows lit, lamps along the jetty
+      RJ.nightEach(g, 0, (c, d) => (d.k === K_FILL && RJ_HEX(c) ? mix(RJ.litCol(c, 0.68), '#FFD9A0', 0.16) : undefined));
+      for (const [x, y, z, r] of [[0, 6.4, 2.5, 3.0], [6.4, 0, 2.5, 3.0], [0, 2.2, 9, 2.2], [0, 0, 14.5, 1.4], [-6, 6, 8.5, 1.2], [6, 6, 8.5, 1.2], [6, -6, 8.5, 1.2]]) g.glow2('lantern', g.p(x, y, z), g.p(x + 2.5, y + 2.5, 0), { r, col: '#FFD08A' });
     }, { name: 'ilha fiscal' });
     T.actor({ sample: 0.5, period: 30, grow: false,
       at(t) { const u = (t / 30) % 1, f = u < 0.4 ? 0 : u < 0.7 ? (u - 0.4) / 0.3 : 1 - (u - 0.7) / 0.3; return { x: 20 + f * 18, y: 5.2, z: -0.6, key: u < 0.7 ? 0 : 1, d: u < 0.7 }; },
@@ -93,5 +105,7 @@
         const b = P(0, 0, -0.6), h = P(0, 0, 0.9); g.segs2([b[0], b[1], h[0], h[1]], '#5A564E', 0.3);
         g.fill2([[b[0] - 2.2, b[1] - 0.6], [b[0] + 2.2, b[1] - 0.6], [b[0] + 2.2, b[1] + 0.8], [b[0] - 2.2, b[1] + 0.8]], '#3A3530', true);
       } });
+    // the last tile defined: the city's night-only things are made here, after everything else (see RJ.late)
+    RJ.runLate(T);
   });
 })();

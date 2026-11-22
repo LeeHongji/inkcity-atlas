@@ -22,7 +22,8 @@ TK.glyph2 = function (g, c, s, col, seed, w) {
 /* a sign board on a face, with a column (vertical) or row of glyphs */
 TK.sign = function (g, face, p, a0, a1, z0, z1, col, o) {
   o = o || {}; const q = K.on(face, p + (face === 'L' ? 0.08 : 0.08), a0, a1, z0, z1);
-  g.fill(q, col); g.outline(q, { w: o.w || 0.45, c: o.c || shade(col, 0.5), boil: false });
+  g.fill(q, col); g.mark({ nc: true }); g.outline(q, { w: o.w || 0.45, c: o.c || shade(col, 0.5), boil: false });   // lit from behind at night
+  { const c = g.p.apply(g, K.pt(face, p + 0.1, (a0 + a1) / 2, (z0 + z1) / 2)); g.glow2('neon', c, c, { r: 0.3 * Math.max(Math.abs(a1 - a0) * 2.92, (z1 - z0) * 3.46), col }); }
   const vert = (z1 - z0) > Math.abs(a1 - a0), n = o.n || Math.max(1, Math.floor((vert ? (z1 - z0) : Math.abs(a1 - a0)) / (vert ? Math.abs(a1 - a0) : (z1 - z0)) * 0.9));
   const am = (a0 + a1) / 2, zm = (z0 + z1) / 2, cell = vert ? (z1 - z0) / n : (a1 - a0) / n;
   const s = Math.min(Math.abs(cell), vert ? Math.abs(a1 - a0) : (z1 - z0)) * 0.62 * 3.3;
@@ -122,13 +123,14 @@ TK.torii = function (g, x, y, o) {
 TK.lantern2 = function (g, c, r, col, o) {
   o = o || {}; const rx = r * 0.78, pts = [];
   for (let i = 0; i < 16; i++) { const t = TAU * i / 16; pts.push([c[0] + Math.cos(t) * rx, c[1] + Math.sin(t) * r]); }
-  g.fill2(pts, col, true);
-  g.fill2(pts.filter((p) => p[0] > c[0] + rx * 0.2).concat([[c[0] + rx * 0.2, c[1] + r * 0.9], [c[0] + rx * 0.2, c[1] - r * 0.9]]).sort((a, b) => Math.atan2(a[1] - c[1], a[0] - c[0] - rx * 0.4) - Math.atan2(b[1] - c[1], b[0] - c[0] - rx * 0.4)), shade(col, 0.14), true);
+  g.fill2(pts, col, true); g.mark({ nc: true, light: true });                           // at night a light burns inside
+  g.fill2(pts.filter((p) => p[0] > c[0] + rx * 0.2).concat([[c[0] + rx * 0.2, c[1] + r * 0.9], [c[0] + rx * 0.2, c[1] - r * 0.9]]).sort((a, b) => Math.atan2(a[1] - c[1], a[0] - c[0] - rx * 0.4) - Math.atan2(b[1] - c[1], b[0] - c[0] - rx * 0.4)), shade(col, 0.14), true); g.mark({ nc: true });
   if (r > 1.6) { const segs = []; for (let k = -2; k <= 2; k++) { const yy = c[1] + k * r * 0.33, xx = rx * Math.sqrt(Math.max(0, 1 - Math.pow(k * 0.33, 2))); segs.push(c[0] - xx, yy, c[0] + xx, yy); } g.segs2(segs, shade(col, 0.3), 0.25); }
   const cap = (yy) => g.fill2([[c[0] - rx * 0.62, yy - r * 0.13], [c[0] + rx * 0.62, yy - r * 0.13], [c[0] + rx * 0.62, yy + r * 0.13], [c[0] - rx * 0.62, yy + r * 0.13]], '#2A2622', true);
   cap(c[1] - r); cap(c[1] + r);
   if (o.glyph) TK.glyph2(g, [c[0], c[1] + r * 0.05], r * 0.95, o.gc || '#2A2622', o.glyph, Math.max(0.35, r * 0.13));
   if (r > 1.2) g.line2(pts, { w: 0.4, c: shade(col, 0.45), close: true, boil: false, wob: 0.3 });
+  g.glow2('lantern', c, c, { r: r * 1.1, col });
 };
 /* a string of small lanterns between two wide-px points, sagging */
 TK.lanternString2 = function (g, a, b, n, cols, sag) {
@@ -167,6 +169,7 @@ TK.upole = function (g, x, y, o) {
   arm(h - 0.8, 1.8); arm(h - 2.3, 1.3);
   if (o.can !== false) { const c = g.p(x, y, h - 4.8); g.fill2([[c[0] + 0.6, c[1]], [c[0] + 2.6, c[1]], [c[0] + 2.6, c[1] - 5.2], [c[0] + 0.6, c[1] - 5.2]], '#9FA39E'); g.outline2([[c[0] + 0.6, c[1]], [c[0] + 2.6, c[1]], [c[0] + 2.6, c[1] - 5.2], [c[0] + 0.6, c[1] - 5.2]], { w: 0.4, c: '#5A564E', boil: false }); }
   if (o.band) { const a = g.p(x, y, 4.5), b = g.p(x, y, 6.2); g.fill2([[a[0] - 0.7, a[1]], [a[0] + 0.7, a[1]], [b[0] + 0.65, b[1]], [b[0] - 0.65, b[1]]], '#E6C24F'); }
+  if (o.light !== false) g.glow('lamp', x, y, h - 3.4, { r: 1.3 });   // the street light every pole carries (only at night: nothing is drawn by day)
   const L1 = 1.6, L2 = 1.1;
   return o.across === 'y' ? [[x, y - L1, h - 0.8], [x, y + L1, h - 0.8], [x, y - L2, h - 2.3], [x, y + L2, h - 2.3]] : [[x - L1, y, h - 0.8], [x + L1, y, h - 0.8], [x - L2, y, h - 2.3], [x + L2, y, h - 2.3]];
 };
@@ -184,10 +187,11 @@ TK.vend = function (g, x, y, o) {
   const fp = face === 'L' ? [x - w, y - d, x + w, y + d] : [x - d, y - w, x + d, y + w];
   K.box(g, fp[0], fp[1], fp[2], fp[3], 0, h, col, { w: 0.6, boil: false });
   const p = face === 'L' ? fp[3] : fp[2], a0 = face === 'L' ? fp[0] : fp[1];
-  const win = K.on(face, p + 0.03, a0 + 0.25, a0 + 2 * w - 0.25, 2.2, 3.85); g.fill(win, '#E9F1F4');
+  const win = K.on(face, p + 0.03, a0 + 0.25, a0 + 2 * w - 0.25, 2.2, 3.85); g.fill(win, '#E9F1F4'); g.mark({ nc: '#F2FAFF' });
   const R = RNG(Math.round(x * 13 + y * 7)), dots = [];
-  for (let r = 0; r < 3; r++) for (let i = 0; i < 5; i++) { const c = g.p.apply(g, K.pt(face, p + 0.05, a0 + 0.5 + i * 0.3, 2.45 + r * 0.5)); g.fill2([[c[0] - 0.28, c[1]], [c[0] + 0.28, c[1]], [c[0] + 0.28, c[1] - 1.1], [c[0] - 0.28, c[1] - 1.1]], R.pick(['#C9584B', '#5F8FC9', '#E6C24F', '#8FBF73', '#E08A3C', '#F3F1EA', '#3A3530']), true); }
+  for (let r = 0; r < 3; r++) for (let i = 0; i < 5; i++) { const c = g.p.apply(g, K.pt(face, p + 0.05, a0 + 0.5 + i * 0.3, 2.45 + r * 0.5)); g.fill2([[c[0] - 0.28, c[1]], [c[0] + 0.28, c[1]], [c[0] + 0.28, c[1] - 1.1], [c[0] - 0.28, c[1] - 1.1]], R.pick(['#C9584B', '#5F8FC9', '#E6C24F', '#8FBF73', '#E08A3C', '#F3F1EA', '#3A3530']), true); g.mark({ nc: true }); }
   g.outline(win, { w: 0.35, c: '#5A564E', boil: false });
+  { const c = g.p.apply(g, K.pt(face, p + 0.05, a0 + w, 3)); g.glow2('neon', c, g.p(x, y, 0), { r: 2.4, col: '#DDF0FF' }); }
   const slot = K.on(face, p + 0.03, a0 + 0.5, a0 + 2 * w - 0.6, 0.5, 1.1); g.fill(slot, '#3A3530');
   const bt = g.p.apply(g, K.pt(face, p + 0.04, a0 + 2 * w - 0.45, 1.8)); g.disc2(bt, 0.4, '#C9584B');
   if (o.top) { const tq = K.on(face, p + 0.02, a0, a0 + 2 * w, h - 0.35, h); g.fill(tq, o.top); }
@@ -203,14 +207,15 @@ TK.sakura = function (g, x, y, o) {
   // clumps painted back to front, each with its shade and its own edge, so the front ones overlap the back ones
   blobs.map((b) => ({ b, cy: b.reduce((s, p) => s + p[1], 0) / b.length })).sort((p, q) => p.cy - q.cy).forEach(({ b }) => {
     const cxx = b.reduce((s, p) => s + p[0], 0) / b.length, cyy = b.reduce((s, p) => s + p[1], 0) / b.length;
-    g.fill2(b, col);
-    const sh = b.filter((p) => (p[0] - cxx) * 0.5 + (p[1] - cyy) > 0); if (sh.length > 2) g.fill2(sortAround(sh.concat([[cxx, cyy + 1]])), dk);
+    g.fill2(b, col); g.mark({ nc: (c) => mix(nightColour(c), c, 0.5) });               // at night the blossom is lit (yozakura)
+    const sh = b.filter((p) => (p[0] - cxx) * 0.5 + (p[1] - cyy) > 0); if (sh.length > 2) { g.fill2(sortAround(sh.concat([[cxx, cyy + 1]])), dk); g.mark({ nc: (c) => mix(nightColour(c), c, 0.4) }); }
     g.outline2(b, { c: ink, w: 0.6, ext: 0.2 });
   });
   const fl = []; for (let i = 0; i < 26; i++) { const a = R() * TAU, d = R() * r * 0.85, px = top[0] + Math.cos(a) * d * 1.05, py = cy + Math.sin(a) * d * 0.75 - r * 0.05; fl.push(px - 0.35, py, px + 0.35, py); }
   g.segs2(fl, '#FBF4F4', 0.75);
   const pk = []; for (let i = 0; i < 14; i++) { const a = R() * TAU, d = R() * r * 0.8, px = top[0] + Math.cos(a) * d, py = cy + Math.sin(a) * d * 0.72; pk.push(px, py, px + 0.9, py - 0.5); }
   g.segs2(pk, ink, 0.45);
+  g.glow2('tree', [top[0], cy], f, { r, col: '#FFB3D3' });
 };
 /* a blue tarp spread on the ground (world points), with fold lines */
 TK.tarp = function (g, pts, o) {
@@ -289,7 +294,7 @@ TK.bust2 = function (g, p, w, k) {
 /* a Tokyo taxi: tall and boxy, dark navy (or the old yellow / green), a lamp on the roof */
 TK.taxi = function (g, ang, o) {
   o = o || {}; const col = o.col || '#2E3A55';
-  K.car(g, ang, { col, L: 5.0, W: 2.45, roof: (gg, cab) => { const ca = Math.cos(ang), sa = Math.sin(ang); K.rbox(gg, cab.cx, cab.cy, 0.5, 1.0, ang + Math.PI / 2, 4.8, 5.6, o.lamp || '#F1E3B0', { w: 0.45, nb: true }); } });
+  K.car(g, ang, { col, L: 5.0, W: 2.45, roof: (gg, cab) => { const ca = Math.cos(ang), sa = Math.sin(ang); gg.lit({ nc: true, light: true }, () => K.rbox(gg, cab.cx, cab.cy, 0.5, 1.0, ang + Math.PI / 2, 4.8, 5.6, o.lamp || '#F1E3B0', { w: 0.45, nb: true })); } });
 };
 /* a kei truck: a tiny white cab and an open bed */
 TK.kei = function (g, ang, o) {
@@ -303,6 +308,8 @@ TK.kei = function (g, ang, o) {
   K.wheels(g, sh, [-L * 0.6, L * 0.62], 0.8, 'near', { arch: '#3F3A34' });
   K.lights(g, cab, 1.5);
 };
+/* a train window that is lit at night */
+TK.rwinLit = function (g, B, f, a0, a1, z0, z1, o) { g.lit({ nc: '#FFE3A6' }, () => K.rwin(g, B, f, a0, a1, z0, z1, o)); };
 /* one car of a train, centred on the origin, heading ang, standing at z 0 on its rails.
    kind 'yamanote' (stainless with a yellow-green band and green doors), 'shin' (white with blue lines), 'sobu' (yellow band).
    cab: +1 or -1 puts a driver's end at +u or -u (the shinkansen grows a long nose there). */
@@ -321,17 +328,17 @@ TK.trainCar = function (g, ang, o) {
   for (const f of ['pv', 'nv']) if (B.vis[f]) {
     if (kind === 'yamanote') {
       g.fill(B.quad(f, -1, 1, z0 + 1.15, z0 + 1.5), band);
-      for (const d of [-0.62, -0.2, 0.22, 0.64]) { g.fill(B.quad(f, d - 0.09, d + 0.09, z0 + 0.15, z1 - 0.45), '#7FB047'); K.rwin(g, B, f, d - 0.06, d + 0.06, z0 + 1.9, z1 - 0.8, { col: '#BFD3DD', glint: false }); }
-      for (const [a, b] of [[-0.95, -0.72], [-0.52, -0.3], [-0.1, 0.12], [0.32, 0.54], [0.74, 0.95]]) K.rwin(g, B, f, a, b, z0 + 1.85, z1 - 0.75);
+      for (const d of [-0.62, -0.2, 0.22, 0.64]) { g.fill(B.quad(f, d - 0.09, d + 0.09, z0 + 0.15, z1 - 0.45), '#7FB047'); TK.rwinLit(g, B, f, d - 0.06, d + 0.06, z0 + 1.9, z1 - 0.8, { col: '#BFD3DD', glint: false }); }
+      for (const [a, b] of [[-0.95, -0.72], [-0.52, -0.3], [-0.1, 0.12], [0.32, 0.54], [0.74, 0.95]]) TK.rwinLit(g, B, f, a, b, z0 + 1.85, z1 - 0.75);
     } else if (kind === 'shin') {
       g.fill(B.quad(f, -1, 1, z0 + 0.9, z0 + 1.15), band); g.fill(B.quad(f, -1, 1, z0 + 1.32, z0 + 1.42), band);
-      const n = 7; for (let i = 0; i < n; i++) { const a = -0.92 + 1.84 * i / n; K.rwin(g, B, f, a + 0.05, a + 1.84 / n - 0.05, z0 + 1.8, z0 + 2.45, { col: '#3F4D63', glint: false }); }
+      const n = 7; for (let i = 0; i < n; i++) { const a = -0.92 + 1.84 * i / n; TK.rwinLit(g, B, f, a + 0.05, a + 1.84 / n - 0.05, z0 + 1.8, z0 + 2.45, { col: '#3F4D63', glint: false }); }
     } else if (kind === 'frog') {
       g.fill(B.quad(f, -1, 1, z0 + 1.7, z1), band);
-      for (const [a, b] of [[-0.88, -0.6], [-0.5, -0.22], [-0.1, 0.18], [0.3, 0.58], [0.68, 0.88]]) K.rwin(g, B, f, a, b, z0 + 1.95, z1 - 0.6, { col: '#DDE8EA' });
+      for (const [a, b] of [[-0.88, -0.6], [-0.5, -0.22], [-0.1, 0.18], [0.3, 0.58], [0.68, 0.88]]) TK.rwinLit(g, B, f, a, b, z0 + 1.95, z1 - 0.6, { col: '#DDE8EA' });
     } else {
       g.fill(B.quad(f, -1, 1, z0 + 1.15, z0 + 1.55), band);
-      for (const [a, b] of [[-0.9, -0.55], [-0.4, -0.05], [0.1, 0.45], [0.6, 0.9]]) K.rwin(g, B, f, a, b, z0 + 1.9, z1 - 0.8);
+      for (const [a, b] of [[-0.9, -0.55], [-0.4, -0.05], [0.1, 0.45], [0.6, 0.9]]) TK.rwinLit(g, B, f, a, b, z0 + 1.9, z1 - 0.8);
     }
   }
   // ends: a cab face, or the gangway between cars
@@ -366,7 +373,7 @@ TK.yakata = function (g, ang, o) {
   o = o || {}; const L = o.L || 6.2, Wd = o.W || 2.0, ca = Math.cos(ang), sa = Math.sin(ang);
   K.boat(g, ang, { kind: 'row', L, W: Wd, hull: o.hull || '#8A5A3A', deck: '#C9A26B' });
   const B = K.rbox(g, -L * 0.1 * ca, -L * 0.1 * sa, L * 0.68, Wd * 0.82, ang, 1.4, 3.6, { t: '#E9E2CF', l: '#F3EFE3', r: '#DCD4C0' }, { w: 0.6, nb: true, nt: true });
-  for (const f of ['pv', 'nv']) if (B.vis[f]) { const n = 6; for (let i = 0; i < n; i++) { const q = B.quad(f, -0.9 + 1.8 * i / n + 0.03, -0.9 + 1.8 * (i + 1) / n - 0.03, 1.9, 3.2); g.fill(q, '#FBF6E8'); g.outline(q, { w: 0.3, c: '#8A7A5A', boil: false, ext: 0 }); } }
+  for (const f of ['pv', 'nv']) if (B.vis[f]) { const n = 6; for (let i = 0; i < n; i++) { const q = B.quad(f, -0.9 + 1.8 * i / n + 0.03, -0.9 + 1.8 * (i + 1) / n - 0.03, 1.9, 3.2); g.fill(q, '#FBF6E8'); g.mark({ nc: '#FFDE9C' }); g.outline(q, { w: 0.3, c: '#8A7A5A', boil: false, ext: 0 }); } }
   const R = K.rbox(g, -L * 0.1 * ca, -L * 0.1 * sa, L * 0.78, Wd * 1.0, ang, 3.6, 4.3, { t: '#6E4A36', l: '#7E5A44', r: '#5E3E2C' }, { w: 0.65 });
   const lp = []; for (const f of ['pv', 'nv']) if (R.vis[f]) for (let i = 0; i < 7; i++) { const q = R.quad(f, -0.9 + 1.8 * i / 6, -0.9 + 1.8 * i / 6, 3.3, 3.3)[0]; lp.push(g.p(q[0], q[1], q[2])); }
   for (const p of lp) TK.lantern2(g, p, 0.55, '#D4553A');

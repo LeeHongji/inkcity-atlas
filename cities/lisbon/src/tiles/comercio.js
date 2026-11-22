@@ -8,7 +8,10 @@
    lattice. Across the promenade the Cais das Colunas: marble steps down into the Tagus between two columns.
    Who: tourists photographing the arch; a guide with a raised umbrella and her group circling the statue; a café
    terrace before the west arcade with a waiter; a gold living statue and two children; a tuk-tuk waiting for fares;
-   a couple on the steps by the water; pigeons and a child chasing them. */
+   a couple on the steps by the water; pigeons and a child chasing them.
+   At night: the yellow fronts softly floodlit, the arcades glowing with the restaurants under them and a lantern
+   hanging in every other arch, a few office windows still lit above; the arch floodlit gold-white with its clock lit;
+   King José lit from the foot of his pedestal; lamps under the café umbrellas. */
 SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
   const H = 37, YEL = { t: '#E3BD55', l: '#F2CC5E', r: '#DDB047' }, WH = { t: '#EAE5DA', l: '#F6F3EB', r: '#E1DBCE' }, WZ = 14.2;
   T.ground(function (g) {
@@ -36,14 +39,15 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
     for (let i = 0; i < n; i++) {
       const m = lerp(a0, a1, (i + 0.5) / n), hw = (a1 - a0) / n * 0.34, pts = [K.pt(face, p + 0.05, m - hw, 0), K.pt(face, p + 0.05, m + hw, 0)];
       for (let k = 0; k <= 8; k++) { const t = Math.PI * k / 8; pts.push(K.pt(face, p + 0.05, m + hw * Math.cos(t), 3.6 + hw * Math.sin(t))); }
-      g.fill(pts, '#6A5634'); g.line(pts.slice(1), { w: 0.4, c: '#4A3A22', boil: false });
-      g.fill(K.on(face, p + 0.06, m - hw * 0.6, m + hw * 0.6, 0, 2.6), '#8E7650');
+      g.fill(pts, '#6A5634'); g.mark({ nc: '#A8743E' }); g.line(pts.slice(1), { w: 0.4, c: '#4A3A22', boil: false });   // (the vault lit at night)
+      g.fill(K.on(face, p + 0.06, m - hw * 0.6, m + hw * 0.6, 0, 2.6), '#8E7650'); g.mark({ nc: '#F6C57E', spill: true });   // the restaurant inside
+      if (i % 2 === 0) g.glow('lamp', ...K.pt(face, p + 0.3, m, 3.7), { r: 1.1, base: 0 });   // a lantern hanging in the arch
     }
     g.fill(K.on(face, p + 0.04, a0, a1, 0, 0.5), '#E6DFCF');
   };
   const upper = (g, face, p, a0, a1, z0, n) => {
     const nb = Math.max(1, Math.round((a1 - a0) / 3.3));
-    for (let s = 0; s < n; s++) for (let b = 0; b < nb; b++) { const m = lerp(a0, a1, (b + 0.5) / nb), z = z0 + s * 3.6; LX.win(g, face, p, m - 0.6, m + 0.6, z + (s === 0 ? 0 : 0.4), z + 2.8, { bal: s === 0, glass: '#5C6E78' }); }
+    for (let s = 0; s < n; s++) for (let b = 0; b < nb; b++) { const m = lerp(a0, a1, (b + 0.5) / nb), z = z0 + s * 3.6; LX.win(g, face, p, m - 0.6, m + 0.6, z + (s === 0 ? 0 : 0.4), z + 2.8, { bal: s === 0, glass: '#5C6E78', lit: 0.4 }); }   // (ministries: a few lit late)
     g.fill(K.on(face, p + 0.05, a0, a1, z0 - 0.7, z0 - 0.4), '#F6F3EB');
   };
   const wing = (x0, y0, x1, y1, inner, zt) => (g) => {
@@ -52,10 +56,11 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
     for (const face of ['L', 'R']) {
       const p = face === 'L' ? y1 : x1, a0 = face === 'L' ? x0 : y0, a1 = face === 'L' ? x1 : y1;
       if (face === inner) arcade(g, face, p, a0 + 0.6, a1 - 0.6);
-      else { const nb = Math.max(1, Math.round((a1 - a0) / 3.3)); for (let b = 0; b < nb; b++) { const m = lerp(a0, a1, (b + 0.5) / nb); LX.win(g, face, p, m - 0.55, m + 0.55, 1.2, 3.4, { glass: '#6A7F8C' }); } }
+      else { const nb = Math.max(1, Math.round((a1 - a0) / 3.3)); for (let b = 0; b < nb; b++) { const m = lerp(a0, a1, (b + 0.5) / nb); LX.win(g, face, p, m - 0.55, m + 0.55, 1.2, 3.4, { glass: '#6A7F8C', lit: 0.55 }); if (b % 2 === 1) g.glow('lamp', ...K.pt(face, p + 0.7, m - 1.65, 4.3), { r: 1.2, base: 0 }); } }   // (wall lanterns on the street side)
       upper(g, face, p, a0 + 0.3, a1 - 0.3, 5.2, 2);
       g.fill(K.on(face, p + 0.05, a0, a1, zt - 0.8, zt - 0.3), '#F6F3EB');
     }
+    LX.flood(g, 0, 0.45, LX.FLOOD.warm);                                                  // night: the fronts softly floodlit (not the roof)
     LX.roof(g, x0, y0, x1, y1, zt, 2.6, { ridge: Math.max(0, Math.abs((x1 - x0) - (y1 - y0))) });
   };
   // the pavilion at a wing's river end
@@ -68,6 +73,8 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
       // the royal arms in the pediment
       const m = (a0 + a1) / 2, c = g.p.apply(g, K.pt(face, p + 0.1, m, WZ + 1.2)); g.disc2(c, 1.6, '#F6F3EB'); g.ring2(c, 1.6, { w: 0.35, c: '#9C8A5A' });
     }
+    LX.flood(g, 0, 0.6, LX.FLOOD.warm);
+    for (const [f, p, a] of [['L', y1 + 0.6, (x0 + x1) / 2], ['R', x1 + 0.6, (y0 + y1) / 2]]) g.glow('lantern', ...K.pt(f, p, a, WZ - 1.5), { r: 2.2, col: '#FFD9A0' });
     K.hip(g, x0 - 0.4, y0 - 0.4, x1 + 0.4, y1 + 0.4, WZ + 3.4, 4.6, '#B9B4AA', { c: '#5E5A52', w: 0.85 });
     const t = g.p((x0 + x1) / 2, (y0 + y1) / 2, WZ + 8.0); g.line2([t, [t[0], t[1] - 4]], { w: 0.45, c: '#4A4540', boil: false }); g.disc2([t[0], t[1] - 4.2], 0.6, '#C9A44A');
   };
@@ -86,13 +93,13 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
     // the opening: a tall round arch, Rua Augusta glimpsed through it
     const op = [K.pt('L', y1 + 0.05, -2.6, 0), K.pt('L', y1 + 0.05, 2.6, 0)];
     for (let k = 0; k <= 10; k++) { const t = Math.PI * k / 10; op.push(K.pt('L', y1 + 0.05, 2.6 * Math.cos(t), 8.6 + 2.6 * Math.sin(t))); }
-    g.fill(op, '#7C6A52'); g.fill(K.on('L', y1 + 0.06, -2.0, 2.0, 0, 4.2), '#E2CC8A'); g.line(op.slice(1), { w: 0.6, boil: false });
+    g.fill(op, '#7C6A52'); g.mark({ nc: '#B98A52' }); g.fill(K.on('L', y1 + 0.06, -2.0, 2.0, 0, 4.2), '#E2CC8A'); g.mark({ nc: '#FFD98A', spill: true }); g.line(op.slice(1), { w: 0.6, boil: false });   // (Rua Augusta lit beyond)
     // paired columns either side, an entablature, the clock in the attic
     for (const m of [-5.2, -3.7, 3.7, 5.2]) { const a = g.p(m, y1 + 0.5, 0.8), b = g.p(m, y1 + 0.5, 10.6); g.fill2([[a[0] - 1.1, a[1]], [a[0] + 1.1, a[1]], [b[0] + 1.1, b[1]], [b[0] - 1.1, b[1]]], '#FBF9F3'); g.line2([[a[0] + 1.1, a[1]], [b[0] + 1.1, b[1]]], { w: 0.35, c: '#B8B0A0', boil: false }); }
     K.box(g, -6.9, -H, 6.9, y1 + 0.8, 10.6, 11.6, WH, { w: 0.7, nohid: true });
     g.fill(K.on('L', y1 + 0.85, -5.5, 5.5, 10.8, 11.4), '#E9E3D6');
     K.text(g, 'L', y1 + 0.85, 0, 10.85, 0.5, 'VIRTVTIBVS MAIORVM', '#8C8576', { center: true });
-    const ck = g.p(0, y1 + 0.06, 13.4); g.disc2(ck, 3.2, '#2F3A4F'); g.ring2(ck, 3.2, { w: 0.45, c: '#C9A44A' }); g.segs2([ck[0], ck[1], ck[0] + 0.3, ck[1] - 2.3, ck[0], ck[1], ck[0] + 1.6, ck[1] + 0.6], '#E9D9A0', 0.45);
+    const ck = g.p(0, y1 + 0.06, 13.4); g.disc2(ck, 3.2, '#2F3A4F'); g.mark({ nc: '#4E6890' }); g.ring2(ck, 3.2, { w: 0.45, c: '#C9A44A' }); g.segs2([ck[0], ck[1], ck[0] + 0.3, ck[1] - 2.3, ck[0], ck[1], ck[0] + 1.6, ck[1] + 0.6], '#E9D9A0', 0.45);
     // the statue group on its plinth: Glory standing with wreaths over two seated figures
     K.box(g, -4.5, -H + 2, 4.5, y1 - 1.5, Z, Z + 1.6, WH, { w: 0.6 });
     const c = g.p(0, -29.5, Z + 1.6), WS = '#E9E5DB', SD = '#C9C2B2';
@@ -101,6 +108,10 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
     g.fill2(gl, WS, true); g.fill2(gl.slice(1, 4).concat([[c[0], c[1] - 6]]), SD, true); g.line2(gl, { w: 0.5, c: '#8C8576', boil: false, close: true });
     g.disc2([c[0], c[1] - 15.6], 1.7, WS); g.ring2([c[0], c[1] - 15.6], 1.7, { w: 0.4, c: '#8C8576' });
     for (const s of [-1, 1]) { g.line2([[c[0] + s * 1.2, c[1] - 12.5], [c[0] + s * 4.2, c[1] - 18.5]], { w: 0.8, c: WS, boil: false }); g.ring2([c[0] + s * 4.6, c[1] - 19.4], 1.0, { w: 0.5, c: '#7FA35E' }); }
+    // night: floodlit warm white from the square, the statues on top brightest
+    LX.flood(g, 0, 1, LX.FLOOD.warm);
+    for (const [x, z, r] of [[-4.5, 2.5, 2.4], [4.5, 2.5, 2.4], [0, 9.5, 2.2], [-4.5, 9, 1.8], [4.5, 9, 1.8], [0, 13.5, 2.6]]) g.glow('lantern', x, y1 + 1.4, z, { r, col: '#FFDDA6' });
+    g.glow2('lantern', [c[0], c[1] - 10], [c[0], c[1]], { r: 3.0, col: '#FFE2B0' });
   }, { name: 'arco' });
 
   /* ---------------- King José I ---------------- */
@@ -135,6 +146,10 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
     g.disc2(P(0.1, -15.3), 1.05 * k, B);
     g.fill2([P(-1.6, -16.0), P(1.8, -16.0), P(1.2, -17.0), P(-1.0, -17.0)], BD, true);
     g.fill2([P(0.4, -17.0), P(2.2, -18.6), P(2.6, -17.6), P(1.2, -16.6)], '#E9E5DB', true);
+    // night: lit from the foot of the pedestal, the bronze catching the light
+    LX.flood(g, 0, 0.9, LX.FLOOD.warm, (c) => (c === B || c === BD || c === BL || c === '#22302A' ? mix(nightColour(c), '#C8B080', 0.3) : undefined));
+    for (const [x, y] of [[0, 5.9], [3.9, 2]]) g.glow('lantern', x, y, 1.4, { r: 1.8, col: '#FFDDA6' });
+    g.glow('lantern', 0.6, 2.6, 12, { r: 2.4, col: '#FFE2B0' });
   }, { name: 'jose I' });
 
   /* ---------------- the Cais das Colunas, across the promenade ---------------- */
@@ -156,7 +171,8 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
     LX.person(g, x - 1.8, y + 0.4, 1.3, LX.who(510 + i * 3, { dir: 0, pose: 'sit' })); LX.person(g, x + 1.8, y + 0.6, 1.3, LX.who(511 + i * 3, { dir: 1, pose: 'sit', beer: i !== 1 }));
     if (i === 1) LX.person(g, x + 0.4, y + 2.6, 1.3, LX.who(512 + i * 3, { dir: 1, pose: 'sit' }));
     const up = g.p(x, y, 7.2); g.segs2([tt[0], tt[1], up[0], up[1]], '#5A4A3C', 0.4);
-    const um = arcPts(up[0], up[1] + 2.4, 8.4, Math.PI, TAU, 12).concat([[up[0] + 8.4, up[1] + 3.6], [up[0] - 8.4, up[1] + 3.6]]); g.fill2(um, '#EFE6CF', true); g.outline2(um, { w: 0.4, c: '#9C8A5A', boil: false });
+    const um = arcPts(up[0], up[1] + 2.4, 8.4, Math.PI, TAU, 12).concat([[up[0] + 8.4, up[1] + 3.6], [up[0] - 8.4, up[1] + 3.6]]); g.fill2(um, '#EFE6CF', true); g.mark({ nc: '#E6C48E' }); g.outline2(um, { w: 0.4, c: '#9C8A5A', boil: false });
+    g.glow('lamp', x, y, 6.3, { r: 1.2, base: 0 });                                         // a lamp under the umbrella at night
   }, { on: true }));
   T.cast([-18.5, 1.5], (g) => { const r = LX.person(g, -18.5, 1.5, 0, LX.who(520, { dir: 1, pose: 'hold', top: '#F7F5EF', bot: '#2F343B', tie: '#2F343B' })); g.fill2(arcPts(r.hands[0][0], r.hands[0][1] - 0.3, 2.2, 0, TAU, 10).map((p) => [p[0], r.hands[0][1] - 0.3 + (p[1] - r.hands[0][1] + 0.3) * 0.35]), '#D9D5CB', true); });
   // tourists photographing the arch
@@ -179,7 +195,7 @@ SF.tile('comercio', 0, 100, { rim: 30 }, function (T) {
   // an ice-cream cart with two children waiting, a couple taking a selfie with the king behind them
   T.cast([-9, 22], function (g) {
     K.box(g, -10.6, 20.8, -7.4, 23.2, 0.9, 3.4, { t: '#F3F1EA', l: '#F6F3EC', r: '#DDD7CA' }, { w: 0.55, boil: false });
-    K.sign(g, 'L', 23.2, -10.4, -7.6, 1.6, 2.6, '#E2483D', 'GELADOS', { ink: '#FBF8EE' });
+    { const i0 = g.cmds.length; K.sign(g, 'L', 23.2, -10.4, -7.6, 1.6, 2.6, '#E2483D', 'GELADOS', { ink: '#FBF8EE' }); g.mark({ nc: true }, i0); g.glow('lantern', -9, 23.4, 2.6, { r: 1.4, col: '#FFE0B0' }); }
     for (const x of [-10.2, -7.8]) { const w = g.p(x, 23.3, 0.6); g.ring2(w, 1.0, { w: 0.5, c: '#2E2A26' }); }
     const t = g.p(-9, 22, 3.4), u = g.p(-9, 22, 8.6); g.segs2([t[0], t[1], u[0], u[1]], '#5A4A3C', 0.4);
     const um = arcPts(u[0], u[1] + 2, 7, Math.PI, TAU, 10).concat([[u[0] + 7, u[1] + 3], [u[0] - 7, u[1] + 3]]); g.fill2(um, '#E2483D', true); for (let k = 1; k < 10; k += 2) { const a = arcPts(u[0], u[1] + 2, 7, Math.PI + Math.PI * k / 10, Math.PI + Math.PI * (k + 1) / 10, 2); g.fill2(a.concat([[u[0], u[1] + 2]]), '#F7F5EF', true); }

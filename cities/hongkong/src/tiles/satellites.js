@@ -22,10 +22,11 @@
     const junk = (x, y, s) => T.obj([x - 6, y - 2, x + 6, y + 2], (g) => {
       g.at(x, y, -0.6, (g2) => {
         K.boat(g2, 0, { kind: 'row', L: 6, W: 1.8, hull: '#6E4A30', stripe: '#C8372D', deck: '#B9976A' });
-        K.rbox(g2, -2.6, 0, 1.8, 1.4, 0, 1.2, 3.4, { t: '#C9A26B', l: '#E9DCC0', r: '#C9B48A' }, { w: 0.5 });
+        const ic = g2.cmds.length; K.rbox(g2, -2.6, 0, 1.8, 1.4, 0, 1.2, 3.4, { t: '#C9A26B', l: '#E9DCC0', r: '#C9B48A' }, { w: 0.5 }); HK.nite(g2, ic, { nc: (c) => ({ '#E9DCC0': '#FFE0A0', '#C9B48A': '#E9BF78' })[c] });   // the cabin lit at night
         for (const mx of [-3.2, 2.0]) g2.line([[mx, 0, 1.2], [mx, 0, 9]], { w: 0.5, c: '#3A2A1E', boil: false, ext: 0 });
         const a = g2.p(-3.2, 0, 9), b = g2.p(2.0, 0, 9), c = g2.p(5.6, 0, 1.4), d = g2.p(-6, 0, 1.4), fl = ['#C8372D', '#E6C24F', '#3F7FB8', '#5FA58F', '#F3F1EA'];
         for (const [p, q] of [[d, a], [a, b], [b, c]]) { g2.fine2([p, q], { w: 0.2, c: '#5A564E' }); for (let k = 1; k < 6; k++) { const m = [lerp(p[0], q[0], k / 6), lerp(p[1], q[1], k / 6)]; g2.fill2([[m[0] - 0.5, m[1]], [m[0] + 0.5, m[1]], [m[0], m[1] + 1.2]], fl[(k + s) % 5], true); } }
+        HK.leds2(g2, [a[0], a[1], a[0] + 0.01, a[1]], '#FFFBEE', 0.7); g2.glow2('lantern', a, g2.p(-3.2, 0, 0), { r: 1.2, col: '#FFF4DC' });   // the masthead light at night
       });
     }, { name: 'fishing junk' });
     junk(-14, -4, 0); junk(-14, 1.6, 2); junk(4, -6, 1); junk(4, -0.4, 3);
@@ -91,10 +92,15 @@
       const s = []; for (let x = -27; x <= 27; x += 1.5) { const a = g.p(x, 1.62, ZD - 1.5), b = g.p(x, 1.62, ZD - 0.2); s.push(a[0], a[1], b[0], b[1]); } g.segs2(s, '#B9B3A6', 0.3);
       for (const x of [-TX, TX]) { for (const y of [-1.8, 1.8]) K.box(g, x - 0.7, y - 0.5, x + 0.7, y + 0.5, 0, ZD + 16.4, { t: '#E9E6DE', l: '#F1EFE8', r: '#D9D4C8' }, { w: 0.6 }); for (const z of [ZD + 1, ZD + 9, ZD + 16]) K.box(g, x - 0.6, -1.8, x + 0.6, 1.8, z, z + 0.9, { t: '#E9E6DE', l: '#F1EFE8', r: '#D9D4C8' }, { w: 0.5, boil: false }); }
       for (const y of [-1.7, 1.7]) { const pts = []; for (let x = -28; x <= 28; x += 1) pts.push([x, y, cab(x)]); g.line(pts, { w: 0.6, c: '#8E2F2F', boil: false, ext: 0 }); const h = []; for (let x = -TX + 1.5; x < TX; x += 1.5) { const a = g.p(x, y, cab(x)), b = g.p(x, y, ZD); h.push(a[0], a[1], b[0], b[1]); } g.segs2(h, '#A9A296', 0.22); }
+      // at night: the lights along the tops of its main cables, the towers lit, lamps along the deck
+      for (const y of [-1.7, 1.7]) { const pts = []; for (let x = -28; x <= 28; x += 1) pts.push(g.p(x, y, cab(x) + 0.2)); HK.bulbs2(g, pts, 1.6, '#FFF0C8', 0.9); }
+      for (const x of [-TX, TX]) for (const z of [ZD + 4, ZD + 13]) g.glow('lantern', x, 0, z, { r: 2.4, col: '#FFF0D0' });
+      for (let x = -24; x <= 24; x += 8) g.glow('lantern', x, 1.6, ZD + 0.4, { r: 1.0, col: '#FFD98A' });
     }, { name: 'tsing ma', under: ZD });
     // traffic on the deck, keeping left
     for (let i = 0; i < 4; i++) T.actor({ sample: 0.25, period: 9.4, grow: false,
       at(t) { const dir = i % 2 ? -1 : 1, u = HT.mod(t / 9.4 + i * 0.27, 1), x = dir * lerp(-27, 27, u), a = Math.min(1, (27 - Math.abs(x)) / 3); if (a <= 0.03) return null; return { x, y: dir > 0 ? -0.8 : 0.8, z: ZD, key: 'v', alpha: a < 1 ? a : null }; },
-      draw(g) { const dir = i % 2 ? -1 : 1, col = ['#C8372D', '#F2EEE2', '#8FA3B5', '#E6C24F'][i], B = K.rbox(g, 0, 0, i === 2 ? 2.8 : 1.7, 0.75, dir > 0 ? 0 : Math.PI, 0.2, i === 2 ? 2.6 : 1.3, col, { w: 0.4 }); for (const f of ['pv', 'nv']) if (B.vis[f]) g.fill(B.quad(f, -0.8, 0.8, i === 2 ? 1.5 : 0.75, i === 2 ? 2.3 : 1.15), '#5E6A72'); } });
+      draw(g) { const dir = i % 2 ? -1 : 1, col = ['#C8372D', '#F2EEE2', '#8FA3B5', '#E6C24F'][i], L = i === 2 ? 2.8 : 1.7, B = K.rbox(g, 0, 0, L, 0.75, dir > 0 ? 0 : Math.PI, 0.2, i === 2 ? 2.6 : 1.3, col, { w: 0.4 }); for (const f of ['pv', 'nv']) if (B.vis[f]) g.fill(B.quad(f, -0.8, 0.8, i === 2 ? 1.5 : 0.75, i === 2 ? 2.3 : 1.15), '#5E6A72');
+        HK.light2(g, g.p(dir * (L - 0.25), 0, 0.6), 0.35, '#F6E7A8'); HK.light2(g, g.p(-dir * (L - 0.25), 0, 0.6), 0.3, '#D0483A'); } });   // head and tail lights at night
   });
 })();

@@ -53,7 +53,7 @@ SF.tile('etoile', 0, -100, { rim: 26 }, function (T) {
   const AX0 = -10.3, AX1 = 10.3, AY0 = -5.3, AY1 = 5.3, Z1 = 13.0, ZC = 14.6, ZA = 20.4, ZT = 21.2;
   const ST = { t: '#EFE6CE', l: '#EADFC3', r: '#D7C9A8' };
   T.obj([AX0 - 0.4, AY0 - 0.4, AX1 + 0.4, AY1 + 0.4], function (g) {
-    g.boilP = 0.35;
+    g.boilP = 0.35; const i0 = g.cmds.length;
     K.box(g, AX0 - 0.4, AY0 - 0.4, AX1 + 0.4, AY1 + 0.4, 0, 0.7, { t: '#E4DCCB', l: '#DCD2BE', r: '#C9BFA9' }, { w: 0.7 });
     K.box(g, AX0, AY0, AX1, AY1, 0.7, Z1, ST, { w: 1.0 });
     // the great arch on the face towards the Champs-Élysées
@@ -93,13 +93,20 @@ SF.tile('etoile', 0, -100, { rim: 26 }, function (T) {
     K.box(g, AX0 - 0.2, AY0 - 0.2, AX1 + 0.2, AY0 + 0.3, ZT, ZT + 0.9, ST, { w: 0.5, nohid: true, boil: false });
     K.box(g, AX0 - 0.2, AY0 - 0.2, AX0 + 0.3, AY1 + 0.2, ZT, ZT + 0.9, ST, { w: 0.5, nohid: true, boil: false });
     K.box(g, AX0 + 2, AY0 + 1, AX0 + 4.4, AY0 + 3, ZT, ZT + 2.2, '#D9D1BE', { w: 0.5, boil: false });     // the stair head
+    // at night the Arc is floodlit from the ring in warm white; under the great arch the flame on the Unknown
+    // Soldier's tomb burns (rekindled every evening at 18:30)
+    PA.flood(g, i0, 0.82, '#FFE4B8');
+    for (const [x, y, z, r] of [[0, AY1, 5, 5], [AX1, 0, 5, 3.4], [-AX1 * 0.55, AY1, 12.6, 1.8], [AX1 * 0.55, AY1, 12.6, 1.8], [AX1, 0, 12.6, 1.8]]) g.glow('lantern', x, y, z, { r, col: '#FFDFA8' });
+    g.glow('lantern', 0, 0, 1.1, { r: 0.9, col: '#FF9A3C' });
   }, { name: 'arc de triomphe' });
   // tourists on the roof terrace, behind the front and side parapets (drawn after them, inside this piece)
   T.cast([AX1 - 1.5, AY1 - 1.5], function (g) {
     const spots = [[-7, 4.0, 1], [-5.6, 4.2, 3], [-2, 4.1, 1], [-0.6, 3.8, 2], [3.4, 4.2, 1], [6.8, 3.9, 0], [8.8, 2.0, 0], [8.9, -1.5, 3], [5.0, -2.5, 2], [0.5, -0.5, 1]];
     spots.forEach(([x, y, d], i) => PA.person(g, x, y, ZT, PA.who(9200 + i, { dir: d, pose: i % 4 === 1 ? 'hold' : 'stand', k: 0.95 })));
+    const iP = g.cmds.length;
     K.box(g, AX0 - 0.2, AY1 - 0.3, AX1 + 0.2, AY1 + 0.2, ZT, ZT + 0.9, ST, { w: 0.5, nohid: true, boil: false });
     K.box(g, AX1 - 0.3, AY0 - 0.2, AX1 + 0.2, AY1 + 0.2, ZT, ZT + 0.9, ST, { w: 0.5, nohid: true, boil: false });
+    PA.flood(g, iP, 0.82, '#FFE4B8');                                  // the parapets in the Arc's floodlight
   }, { on: true, name: 'arc roof' });
   // the giant tricolour hanging in the great arch, its free edge moving
   T.actor({ sample: 5, period: 10, grow: false,
@@ -110,7 +117,7 @@ SF.tile('etoile', 0, -100, { rim: 26 }, function (T) {
         const a0 = -w + 2 * w * k / 3, a1 = -w + 2 * w * (k + 1) / 3, q = [];
         for (let i = 0; i <= 6; i++) { const z = 11.4 - i * 1.2, b = Math.sin(i * 0.8 + st.f / 8 * TAU) * 0.18 * i / 6; q.push([a0 + b + sw * i / 6, 0, z]); }
         for (let i = 6; i >= 0; i--) { const z = 11.4 - i * 1.2, b = Math.sin(i * 0.8 + st.f / 8 * TAU) * 0.18 * i / 6; q.push([a1 + b + sw * i / 6, 0, z]); }
-        g.fill(q, cols[k]);
+        g.fill(q, cols[k]); g.mark({ nc: (c) => PA.floodCol(c, 0.7, '#FFE4B8') });     // lit by the arch's lights
       }
       g.line([[-w - 0.3, 0, 11.5], [w + 0.3, 0, 11.5]], { w: 0.6, c: '#5E574A', boil: false });
     } });

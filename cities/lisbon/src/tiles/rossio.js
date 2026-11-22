@@ -9,7 +9,10 @@
    cabins going up and down inside it, a walkway across to the Largo at the top and a viewing deck above.
    Who: a queue for the lift; people on the deck and walkway; tourists photographing the waves; a flower seller and
    her customers; children at the fountains; a pigeon flock; people at café tables under the jacarandas up on the
-   Largo; walkers crossing the square in all directions. */
+   Largo; walkers crossing the square in all directions.
+   At night: the theatre floodlit, its windows lit; the column lit from its foot; the fountains lit from their basins;
+   the Santa Justa lift lit warm with its cabins' lights going up and down (it runs till eleven in summer); the Carmo's
+   arches floodlit over the Largo, lamps on its parapet, the cafés' tables; lanterns on the houses in its wall. */
 SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
   const H = 37, ZC = 14, IRON = '#4A4540', IRONT = { t: '#5E5850', l: '#5A544C', r: '#46413B' };
   T.ground(function (g) {
@@ -29,7 +32,7 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
       for (let b = 0; b < nb; b++) { const m = lerp(a0, a1, (b + 0.5) / nb); if (b % 3 === 1) LX.door(g, f, p, m - 0.8, m + 0.8, 0, 3.4, '#4F6A5E'); else LX.win(g, f, p, m - 0.6, m + 0.6, 1.4, 3.6, { glass: '#6A7F8C' }); LX.win(g, f, p, m - 0.55, m + 0.55, 6.4, 8.8, { bal: b % 2 === 0, glass: '#5E7380' }); }
       LX.azulejo(g, f, p, f === 'L' ? -30 : -30, f === 'L' ? -20 : -20, 10.2, 12.6, 'y', 3);
     }
-    for (const [f, p, a0, a1] of [['L', 12, -H, -14], ['R', -14, -H, 12]]) LX.parapet(g, f, p, a0, a1, ZC, { h: 1.0 });
+    for (const [f, p, a0, a1] of [['L', 12, -H, -14], ['R', -14, -H, 12]]) LX.parapet(g, f, p, a0, a1, ZC, { h: 1.0, lamps: 8 });
   }, { name: 'carmo terrace' });
   // the convent's ruined nave: two rows of pointed arches on piers, the end wall with its empty rose, no roof
   T.obj([-35, -35, -19, -22], function (g) {
@@ -43,6 +46,9 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
     K.box(g, -20.4, -35, -19, -22, Z, Z + 15, ST, { w: 0.85 });         // the east end wall, standing tall, its rose window open to the sky
     const r = g.p(-19, -28.5, Z + 10.5); g.disc2(r, 4.6, '#F0EEE4'); g.ring2(r, 4.6, { w: 0.6, c: '#8C8270' });
     K.win(g, 'R', -19, -31, -26, Z, Z + 5.6, { style: 'dark', arch: true });
+    // night: the ruined arches floodlit warm against the sky
+    LX.flood(g, 0, 0.9, LX.FLOOD.warm);
+    for (const [x, y, z, r] of [[-18.4, -28.5, Z + 3, 2.4], [-18.4, -28.5, Z + 10.5, 2.6], [-27, -24.5, Z + 4, 2.0], [-31, -24.5, Z + 9, 1.8]]) g.glow('lantern', x, y, z, { r, col: '#FFD49A' });
   }, { on: true, name: 'carmo ruins' });
   [[-28, -14], [-20.5, -16], [-31, -3]].forEach(([x, y], i) => T.obj([x, y], (g) => LX.jacaranda(g, x, y, { z: ZC, r: 4.6, h: 5.4, fallen: true, seed: 300 + i }), { on: true, name: 'jacaranda' }));
   [[-24, -6], [-29, 4], [-21, 3]].forEach(([x, y], i) => T.cast([x, y], function (g) {
@@ -63,7 +69,7 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
   // the far faces first (seen through the open lattice), then the cabins (actors), then the near faces
   T.obj([LX0, LY0, LX1, LY0 + 0.3], function (g) {
     g.fill(K.rect(LX0, LY0, LX1, LY1, 0.02), '#8C8578');
-    for (const [f, p, a0, a1] of [['L', LY0, LX0, LX1], ['R', LX0, LY0, LY1]]) { g.fill(K.on(f, p, a0, a1, 0, TOP), 'rgba(70,64,56,0.18)'); lattice(g, f, p, a0, a1, 0, TOP); }
+    for (const [f, p, a0, a1] of [['L', LY0, LX0, LX1], ['R', LX0, LY0, LY1]]) { g.fill(K.on(f, p, a0, a1, 0, TOP), 'rgba(70,64,56,0.18)'); g.mark({ nc: 'rgba(255,196,120,0.34)' }); lattice(g, f, p, a0, a1, 0, TOP); }   // (lit inside at night)
   }, { name: 'lift back' });
   T.obj([LX0 - 0.6, LY0 - 0.6, LX1 + 0.6, LY1 + 0.6], function (g) {     // (a footprint over 6 u, so it sorts as a box, not as a small prop)
     for (const [f, p, a0, a1] of [['L', LY1, LX0, LX1], ['R', LX1, LY0, LY1]]) lattice(g, f, p, a0, a1, 0, TOP);
@@ -77,6 +83,11 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
     g.segs2(rail, IRON, 0.35); g.line([[LX0 - 0.2, LY1 + 0.2, DECK + 1.1], [LX1 + 0.2, LY1 + 0.2, DECK + 1.1], [LX1 + 0.2, LY0 - 0.2, DECK + 1.1]], { w: 0.5, c: IRON, boil: false });
     // the little lantern on top
     K.box(g, -7.6, 16.9, -6.4, 18.1, DECK, DECK + 2.4, IRONT, { w: 0.5 }); K.cone(g, -7, 17.5, 0.9, DECK + 2.4, 1.6, '#46413B', { w: 0.45 });
+    // night: the iron lit warm from inside, the door lit, lamps on the deck
+    g.mark({ nc: (c) => (c === '#3A3530' ? '#E6B070' : undefined) }, 0);
+    for (const z of [3, 9, 15.5]) g.glow('lantern', -7, LY1 + 0.4, z, { r: 2.0, col: '#FFC880' });
+    g.glow('lantern', -7, LY1 + 0.4, TOP + 3.4, { r: 2.4, col: '#FFD9A0' });
+    for (const [x, y] of [[LX0 - 0.2, LY1 + 0.2], [LX1 + 0.2, LY0 - 0.2]]) g.glow('lamp', x, y, DECK + 1.6, { r: 1.0, base: DECK });
   }, { under: 99, name: 'lift' });
   // the walkway across to the Largo: a lattice bridge at the terrace's height
   T.obj([-14, 16.3, LX0, 18.7], function (g) {
@@ -90,7 +101,7 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
     draw(g) {
       const x0 = -0.95, x1 = 0.95, y0 = -3.0, y1 = 0;
       K.box(g, x0, y0, x1, y1, 0, 3.4, { t: '#9C7A52', l: '#B58A5A', r: '#9A7248' }, { w: 0.45, boil: false });
-      for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) { g.fill(K.on(f, p + 0.03, a0 + 0.25, a1 - 0.25, 1.6, 3.0), '#DDE6E8'); const m = (a0 + a1) / 2, h = g.p.apply(g, LX.out(f, p, m, 2.4, 0.04)); g.disc2(h, 0.75, SKIN[i + 1]); g.fill2(arcPts(h[0], h[1] - 0.2, 0.8, Math.PI, TAU, 6), HAIR[i * 3], true); }
+      for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) { g.fill(K.on(f, p + 0.03, a0 + 0.25, a1 - 0.25, 1.6, 3.0), '#DDE6E8'); g.mark({ nc: '#FFE6B0', light: f === 'L' }); const m = (a0 + a1) / 2, h = g.p.apply(g, LX.out(f, p, m, 2.4, 0.04)); g.disc2(h, 0.75, SKIN[i + 1]); g.fill2(arcPts(h[0], h[1] - 0.2, 0.8, Math.PI, TAU, 6), HAIR[i * 3], true); }
     } });
   // the queue at the foot of the lift, people on the deck and the walkway
   [[-3.2, 22.5, 1], [-2.0, 24.4, 2], [-1.2, 26.4, 3], [0.2, 28.0, 4], [-3.8, 25.6, 5]].forEach(([x, y, i]) => T.cast([x, y], (g) => LX.person(g, x, y, 0, LX.who(620 + i, { dir: 2, pose: i % 2 ? 'stand' : 'hold', phone: i === 3 }))));
@@ -115,6 +126,11 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
     const pc = g.p(14, y1 + 2.9, 11.8); g.fill2([[pc[0] - 6, pc[1] + 1.4], [pc[0] + 6, pc[1] + 1.4], [pc[0] + 1.4, pc[1] - 2.6], [pc[0] - 1.4, pc[1] - 2.6]], '#D9D1BF', true);
     K.text(g, 'L', y1 + 2.82, 14, 9.85, 0.55, 'TEATRO NACIONAL D. MARIA II', '#6E665A', { center: true });
     const st = g.p(14, y1 + 1.4, 14.4); g.fill2([[st[0] - 0.9, st[1]], [st[0] + 0.9, st[1]], [st[0] + 0.6, st[1] - 4.4], [st[0] - 0.6, st[1] - 4.4]], '#D9D1BF', true); g.disc2([st[0], st[1] - 5.1], 0.8, '#D9D1BF');
+    // night: floodlit warm white, the portico's back wall lit, lamps either side of the steps
+    LX.flood(g, 0, 0.85, LX.FLOOD.warm, (c) => (c === '#BDB4A2' ? '#D9B47E' : c === '#B9B4AA' || c === shade('#B9B4AA', 0.16) || c === shade('#B9B4AA', -0.04) || c === shade('#B9B4AA', -0.1) || c === shade('#B9B4AA', 0.1) ? nightColour(c) : undefined));
+    for (const x of [9.5, 14, 18.5]) g.glow('lantern', x, y1 + 3.6, 2.6, { r: 2.0, col: '#FFDDA6' });
+    g.glow('lantern', 14, y1 + 3.2, 11.8, { r: 2.4, col: '#FFE2B0' });
+    for (const x of [7.2, 20.8]) g.glow('lamp', x, y1 + 3.6, 4.2, { r: 1.3, base: 0 });
   }, { name: 'teatro' });
 
   /* ---------------- the column and the fountains ---------------- */
@@ -126,6 +142,10 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
     K.cyl(g, 15, 2, 1.4, 23, 24, K.STONE, { n: 12, w: 0.6 });
     const b = g.p(15, 2, 24); g.fill2([[b[0] - 1.0, b[1]], [b[0] + 1.0, b[1]], [b[0] + 0.8, b[1] - 5.8], [b[0] - 0.8, b[1] - 5.8]], '#4E6A5E', true); g.disc2([b[0], b[1] - 6.6], 0.85, '#4E6A5E');
     g.line2([[b[0] + 0.6, b[1] - 4.8], [b[0] + 2.4, b[1] - 7.4]], { w: 0.5, c: '#3C5449', boil: false }); g.fill2([[b[0] - 1.6, b[1] - 4.2], [b[0] - 0.4, b[1] - 5.4], [b[0] - 0.6, b[1] - 1.0], [b[0] - 1.8, b[1] - 0.4]], '#3C5449', true);
+    // night: lit from its foot up to the king
+    LX.flood(g, 0, 0.8, LX.FLOOD.warm);
+    for (const [x, y] of [[15, 4.6], [17.6, 2]]) g.glow('lantern', x, y, 1.6, { r: 1.8, col: '#FFDDA6' });
+    g.glow('lantern', 15, 3.4, 14, { r: 2.0, col: '#FFE2B0' });
   }, { name: 'pedro iv' });
   for (const fy of [-15, 20]) {
     T.obj([10, fy - 5, 20, fy + 5], function (g) {
@@ -137,10 +157,14 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
       K.cyl(g, 15, fy, 2.0, 4.6, 5.2, '#5E7A6A', { n: 14, w: 0.55 });
       K.cyl(g, 15, fy, 0.5, 5.2, 7.4, '#5E7A6A', { n: 8, w: 0.5 });
       const t = g.p(15, fy, 7.4); g.fill2([[t[0] - 1.6, t[1]], [t[0] + 1.6, t[1]], [t[0] + 0.8, t[1] - 2.8], [t[0] - 0.8, t[1] - 2.8]], '#4E6A5E', true);
+      // night: lights under the water: the basin glows, the bronze lit from below
+      g.mark({ nc: (c) => (c === LC.water ? '#6FA8C8' : c === '#5E7A6A' || c === '#4E6A5E' ? mix(nightColour(c), '#D8C090', 0.3) : LX.floodCol(c, 0.5)) }, 0);
+      for (const [x, y] of [[15, fy + 4.4], [19.4, fy]]) g.glow('lantern', x, y, 1.4, { r: 2.0, col: '#FFF0D0' });
+      g.glow('lantern', 15, fy, 6.5, { r: 2.2, col: '#F6EEDC' });
     }, { name: 'fountain' });
     T.actor({ sample: 5, period: 2, grow: false, at(t) { const f = Math.floor((t / 2 % 1) * 6); return { x: 15, y: fy + 5, z: 0, key: 'j' + f, f }; },
       draw(g, st) {
-        const c = g.p(0, -5, 8.6), lo = g.p(0, -5, 5.4); g.fill2(arcPts(c[0], c[1] + 0.3, 1.0 + (st.f % 2) * 0.3, 0, TAU, 8), 'rgba(214,236,240,0.9)', true);
+        const c = g.p(0, -5, 8.6), lo = g.p(0, -5, 5.4); g.fill2(arcPts(c[0], c[1] + 0.3, 1.0 + (st.f % 2) * 0.3, 0, TAU, 8), 'rgba(214,236,240,0.9)', true); g.mark({ nc: 'rgba(250,244,226,0.95)' });
         for (let k = 0; k < 8; k++) { const a = TAU * k / 8 + st.f * 0.13, e = g.p(Math.cos(a) * 3.6, -5 + Math.sin(a) * 3.6, 1.3), m = [lerp(lo[0], e[0], 0.5), lerp(lo[1], e[1], 0.5) - 3.2]; g.line2([lo, m, e], { w: 0.5, c: '#CFE6EC', boil: false, ext: 0 }); }
       } });
   }
@@ -148,7 +172,9 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
   /* ---------------- life on the square ---------------- */
   // the flower sellers along the east side
   [[30, -8, '#E2483D'], [30, 4, '#F2C230']].forEach(([x, y, c], i) => T.cast([x, y], function (g) {
+    const i0 = g.cmds.length;
     K.stall(g, x, y, { face: 'R', L: 2.6, D: 1.5, a: c, b: '#F7F5EF', goods: (g2, D, L) => { const R = RNG(40 + i); for (let k = 0; k < 18; k++) { const p = g2.p(lerp(-D, D, R()), lerp(-L, L, R()), 2.9); g2.disc2(p, 0.7, R.pick(LC.festa)); } } });
+    g.mark({ nc: (q) => mix(nightColour(q), q, 0.55) }, i0); g.glow('lamp', x + 1.2, y, 5.7, { r: 1.3, base: 0 });   // (selling basil and carnations late, under a lamp)
     LX.person(g, x + 1, y + 3.6, 0, LX.who(640 + i, { dir: 0, pose: 'hold', hair: '#8E8A84' }));
     LX.person(g, x + 4.4, y - 1, 0, LX.who(642 + i, { dir: 2, pose: 'hold' }));
   }));
@@ -158,7 +184,7 @@ SF.tile('rossio', 0, 0, { rim: 22 }, function (T) {
   T.cast([18.4, 5.4], (g) => { LX.person(g, 18.4, 5.4, 1.0, LX.who(654, { dir: 1, pose: 'sit' })); LX.person(g, 16.4, 5.6, 1.0, LX.who(655, { dir: 1, pose: 'sit', phone: true, pose2: 0 })); });
   [[1, 7, 3], [21, 30, 2], [8, -9, 2]].forEach(([x, y, d], i) => T.cast([x, y], (g) => LX.person(g, x, y, 0, LX.who(660 + i, { dir: d, pose: 'hold', reach: [0.6, -12.5], phone: true }))));
   // the plain corner by the lift: a newspaper kiosk, benches and their sitters
-  T.obj([-29, 24], (g) => { K.box(g, -30.4, 22.6, -27.6, 25.4, 0, 4.0, { t: '#3F6A4E', l: '#4F7A5E', r: '#3A604A' }, { w: 0.6 }); K.hip(g, -31, 22, -27, 26, 4.0, 1.4, '#3F6A4E', { c: '#22302A' }); K.sign(g, 'L', 25.4, -30.2, -27.8, 2.6, 3.6, '#F2E3C0', 'JORNAIS', { ink: '#2F3A4F' }); }, { name: 'kiosk' });
+  T.obj([-29, 24], (g) => { K.box(g, -30.4, 22.6, -27.6, 25.4, 0, 4.0, { t: '#3F6A4E', l: '#4F7A5E', r: '#3A604A' }, { w: 0.6 }); K.hip(g, -31, 22, -27, 26, 4.0, 1.4, '#3F6A4E', { c: '#22302A' }); const i0 = g.cmds.length; K.sign(g, 'L', 25.4, -30.2, -27.8, 2.6, 3.6, '#F2E3C0', 'JORNAIS', { ink: '#2F3A4F' }); g.mark({ nc: true }, i0); g.glow('lamp', -29, 26, 4.2, { r: 1.1, base: 0 }); }, { name: 'kiosk' });
   for (const [x, y, i] of [[-20, 27, 0], [-31, 31, 1]]) { T.obj([x, y], (g) => K.bench(g, x, y, { face: 'L', L: 2.2, col: '#4F7A5E' }), { name: 'bench' }); T.cast([x, y + 1], (g) => LX.person(g, x, y + 1.2, 1.3, LX.who(680 + i, { dir: 1, pose: 'sit', hair: i ? '#D9D5CB' : undefined })), { name: 'sitter' }); }
   // the pigeons
   T.actor({ sample: 0.3, period: 8, at(t) { const f = Math.floor((t % 8) / 8 * 16); return { x: 6, y: 13, key: 'pg' + f, f }; },

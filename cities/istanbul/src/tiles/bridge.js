@@ -69,11 +69,11 @@ SF.tile('kopru', -50, -50, { order: -1.1, shared: true, half: 26 }, function (T)
   for (const R0 of REST) {
     T.obj([8.4, R0.y0, X1 + 0.2, R0.y1], function (g) {
       g.boilP = 0.3;
-      const ya = R0.y0, yb = R0.y1, RR = RNG(R0.seed * 91);
+      const ya = R0.y0, yb = R0.y1, RR = RNG(R0.seed * 91), i00 = g.cmds.length;
       K.box(g, 8.4, ya, X1 + 0.2, yb, -0.6, 0, { t: '#B79A74', l: '#9C8262', r: '#86704F' }, { w: 0.6 });                  // the floor on its beams
       K.box(g, 8.4, ya, 9.4, yb, 0, DZ - 0.8, { t: '#E9E2D2', l: '#EFE9DC', r: '#E2D9C6' }, { w: 0.6 });                   // the kitchen wall
       g.fill(K.on('R', 9.42, ya + 0.6, ya + 2.0, 0, 3.6), '#4E4A42');                                                       // a door
-      g.fill(K.on('R', 9.42, ya + 2.6, yb - 0.6, 1.4, 3.8), '#E9C98A');                                                     // a lit hatch
+      g.fill(K.on('R', 9.42, ya + 2.6, yb - 0.6, 1.4, 3.8), '#E9C98A'); g.mark({ nc: '#FFCF7C', win: 1, spill: true });     // a lit hatch (at night: bright, the terrace in its light)
       // tables along the terrace, two diners each (back to front)
       const tabs = []; for (let y = ya + 1.6; y < yb - 0.8; y += 2.7) tabs.push(y);
       for (const y of tabs) {
@@ -88,9 +88,17 @@ SF.tile('kopru', -50, -50, { order: -1.1, shared: true, half: 26 }, function (T)
       // the valance under the upper deck: scalloped cloth with the name, lamps hanging under it
       const vz0 = DZ - 2.0, vz1 = DZ - 0.8, q = [[X1 + 0.15, ya, vz1], [X1 + 0.15, yb, vz1]];
       for (let k = 0; k <= 10; k++) { const yy = lerp(yb, ya, k / 10); q.push([X1 + 0.15, yy, vz0 + (k % 2 ? 0.0 : 0.35)]); }
+      const j0 = g.cmds.length;
       g.fill(q, R0.val); g.outline(q, { w: 0.4, c: shade(R0.val, 0.5), boil: false });
       K.text(g, 'R', X1 + 0.18, yb - 0.5, vz0 + 0.42, 0.62, R0.name, '#F6F1E2', { w: 0.32 });
       for (let y = ya + 1.4; y < yb - 0.5; y += 2.7) { const a = g.p(X1 - 0.6, y, vz0), b = g.p(X1 - 0.6, y, vz0 - 1.0); g.line2([a, b], { w: 0.25, c: '#3A3530', boil: false, ext: 0 }); g.disc2(b, 0.75, '#F6D98A'); }
+      // at night: the valance and its name lit, its lamps on (their light broken on the Horn below), a string of
+      // bulbs along its scalloped edge; the diners' food and faces in the lamplight
+      IS.lift(g, i00, 0.38);
+      g.mark({ nc: true }, j0); IS.litLines(g, j0);
+      // (by the Eminönü bank the water under them hides beneath the quay's edge: those lay no reflection)
+      for (let y = ya + 1.4; y < yb - 0.5; y += 2.7) (y > 14 ? IS.glowDry : IS.glowWet)(g, 'lantern', X1 - 0.6, y, vz0 - 1.0, { r: 1.3, col: '#FFD98A' });
+      for (let y = ya + 0.6; y < yb - 0.2; y += 1.15) IS.glowDry(g, 'lantern', X1 + 0.2, y, vz0 + 0.05, { r: 0.55, col: h1(R0.seed * 13 + Math.round(y * 5)) < 0.5 ? '#FFE6A0' : shade(R0.val, -0.55) });
     }, { name: 'restaurant', bias: -40 });
   }
   // the west lower deck: its floor and the backs of its restaurants (mostly hidden)
@@ -124,7 +132,7 @@ SF.tile('kopru', -50, -50, { order: -1.1, shared: true, half: 26 }, function (T)
     T.obj([X1 - 0.5, ya, X1, yb], (g) => {
       const ps = []; for (let yy = ya; yy <= yb + 0.01; yy += 1.0) { const a = g.p(X1 - 0.25, yy, DZ), b = g.p(X1 - 0.25, yy, DZ + 1.6); ps.push(a[0], a[1], b[0], b[1]); }
       g.segs2(ps, '#5E6B76', 0.4); g.line([[X1 - 0.25, ya, DZ + 1.6], [X1 - 0.25, yb, DZ + 1.6]], { w: 0.7, c: '#4A5560', boil: false });
-      if (Math.abs(((ya - Y0) / 5.5) % 2 - 1) < 0.01) IS.lamp(g, X1 - 0.25, ya + 2.75, { z: DZ, h: 9 });
+      if (Math.abs(((ya - Y0) / 5.5) % 2 - 1) < 0.01) IS.lamp(g, X1 - 0.25, ya + 2.75, { z: DZ, h: 9, dry: ya + 2.75 > 15 });   // (the last by the Eminönü bank: no reflection)
     }, { on: true, name: 'rail' });
   }
 
@@ -143,11 +151,12 @@ SF.tile('kopru', -50, -50, { order: -1.1, shared: true, half: 26 }, function (T)
   for (let y = Y0 + 2.6, i = 0; y < Y1 - 0.5; y += 4.6, i++) anglers.push({ side: -1, x: X0 + 1.15, y, i, seed: 640 + i });
   anglers.forEach((A) => {
     const who = IS.who(A.seed, { fcap: h1(A.seed) < 0.6 ? ['#3B3F47', '#5A6B5A', '#C9584B', '#3F5F8F'][A.seed % 4] : undefined, scarf: undefined, dress: undefined, hairStyle: 'short', bare: false });
-    const lag = A.i * 0.45 + (A.side < 0 ? 2.1 : 0), fishy = (n) => h2(A.seed, n) < 0.45;
+    const lag = A.i * 0.45 + (A.side < 0 ? 2.1 : 0), fishy = (n) => h2(A.seed, n) < 0.45, lamp = h1(A.seed * 3 + 1) < 0.55;
     T.actor({ sample: 0.5, period: CYC * 4,
       at(t) {
         const u = (((t - lag) % CYC) + CYC) % CYC, n = Math.floor((t - lag) / CYC), s = castAt(u), fish = (s.line === 'reel' || s.line === 'short') && fishy(n);
-        return { x: A.x, y: A.y, z: DZ, key: s.k + (fish ? 'f' : ''), cs: s, fish };
+        const nt = LOOK.night;                                    // at night: a glow stick on the rod tip, a lamp at some anglers' feet
+        return { x: A.x, y: A.y, z: DZ, key: s.k + (fish ? 'f' : '') + (nt ? 'n' : ''), cs: s, fish, n: nt };
       },
       draw(g, st) {
         const sg = A.side, s = st.cs;
@@ -162,6 +171,10 @@ SF.tile('kopru', -50, -50, { order: -1.1, shared: true, half: 26 }, function (T)
         else if (s.line === 'reel') { const zz = lerp(WL - DZ, tipW[2] - 2.6, s.f), e = g.p(tipW[0] + sg * 0.2, 0, sg > 0 ? zz : Math.max(zz, deep)); g.fine2([tip, e], lo); if (st.fish && (sg > 0 || zz > deep)) IS.fish2(g, g.p(tipW[0] + sg * 0.2, 0, zz)); }
         else if (s.line === 'short') { const e = g.p(tipW[0] - sg * 0.6, 0, tipW[2] - 2.4); g.fine2([tip, e], lo); if (st.fish) IS.fish2(g, e); }
         else if (s.line === 'fly') { const pts = []; for (let k = 0; k <= 10; k++) { const f = k / 10; pts.push(g.p(tipW[0] + sg * f * 6, 0, tipW[2] + Math.sin(Math.PI * f) * 2.5 - f * 4)); } g.fine2(pts, lo); }
+        if (st.n) {
+          g.disc2(tip, 0.5, IS.N.tip); g.mark({ nc: true, light: true });
+          if (lamp) { const c = g.p(sg * 0.9, 1.3, 0); g.fill2([[c[0] - 0.6, c[1]], [c[0] + 0.6, c[1]], [c[0] + 0.55, c[1] - 1.6], [c[0] - 0.55, c[1] - 1.6]], '#FFD27A', true); g.mark({ nc: true, light: true }); g.fill2([[c[0] - 0.8, c[1] - 1.6], [c[0] + 0.8, c[1] - 1.6], [c[0], c[1] - 2.4]], '#2A2622', true); g.line2([[c[0] - 0.6, c[1]], [c[0] + 0.6, c[1]], [c[0] + 0.55, c[1] - 1.6], [c[0] - 0.55, c[1] - 1.6]], { w: 0.22, c: '#2A2622', boil: false, close: true }); }
+        }
       } });
   });
   // cats waiting for a fish by the buckets

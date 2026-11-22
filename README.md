@@ -7,18 +7,21 @@
 <p align="center">
   <b>Twelve cities, drawn alive.</b><br>
   Hand-inked isometric maps, built entirely in code. Each one draws itself, then lives:<br>
-  traffic on a timetable, crowds that gather and scatter, and one clever moment only that city could have.
+  traffic on a timetable, crowds that gather and scatter, and one clever moment only that city could have.<br>
+  Press <code>N</code> and the city turns to night.
 </p>
 
 <p align="center">
   <a href="https://leehongji.github.io/inkcity-atlas/"><img alt="Explore the Atlas" src="https://img.shields.io/badge/%E2%96%B6%20EXPLORE-the%20atlas-df6b3c?style=for-the-badge&labelColor=2C271C"></a>
   <a href="https://leehongji.github.io/inkcity-atlas/media/inkcity-atlas-film.mp4"><img alt="Watch the film" src="https://img.shields.io/badge/FILM-43%20s-fbd63a?style=for-the-badge&labelColor=2C271C"></a>
+  <a href="https://leehongji.github.io/inkcity-atlas/cities/tokyo/index.html?night"><img alt="See a city at night" src="https://img.shields.io/badge/NIGHT-press%20N-3b4675?style=for-the-badge&labelColor=2C271C"></a>
   <a href="#draw-your-own-city-the-inkcity-skill"><img alt="Draw your own city" src="https://img.shields.io/badge/SKILL-draw%20your%20own%20city-5db85c?style=for-the-badge&labelColor=2C271C"></a>
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/LICENCE-MIT-a8c8bb?style=for-the-badge&labelColor=2C271C"></a>
 </p>
 
 <p align="center">
   <a href="#the-twelve-cities">The cities</a> ·
+  <a href="#by-day-and-by-night">Day and night</a> ·
   <a href="#see-it">See it</a> ·
   <a href="#draw-your-own-city-the-inkcity-skill">The skill</a> ·
   <a href="#the-film">The film</a> ·
@@ -32,6 +35,24 @@ Open a city and it draws itself: the pen scaffold first, then broken colour, the
 explore: drag, zoom, click a place. Handwritten notes sit in the margins, and a guidebook tells each place's history
 and the life you can see in it, with details to find. Every map is a single offline HTML page.
 
+## By day and by night
+
+<p align="center">
+  <a href="https://leehongji.github.io/inkcity-atlas/cities/tokyo/index.html?night"><img src="docs/media/day-to-night.webp" alt="Tokyo turning from day to night: the day fades, the street lamps come on in a wave from the middle, Tokyo Tower glows orange, the Skytree pale blue, and the windows, signs and lanterns light up." width="100%"></a>
+</p>
+
+Press `N`, or the night switch under the map, and the city turns to night. It is the same drawing under moonlight,
+with each place lit the way it is lit today. Windows light up, every lamp lays a pool of light on the street, signs
+and lanterns keep their colours, the landmarks are floodlit, and lights by the water are doubled in it. Motes drift up
+out of the trees and the flower beds. Add `?night` to a city's address to open it at night; click one below.
+
+| | | |
+|---|---|---|
+| [![Tokyo at night](docs/media/night/tokyo.jpg)](https://leehongji.github.io/inkcity-atlas/cities/tokyo/index.html?night) **Tokyo** | [![Paris at night](docs/media/night/paris.jpg)](https://leehongji.github.io/inkcity-atlas/cities/paris/index.html?night) **Paris** | [![New York at night](docs/media/night/newyork.jpg)](https://leehongji.github.io/inkcity-atlas/cities/newyork/index.html?night) **New York** |
+| [![London at night](docs/media/night/london.jpg)](https://leehongji.github.io/inkcity-atlas/cities/london/index.html?night) **London** | [![Barcelona at night](docs/media/night/barcelona.jpg)](https://leehongji.github.io/inkcity-atlas/cities/barcelona/index.html?night) **Barcelona** | [![Venice at night](docs/media/night/venice.jpg)](https://leehongji.github.io/inkcity-atlas/cities/venice/index.html?night) **Venice** |
+| [![Lisbon at night](docs/media/night/lisbon.jpg)](https://leehongji.github.io/inkcity-atlas/cities/lisbon/index.html?night) **Lisbon** | [![Istanbul at night](docs/media/night/istanbul.jpg)](https://leehongji.github.io/inkcity-atlas/cities/istanbul/index.html?night) **Istanbul** | [![Rio de Janeiro at night](docs/media/night/rio.jpg)](https://leehongji.github.io/inkcity-atlas/cities/rio/index.html?night) **Rio de Janeiro** |
+| [![Beijing at night](docs/media/night/beijing.jpg)](https://leehongji.github.io/inkcity-atlas/cities/beijing/index.html?night) **Beijing** | [![Hong Kong at night](docs/media/night/hongkong.jpg)](https://leehongji.github.io/inkcity-atlas/cities/hongkong/index.html?night) **Hong Kong** | [![Chongqing at night](docs/media/night/chongqing.jpg)](https://leehongji.github.io/inkcity-atlas/cities/chongqing/index.html?night) **Chongqing** |
+
 ## The twelve cities
 
 Click a city to open it.
@@ -43,20 +64,20 @@ Click a city to open it.
 | [![Lisbon](thumbs/lisbon-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/lisbon/index.html) **Lisbon** | [![Istanbul](thumbs/istanbul-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/istanbul/index.html) **Istanbul** | [![Rio de Janeiro](thumbs/rio-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/rio/index.html) **Rio de Janeiro** |
 | [![Beijing](thumbs/beijing-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/beijing/index.html) **Beijing** 北京 | [![Hong Kong](thumbs/hongkong-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/hongkong/index.html) **Hong Kong** 香港 | [![Chongqing](thumbs/chongqing-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/chongqing/index.html) **Chongqing** 重庆 |
 
-| City | Street fingerprint | The moment |
-|---|---|---|
-| Tokyo | The Yamanote loop on its brick viaduct, trains circling, izakaya in the arches | Every light turns red and the whole crowd crosses at once at Shibuya |
-| Paris | The Seine and its quais, Haussmann limestone, café terraces | Twelve cars pour into the Étoile, weave round the Arc and never touch |
-| New York | The one-way grid, yellow cabs, bus lanes, fire escapes | The lights on Fifth turn green block by block ahead of a pack of cabs |
-| London | The Thames between embankments, red buses keeping left | Tower Bridge lifts for a tall ship while the traffic queues |
-| Barcelona | The Eixample grid, every corner cut into an octagonal plaza | Castellers build a human tower in Plaça Sant Jaume |
-| Venice | No cars: canals for streets, gondolas, vaporetti, barges | Acqua alta floods San Marco; the walkways fill in single file |
-| Lisbon | Hills of tiled houses, wave-patterned squares, tram 28 | Two trams squeeze past each other on the Alfama's single track |
-| Istanbul | The Golden Horn and the Bosphorus, ferries, domes, cats | Anglers cast in a wave along the Galata Bridge as a ferry slides beneath |
-| Rio de Janeiro | Sea, granite peaks, the Copacabana wave pavement | A samba school parades through the Sambadrome |
-| Beijing | Hutong courtyards under golden ginkgo, the imperial axis | The flag guard marches out and Chang'an Avenue stops for it |
-| Hong Kong | Towers and neon on a harbour, trams keeping left | One Star Ferry berths at Central as the other casts off |
-| Chongqing | A city stacked on mountains where two rivers meet | The monorail runs straight through a residential tower |
+| City | Street fingerprint | The moment | After dark |
+|---|---|---|---|
+| Tokyo | The Yamanote loop on its brick viaduct, trains circling, izakaya in the arches | Every light turns red and the whole crowd crosses at once at Shibuya | Tokyo Tower lit orange, the Skytree pale blue, night cherry blossom under paper lanterns |
+| Paris | The Seine and its quais, Haussmann limestone, café terraces | Twelve cars pour into the Étoile, weave round the Arc and never touch | The Eiffel Tower golden, sparkling, its beacon turning; the Seine's bridges doubled in the river |
+| New York | The one-way grid, yellow cabs, bus lanes, fire escapes | The lights on Fifth turn green block by block ahead of a pack of cabs | Times Square's screens, the brightest place on the map; the Empire State Building's white top |
+| London | The Thames between embankments, red buses keeping left | Tower Bridge lifts for a tall ship while the traffic queues | Big Ben's lit dials, the Eye in pink, Tower Bridge traced in light |
+| Barcelona | The Eixample grid, every corner cut into an octagonal plaza | Castellers build a human tower in Plaça Sant Jaume | The Sagrada Família floodlit; the Magic Fountain in its light show |
+| Venice | No cars: canals for streets, gondolas, vaporetti, barges | Acqua alta floods San Marco; the walkways fill in single file | San Marco floodlit, every canal lamp doubled in the water, Carnival lanterns |
+| Lisbon | Hills of tiled houses, wave-patterned squares, tram 28 | Two trams squeeze past each other on the Alfama's single track | The Santo António street party under strings of lights, sardine grills glowing |
+| Istanbul | The Golden Horn and the Bosphorus, ferries, domes, cats | Anglers cast in a wave along the Galata Bridge as a ferry slides beneath | The mosques floodlit gold, ferries' lights on the Golden Horn, the Maiden's Tower |
+| Rio de Janeiro | Sea, granite peaks, the Copacabana wave pavement | A samba school parades through the Sambadrome | Christ the Redeemer floodlit; the Sambadrome under its floodlights all night |
+| Beijing | Hutong courtyards under golden ginkgo, the imperial axis | The flag guard marches out and Chang'an Avenue stops for it | Tiananmen floodlit, red lanterns down Qianmen and the hutongs, the ginkgos glowing gold |
+| Hong Kong | Towers and neon on a harbour, trams keeping left | One Star Ferry berths at Central as the other casts off | Both shores of the harbour lit, Mong Kok's neon, December's Christmas lights |
+| Chongqing | A city stacked on mountains where two rivers meet | The monorail runs straight through a residential tower | Hongyadong lit gold from top to bottom, the monorail lit through its tower |
 
 ## See it
 
@@ -66,7 +87,8 @@ Online: **https://leehongji.github.io/inkcity-atlas/**. Offline: open `index.htm
 python3 -m http.server 8000      # then open http://localhost:8000
 ```
 
-Keys in a city: `1`–`9` jump to places, `0` or `Esc` frames the whole city, `Space` pauses, `R` plays the guided tour.
+Keys in a city: `1`–`9` jump to places, `0` or `Esc` frames the whole city, `N` switches day and night, `Space` pauses,
+`R` plays the guided tour.
 
 ## Draw your own city: the inkcity skill
 
@@ -80,7 +102,9 @@ cp -r skill/inkcity ~/.claude/skills/
 
 Then ask, in any words: *"Draw my home town as a living hand-inked map."* The skill brings an engine, a starter town
 that already plays, scripts to check every frame and every pan (`verify`, `perf`, `explore`, `interact`), references
-on depth order, drawing and pitfalls, and worked examples. Start with `skill/inkcity/SKILL.md`.
+on depth order, drawing and pitfalls, and worked examples. Start with `skill/inkcity/SKILL.md`. Its maps have a
+night too: a moonlit grade, lit windows and lamps, halos, glints, reflections and drifting motes, and a few calls to say
+what lights up in your place (`references/engine.md`, §9c).
 
 The scripts need Node 18+ and Playwright, and Python 3 for building pages:
 
@@ -118,13 +142,14 @@ cities/<slug>/            one city
   src/guide.js            the guidebook's words: notes, places, stories, things to find
   brief.md, refs/         the plan and the landmark data cards behind the drawing
   tools/                  timetable searches and checks for that city's traffic
-cities/BRIEF-*.md         the briefs every city follows (drawing, and writing its guide)
+cities/BRIEF-*.md         the briefs every city follows (drawing, writing its guide, lighting it at night)
+cities/tools/             night-check (the day stays pixel-identical; the night views) and the README's night media
 engine/                   the shared engine: projection, pen, kit, world, render, app
 skill/inkcity/            the skill that makes all of this (see below)
 gallery-src/              the gallery and guide overlay source (React, Vite, Tailwind, Looseleaf)
 film/                     the promo film: direction, shots, capture tools, score (see film/README.md)
 media/                    the film, as served by the site
-docs/media/               the README's preview and poster
+docs/media/               the README's preview, poster, day-to-night animation and night thumbnails
 ```
 
 ## Rebuilding the gallery

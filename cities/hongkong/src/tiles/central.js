@@ -34,8 +34,8 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
   T.obj([-35, -36, -21, -22], function (g) {
     g.boilP = 0.2;
     const A = [-34, -35], B = [-22, -35], Cn = [-22, -23], D = [-34, -23], O = [-28, -29];
-    const brace = (vis, z0, z1) => { const s = []; for (const f of vis) { const a = f.a, b = f.b, n = Math.max(1, Math.round((z1 - z0) / (Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.9))), h = (z1 - z0) / n; for (let k = 0; k < n; k++) { const za = z0 + k * h, zb = za + h; for (const [p, q] of [[[a[0], a[1], za], [b[0], b[1], zb]], [[b[0], b[1], za], [a[0], a[1], zb]], [[a[0], a[1], zb], [b[0], b[1], zb]]]) { const P = g.p.apply(g, p), Q = g.p.apply(g, q); s.push(P[0], P[1], Q[0], Q[1]); } } const v0 = g.p(a[0], a[1], z0), v1 = g.p(a[0], a[1], z1), w0 = g.p(b[0], b[1], z0), w1 = g.p(b[0], b[1], z1); s.push(v0[0], v0[1], v1[0], v1[1], w0[0], w0[1], w1[0], w1[1]); } g.segs2(s, WHITE, 0.55); };
-    const lit = (vis, z0, z1, seed) => { const R = RNG(seed); for (const f of vis) for (let z = z0 + 1.6; z < z1 - 1; z += 2.2) if (R() < 0.3) { const u0 = R() * 0.5, u1 = u0 + 0.2 + R() * 0.3; g.fill([[lerp(f.a[0], f.b[0], u0), lerp(f.a[1], f.b[1], u0), z], [lerp(f.a[0], f.b[0], u1), lerp(f.a[1], f.b[1], u1), z], [lerp(f.a[0], f.b[0], u1), lerp(f.a[1], f.b[1], u1), z + 1.2], [lerp(f.a[0], f.b[0], u0), lerp(f.a[1], f.b[1], u0), z + 1.2]], f.nx > f.ny ? HK.C.litD : HK.C.lit); } };
+    const brace = (vis, z0, z1) => { const s = []; for (const f of vis) { const a = f.a, b = f.b, n = Math.max(1, Math.round((z1 - z0) / (Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.9))), h = (z1 - z0) / n; for (let k = 0; k < n; k++) { const za = z0 + k * h, zb = za + h; for (const [p, q] of [[[a[0], a[1], za], [b[0], b[1], zb]], [[b[0], b[1], za], [a[0], a[1], zb]], [[a[0], a[1], zb], [b[0], b[1], zb]]]) { const P = g.p.apply(g, p), Q = g.p.apply(g, q); s.push(P[0], P[1], Q[0], Q[1]); } } const v0 = g.p(a[0], a[1], z0), v1 = g.p(a[0], a[1], z1), w0 = g.p(b[0], b[1], z0), w1 = g.p(b[0], b[1], z1); s.push(v0[0], v0[1], v1[0], v1[1], w0[0], w0[1], w1[0], w1[1]); } const i0 = g.cmds.length; g.segs2(s, WHITE, 0.55); HK.nite(g, i0, { nc: '#EEF6FF' }); };   // at night its frames are lines of white light
+    const lit = (vis, z0, z1, seed) => { const R = RNG(seed); for (const f of vis) for (let z = z0 + 1.6; z < z1 - 1; z += 2.2) if (R() < 0.3) { const u0 = R() * 0.5, u1 = u0 + 0.2 + R() * 0.3; g.fill([[lerp(f.a[0], f.b[0], u0), lerp(f.a[1], f.b[1], u0), z], [lerp(f.a[0], f.b[0], u1), lerp(f.a[1], f.b[1], u1), z], [lerp(f.a[0], f.b[0], u1), lerp(f.a[1], f.b[1], u1), z + 1.2], [lerp(f.a[0], f.b[0], u0), lerp(f.a[1], f.b[1], u0), z + 1.2]], f.nx > f.ny ? HK.C.litD : HK.C.lit); g.mark({ nc: true }); } };
     // the podium of grey granite
     K.box(g, -35, -36, -21, -22, 0, 3.2, { t: '#CFC9BC', l: '#D9D4C8', r: '#BFB9AC' }, { w: 0.8 });
     let v = HK.prism(g, [A, B, Cn, D], 3.2, 20, GLASS, { nt: true }); lit(v, 3.2, 20, 11); brace(v, 3.2, 20);
@@ -50,7 +50,10 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
     // the top shaft ends in its own slope up to the far corner; two masts
     g.fill([[O[0], O[1], 44], [B[0], B[1], 44], [A[0], A[1], 52]], '#C9DCE6'); g.outline([[O[0], O[1], 44], [B[0], B[1], 44], [A[0], A[1], 52]], { w: 0.65 });
     for (const [x, y, h] of [[-31.6, -33.2, 62], [-29.4, -34.0, 59]]) g.line([[x, y, 48], [x, y, h]], { w: 0.55, c: '#5A6066', boil: false, ext: 0 });
-    K.sign(g, 'L', -22, -33.6, -23.6, 1.0, 2.4, '#2E3A4A', 'BANK OF CHINA', { ink: '#F3D9A2', w: 0.3 });
+    const i0 = g.cmds.length; K.sign(g, 'L', -22, -33.6, -23.6, 1.0, 2.4, '#2E3A4A', 'BANK OF CHINA', { ink: '#F3D9A2', w: 0.3 }); HK.nite(g, i0, { nc: true });
+    // night: the white light up its height, the red aircraft lights on the masts
+    for (const [z, r] of [[8, 3.6], [17, 3.2], [26, 3.0], [36, 2.8], [46, 2.6]]) g.glow('lantern', -28, -29, z, { r, col: '#DCEBFF' });
+    for (const [x, y, h] of [[-31.6, -33.2, 62], [-29.4, -34.0, 59]]) g.glow('lantern', x, y, h, { r: 0.7, col: '#FF4A3A' });
   }, { name: 'bank of china tower' });
 
   /* ---- the HSBC building: masts, coat-hanger trusses, an open plaza under it ---- */
@@ -66,7 +69,9 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
       K.box(g, a, y0, b, y1, Z0, h, GL, { w: 0.8 });
       // floors, lit floors
       const s = [], R = RNG(a * 7 + 3);
-      for (let z = Z0 + 2; z < h; z += 2) { if (R() < 0.3) g.fill(K.on('L', y1 + 0.02, a + 0.4, b - 0.4, z + 0.3, z + 1.5), HK.C.lit); const p0 = g.p(a, y1 + 0.03, z), p1 = g.p(b, y1 + 0.03, z); s.push(p0[0], p0[1], p1[0], p1[1]); }
+      const nf = [];
+      for (let z = Z0 + 2; z < h; z += 2) { if (R() < 0.3) { g.fill(K.on('L', y1 + 0.02, a + 0.4, b - 0.4, z + 0.3, z + 1.5), HK.C.lit); g.mark({ nc: true }); } else nf.push(z); const p0 = g.p(a, y1 + 0.03, z), p1 = g.p(b, y1 + 0.03, z); s.push(p0[0], p0[1], p1[0], p1[1]); }
+      for (const z of nf) for (let k = 0; k < 3; k++) { const w = (b - a - 0.8) / 3; g.fill(K.on('L', y1 + 0.025, a + 0.4 + k * w + 0.1, a + 0.4 + (k + 1) * w - 0.1, z + 0.3, z + 1.5), HK.NONE); g.mark({ win: 0.72 }); }   // night: more floors lit
       if (b === 4) for (let z = Z0 + 2; z < h; z += 2) { const p0 = g.p(4.03, y0, z), p1 = g.p(4.03, y1, z); s.push(p0[0], p0[1], p1[0], p1[1]); }
       g.segs2(s, '#5E6A72', 0.28);
     }
@@ -82,7 +87,7 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
     }
     // the R side: masts too
     for (const y of [-34, -24]) K.box(g, 4.1, y - 0.3, 4.7, y + 0.3, 0, 36, STEEL, { w: 0.4, boil: false });
-    K.text(g, 'L', y1 + 0.8, -6.5, Z0 + 0.6, 0.9, 'HSBC', '#C8372D', { center: true });
+    K.text(g, 'L', y1 + 0.8, -6.5, Z0 + 0.6, 0.9, 'HSBC', '#C8372D', { center: true }); HK.nite(g, g.cmds.length - 1, { nc: '#FF5A48' }); HK.signGlow(g, 'L', y1 + 0.8, -8.8, -4.2, Z0 + 0.5, Z0 + 1.6, '#FF5A48', 0.5);
   }, { name: 'hsbc' });
   // the two bronze lions at the plaza's front, on granite plinths
   for (const [x, f] of [[-11, 1], [-0.4, -1]]) T.obj([x, -20.6], (g) => {
@@ -99,14 +104,15 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
     K.box(g, 10, -35, 24, -23, 0, 31, { t: '#E3E5E6', l: '#D9DCDD', r: '#C3C7C9' }, { w: 0.85 });
     const dots = [], lit = [];
     for (const [f, p, a0, a1] of [['L', -23, 10, 24], ['R', 24, -35, -23]]) for (let z = 3; z < 30.4; z += 1.75) for (let a = a0 + 0.9; a < a1 - 0.5; a += 1.35) { const q = g.p.apply(g, K.pt(f, p + 0.03, a, z)); ((Math.round(z * 3 + a * 7) % 11) === 0 ? lit : dots).push(q[0], q[1], q[0] + 0.01, q[1]); }
-    g.segs2(dots, '#4E5E6A', 0.95); g.segs2(lit, HK.C.litD, 1.0);
+    g.segs2(dots, '#4E5E6A', 0.95); g.segs2(lit, HK.C.litD, 1.0); HK.nite(g, g.cmds.length - 1, { nc: true });
+    { const n2 = []; for (const [f, p, a0, a1] of [['L', -23, 10, 24], ['R', 24, -35, -23]]) for (let z = 3; z < 30.4; z += 1.75) for (let a = a0 + 0.9; a < a1 - 0.5; a += 1.35) { const h = Math.round(z * 3 + a * 7) % 11; if (h === 2 || h === 4 || h === 7 || h === 9 || h === 5) { const q = g.p.apply(g, K.pt(f, p + 0.035, a, z)); n2.push(q[0], q[1], q[0] + 0.01, q[1]); } } HK.leds2(g, n2, '#FFD98A', 1.0); }
     K.box(g, 15, -31, 20, -27, 31, 33, { t: '#E9E6DE', l: '#DCD8CE', r: '#C9C4B8' }, { w: 0.5, boil: false });
   }, { name: 'jardine house' });
 
   /* ---- the old Supreme Court (LegCo): granite, colonnade, dome, Justice ---- */
   T.obj([-35, -16, -17, 3], (g) => {
     g.boilP = 0.3;
-    const G0 = { t: '#DDD8CC', l: '#E6E1D5', r: '#CFC9BC' };
+    const G0 = { t: '#DDD8CC', l: '#E6E1D5', r: '#CFC9BC' }, i0 = g.cmds.length;
     K.box(g, -34, -15, -18, 2, 0, 9.4, G0, { w: 0.85 });
     // the colonnade round the ground floor: a dark loggia behind Ionic columns
     for (const [f, p, a0, a1] of [['L', 2, -34, -18], ['R', -18, -15, 2]]) {
@@ -122,20 +128,26 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
     K.cyl(g, -26, -6.5, 3.2, 9.4, 11.6, { t: '#DDD8CC', l: '#E6E1D5', r: '#CFC9BC' }, { n: 16, w: 0.6 });
     K.dome(g, -26, -6.5, 3.2, 11.6, 3.6, '#B9C3BE', { w: 0.6 });
     K.cyl(g, -26, -6.5, 0.6, 15.2, 16.4, { t: '#DDD8CC', l: '#E6E1D5', r: '#CFC9BC' }, { n: 8, w: 0.4 });
+    // at night the granite is floodlit warm from below, the dome too
+    const FL = new Set(['#DDD8CC', '#E6E1D5', '#CFC9BC', '#E9E4D8', '#D2CCBF', '#C2BCAF', '#B9C3BE', '#BFB9AC']);
+    HK.nite(g, i0, { nc: (c) => (FL.has(c) ? mix(mix(nightColour(c), c, 0.55), '#FFDDA8', 0.18) : undefined) });
+    for (const [x, y, z, r] of [[-26, 2.2, 10.6, 3.0], [-26, -6.5, 13.6, 2.8], [-33.6, 2.3, 4.8, 2.0], [-18.4, 2.3, 4.8, 2.0], [-17.8, -14.6, 4.8, 2.0]]) g.glow('lantern', x, y, z, { r, col: '#FFE2B0' });
   }, { name: 'legislative council' });
 
   /* ---- the Mandarin Oriental ---- */
   T.obj([23, -20, 36, 0], (g) => {
-    HK.tower(g, 24, -19, 35, -1, 0, 23, { col: '#D9D3C4', tone: { t: '#CFC8B6', l: '#E3DDCE', r: '#C9C2B1' }, fl: 2.0, ml: 1.6, lit: 0.4, grid: '#8E877A', seed: 21 });
+    HK.tower(g, 24, -19, 35, -1, 0, 23, { col: '#D9D3C4', tone: { t: '#CFC8B6', l: '#E3DDCE', r: '#C9C2B1' }, fl: 2.0, ml: 1.6, lit: 0.4, grid: '#8E877A', seed: 21, nwin: { L: 0.2, R: 0.62 } });
     K.box(g, 24, -19, 35, -1, 23, 24, { t: '#CFC8B6', l: '#E3DDCE', r: '#C9C2B1' }, { w: 0.6 });
-    K.sign(g, 'L', -1, 25.5, 33.5, 1.6, 2.6, '#2C2622', 'MANDARIN ORIENTAL', { ink: '#E6C24F', w: 0.3 });
+    const i0 = g.cmds.length; K.sign(g, 'L', -1, 25.5, 33.5, 1.6, 2.6, '#2C2622', 'MANDARIN ORIENTAL', { ink: '#E6C24F', w: 0.3 }); HK.nite(g, i0, { nc: true });
+    HK.xmasTree(g, 'L', -1, 29.5, 4.4, 20.6, 4.6);          // December: a Christmas tree of lights on the face to the square
   }, { name: 'mandarin oriental' });
 
   /* ---- City Hall: a long low modernist block on the harbour front ---- */
   T.obj([-35, 9, -15, 22], (g) => {
     K.box(g, -34, 10, -16, 21, 0, 6.2, { t: '#E9E6DE', l: '#F1EFE8', r: '#DCD8CE' }, { w: 0.8 });
-    for (const [f, p, a0, a1] of [['L', 21, -34, -16], ['R', -16, 10, 21]]) { g.fill(K.on(f, p + 0.02, a0 + 0.5, a1 - 0.5, 2.4, 5.4), '#93AEBD'); const s = []; for (let a = a0 + 1.6; a < a1; a += 1.6) { const q0 = g.p.apply(g, K.pt(f, p + 0.03, a, 2.4)), q1 = g.p.apply(g, K.pt(f, p + 0.03, a, 5.4)); s.push(q0[0], q0[1], q1[0], q1[1]); } g.segs2(s, '#F1EFE8', 0.45); }
-    K.sign(g, 'L', 21, -31, -23, 0.7, 1.7, '#2C2622', 'CITY HALL', { ink: '#F3F1EA', w: 0.3 });
+    for (const [f, p, a0, a1] of [['L', 21, -34, -16], ['R', -16, 10, 21]]) { g.fill(K.on(f, p + 0.02, a0 + 0.5, a1 - 0.5, 2.4, 5.4), '#93AEBD'); g.mark({ nc: '#FFE6B4', spill: f === 'L' }); const s = []; for (let a = a0 + 1.6; a < a1; a += 1.6) { const q0 = g.p.apply(g, K.pt(f, p + 0.03, a, 2.4)), q1 = g.p.apply(g, K.pt(f, p + 0.03, a, 5.4)); s.push(q0[0], q0[1], q1[0], q1[1]); } g.segs2(s, '#F1EFE8', 0.45); }
+    const i0 = g.cmds.length; K.sign(g, 'L', 21, -31, -23, 0.7, 1.7, '#2C2622', 'CITY HALL', { ink: '#F3F1EA', w: 0.3 }); HK.nite(g, i0, { nc: true });
+    HK.bulbs2(g, [g.p(-34, 21.05, 6.1), g.p(-16, 21.05, 6.1), g.p(-16, 10, 6.1)], 2.2, '#FFD98A');   // December: a string of bulbs round the roof
   }, { name: 'city hall' });
 
   /* ---- the Star Ferry pier: the hall with its clock tower, two fingers out into the harbour ---- */
@@ -144,14 +156,14 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
     const CR = { t: '#EFE6CF', l: '#F3ECD8', r: '#DDD3BA' };
     K.box(g, -8, 14, 18, I, 0, 7.2, CR, { w: 0.85 });
     // doors to the fingers, arched windows
-    for (const xc of [0, 12]) { const q = [[xc - 2.2, I + 0.02, 0], [xc + 2.2, I + 0.02, 0]]; for (let k = 0; k <= 8; k++) { const t = Math.PI * k / 8; q.push([xc + 2.2 * Math.cos(t), I + 0.02, 3.4 + 1.2 * Math.sin(t)]); } g.fill(q, '#5A4E42'); g.outline(q, { w: 0.5, boil: false }); }
+    for (const xc of [0, 12]) { const q = [[xc - 2.2, I + 0.02, 0], [xc + 2.2, I + 0.02, 0]]; for (let k = 0; k <= 8; k++) { const t = Math.PI * k / 8; q.push([xc + 2.2 * Math.cos(t), I + 0.02, 3.4 + 1.2 * Math.sin(t)]); } g.fill(q, '#5A4E42'); g.mark({ nc: '#F2C887', spill: true }); g.outline(q, { w: 0.5, boil: false }); }
     for (const x of [-6, -3.2, 3.2, 6, 8.8, 15.2]) K.win(g, 'L', I + 0.01, x, x + 1.4, 1.4, 4.2, { style: 'navy', arch: true, w: 0.3 });
     K.hip(g, -8.6, 13.4, 18.6, I + 0.6, 7.2, 3.2, '#4E8A62', { w: 0.7 });
     HK.board(g, 'L', I + 0.6, -6.6, 5.0, 5.0, 6.8, '#2E6B4E', '天星小輪', { rim: '#F3ECD8', en: 'STAR FERRY' });
     HK.board(g, 'L', I + 0.6, 7.4, 13.4, 4.3, 7.0, '#F3ECD8', '中環', { c: '#2E6B4E', en: 'CENTRAL' });
     // the clock tower
     K.box(g, 14.6, 15.2, 17.8, 18.4, 7.2, 16.6, CR, { w: 0.75 });
-    for (const [f, p, a] of [['L', 18.4, 16.2], ['R', 17.8, 16.8]]) { const c = g.p.apply(g, K.pt(f, p + 0.03, a, 14.4)); g.disc2(c, 2.6, '#FBF8EE'); g.ring2(c, 2.6, { w: 0.4, c: '#3A3530' }); g.segs2([c[0], c[1], c[0] + 0.3, c[1] - 1.9, c[0], c[1], c[0] + 1.3, c[1] + 0.5], '#2A2622', 0.35); }
+    for (const [f, p, a] of [['L', 18.4, 16.2], ['R', 17.8, 16.8]]) { const c = g.p.apply(g, K.pt(f, p + 0.03, a, 14.4)); g.disc2(c, 2.6, '#FBF8EE'); g.mark({ nc: '#FFF2D0' }); g.glow2('lantern', c, c, { r: 2.4, col: '#FFF0C8' }); g.ring2(c, 2.6, { w: 0.4, c: '#3A3530' }); g.segs2([c[0], c[1], c[0] + 0.3, c[1] - 1.9, c[0], c[1], c[0] + 1.3, c[1] + 0.5], '#2A2622', 0.35); }
     K.hip(g, 14.3, 14.9, 18.1, 18.7, 16.6, 2.4, '#4E8A62', { w: 0.6 });
   }, { name: 'star ferry pier' });
   // the fingers: decks on piles (people walk on them: under 0), the near rails as their own objects
@@ -183,17 +195,17 @@ SF.tile('central', 0, 0, { rim: 18 }, function (T) {
     draw(g, st) {
       const P = (a, r) => [Math.cos(a) * r, -2.4, WZ + Math.sin(a) * r], th0 = (st.ph / 8) * (TAU / 18), rim = [], spk = [];
       for (let i = 0; i <= 48; i++) rim.push(P(TAU * i / 48, WR));
-      g.line(rim, { w: 1.3, c: '#5A564E', boil: false, ext: 0 }); g.line(rim, { w: 0.8, c: '#F3F1EA', boil: false, ext: 0 });
+      g.line(rim, { w: 1.3, c: '#5A564E', boil: false, ext: 0 }); g.line(rim, { w: 0.8, c: '#F3F1EA', boil: false, ext: 0 }); HK.nite(g, g.cmds.length - 1, { nc: '#FFF0C8' });   // LED on the rim at night
       for (let i = 0; i < 18; i++) { const a = th0 + TAU * i / 18, p = g.p.apply(g, P(a, WR)), c = g.p.apply(g, P(a, 0)); spk.push(c[0], c[1], p[0], p[1]); }
-      g.segs2(spk, '#8E8A80', 0.3);
-      const hub = g.p.apply(g, P(0, 0)); g.disc2(hub, 1.2, '#E9E6DE'); g.ring2(hub, 1.2, { w: 0.3, c: '#5A564E' });
-      for (let i = 0; i < 18; i++) { const a = th0 + TAU * i / 18, p = g.p.apply(g, P(a, WR)); const q = [[p[0] - 1.3, p[1] + 0.4], [p[0] + 1.3, p[1] + 0.4], [p[0] + 1.1, p[1] + 2.9], [p[0] - 1.1, p[1] + 2.9]]; g.fill2(q, '#F3F1EA', true); g.fill2([[p[0] - 1.0, p[1] + 0.9], [p[0] + 1.0, p[1] + 0.9], [p[0] + 0.9, p[1] + 2.0], [p[0] - 0.9, p[1] + 2.0]], i % 5 === 0 ? HK.C.lit : '#7E9AAD', true); g.outline2(q, { w: 0.25, c: '#5A564E', boil: false }); }
+      g.segs2(spk, '#8E8A80', 0.3); HK.nite(g, g.cmds.length - 1, { nc: '#C9B48A' });
+      const hub = g.p.apply(g, P(0, 0)); g.disc2(hub, 1.2, '#E9E6DE'); g.mark({ nc: '#FFF0C8', light: true }); g.ring2(hub, 1.2, { w: 0.3, c: '#5A564E' });
+      for (let i = 0; i < 18; i++) { const a = th0 + TAU * i / 18, p = g.p.apply(g, P(a, WR)); const q = [[p[0] - 1.3, p[1] + 0.4], [p[0] + 1.3, p[1] + 0.4], [p[0] + 1.1, p[1] + 2.9], [p[0] - 1.1, p[1] + 2.9]]; g.fill2(q, '#F3F1EA', true); g.fill2([[p[0] - 1.0, p[1] + 0.9], [p[0] + 1.0, p[1] + 0.9], [p[0] + 0.9, p[1] + 2.0], [p[0] - 0.9, p[1] + 2.0]], i % 5 === 0 ? HK.C.lit : '#7E9AAD', true); g.mark({ nc: i % 3 ? '#FFE3A6' : '#FFF4DA', light: i % 2 === 0 }); g.outline2(q, { w: 0.25, c: '#5A564E', boil: false }); }
     } });
 
   /* ---- trees, lamps, the seawall railing ---- */
-  for (const [x, y] of [[-15.6, -19], [-15.6, 5], [19.4, -19], [19.4, 5], [-36, 7]]) T.obj([x, y], (g) => K.tree(g, x, y, { r: 3.6, h: 4.6, col: '#6FA06A' }), { name: 'tree' });
+  for (const [x, y] of [[-15.6, -19], [-15.6, 5], [19.4, -19], [19.4, 5], [-36, 7]]) T.obj([x, y], (g) => { K.tree(g, x, y, { r: 3.6, h: 4.6, col: '#6FA06A' }); if (x > -30) HK.fairy(g, 22, ['#FFE7A0', '#FFF6DE', '#FF8A6A']); }, { name: 'tree' });   // December: fairy lights in the square's trees
   for (const [x, y] of [[-12, 17], [6, 9.6], [-24, 8], [21, 18]]) T.obj([x, y], (g) => HK.lamp(g, x, y, { h: 8, arm: 1.8 }), { name: 'lamp' });
-  for (const [a, b] of [[-36.6, -3.6], [3.6, 8.4], [15.6, 36.6]]) T.obj([a, I - 0.5, b, I - 0.1], (g) => HK.rail(g, [a, I - 0.3], [b, I - 0.3], { h: 1.7 }), { name: 'seawall rail' });
+  for (const [a, b] of [[-36.6, -3.6], [3.6, 8.4], [15.6, 36.6]]) T.obj([a, I - 0.5, b, I - 0.1], (g) => { HK.rail(g, [a, I - 0.3], [b, I - 0.3], { h: 1.7 }); HK.railLights(g, a, b, I - 0.3); }, { name: 'seawall rail' });
   // fountains in the pools (jets rising and falling)
   for (const [x0, x1] of [[-11, -1], [5, 15]]) for (let k = 0; k < 4; k++) { const x = x0 + 1.4 + k * (x1 - x0 - 2.8) / 3; T.actor({ sample: 0.5, period: 2, grow: false,
     at(t) { const f = Math.floor(t * 6 + k * 2) % 6; return { x, y: -10.5, z: 0, key: 'j' + f, f }; },

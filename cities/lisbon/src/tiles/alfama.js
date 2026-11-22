@@ -11,7 +11,10 @@
    basil, and in front, by the river, the Largo do Chafariz de Dentro: a tasca with its tables out, a fadista in her
    black shawl between two guitarists, a sardine grill smoking, garlands across.
    What moves: tram 28 in both directions (src/37_traffic.js), and the people in the lane, who stop and flatten
-   themselves against the house fronts whenever a tram comes by (the moment of this place). */
+   themselves against the house fronts whenever a tram comes by (the moment of this place).
+   At night: the Sé floodlit, the trams' saloons lit as they squeeze through the lane, every house's lantern and most
+   windows lit, the fado house's lamp and its tables, the grill's embers, the bulbs along the garlands across the lane,
+   candles at Santo António's feet, the miradouro's parapet lamps and its kiosk. */
 SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
   const H = 37, LW = 4.7;
   // the lane's centre line in tile-local coordinates (from LXT, world)
@@ -38,6 +41,8 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
 
   /* ---------------- north of the lane: the Sé ---------------- */
   const SE = { t: '#E3DCCB', l: '#EFE9DC', r: '#D9D1BF' }, yF = 2.4, DXS = 11;   // the Sé is drawn about x = -24 and moved 11 east
+  // at night the Sé is floodlit warm (its roofs stay dark over it)
+  const SEROOF = (c) => ([LC.roof, shade(LC.roof, 0.16), shade(LC.roof, -0.04), shade(LC.roof, -0.1), shade(LC.roof, 0.1), '#C9C2B2', shade('#C9C2B2', 0.16), shade('#C9C2B2', -0.04), shade('#C9C2B2', -0.1), shade('#C9C2B2', 0.1)].indexOf(c) >= 0 ? nightColour(c) : undefined);
   T.obj([-29 + DXS, -34, -19 + DXS, -6], (g0) => g0.at(DXS, 0, 0, function (g) {      // the nave and the crossing lantern behind the towers
     g.boilP = 0.3;
     K.box(g, -29, -34, -19, -6, 0, 13, SE, { w: 0.9 });
@@ -46,6 +51,8 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
     K.box(g, -27.5, -22, -20.5, -15, 13, 19, SE, { w: 0.8 });
     for (const [f, p, a] of [['L', -15, -24], ['R', -20.5, -18.5]]) K.win(g, f, p, a - 0.6, a + 0.6, 14.5, 17.5, { style: 'slit', arch: true });
     K.hip(g, -27.9, -22.4, -20.1, -14.6, 19, 2.6, '#C9C2B2', { c: '#6E665A' });
+    LX.flood(g, 0, 0.7, LX.FLOOD.warm, SEROOF);                                             // night: floodlit
+    g.glow('lantern', -18.4, -20, 8, { r: 2.2, col: '#FFD49A' }); g.glow('lantern', -20, -15, 16, { r: 1.8, col: '#FFD49A' });
   }), { name: 'se nave' });
   T.obj([-35 + DXS, -6, -13 + DXS, yF], (g0) => g0.at(DXS, 0, 0, function (g) {        // the west front: two towers, the porch, the rose
     g.boilP = 0.35;
@@ -65,6 +72,9 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
     const rose = g.p(-24, yF - 1.1, 10.4); g.disc2(rose, 6.2, '#D9D1BF'); g.disc2(rose, 4.6, '#4E5E76'); g.ring2(rose, 6.2, { w: 0.5, c: '#8C8270' });
     const sp = []; for (let k = 0; k < 12; k++) { const a = TAU * k / 12; sp.push(rose[0], rose[1], rose[0] + Math.cos(a) * 4.6, rose[1] + Math.sin(a) * 4.6 * 0.95); } g.segs2(sp, '#D9D1BF', 0.45);
     for (let x = -26.8; x < -21.2; x += 1.5) K.box(g, x, yF - 2.0, x + 0.8, yF - 1.2, 15, 15.9, SE, { w: 0.35, boil: false, nohid: true });
+    // night: floodlit from the largo, the porch lit, the rose window glowing
+    LX.flood(g, 0, 1, LX.FLOOD.warm, (c) => (c === '#5E4A36' ? '#B07C48' : c === '#4E5E76' ? '#C79458' : undefined));
+    for (const [x, z, r] of [[-31, 3, 2.6], [-17, 3, 2.6], [-31, 13, 2.2], [-17, 13, 2.2], [-24, 5, 2.4], [-24, 10.4, 2.4]]) g.glow('lantern', x, yF + 0.8, z, { r, col: '#FFD49A' });
   }), { name: 'se front' });
 
   /* ---------------- north of the lane: the house row and the upper terrace ---------------- */
@@ -100,13 +110,16 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
     const b = g.p(-29.5, -7.5, 3.6); g.fill2([[b[0] - 1.6, b[1]], [b[0] + 1.6, b[1]], [b[0] + 1.1, b[1] - 7.5], [b[0] - 1.1, b[1] - 7.5]], '#6E5A44', true); g.disc2([b[0], b[1] - 8.6], 1.2, '#E9D2B4'); g.fill2(arcPts(b[0], b[1] - 8.9, 1.25, Math.PI, TAU, 6), '#4A3A2C', true);
     g.disc2([b[0] + 1.0, b[1] - 5.2], 0.8, '#F2DCC0'); g.ring2([b[0], b[1] - 9.2], 1.9, { w: 0.35, c: '#C9A44A' });
     const f = g.p(-29.5, -6.3, 0.7), R = RNG(5); for (let i = 0; i < 9; i++) g.disc2([f[0] + (R() - 0.5) * 6, f[1] - R() * 1.6], 0.6, R.pick(LC.festa)); g.segs2([f[0] - 2, f[1], f[0] - 2, f[1] - 2.2, f[0] + 2.4, f[1] + 0.2, f[0] + 2.4, f[1] - 1.8], '#F7F5EF', 0.5);
+    // night: the candles at his feet lit, the saint in their light
+    g.mark({ nc: (c) => mix(nightColour(c), '#FFD9A0', 0.35) }, 0);
+    for (const dx of [-2, 2.4]) g.glow2('lantern', [f[0] + dx, f[1] - 2.4], f, { r: 1.2, col: '#FFC870' });
   }, { name: 'santo antonio' });
   for (const [x, y] of [[-34, -3.5], [-26.5, -11.5]]) T.obj([x, y], (g) => K.bench(g, x, y, { face: 'L', L: 2.2, col: '#4F7A5E' }), { name: 'bench' });
   T.obj([-34.5, -12], (g) => K.tree(g, -34.5, -12, { r: 3.4, h: 4.2, col: '#7FA65A' }), { name: 'lemon tree' });
   T.cast([-34, -3.5], (g) => { LX.person(g, -34, -3.5, 1.3, LX.who(4390, { dir: 1, pose: 'sit', hair: '#D9D5CB', top: '#2F343B', cap: '#2F343B' })); LX.person(g, -34.4, -1.4, 1.3, LX.who(4391, { dir: 1, pose: 'sit', hair: '#BDB8AE', dress: '#3B3F47' })); });
   T.cast([-27.5, -4], function (g) {     // the ginjinha stand: a little counter, bottles, two tourists with tiny cups
     K.box(g, -28.6, -5, -26.4, -3, 0, 3.0, { t: '#7A2E2A', l: '#8E3A32', r: '#6E2A24' }, { w: 0.5, boil: false });
-    K.sign(g, 'L', -3, -28.5, -26.5, 2.0, 2.8, '#F2E3C0', 'GINJINHA', { ink: '#7A2E2A' });
+    { const i0 = g.cmds.length; K.sign(g, 'L', -3, -28.5, -26.5, 2.0, 2.8, '#F2E3C0', 'GINJINHA', { ink: '#7A2E2A' }); g.mark({ nc: true }, i0); g.glow('lantern', -27.5, -2.6, 3.4, { r: 1.5, col: '#FFD49A' }); }
     const t = g.p(-27.5, -4, 3.0); for (let i = 0; i < 3; i++) g.fill2([[t[0] - 1.2 + i * 1.1, t[1]], [t[0] - 0.8 + i * 1.1, t[1]], [t[0] - 0.8 + i * 1.1, t[1] - 2.2], [t[0] - 1.2 + i * 1.1, t[1] - 2.2]], '#5E1A2A', true);
     LX.person(g, -27.6, -6.6, 0, LX.who(4392, { dir: 0, pose: 'stand', noLegs: false }));
     LX.person(g, -25.6, -1.4, 0, LX.who(4393, { dir: 2, pose: 'hold', beer: false })); LX.person(g, -27.9, -0.6, 0, LX.who(4394, { dir: 3, pose: 'hold' }));
@@ -133,7 +146,7 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
   }, { name: 'miradouro' });
   // the stairs up from the lane to the terrace
   // the parapet along the terrace edge (pieces), with tile insets
-  for (const [x0, x1, y1] of [[MW[0][0] + 0.1, MW[0][1], MW[0][2]], [MW[1][0], H - 0.6, MW[1][2]]]) { T.obj([x0, y1 - 0.6, x1, y1], (g) => LX.parapet(g, 'L', y1, x0, x1, ZB, { az: 'b', seed: 9 }), { on: true, name: 'parapet' }); }
+  for (const [x0, x1, y1] of [[MW[0][0] + 0.1, MW[0][1], MW[0][2]], [MW[1][0], H - 0.6, MW[1][2]]]) { T.obj([x0, y1 - 0.6, x1, y1], (g) => LX.parapet(g, 'L', y1, x0, x1, ZB, { az: 'b', seed: 9, lamps: 6 }), { on: true, name: 'parapet' }); }
   T.obj([H - 0.6, -37, H, MW[1][2] - 0.6], (g) => LX.parapet(g, 'R', H, -36, MW[1][2] - 0.6, ZB, {}), { on: true, name: 'parapet e' });
   // the little church of Santa Luzia, the pergola, a jacaranda
   T.obj([24, -36, 36, -26], function (g) {
@@ -143,6 +156,8 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
     const gb = [K.pt('L', -26.02, 24, ZB + 9), K.pt('L', -26.02, 36, ZB + 9), K.pt('L', -26.02, 30, ZB + 12.4)]; g.fill(gb, '#F6F3EB'); g.outline(gb, { w: 0.7, boil: false });
     K.gable(g, 24, -36, 36, -26, ZB + 9, 3.4, 'y', { a: '#C96A42', b: '#B85C38', e: '#F6F3EB' }, { c: '#7E3A22', noEnd: true });
     const c = g.p(30, -26, ZB + 12.4); g.segs2([c[0], c[1], c[0], c[1] - 3.6, c[0] - 1.1, c[1] - 2.6, c[0] + 1.1, c[1] - 2.6], '#4A4540', 0.5);
+    LX.flood(g, 0, 0.6, LX.FLOOD.warm, (c) => (c === '#C96A42' || c === '#B85C38' ? nightColour(c) : undefined));   // night: its white front lit
+    g.glow('lantern', 30, -25.2, ZB + 6.5, { r: 2.0, col: '#FFD9A0' });
   }, { on: true, name: 'santa luzia' });
   T.obj([18, -24, 34, -16], function (g) {        // the pergola: white columns, beams, the bougainvillea over it
     const cols = []; for (let x = 18.5; x <= 33.6; x += 3) for (const y of [-23.5, -16.5]) { const a = g.p(x, y, ZB), b = g.p(x, y, ZB + 6); cols.push([a, b]); }
@@ -150,6 +165,9 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
     for (const y of [-23.5, -16.5]) g.line([[18.5, y, ZB + 6.2], [33.6, y, ZB + 6.2]], { w: 0.6, c: '#8C8270', boil: false });
     const R = RNG(17), pts = []; for (let i = 0; i < 70; i++) { const p = g.p(lerp(18, 34, R()), lerp(-24, -16, R()), ZB + 6.3 + R() * 0.8); pts.push(p); }
     for (const p of pts) g.disc2(p, 1.0 + (p[0] % 3) * 0.25, ['#C9367A', '#D9488A', '#5E8A3E', '#B62E6A'][Math.floor(p[1]) % 4]);
+    g.mark({ nc: (c) => (c === '#F6F3EB' ? LX.floodCol(c, 0.5) : c === '#5E8A3E' ? undefined : mix(nightColour(c), c, 0.4)) }, 0);   // night: the columns lit, the bougainvillea glowing
+    g.glow2('bloom', g.p(26, -20, ZB + 6.6), g.p(26, -20, ZB), { r: 14, col: '#FF9AC8' });
+    for (const x of [21.5, 30.5]) g.glow('lamp', x, -16.5, ZB + 5.4, { r: 1.2, base: ZB });
   }, { on: true, name: 'pergola' });
 
   /* ---------------- south of the lane: lower Alfama ---------------- */
@@ -165,7 +183,7 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
     T.obj([x0, y0, x1, y1], function (g) {
       const col = [LC.ochre, LC.pink, LC.white, '#E9C9A0', LC.sky, LC.mint, LC.rose, LC.lemon][sd % 8];
       LX.house(g, { x0, y0, x1, y1, n: 1, col: kind === 'tasca' ? '#F4F0E6' : col, seed: sd, roof: kind === 'tasca' ? 'hip' : kind, rh: 1.8, shop: kind === 'tasca' ? 'TASCA' : (sd === 57 ? 'PEIXARIA' : null), sc: '#3F5F4F', door: 'L', faces: 'LR' });
-      if (kind === 'tasca') { const s = g.p(-6.6, y1 + 1.0, 4.4); g.fill2([[s[0] - 2.6, s[1]], [s[0] + 2.6, s[1]], [s[0] + 2.6, s[1] + 2.8], [s[0] - 2.6, s[1] + 2.8]], '#2F3A4F', true); K.text(g, 'L', y1 + 1.0, -6.6, 3.65, 0.55, 'FADO', '#F2C230', { center: true }); }
+      if (kind === 'tasca') { const s = g.p(-6.6, y1 + 1.0, 4.4); g.fill2([[s[0] - 2.6, s[1]], [s[0] + 2.6, s[1]], [s[0] + 2.6, s[1] + 2.8], [s[0] - 2.6, s[1] + 2.8]], '#2F3A4F', true); g.mark({ nc: '#4A5C80' }); K.text(g, 'L', y1 + 1.0, -6.6, 3.65, 0.55, 'FADO', '#F2C230', { center: true }); g.glow('lantern', -6.6, y1 + 1.2, 5.2, { r: 1.8, col: '#FFC870' }); }   // (the fado house's lamp at night)
       if (kind === 'flat') {   // the roof terrace: washing, a basil pot, a cat
         const zt = LX.GF + 1.0, R = RNG(sd), ln = [g.p(x0 + 1, (y0 + y1) / 2, zt + 3.2), g.p(x1 - 1, (y0 + y1) / 2 + 1, zt + 3.2)];
         for (const a of [x0 + 1, x1 - 1]) { const b = g.p(a, (y0 + y1) / 2 + (a > x0 + 1 ? 1 : 0), zt), t = g.p(a, (y0 + y1) / 2 + (a > x0 + 1 ? 1 : 0), zt + 3.3); g.segs2([b[0], b[1], t[0], t[1]], '#6E6A64', 0.35); }
@@ -191,6 +209,7 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
   [[-12, 32, 4330], [5, 33, 4334]].forEach(([x, y, sd]) => T.cast([x, y], function (g) {
     const tt = g.p(x, y, 2.4), tb = g.p(x, y, 0); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#5A4A3C', 0.5); g.fill2(arcPts(tt[0], tt[1], 3.4, 0, TAU, 12).map((p) => [p[0], tt[1] + (p[1] - tt[1]) * 0.5]), '#F3F1EA', true);
     g.fill2([[tt[0] - 1.2, tt[1] - 0.2], [tt[0] - 0.6, tt[1] - 0.2], [tt[0] - 0.7, tt[1] - 2.0], [tt[0] - 1.1, tt[1] - 2.0]], '#5E2A3A', true);
+    g.glow2('lantern', [tt[0] + 0.8, tt[1] - 0.8], tb, { r: 1.2, col: '#FFC870' });               // a candle on the table at night
     for (const [dx, dy, d, k] of [[-2.2, -0.6, 0, 0], [2.2, -0.4, 1, 1], [0.2, 2.2, 2, 2]]) { K.box(g, x + dx - 0.6, y + dy - 0.6, x + dx + 0.6, y + dy + 0.6, 0.9, 1.3, { t: '#B9824A', l: '#A87440', r: '#94653A' }, { w: 0.3, boil: false }); LX.person(g, x + dx, y + dy, 1.3, LX.who(sd + k, { dir: d, pose: 'sit', beer: k === 1 })); }
   }));
   // the sardine grill, the griller in his apron, people eating sardines on bread
@@ -215,11 +234,13 @@ SF.tile('alfama', 100, 100, { rim: 40 }, function (T) {
     const w = g.p(c[0], c[1] + 2.0, ZB + 1.4), w2 = g.p(c[0] + 1.4, c[1] + 1.4, ZB + 3.6); g.fill2([[w[0] - 3, w[1]], [w[0] + 3, w[1] - 1.5], [w2[0] + 1, w2[1]], [w2[0] - 4, w2[1] + 1.5]], '#F3E3B0', true);
     K.cyl(g, c[0], c[1], 2.4, ZB + 4.2, ZB + 4.7, { t: '#3F6A4E', l: '#4F7A5E', r: '#3A604A' }, { n: 8, w: 0.5 });
     K.dome(g, c[0], c[1], 2.2, ZB + 4.7, 2.0, '#4F7A5E', { w: 0.6 }); const t = g.p(c[0], c[1], ZB + 6.7); g.line2([t, [t[0], t[1] - 2]], { w: 0.4, c: '#2E3A32', boil: false });
+    g.mark({ nc: (q) => (q === '#F3E3B0' ? '#FFE2A0' : undefined) }, 0); g.glow('lamp', c[0], c[1] + 2.4, ZB + 3.9, { r: 1.3, base: ZB });   // night: the kiosk's counter lit
   }, { on: true, name: 'quiosque' });
   [[27.5, -7], [24, -12.5], [30.5, -3.5]].forEach(([x, y], i) => T.cast([x, y], function (g) {
     const tt = g.p(x, y, ZB + 2.4), tb = g.p(x, y, ZB); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#5A4A3C', 0.45); g.fill2(arcPts(tt[0], tt[1], 2.6, 0, TAU, 12).map((p) => [p[0], tt[1] + (p[1] - tt[1]) * 0.5]), '#F3F1EA', true);
     for (const [dx, dy, d, k] of [[-1.8, 0, 0, 0], [1.8, 0.3, 1, 1]]) { K.box(g, x + dx - 0.6, y + dy - 0.6, x + dx + 0.6, y + dy + 0.6, ZB + 0.9, ZB + 1.3, { t: '#B9824A', l: '#A87440', r: '#94653A' }, { w: 0.3, boil: false }); LX.person(g, x + dx, y + dy, ZB + 1.3, LX.who(4372 + i * 2 + k, { dir: d, pose: 'sit', beer: k === 1 && i !== 1 })); }
-    const up = g.p(x, y, ZB + 7); g.segs2([tt[0], tt[1], up[0], up[1]], '#5A4A3C', 0.4); const um = arcPts(up[0], up[1] + 2.2, 7.6, Math.PI, TAU, 10).concat([[up[0] + 7.6, up[1] + 3.2], [up[0] - 7.6, up[1] + 3.2]]); g.fill2(um, ['#E2483D', '#F3F1EA', '#3F8FD2'][i], true); g.outline2(um, { w: 0.35, c: '#6E5A44', boil: false });
+    const up = g.p(x, y, ZB + 7); g.segs2([tt[0], tt[1], up[0], up[1]], '#5A4A3C', 0.4); const um = arcPts(up[0], up[1] + 2.2, 7.6, Math.PI, TAU, 10).concat([[up[0] + 7.6, up[1] + 3.2], [up[0] - 7.6, up[1] + 3.2]]); g.fill2(um, ['#E2483D', '#F3F1EA', '#3F8FD2'][i], true); g.mark({ nc: (c) => mix(nightColour(c), c, 0.55) }); g.outline2(um, { w: 0.35, c: '#6E5A44', boil: false });
+    g.glow('lamp', x, y, ZB + 6.2, { r: 1.1, base: ZB });                                     // a lamp under the umbrella at night
   }, { on: true }));
   T.obj([35.2, -22], (g) => LX.jacaranda(g, 35.2, -22, { z: ZB, r: 4.4, h: 5.2, fallen: true }), { on: true, name: 'jacaranda' });
   LX.walker(T, LX.who(4370), [[-8, -30], [12, -30]], 0.9, { z: ZA, phase: 0.3 });

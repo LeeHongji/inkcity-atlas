@@ -78,19 +78,21 @@ SF.tile('village', 100, -100, { rim: 28 }, function (T) {
     const ring = (r, z, a0, a1, n) => { const p = []; for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; p.push([FX + Math.cos(a) * r, FY + Math.sin(a) * r, z]); } return p; };
     // the inside of the far wall, the water, then the rim and the near wall
     g.fill(ring(FR - 0.6, 0.9, Math.PI * 0.75, Math.PI * 1.75, 16).concat(ring(FR - 0.6, 0.2, Math.PI * 1.75, Math.PI * 0.75, 16)), '#B9B3A8');
-    const w = ring(FR - 0.6, 0.2, 0, TAU, 32); g.fill(w, '#A9CCE0'); g.water(w, { dens: 1.2 });
+    const w = ring(FR - 0.6, 0.2, 0, TAU, 32); g.fill(w, '#A9CCE0'); g.mark({ nc: '#86C2E6' }); g.water(w, { dens: 1.2 });   // lit from under the water at night
     const rimTop = ring(FR + 0.6, 1.0, 0, TAU, 40).concat(ring(FR - 0.6, 1.0, TAU, 0, 40)); g.fill(rimTop, '#E6E0D3');
     g.fill(ring(FR + 0.6, 0, A_L, A_R, 20).concat(ring(FR + 0.6, 1.0, A_R, A_L, 20)), '#D3CCBE');
     g.line(ring(FR + 0.6, 1.0, 0, TAU, 40), { w: 0.6, boil: false }); g.line(ring(FR - 0.6, 1.0, 0, TAU, 40), { w: 0.45, c: '#8C8576', boil: false });
     g.line(ring(FR + 0.6, 0, A_L, A_R, 20), { w: 0.7, boil: false });
     // the ring of small jets' nozzles round the middle
     for (let i = 0; i < 12; i++) { const a = TAU * i / 12, p = g.p(FX + Math.cos(a) * 3, FY + Math.sin(a) * 3, 0.25); g.disc2(p, 0.35, '#8C8576'); }
+    for (let i = 0; i < 6; i++) { const a = TAU * (i + 0.5) / 6; g.glow('lantern', FX + Math.cos(a) * 3.4, FY + Math.sin(a) * 3.4, 0.6, { r: 1.6, col: '#CFE8FF' }); }
+    g.glow('lantern', FX, FY, 4, { r: 3.2, col: '#E4F2FF' });
   }, { name: 'fountain' });
   // the jets: a tall plume in the middle, a ring of arcs, rings spreading on the water
   T.actor({ sample: 5, period: 10, grow: false,
     at(t) { const ph = Math.floor((t * 1.5) % 1 * 6); return { x: FX, y: FY, z: 0, key: ph, ph }; },
     draw(g, st) {
-      const P = (x, y, z) => g.p(x, y, z), ph = st.ph / 6;
+      const P = (x, y, z) => g.p(x, y, z), ph = st.ph / 6, i0 = g.cmds.length;
       for (let i = 0; i < 12; i++) {
         const a = TAU * i / 12, sx = Math.cos(a) * 3, sy = Math.sin(a) * 3, pts = [];
         for (let k = 0; k <= 8; k++) { const u = k / 8; pts.push(P(sx * (1 - u * 0.75), sy * (1 - u * 0.75), 0.3 + 4.2 * u * (1 - u) * 1.6)); }
@@ -100,6 +102,7 @@ SF.tile('village', 100, -100, { rim: 28 }, function (T) {
       g.fill2([[base[0] - 1.2, base[1]], [base[0] + 1.2, base[1]], [top[0] + 0.5, top[1] + 2], [top[0], top[1]], [top[0] - 0.5, top[1] + 2]], 'rgba(236,246,250,0.92)', true);
       g.fill2(arcPts(top[0], top[1] + 3, 2.8, Math.PI * 1.05, Math.PI * 1.95, 8).concat([[top[0] + 2.4, top[1] + 9], [top[0] - 2.4, top[1] + 9]]), 'rgba(236,246,250,0.75)', true);
       for (let k = 0; k < 2; k++) { const r = 2.2 + ((ph + k * 0.5) % 1) * 3.2, pts = []; for (let i = 0; i <= 20; i++) { const a = TAU * i / 20; pts.push(P(Math.cos(a) * r, Math.sin(a) * r, 0.22)); } g.fine2(pts, { w: 0.35, c: 'rgba(255,255,255,0.8)' }); }
+      NK.nmark(g, i0, { nc: true }); NK.nmark(g, i0, { nc: true }, true);              // the jets lit from below at night
     } });
   // people sitting on the rim, facing out over the plaza
   const rim = (a, s, o) => { const x = FX + Math.cos(a) * FR, y = FY + Math.sin(a) * FR; return T.cast([x, y], (g) => NK.person(g, x, y, 1.0, NK.who(s, Object.assign({ dir: Math.sin(a) > 0.3 ? 1 : Math.cos(a) > 0 ? 0 : 1, pose: 'sit' }, o || {}))), { on: true }); };
@@ -113,7 +116,7 @@ SF.tile('village', 100, -100, { rim: 28 }, function (T) {
   const AX0 = -16, AX1 = 0, AY0 = 24.5, AY1 = 27.5, O0 = -10.6, O1 = -5.4, SPR = 8.2, ATT = 13, TOP = 16.6;
   T.obj([AX0, AY0, AX1, AY1], function (g) {
     g.boilP = 0.3;
-    const rad = (O1 - O0) / 2, mid = (O0 + O1) / 2;
+    const rad = (O1 - O0) / 2, mid = (O0 + O1) / 2, i0 = g.cmds.length;
     // the piers
     K.box(g, AX0, AY0, O0, AY1, 0, ATT, MARBLE, { w: 0.9 });
     K.box(g, O1, AY0, AX1, AY1, 0, ATT, MARBLE, { w: 0.9 });
@@ -140,6 +143,10 @@ SF.tile('village', 100, -100, { rim: 28 }, function (T) {
     K.box(g, AX0, AY0, AX1, AY1, ATT + 0.8, TOP - 0.8, MARBLE, { w: 0.85 });
     const ins = []; for (let a = AX0 + 2; a < AX1 - 2; a += 0.55) { const p = g.p(a, AY1 + 0.02, ATT + 2.0); ins.push(p[0], p[1], p[0] + 0.35, p[1] + 0.2); } g.segs2(ins, '#A9A296', 0.35);
     K.box(g, AX0 - 0.45, AY0 - 0.45, AX1 + 0.45, AY1 + 0.45, TOP - 0.8, TOP, MARBLE, { w: 0.8 });
+    // at night the arch is floodlit from its foot
+    NK.floodMark(g, i0, 0.72, '#FFF0D6');
+    for (const x of [AX0 + 1.5, (AX0 + O0) / 2, (O1 + AX1) / 2, AX1 - 1.5]) g.glow('lantern', x, AY1 + 1.4, 0.8, { r: 2.6, col: '#FFE8C0' });
+    g.glow('lantern', mid, AY1 + 0.4, ATT + 1.8, { r: 4.4, col: '#FFF0D6' });
   }, { name: 'arch', under: ATT });
 
   /* ---------------- the chess plaza (south-west, far right) ---------------- */

@@ -43,13 +43,15 @@ SF.tile('gracia', -100, 0, { rim: 18 }, function (T) {
     const ST = { t: '#F0D9B4', l: '#E8C79A', r: '#CFAE80' }, x0 = -0.5, y0 = -0.5, x1 = 2.5, y1 = 2.5;
     K.box(g, x0 - 0.8, y0 - 0.8, x1 + 0.8, y1 + 0.8, 0, 2.2, ST, { w: 0.7 });
     K.box(g, x0, y0, x1, y1, 2.2, 20, ST, { w: 0.85, nohid: true });
-    for (const z of [6, 11]) { K.win(g, 'L', y1, x0 + 1, x1 - 1, z, z + 2.2, { style: 'slit', arch: true }); K.win(g, 'R', x1, y0 + 1, y1 - 1, z, z + 2.2, { style: 'slit', arch: true }); }
-    for (const [f, p, a] of [['L', y1, (x0 + x1) / 2], ['R', x1, (y0 + y1) / 2]]) { const c = g.p.apply(g, K.pt(f, p + 0.05, a, 17)); g.disc2(c, 2.6, '#F6F1E4'); g.ring2(c, 2.6, { w: 0.45, c: '#5A4632' }); g.segs2([c[0], c[1], c[0] + 0.6, c[1] - 1.8, c[0], c[1], c[0] + 1.3, c[1] + 0.3], '#2A2622', 0.35); }
+    for (const z of [6, 11]) { K.win(g, 'L', y1, x0 + 1, x1 - 1, z, z + 2.2, { style: 'slit', arch: true, lit: 0 }); K.win(g, 'R', x1, y0 + 1, y1 - 1, z, z + 2.2, { style: 'slit', arch: true, lit: 0 }); }
+    // at night the clock faces are lit from inside and the tower is floodlit over the square
+    for (const [f, p, a] of [['L', y1, (x0 + x1) / 2], ['R', x1, (y0 + y1) / 2]]) { const c = g.p.apply(g, K.pt(f, p + 0.05, a, 17)); g.disc2(c, 2.6, '#F6F1E4'); g.mark({ nc: '#FFF0C8' }); g.ring2(c, 2.6, { w: 0.45, c: '#5A4632' }); g.segs2([c[0], c[1], c[0] + 0.6, c[1] - 1.8, c[0], c[1], c[0] + 1.3, c[1] + 0.3], '#2A2622', 0.35); g.glow2('lantern', c, c, { r: 2.0, col: '#FFEAB8' }); }
     K.box(g, x0 - 0.3, y0 - 0.3, x1 + 0.3, y1 + 0.3, 20, 20.6, ST, { w: 0.6, nohid: true });
     // the open belfry: four posts, the bell inside, the little pyramid roof
     for (const [x, y] of [[x0, y1], [x1, y1], [x1, y0]]) { const a = g.p(x, y, 20.6), b = g.p(x, y, 24); g.segs2([a[0], a[1], b[0], b[1]], '#CFAE80', 1.4); }
     K.hip(g, x0 - 0.5, y0 - 0.5, x1 + 0.5, y1 + 0.5, 24, 3.2, '#C9734F', { ridge: 0 });
     const t = g.p(1, 1, 27.2); g.segs2([t[0], t[1], t[0], t[1] - 4], '#3A3530', 0.45); g.disc2([t[0], t[1] - 4.4], 0.6, '#D8AE48');
+    BC.flood(g, 0, 0.72); g.glow('lantern', 2.5, 2.5, 4, { r: 2.6, col: '#FFDCA0' }); g.glow('lantern', 1, 1, 22, { r: 1.4, col: '#FFDCA0' });
   }, { name: 'clock tower' });
   // the bell: swings every 20 s
   T.actor({ sample: 5, period: 20, grow: false, bias: 0.2,
@@ -65,7 +67,7 @@ SF.tile('gracia', -100, 0, { rim: 18 }, function (T) {
     for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) {
       for (const zb of [3.5, 7.4]) for (let i = 0; i < 2; i++) for (let a = a0; a < a1 - 0.4; a += 0.8) { const g0 = (Math.round((a - a0) / 0.8) + i) % 2; g.fill(K.on(f, p + 0.04, a, a + 0.8, zb + i * 0.6, zb + i * 0.6 + 0.6), g0 ? '#3E8A5A' : '#F3F1EA'); }
       for (let a = a0 + 0.5; a < a1; a += 1.2) { const c = g.p.apply(g, K.pt(f, p + 0.05, a, 6.6)); g.disc2(c, 0.5, '#E6A43A'); }
-      for (let a = a0 + 1.2; a < a1 - 1; a += 2.6) { K.win(g, f, p, a, a + 1.2, 1.0, 3.2, { style: 'dark' }); K.win(g, f, p, a, a + 1.2, 4.8, 6.4, { style: 'dark' }); }
+      for (let a = a0 + 1.2; a < a1 - 1; a += 2.6) { K.win(g, f, p, a, a + 1.2, 1.0, 3.2, { style: 'dark', lit: 0 }); K.win(g, f, p, a, a + 1.2, 4.8, 6.4, { style: 'dark', lit: 0 }); }
     }
     K.box(g, x0 - 0.4, y0 - 0.4, x1 + 0.4, y1 + 0.4, Z, Z + 0.6, { t: '#F3F1EA', l: '#3E8A5A', r: '#2E6A44' }, { w: 0.6, nohid: true });
     for (const [x, y] of [[x0, y1], [x1, y1], [x1, y0], [x0, y0]]) { K.cyl(g, x, y, 0.9, Z, Z + 3.4, { t: '#F3F1EA', l: '#F3F1EA', r: '#D9D5CA' }, { w: 0.5, n: 8 }); const c = g.p(x, y, Z + 3.4); g.fill2([[c[0] - 2.2, c[1]], [c[0] + 2.2, c[1]], [c[0], c[1] - 4]], '#3E8A5A', true); g.fill2([[c[0], c[1]], [c[0] + 2.2, c[1]], [c[0], c[1] - 4]], '#2E6A44', true); }
@@ -77,7 +79,7 @@ SF.tile('gracia', -100, 0, { rim: 18 }, function (T) {
 
   /* ---- Plaça del Sol: terraces, plane trees ---- */
   for (const [x, y] of [[20, -8], [33, -8], [33, 10]]) T.obj([x, y], (g) => BC.plane(g, x, y, { r: 3.6, h: 5.8 }), { name: 'tree' });
-  const table = (g, x, y, seed) => { const tt = g.p(x, y, 2.3), tb = g.p(x, y, 0); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#3A3530', 0.45); g.fill2(arcPts(tt[0], tt[1], 2.2, 0, TAU, 10).map((q) => [q[0], tt[1] + (q[1] - tt[1]) * 0.45]), '#ECE8DF', true); g.fill2([[tt[0] - 0.4, tt[1]], [tt[0] + 0.4, tt[1]], [tt[0] + 0.5, tt[1] - 1.6], [tt[0] - 0.5, tt[1] - 1.6]], seed % 2 ? '#E3B23C' : '#8E2A36', true); };
+  const table = (g, x, y, seed) => { const tt = g.p(x, y, 2.3), tb = g.p(x, y, 0); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#3A3530', 0.45); g.fill2(arcPts(tt[0], tt[1], 2.2, 0, TAU, 10).map((q) => [q[0], tt[1] + (q[1] - tt[1]) * 0.45]), '#ECE8DF', true); g.mark({ nc: '#C9A472' }); g.fill2([[tt[0] - 0.4, tt[1]], [tt[0] + 0.4, tt[1]], [tt[0] + 0.5, tt[1] - 1.6], [tt[0] - 0.5, tt[1] - 1.6]], seed % 2 ? '#E3B23C' : '#8E2A36', true); g.mark({ nc: seed % 2 ? '#FFC65A' : '#E0566A' }); g.glow2('lantern', [tt[0], tt[1] - 1.0], tb, { r: 0.8, col: '#FFC874' }); };   // at night a candle on each terrace table
   for (const [x, y, s] of [[18.5, -9.5, 120], [18.5, -4, 121], [18.5, 1.5, 122], [18.5, 7, 123], [-9.5, 9, 124], [-9.5, 3.5, 125]]) T.cast([x, y], (g) => { table(g, x + 1.3, y, s); BC.person(g, x, y, 1.3, BC.who(s, { dir: 0, pose: 'sit' })); BC.person(g, x + 2.6, y - 0.4, 1.3, BC.who(s + 40, { dir: 3, pose: 'sit' })); }, {});
   // the guitarist on a bench with friends standing round
   T.cast([28, 3], (g) => { K.bench(g, 28, 3, { face: 'R', L: 2.6 }); const r = BC.person(g, 29.1, 3, 1.3, BC.who(130, { dir: 0, pose: 'sit', hands: [[2.4, -10.4], [-0.6, -12.6]] })); const hp = r.hip; g.fill2(K.curve([[hp[0] - 1, hp[1] - 1], [hp[0] + 2, hp[1] - 3.2], [hp[0] + 4.4, hp[1] - 1.8], [hp[0] + 3.4, hp[1] + 0.8], [hp[0] + 0.6, hp[1] + 0.8]], 3, true), '#B5763E', true); g.segs2([hp[0] + 1, hp[1] - 1.6, hp[0] - 3.6, hp[1] - 6.6], '#5A3E2E', 0.6); BC.person(g, 29.4, 5.0, 1.3, BC.who(131, { dir: 0, pose: 'sit' })); }, {});

@@ -56,6 +56,10 @@ SF.tile('palace', -100, -100, { rim: 4 }, function (T) {
       const bal = []; for (let y = -6; y <= 0; y += 0.5) { const a = g.p(x1 + 3.0, y, 4.6), b = g.p(x1 + 3.0, y, 5.7); bal.push(a[0], a[1], b[0], b[1]); } g.segs2(bal, '#E6E0D0', 0.4);
       LK.pole(g, -30.5, -3, h + 1.5, 7);
     }
+    // at night: the east front floodlit warm white from the forecourt
+    LK.flood(g, 0, 0.85, LK.FLOOD.warm, (c) => (c === '#B3262A' ? '#C8343A' : undefined));
+    for (let y = y0 + 2.4; y < y1 - 1; y += 4.4) g.glow('lantern', x1 + 0.7, y, 2.6, { r: 2.4, col: '#FFDCA8' });
+    if (mid) { g.glow('lantern', x1 + 3.4, -3, 5.4, { r: 2.6, col: '#FFDCA8' }); g.glow('lantern', x1 + 2.0, -3, 10.5, { r: 2.6, col: '#FFDCA8' }); }
   }, { name: 'palace' });
   front(-27, -10); front(-10, 4, true); front(4, 20);
   LK.flag(T, -30.5, -3, 12.5 + 1.5 + 7, { L: 4.6, H: 2.6, kind: 'standard', ph: 0.1 });
@@ -64,7 +68,7 @@ SF.tile('palace', -100, -100, { rim: 4 }, function (T) {
     const b = []; for (let y = y0; y <= y1 + 0.01; y += 0.6) { const p = g.p(-12.1, y, 0), q = g.p(-12.1, y, 3.4); b.push(p[0], p[1], q[0], q[1]); } g.segs2(b, '#1E1C1A', 0.45);
     const tips = []; for (let y = y0; y <= y1 + 0.01; y += 0.6) { const q = g.p(-12.1, y, 3.4); tips.push(q); } for (const q of tips) g.disc2([q[0], q[1] - 0.2], 0.35, '#D9A93E');
     g.line([[-12.1, y0, 1.0], [-12.1, y1, 1.0]], { w: 0.4, c: '#1E1C1A', boil: false }); g.line([[-12.1, y0, 3.0], [-12.1, y1, 3.0]], { w: 0.45, c: '#1E1C1A', boil: false });
-    for (const y of [y0, y1]) { const p = g.p(-12.1, y, 0), q = g.p(-12.1, y, 5.2); g.line2([p, q], { w: 1.2, c: '#1E1C1A', boil: false, ext: 0 }); g.disc2([q[0], q[1] - 0.6], 0.8, '#D9A93E'); }
+    for (const y of [y0, y1]) { const p = g.p(-12.1, y, 0), q = g.p(-12.1, y, 5.2); g.line2([p, q], { w: 1.2, c: '#1E1C1A', boil: false, ext: 0 }); g.disc2([q[0], q[1] - 0.6], 0.8, '#D9A93E'); g.mark({ nc: '#FFE6A0' }); g.glow2('lamp', [q[0], q[1] - 0.6], p, { r: 1.3 }); }   // lamps on the gate piers at night
   }, { name: 'railings' });
   rail(-18, -10.2); rail(-5.8, -0.2); rail(4.2, 12);
   // two sentry boxes in front of the palace with their guards
@@ -72,7 +76,7 @@ SF.tile('palace', -100, -100, { rim: 4 }, function (T) {
 
   /* ---------------- the Victoria Memorial ---------------- */
   T.obj([0, -11, 12, 1], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     const cx = 6, cy = -5, W = { t: '#F3F1EA', l: '#F6F4EE', r: '#DCD8CE' };
     K.cyl(g, cx, cy, 6.6, 0, 0.9, W, { w: 0.6, n: 20 }); K.cyl(g, cx, cy, 5.6, 0.9, 1.8, W, { w: 0.6, n: 20 }); K.cyl(g, cx, cy, 4.6, 1.8, 2.7, W, { w: 0.6, n: 20 });
     K.box(g, cx - 2.4, cy - 2.4, cx + 2.4, cy + 2.4, 2.7, 9.5, W, { w: 0.8 });
@@ -84,6 +88,11 @@ SF.tile('palace', -100, -100, { rim: 4 }, function (T) {
     g.fill2([V(-0.4, -4.8), V(-4.6, -9.4), V(-3.6, -6.0), V(-1.0, -3.6)], '#D9A93E', true); g.fill2([V(0.4, -4.8), V(4.6, -9.4), V(3.6, -6.0), V(1.0, -3.6)], '#C9993A', true);
     g.disc2(V(0, -6.6), 0.8, '#E0B54A'); g.line2([V(0.6, -5.0), V(1.6, -8.2)], { w: 0.4, c: '#C9993A', boil: false, ext: 0 });
     g.line2([V(-1.0, 0), V(-0.7, -4.4), V(0, -6.0), V(0.7, -4.4), V(1.0, 0)], { w: 0.35, c: '#8A6A2A', boil: false });
+    // at night: the white marble floodlit, the gilded Victory shining over it
+    const GILT = { '#E0B54A': '#FAD06A', '#D9A93E': '#F2C25A', '#C9993A': '#E6B04E' };
+    LK.flood(g, i0, 0.95, LK.FLOOD.white, (c) => GILT[c]);
+    for (const [x, y, z, r] of [[cx + 3, cy + 3, 4.5, 3.0], [cx + 2.6, cy - 1, 7, 2.2], [cx - 1, cy + 2.6, 7, 2.2]]) g.glow('lantern', x, y, z, { r, col: '#FFF2D8' });
+    g.glow2('lantern', V(0, -5), g.p(cx, cy, 0), { r: 2.6, col: '#FFD27A' });
   }, { name: 'memorial' });
 
   /* ---------------- the barracks, the Mall's trees and flags, the park ---------------- */

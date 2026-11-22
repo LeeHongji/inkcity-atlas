@@ -26,4 +26,13 @@ const SCENE = {
   visit: ['westminster', 'palace', 'trafalgar', 'city', 'tower', 'katharine', 'battersea', 'southbank', 'borough'],
   dive: { borough: 'pub', tower: 'tbridge' },
   bounds: { z: [0.7, 10], cx: [60, 1860], cy: [40, 1120] },
+  // at night: the open Thames (a clear fill over the water the view shows: LK.C.WMASK), St Katharine's dock, the lake in
+  // St James's Park and the rain's puddles carry the lights' reflections (the Thames's own colour is left out: the south
+  // bank's ground hides part of that fill, and lights there would reflect on the promenade); motes over London's lawns;
+  // two windows in three lit
+  night: {
+    water: ['rgba(163,189,189,0)', '#9DB9BC', '#8EABAE', '#A9C6C9', '#7FA0A3', '#C9DCE6', '#B3C9D6'],
+    grass: ['#A8CB7E', '#A9CC7E', '#A6C97C', '#B5CF8E', '#B9CF8E'],
+    lit: 0.66,
+  },
 };

@@ -53,6 +53,7 @@ SF.tile('squero', -100, 100, { rim: 32 }, function (T) {
     // oars and a forcola on the back wall, planks stacked
     for (let i = 0; i < 4; i++) { const A = g.p(0.05, 10 + i * 1.2, 0.5), B = g.p(0.05, 12 + i * 1.2, 6.2); g.line2([A, B], { w: 0.45, c: '#A07A50', boil: false, ext: 0 }); }
     K.box(g, 1, 24, 4, 30, 0, 1.4, { t: '#C9A26B', l: '#B58F5E', r: '#A07A50' }, { w: 0.45 });
+    for (const y of [11, 23]) g.glow('lamp', 9.4, y, 5.6, { r: 1.1 });                                 // work lamps hung under the eave at night
     K.gable(g, -2.6, 5.4, 10.4, 32.6, 7, 3, 'y', { a: '#8C6A4A', b: '#7A5A3C', e: '#8A6440' }, { c: '#4A3420' });
   }, { name: 'shed' });
 

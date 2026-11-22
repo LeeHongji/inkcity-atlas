@@ -46,8 +46,12 @@ SF.tile('paodeacucar', 100, -100, { rim: 14 }, function (T) {
     g.boilP = 0.2;
     RJ.rock(g, URC[0], URC[1], UR, { seed: 7, col: '#BDB6A6', forest: '#5E8F4E', bare: [[-0.76, 0.25, 0, 4]], canopy: 120 });
     // the summit station and its restaurant terrace, the first span's cables to the Praia Vermelha station
+    const iU = g.cmds.length;
     K.box(g, UT[0] - 2.6, UT[1] - 3.2, UT[0] + 2.6, UT[1] + 2.4, 21.2, 24.6, { t: '#E9E6DC', l: '#CFE0E6', r: '#B4C9D2' }, { w: 0.6 });
     K.box(g, UT[0] - 3.0, UT[1] - 3.6, UT[0] + 3.0, UT[1] + 2.8, 24.6, 25.3, '#D9463B', { w: 0.5 });
+    // at night the station and its restaurant are lit on the dark hilltop
+    RJ.nightEach(g, iU, (c, d) => (d.k !== K_FILL ? undefined : c === '#CFE0E6' ? '#FFE4A4' : c === '#B4C9D2' ? '#F5C978' : RJ.litCol(c, 0.55)));
+    for (const [dx, dy] of [[2.6, 0], [0, 2.4], [2.6, -2.4]]) g.glow2('lantern', g.p(UT[0] + dx, UT[1] + dy, 23), g.p(UT[0] + dx + 2, UT[1] + dy + 2, 21.2), { r: 2.2, col: '#FFD9A0' });
     for (const side of [-1.1, 1.1]) { const pts = []; for (let k = 0; k <= 16; k++) pts.push(along(spans[0], k / 16, side)); g.fine(pts.map((p) => [p[0], p[1], p[2] + 0.2]), { w: 0.42, c: '#2F2B27' }); }
   }, { name: 'morro da urca' });
   T.obj([SUG[0] - 14, SUG[1] - 12, SUG[0] + 14, SUG[1] + 12], function (g) {
@@ -56,8 +60,13 @@ SF.tile('paodeacucar', 100, -100, { rim: 14 }, function (T) {
       extra: (gg, S) => {   // a second band of scrub on the shoulders, near the top
         const R = RNG(91); for (let k = 0; k < 22; k++) { const i = 6 + Math.floor(R() * 2.5), p = S(Math.min(i, SR.length - 1), lerp(-0.4, 2.2, R())), r = 1.6 + R() * 1.8; gg.fill2(arcPts(p[0], p[1], r, 0, TAU, 7).map((q) => [q[0], p[1] + (q[1] - p[1]) * 0.7]), k % 3 ? RP.forest : RP.forestL); }
       } });
+    const iS = g.cmds.length;
     K.box(g, STOP[0] - 2.4, STOP[1] - 2.6, STOP[0] + 2.4, STOP[1] + 2.2, 39.6, 42.6, { t: '#E9E6DC', l: '#CFE0E6', r: '#B4C9D2' }, { w: 0.6 });
     K.box(g, STOP[0] - 2.8, STOP[1] - 3.0, STOP[0] + 2.8, STOP[1] + 2.6, 42.6, 43.2, '#D9463B', { w: 0.5 });
+    // at night the summit station is a lit box on the top of the dark rock
+    RJ.nightEach(g, iS, (c, d) => (d.k !== K_FILL ? undefined : c === '#CFE0E6' ? '#FFE4A4' : c === '#B4C9D2' ? '#F5C978' : RJ.litCol(c, 0.55)));
+    for (const [dx, dy] of [[2.4, 0], [0, 2.2]]) g.glow2('lantern', g.p(STOP[0] + dx, STOP[1] + dy, 41), g.p(STOP[0] + dx + 2, STOP[1] + dy + 2, 39.6), { r: 2.2, col: '#FFD9A0' });
+    g.glow('lantern', STOP[0], STOP[1], 44, { r: 0.7, col: '#FF5A48', base: 43.2 });
     for (const side of [-1.1, 1.1]) { const pts = []; for (let k = 0; k <= 20; k++) pts.push(along(spans[1], k / 20, side)); g.fine(pts.map((p) => [p[0], p[1], p[2] + 0.2]), { w: 0.42, c: '#2F2B27' }); }
   }, { name: 'pão de açúcar' });
   const SW = RJ.rockW(SUG[0], SUG[1], SR, { seed: 11 });
@@ -78,6 +87,10 @@ SF.tile('paodeacucar', 100, -100, { rim: 14 }, function (T) {
     K.box(g, -27.6, 10.4, -15.4, 20.6, 4.8, 5.5, '#E9E6DC', { w: 0.7 });
     K.box(g, -25, 14, -19, 18, 5.5, 6.6, '#BDB6A6', { w: 0.5 });
     g.fill(K.on('L', 20.62, -26, -17, 4.85, 5.45), '#D9463B'); K.text(g, 'L', 20.66, -21.5, 4.92, 0.48, 'BONDINHO PÃO DE AÇÚCAR', '#F6F3EA', { center: true, w: 0.36 });
+    // at night the station's glass hall is lit, its red name band too, lamps over the queue
+    RJ.nightEach(g, 0, (c, d) => (d.k !== K_FILL ? (c === '#F6F3EA' ? '#FFF6DC' : c === '#7E97A3' ? '#C9A46A' : undefined) : c === '#CFE0E6' ? '#FFE4A4' : c === '#B4C9D2' ? '#F5C978' : c === '#D9463B' ? '#E8584A' : RJ.litCol(c, 0.45)));
+    for (const a of [-25, -21.5, -18]) g.glow('lamp', a, 21.0, 4.4, { r: 1.2 });
+    g.glow('neon', -21.5, 21.2, 5.15, { r: 7, col: '#FF8A70', base: 0 });
   }, { name: 'station' });
   T.cast([-17, 22], (g) => { for (let i = 0; i < 6; i++) RJ.person(g, -26 + i * 1.7, 21.6 + (i % 2) * 0.5, 0, Object.assign(RJ.who(6030 + i), { dir: 2, pose: i % 3 === 1 ? 'hold' : 'stand', phone: i % 3 === 1, sunhat: i === 4 })); }, {});
   const HC = ['#F3EFE4', '#F0D9A8', '#E9B9A0', '#CFE0D0', '#F3E3B8'];
@@ -85,7 +98,7 @@ SF.tile('paodeacucar', 100, -100, { rim: 14 }, function (T) {
     const x0 = -36.5 + i * 7.6, x1 = x0 + 6.2, y0 = 29, y1 = 36, col = HC[i];
     T.obj([x0, y0, x1, y1], function (g) {
       K.box(g, x0, y0, x1, y1, 0, 6.8, col, { w: 0.8 });
-      RJ.colonial(g, 'L', y1, x0 + 0.4, x1 - 0.4, 0, 6.6, col, 6040 + i);
+      RJ.colonial(g, 'L', y1, x0 + 0.4, x1 - 0.4, 0, 6.6, col, 6040 + i, { lamps: true });
       TK_hip(g, x0, y0, x1, y1, 6.8);
     }, { name: 'casa' });
   }
@@ -123,7 +136,8 @@ SF.tile('paodeacucar', 100, -100, { rim: 14 }, function (T) {
         g.disc2([h0[0] - 1.3, h0[1] - 0.9], 0.6, '#5A5F64'); g.disc2([h0[0] + 1.3, h0[1] - 0.9], 0.6, '#5A5F64');
         g.line2([h0, h1_], { w: 0.8, c: '#3A3F44', boil: false, ext: 0 });
         K.rbox(g, 0, 0, 1.7, 1.35, ang, -2.6, -2.2, '#3A3F44', { w: 0.5 });
-        const B = K.rbox(g, 0, 0, 1.9, 1.5, ang, -5.8, -2.6, { t: '#5A5F64', l: '#CFE6EE', r: '#B4D2DD' }, { w: 0.6 });
+        const iB = g.cmds.length, B = K.rbox(g, 0, 0, 1.9, 1.5, ang, -5.8, -2.6, { t: '#5A5F64', l: '#CFE6EE', r: '#B4D2DD' }, { w: 0.6 });
+        RJ.nightEach(g, iB, (c, d) => (d.k === K_FILL && c !== '#5A5F64' ? mix('#FFE8B8', '#E9BE7A', clamp((0.81 - hex2rgb(c)[0] / 255) * 6, 0, 1)) : undefined)); { const d = g.cmds.find((q, k) => k >= iB && q.k === K_FILL && q.c !== '#5A5F64'); if (d) d.light = true; }   // (night: lit cabins)
         for (let i = 0; i < 3; i++) { const p = g.p.apply(g, B.pt(-1.2 + i * 1.2, 0.3, -4.2)); g.disc2(p, 1.1, looks[i].skin); g.fill2(arcPts(p[0], p[1] - 0.2, 1.15, Math.PI, TAU, 6), looks[i].hair, true); }
         for (const f of ['pv', 'nv', 'pu', 'nu']) if (B.vis[f]) { g.fill(B.quad(f, -1, 1, -5.8, -5.2), '#F2C230'); const m = B.quad(f, 0, 0, -5.2, -2.6); g.line([m[0], m[3]], { w: 0.3, c: '#7E97A3', boil: false, ext: 0 }); }
             } });
@@ -135,5 +149,5 @@ SF.tile('paodeacucar', 100, -100, { rim: 14 }, function (T) {
     RJ.rock(g, 78, -42, [[RS.WZ, 9, 8, 0, 0], [3, 8.4, 7.4, 0.2, 0.2], [7, 6.8, 6.0, 0.4, 0.3], [10, 4.6, 4.0, 0.5, 0.3], [11.6, 2.2, 1.9, 0.5, 0.3]], { seed: 23, col: '#B8B1A2', veg: [3, 12, 0.7], streaks: 10 });
     const sp = []; for (let i = 0; i < 9; i++) { const a = -0.6 + i * 0.32, p = g.p(78 + Math.cos(a) * 9.6, -42 + Math.sin(a) * 8.6, RS.WZ); sp.push([p[0], p[1]]); } g.line2(sp, { w: 0.8, c: '#F6F8F3', boil: false });
   }, { name: 'pedra do leme' });
-  T.cast([77, -35.5], (g) => { RJ.person(g, 77, -35.5, 3, Object.assign(RJ.who(6080, { carnaval: false }), { dir: 1, pose: 'hold', cap: '#F3F1EA', hands: [[4, -14], [3, -12]] })); const h = g.p(77, -35.5, 3), t = [h[0] + 18, h[1] - 26]; g.line2([[h[0] + 3.5, h[1] - 12.5], t], { w: 0.35, c: '#5A4632', boil: false }); g.fine2([t, [t[0] + 4, t[1] + 34]], { w: 0.2, c: '#8C8576' }); }, { on: true });
+  T.cast([77, -35.5], (g) => { g.glow('lantern', 75.8, -35, 3.5, { r: 1.2, col: '#FFD27A', base: 3 }); RJ.person(g, 77, -35.5, 3, Object.assign(RJ.who(6080, { carnaval: false }), { dir: 1, pose: 'hold', cap: '#F3F1EA', hands: [[4, -14], [3, -12]] })); const h = g.p(77, -35.5, 3), t = [h[0] + 18, h[1] - 26]; g.line2([[h[0] + 3.5, h[1] - 12.5], t], { w: 0.35, c: '#5A4632', boil: false }); g.fine2([t, [t[0] + 4, t[1] + 34]], { w: 0.2, c: '#8C8576' }); }, { on: true });
 });

@@ -36,6 +36,9 @@ SF.tile('lagoa', 0, 100, { rim: 46 }, function (T) {
     K.cyl(g, -32, 0, 2.0, 0, 0.8, { t: '#8CC6D2', l: '#D9D3C6', r: '#BDB6A6' }, { w: 0.6, n: 14 });
     K.cyl(g, -32, 0, 0.5, 0.8, 3.6, '#C9C2B2', { w: 0.5, n: 8 });
     const t = g.p(-32, 0, 3.6); g.fill2([[t[0] - 1, t[1]], [t[0] + 1, t[1]], [t[0] + 0.7, t[1] - 5], [t[0] - 0.7, t[1] - 5]], '#B9B2A2', true); g.disc2([t[0], t[1] - 5.8], 0.9, '#B9B2A2');
+    // at night the muse on her fountain is lit from the basin
+    RJ.nightEach(g, 0, (c, d) => (d.k === K_FILL && c === '#8CC6D2' ? '#5FC0DA' : (d.k === K_FILL || d.k === K_DISC) && (c === '#B9B2A2' || c === '#C9C2B2') ? RJ.floodCol(c, 0.9, '#F2D29A') : undefined));
+    for (const [x, y] of [[-33.6, 1.6], [-30.4, 1.6], [-30.4, -1.4]]) g.glow2('lantern', g.p(x, y, 1.0), g.p(x, y, 0), { r: 1.3, col: '#FFDDA0' });
   }, { name: 'chafariz das musas' });
   RJ.walker(T, RJ.who(5801), [[-32, -36], [-32, 36]], 0.9, { phase: 0.1 });
   RJ.walker(T, RJ.who(5802, { set: { sunhat: true } }), [[-31.6, 36], [-31.6, -36]], 0.8, { phase: 0.5 });

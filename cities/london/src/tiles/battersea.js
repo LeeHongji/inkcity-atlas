@@ -30,8 +30,12 @@ SF.tile('battersea', -100, 100, { rim: 30, order: 2.0 }, function (T) {
     // tall slit windows on the river (north... seen) and east faces
     for (const [f, p, a0, a1, zz] of [['R', 5, -20.4, -15.6, 11], ['R', 5, 1.6, 6.4, 11], ['R', 3, -14, 0, 15.6], ['L', 7, -22, 4, 11]]) for (let a = a0 + 0.6; a < a1 - 0.4; a += 1.6) K.win(g, f, p + 0.02, a, a + 0.5, 2.2, zz - 1.2, { style: 'dark', col: '#4E4A48', w: 0.25 });
     // the shops' glazed fronts along the base, the art-deco cornice bands
-    g.fill(K.on('L', 7.03, -23, 4, 0, 2.6), '#CFE0EA'); g.outline(K.on('L', 7.03, -23, 4, 0, 2.6), { w: 0.4, c: '#5A544C', boil: false });
+    g.fill(K.on('L', 7.03, -23, 4, 0, 2.6), '#CFE0EA'); g.mark({ nc: '#FFD592', spill: true }); g.outline(K.on('L', 7.03, -23, 4, 0, 2.6), { w: 0.4, c: '#5A544C', boil: false });
     for (const [x0, y0, x1, y1, h] of [[-24, -21, 5, -15, 12], [-24, 1, 5, 7, 12], [-22, -15, 3, 1, 17]]) K.box(g, x0 - 0.2, y0 - 0.2, x1 + 0.2, y1 + 0.2, h, h + 0.5, '#C9785E', { w: 0.45, nohid: true, boil: false });
+    // at night: the brick floodlit warm gold from below, the shops along its foot lit
+    LK.flood(g, 0, 1, LK.FLOOD.gold);
+    for (let x = -20; x < 4; x += 6) g.glow('lantern', x, 7.6, 4.5, { r: 2.6, col: '#FFC27A' });
+    for (const [y, z] of [[-18, 5], [-7, 8], [4, 5]]) g.glow('lantern', y < -15 || y > 1 ? 5.6 : 3.6, y, z, { r: 2.6, col: '#FFC27A' });
   }, { name: 'power station' });
   // the four white chimneys: fluted columns on square brick bases, rings at the top
   const chimney = (x, y) => T.obj([x - 2.2, y - 2.2, x + 2.2, y + 2.2], (g) => {
@@ -39,11 +43,14 @@ SF.tile('battersea', -100, 100, { rim: 30, order: 2.0 }, function (T) {
     K.cyl(g, x, y, 1.75, 16, 34, CH, { w: 0.75, n: 12 });
     const fl = []; for (const a of [-0.3, 0.2, 0.7, 1.2, 1.7, 2.2]) { const b = g.p(x + Math.cos(a) * 1.75, y + Math.sin(a) * 1.75, 16.4), t = g.p(x + Math.cos(a) * 1.75, y + Math.sin(a) * 1.75, 33.4); fl.push(b[0], b[1], t[0], t[1]); } g.segs2(fl, '#C9C5BA', 0.4);
     K.cyl(g, x, y, 1.95, 33.4, 34.2, CH, { w: 0.55, n: 12 });
+    // at night: the white chimneys floodlit warm gold from their bases
+    LK.flood(g, 0, 1, LK.FLOOD.gold);
+    for (const [z, r] of [[19, 2.4], [26, 2.2], [32, 1.8]]) g.glow('lantern', x + 1.4, y + 1.4, z, { r, col: '#FFD08A' });
   }, { name: 'chimney' });
   chimney(-24, -21); chimney(5, -21); chimney(-24, 7); chimney(5, 7);
   // the glass lift up the north-east chimney
   T.actor({ sample: 0.5, period: 30, at(t) { const u = (t / 30) % 1, z = 16 + 18.2 * (u < 0.45 ? smooth(u / 0.45) : u < 0.55 ? 1 : 1 - smooth((u - 0.55) / 0.45)); return { x: 6.9, y: -19.6, z, key: 0 }; },
-    draw(g) { const o = g.p(0, 0, 0); g.fill2([[o[0] - 1.8, o[1]], [o[0] + 1.8, o[1]], [o[0] + 1.8, o[1] - 6.4], [o[0] - 1.8, o[1] - 6.4]], 'rgba(207,224,232,0.92)', true); g.outline2([[o[0] - 1.8, o[1]], [o[0] + 1.8, o[1]], [o[0] + 1.8, o[1] - 6.4], [o[0] - 1.8, o[1] - 6.4]], { w: 0.45, c: '#3A3530', boil: false }); LK.bust2(g, [o[0] - 0.6, o[1] - 0.6], LK.who(7700), 0.55); LK.bust2(g, [o[0] + 0.8, o[1] - 0.4], LK.who(7701), 0.55); } });
+    draw(g) { const o = g.p(0, 0, 0); g.fill2([[o[0] - 1.8, o[1]], [o[0] + 1.8, o[1]], [o[0] + 1.8, o[1] - 6.4], [o[0] - 1.8, o[1] - 6.4]], 'rgba(207,224,232,0.92)', true); g.mark({ nc: '#FFF0C8', light: true }); g.outline2([[o[0] - 1.8, o[1]], [o[0] + 1.8, o[1]], [o[0] + 1.8, o[1] - 6.4], [o[0] - 1.8, o[1] - 6.4]], { w: 0.45, c: '#3A3530', boil: false }); LK.bust2(g, [o[0] - 0.6, o[1] - 0.6], LK.who(7700), 0.55); LK.bust2(g, [o[0] + 0.8, o[1] - 0.4], LK.who(7701), 0.55); } });
   // the pig, floating over the chimneys on its long tether
   T.actor({ layer: 'top', grow: false, sample: 5, period: 12, at(t) { const f = Math.floor(t * 2) % 6; return { x: -8 + Math.sin(t * 0.5) * 1.2, y: -8, z: 42 + Math.sin(t * 0.8) * 0.8, key: f, f }; },
     draw(g, st) { const o = g.p(0, 0, 0), r = [0, 0.6, 1, 0.6, 0, -0.6][st.f] * 0.08, P = (u, v) => [o[0] + u * Math.cos(r) - v * Math.sin(r), o[1] + u * Math.sin(r) + v * Math.cos(r)];
@@ -69,7 +76,7 @@ SF.tile('battersea', -100, 100, { rim: 30, order: 2.0 }, function (T) {
   T.obj([20, 24, 28, 26], (g) => { const posts = []; for (const x of [20.4, 27.6]) for (const y of [24.2, 25.8]) { const a = g.p(x, y, 0), b = g.p(x, 25, 6); posts.push(a[0], a[1], b[0], b[1]); } g.segs2(posts, '#C8372D', 0.7); g.line([[20.4, 25, 6], [27.6, 25, 6]], { w: 0.8, c: '#C8372D', boil: false }); }, { name: 'swings' });
   for (const [x, ph, s] of [[22.4, 0, 7710], [25.6, 0.4, 7711]]) T.actor({ sample: 5, period: 10, at(t) { const f = Math.floor(((t * 0.45 + ph) % 1) * 8); return { x, y: 25, z: 0, key: f, f }; }, draw(g, st) { const a = Math.sin(st.f / 8 * TAU) * 0.6, sy = Math.sin(a) * 4.2, sz = 6 - Math.cos(a) * 4.2; for (const dx of [-0.6, 0.6]) g.line([[dx, 0, 6], [dx, sy, sz]], { w: 0.3, c: '#5A544C', boil: false, ext: 0 }); K.box(g, -0.8, sy - 0.4, 0.8, sy + 0.4, sz - 0.2, sz, '#3A3530', { w: 0.3, boil: false, nohid: true }); LK.person(g, 0, sy, sz, Object.assign(LK.who(s, { k: 0.72 }), { dir: 1, pose: 'sit' })); } });
   // the street-food stalls in front of the power station
-  for (const [x, a, b] of [[-20, '#3F6B4E', '#F3F1EA'], [-12, '#C8372D', '#F3F1EA'], [-4, '#E6C24F', '#2A2622'], [4, '#3F5F8F', '#F3F1EA']]) T.obj([x - 2.4, 10, x + 2.4, 14], (g) => K.stall(g, x, 12, { face: 'L', L: 2.2, D: 1.6, a, b }), { name: 'stall' });
+  for (const [x, a, b] of [[-20, '#3F6B4E', '#F3F1EA'], [-12, '#C8372D', '#F3F1EA'], [-4, '#E6C24F', '#2A2622'], [4, '#3F5F8F', '#F3F1EA']]) T.obj([x - 2.4, 10, x + 2.4, 14], (g) => { K.stall(g, x, 12, { face: 'L', L: 2.2, D: 1.6, a, b }); g.glow('lamp', x, 12, 5.4, { r: 1.3 }); }, { name: 'stall' });   // a lamp under each awning at night
 
   /* ---------------- the living layer ---------------- */
   T.cast([-8, 17.4], (g) => { const P = [[-21, 15.6, 3], [-19, 16.4, 3], [-13, 15.8, 3], [-10.6, 16.8, 2], [-5, 15.6, 3], [-2.6, 16.6, 3], [3, 15.8, 3], [5.4, 16.8, 2], [-15, 18.6, 0], [0, 18.8, 1]]; P.forEach(([x, y, d], i) => LK.person(g, x, y, 0, (i % 4 === 3 ? LK.tourist : LK.who)(7720 + i, { dir: d, pose: i % 3 === 0 ? 'hold' : 'stand', k: i === 8 ? 0.74 : undefined }))); }, { on: true });

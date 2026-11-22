@@ -27,4 +27,12 @@ const SCENE = {
   visit: ['peak', 'midlevels', 'wanchai', 'causeway', 'central', 'sheungwan', 'choihung', 'tst', 'mongkok'],
   dive: { peak: 'peaktram', mongkok: 'temple', tst: 'ferry', central: 'ferry' },
   bounds: { z: [0.7, 10], cx: [60, 1860], cy: [40, 1120] },
+  // at night (December, about seven): the lit shop floors always lit, two windows in three lit; the harbour's water
+  // reflects every light on its shores; lawns and the hill hold fireflies
+  night: {
+    windows: { '#F2DDA8': 1, '#F6E2A8': 1 },
+    water: ['#9BBABA', '#86A6A8', '#B9CFCB', '#9DBDC3'],
+    grass: ['#B5CF8E', '#A9C98A', '#9DBF7E', '#C7D1AE'],
+    lit: 0.66,
+  },
 };

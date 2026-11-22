@@ -73,7 +73,7 @@ SF.tile('montmartre', 100, -100, { rim: 54 }, function (T) {
   /* ---------------- Sacré-Cœur ---------------- */
   const WH = { t: '#F7F4EC', l: '#F4EFE4', r: '#DFD8C8' }, Z0 = HT;
   T.obj([-27, -30, -5, -5], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     // the campanile behind
     K.box(g, -19, -30, -13, -24, Z0, Z0 + 25, WH, { w: 0.85 });
     for (const [f, p, a0] of [['L', -24, -19], ['R', -13, -30]]) { const ar = []; const m = a0 + 3; for (let k = 0; k <= 6; k++) { const t = Math.PI * k / 6; ar.push(K.pt(f, p + 0.03, m + Math.cos(t) * 1.3, Z0 + 19 + Math.sin(t) * 1.3)); } ar.unshift(K.pt(f, p + 0.03, m + 1.3, Z0 + 12)); ar.push(K.pt(f, p + 0.03, m - 1.3, Z0 + 16)); g.fill(ar, '#8C8578'); }
@@ -92,15 +92,19 @@ SF.tile('montmartre', 100, -100, { rim: 54 }, function (T) {
     K.dome(g, -16, -16, 1.3, Z0 + 29.4, 1.4, '#F4EFE4', { w: 0.5 }); const fin = g.p(-16, -16, Z0 + 30.8); g.line2([fin, [fin[0], fin[1] - 5]], { w: 0.45, c: '#B8B0A0', boil: false }); g.segs2([fin[0] - 1.2, fin[1] - 3.4, fin[0] + 1.2, fin[1] - 3.4], '#B8B0A0', 0.45);
     // the small domes at the corners we see
     for (const [x, y] of [[-23, -9], [-9, -9], [-9, -22]]) { K.cyl(g, x, y, 2.0, Z0 + 11.6, Z0 + 14.4, WH, { w: 0.6, n: 12 }); K.dome(g, x, y, 2.1, Z0 + 14.4, 3.2, '#F7F4EC', { w: 0.7, shadow: '#DED6C5', band: true }); const t = g.p(x, y, Z0 + 17.6); g.line2([t, [t[0], t[1] - 2.4]], { w: 0.4, c: '#B8B0A0', boil: false }); }
+    // at night Sacré-Cœur is floodlit white over the city: the travertine glows, the domes brightest
+    PA.flood(g, i0, 0.86, PN.white);
+    for (const [x, y, z, r] of [[-16, -16, Z0 + 22, 6], [-16, -10.6, Z0 + 15, 4.4], [-16, -7, Z0 + 6, 4.4], [-16, -27, Z0 + 20, 2.4], [-9, -9, Z0 + 15.5, 2.2], [-23, -9, Z0 + 15.5, 2.2]]) g.glow('lantern', x, y, z, { r, col: '#FFF1D6' });
   }, { name: 'sacre coeur' });
   // the portico on the parvis, with the two bronze riders on top
   T.obj([-25, -7, -7, -4.5], function (g) {
-    const y1 = -4.5, Z = Z0 + 7.4;
+    const y1 = -4.5, Z = Z0 + 7.4, i0 = g.cmds.length;
     K.box(g, -25, -7, -7, y1, Z0, Z, WH, { w: 0.85 });
     for (const m of [-20.5, -16, -11.5]) { const ar = [K.pt('L', y1 + 0.03, m - 1.5, Z0), K.pt('L', y1 + 0.03, m + 1.5, Z0)]; for (let k = 0; k <= 8; k++) { const t = Math.PI * k / 8; ar.push(K.pt('L', y1 + 0.03, m + Math.cos(t) * 1.5, Z0 + 4.4 + Math.sin(t) * 1.5)); } g.fill(ar, '#6E6A60'); g.line(ar.slice(2), { w: 0.5, boil: false }); }
     K.box(g, -25.3, -7.3, -6.7, y1 + 0.3, Z, Z + 0.6, WH, { w: 0.55, nohid: true });
     const gb = [K.pt('L', y1 + 0.04, -21, Z + 0.6), K.pt('L', y1 + 0.04, -11, Z + 0.6), K.pt('L', y1 + 0.04, -16, Z + 3.0)]; g.fill(gb, '#F4EFE4'); g.outline(gb, { w: 0.5, boil: false });
     for (const x of [-23.5, -8.5]) { const c = g.p(x, -5.6, Z + 0.6); g.fill2([[c[0] - 2.4, c[1] - 0.6], [c[0] + 2.2, c[1] - 1.0], [c[0] + 2.8, c[1] - 3.4], [c[0] + 1.4, c[1] - 3.0], [c[0] - 1.8, c[1] - 2.8]], '#4E5A52', true); g.fill2([[c[0] - 0.4, c[1] - 3.0], [c[0] + 0.6, c[1] - 3.0], [c[0] + 0.4, c[1] - 6.4], [c[0] - 0.4, c[1] - 6.4]], '#4E5A52', true); g.disc2([c[0], c[1] - 7.0], 0.6, '#4E5A52'); }
+    PA.flood(g, i0, 0.86, PN.white);                                  // floodlit with the basilica
   }, { on: true, name: 'portico' });
 
   /* ---------------- the Place du Tertre, the village ---------------- */
@@ -125,7 +129,8 @@ SF.tile('montmartre', 100, -100, { rim: 54 }, function (T) {
   for (const [x, y] of [[9.5, -19.5], [14.5, -19.5]]) T.cast([x, y], function (g) {
     const z = hAt(x, y), b = g.p(x, y, z), t = g.p(x, y, z + 5.6); g.segs2([b[0], b[1], t[0], t[1]], '#6E5A44', 0.45);
     for (const [dx, dy, s] of [[-1.4, 0, 0], [1.4, 0.6, 1]]) PA.person(g, x + dx, y + dy, z + 1.3, PA.who(1300 + Math.round(x * 3 + y) + s, { dir: s ? 1 : 0, pose: 'sit' }));
-    g.fill2(arcPts(t[0], t[1] + 1.0, 8.0, Math.PI, TAU, 10).concat([[t[0] + 8, t[1] + 2.6], [t[0] - 8, t[1] + 2.6]]), '#C9463E', true); g.line2(arcPts(t[0], t[1] + 1.0, 8.0, Math.PI, TAU, 10), { w: 0.4, c: '#7A2A22', boil: false });
+    g.fill2(arcPts(t[0], t[1] + 1.0, 8.0, Math.PI, TAU, 10).concat([[t[0] + 8, t[1] + 2.6], [t[0] - 8, t[1] + 2.6]]), '#C9463E', true); g.mark({ nc: '#C8503E' }); g.line2(arcPts(t[0], t[1] + 1.0, 8.0, Math.PI, TAU, 10), { w: 0.4, c: '#7A2A22', boil: false });
+    g.glow2('lamp', [t[0], t[1] + 3.6], b, { r: 1.1 });               // at night a lamp hangs under the umbrella
   }, { on: true });
   [[5.5, -17, 'R'], [19, -24.5, 'L'], [11.5, -13.4, 'L'], [19.5, -15, 'R']].forEach(([x, y, f], i) => T.cast([x, y], (g) => { const z = hAt(x, y); g.at(0, 0, z, (g2) => PA.painter(g2, x, y, PA.who(1320 + i, { beret: i % 2 ? '#2A2622' : undefined, top: i % 2 ? '#E7E2D6' : '#5A6B5A' }), f, 1320 + i)); }, { on: true }));
   T.cast([3.6, -21], (g) => { const z = hAt(3.6, -21); PA.person(g, 3.6, -21, z, PA.who(1330, { dir: 0, pose: 'hold' })); PA.person(g, 4.4, -19.4, z, PA.who(1331, { dir: 0 })); }, { on: true });
@@ -153,8 +158,8 @@ SF.tile('montmartre', 100, -100, { rim: 54 }, function (T) {
       const zt = Math.max(zf(y - 1.6), zf(y + 1.6)) + 3.8;
       const side = [P(-3.8, y - 1.6, zf(y - 1.6) + 0.5), P(-3.8, y + 1.6, zf(y + 1.6) + 0.5), P(-3.8, y + 1.6, zt), P(-3.8, y - 1.6, zt)], front = [P(-6.2, y + 1.6, zf(y + 1.6) + 0.5), P(-3.8, y + 1.6, zf(y + 1.6) + 0.5), P(-3.8, y + 1.6, zt), P(-6.2, y + 1.6, zt)];
       g.fill2(front, '#E6C24F', true); g.fill2(side, '#D4AE3E', true);
-      g.fill2([P(-6.0, y + 1.62, zt - 2.6), P(-4.0, y + 1.62, zt - 2.6), P(-4.0, y + 1.62, zt - 0.5), P(-6.0, y + 1.62, zt - 0.5)], '#CFE0E4', true);
-      g.fill2([P(-3.78, y - 1.3, zt - 2.6), P(-3.78, y + 1.3, zt - 2.6), P(-3.78, y + 1.3, zt - 0.5), P(-3.78, y - 1.3, zt - 0.5)], '#BCD0D6', true);
+      g.fill2([P(-6.0, y + 1.62, zt - 2.6), P(-4.0, y + 1.62, zt - 2.6), P(-4.0, y + 1.62, zt - 0.5), P(-6.0, y + 1.62, zt - 0.5)], '#CFE0E4', true); g.mark({ nc: '#FFE7B0', light: true });   // lit at night
+      g.fill2([P(-3.78, y - 1.3, zt - 2.6), P(-3.78, y + 1.3, zt - 2.6), P(-3.78, y + 1.3, zt - 0.5), P(-3.78, y - 1.3, zt - 0.5)], '#BCD0D6', true); g.mark({ nc: '#F6D898' });
       g.fill2([P(-6.2, y - 1.6, zt), P(-3.8, y - 1.6, zt), P(-3.8, y + 1.6, zt), P(-6.2, y + 1.6, zt)], '#F3F1EA', true);
       g.outline2(front, { w: 0.45, boil: false }); g.outline2(side, { w: 0.45, boil: false });
       void fl;

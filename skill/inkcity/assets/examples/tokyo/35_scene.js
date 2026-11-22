@@ -24,4 +24,6 @@ const SCENE = {
   visit: ['tower', 'station', 'akiba', 'shitamachi', 'tsukiji', 'sensoji', 'sumida', 'meiji', 'shibuya'],
   dive: { tsukiji: 'gado' },
   bounds: { z: [0.7, 10], cx: [60, 1860], cy: [60, 1100] },
+  // at night: lit shop floors and izakaya interiors are always lit; two windows in three are lit
+  night: { windows: { '#E9D3A6': 1, '#E9C48A': 1 }, lit: 0.66 },
 };

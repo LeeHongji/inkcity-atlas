@@ -43,9 +43,13 @@ PA.dirOf = (face) => (face === 'L' ? [0.878, 0.478] : face === 'R' ? [0.878, -0.
 /* a sign board on a face with a row of letters */
 PA.sign = function (g, face, p, a0, a1, z0, z1, col, o) {
   o = o || {}; const q = K.on(face, p + 0.06, a0, a1, z0, z1);
+  const i0 = g.cmds.length;
   g.fill(q, col); if (o.line !== false) g.outline(q, { w: 0.4, c: shade(col, 0.5), boil: false, ext: 0 });
   const c = g.p.apply(g, K.pt(face, p + 0.08, (a0 + a1) / 2, (z0 + z1) / 2)), L = Math.abs(a1 - a0) * SX * 0.5 * 0.8;
+  const i1 = g.cmds.length;
   PA.letters2(g, [c[0], c[1]], L, (z1 - z0) * VZ * 0.55, o.ink || '#F6F1E4', o.word || o.seed || 1, 0, PA.dirOf(face));
+  // at night a shop's sign is lit: the board keeps its colour, the letters shine, a soft light round it
+  if (o.lit !== false) { g.mark({ nc: true }, i0); PA.litLines(g, i1); g.glow2('lantern', c, c, { r: Math.max(1.2, Math.min(2.2, L * 0.12)), col: '#FFD9A0' }); }
 };
 
 /* ---------------- facades ---------------- */
@@ -54,7 +58,7 @@ PA.win = function (g, face, p, a0, a1, z0, z1, o) {
   o = o || {};
   if (o.surround !== false) g.fill(K.on(face, p + 0.02, a0 - 0.22, a1 + 0.22, z0 - 0.15, z1 + 0.3), o.sc || PC.sill);
   const q = K.on(face, p + 0.04, a0, a1, z0, z1), P = g.P(q);
-  g.fill2(P, o.pane || PC.pane);
+  { const i0 = g.cmds.length; g.fill2(P, o.pane || PC.pane); g.mark({ win: o.lit == null ? true : o.lit }, i0); }   // at night most are lit
   const m = g.P([K.pt(face, p + 0.05, (a0 + a1) / 2, z0), K.pt(face, p + 0.05, (a0 + a1) / 2, z1), K.pt(face, p + 0.05, a0, z1 - (z1 - z0) * 0.3), K.pt(face, p + 0.05, a1, z1 - (z1 - z0) * 0.3)]);
   g.segs2([m[0][0], m[0][1], m[1][0], m[1][1], m[2][0], m[2][1], m[3][0], m[3][1]], '#E9E2D2', 0.32);
   g.segs2([P[0][0], P[0][1], P[1][0], P[1][1], P[1][0], P[1][1], P[2][0], P[2][1], P[2][0], P[2][1], P[3][0], P[3][1], P[3][0], P[3][1], P[0][0], P[0][1]], '#4A443B', 0.3);
@@ -112,7 +116,7 @@ PA.mansard = function (g, x0, y0, x1, y1, z, o) {
       if (face === 'L') g.fill([[a + w, p, z0], [a + w, p - 0.55, z0 + 0.6], [a + w, p - 0.55, z1 + 0.35], [a + w, p, z1]], shade(col, 0.15));
       else g.fill([[p, a + w, z0], [p - 0.55, a + w, z0 + 0.6], [p - 0.55, a + w, z1 + 0.35], [p, a + w, z1]], shade(col, -0.02));
       g.fill(fr, PC.sill);
-      g.fill(K.on(face, p + 0.03, a - w + 0.22, a + w - 0.22, z0 + 0.2, z1 - 0.15), PC.pane);
+      { const i0 = g.cmds.length; g.fill(K.on(face, p + 0.03, a - w + 0.22, a + w - 0.22, z0 + 0.2, z1 - 0.15), PC.pane); g.mark({ win: o.dlit == null ? 0.5 : o.dlit }, i0); }   // attic rooms: half lit
       const cap = []; for (let k = 0; k <= 6; k++) { const t = Math.PI * k / 6; cap.push(K.pt(face, p + 0.02, a + Math.cos(t) * (w + 0.12), z1 + Math.sin(t) * 0.55)); }
       g.fill(cap, PC.sill); g.outline(fr.concat([]), { w: 0.35, c: '#7A6E58', boil: false, ext: 0 });
       g.line(cap, { w: 0.35, c: '#7A6E58', boil: false, ext: 0 });
@@ -194,7 +198,11 @@ PA.shop = function (g, face, p, a0, a1, rdc, col, kind, seed) {
   const fr = K.on(face, p + 0.03, a0, a1, 0, rdc - 0.5);
   g.fill(fr, col);
   const gl = K.on(face, p + 0.05, a0 + 0.3, a1 - 0.3, 0.35, rdc - 1.75);
+  // at night cafés and most shops are lit inside: the glass shines (and lights the pavement), the goods keep their colours
+  const lit = kind === 'cafe' || h1(seed * 13 + Math.round(a0 * 5) + 7) < 0.78, i0 = g.cmds.length;
   g.fill(gl, kind === 'cafe' ? '#E8D6AE' : C.glass);
+  if (lit) g.mark({ nc: kind === 'cafe' ? '#FFCF7C' : PA.winCol(seed * 3 + Math.round(a0 * 7)), win: 1, spill: true }, i0);
+  const i1 = g.cmds.length;
   if (kind === 'cafe') {   // inside: a warm room, the zinc counter, bottles
     const R = RNG(seed), dots = [];
     for (let i = 0; i < 7; i++) { const c = g.p.apply(g, K.pt(face, p + 0.06, lerp(a0 + 0.6, a1 - 0.6, R()), 1.6 + R() * 0.8)); dots.push(c); }
@@ -204,6 +212,7 @@ PA.shop = function (g, face, p, a0, a1, rdc, col, kind, seed) {
     g.segs2([m[0] - dd * 0.3, m[1] + dd, m[0] + dd * 0.4, m[1] - dd], C.white, 0.55);
     const R = RNG(seed + 3); for (let i = 0; i < 4; i++) { const c = g.p.apply(g, K.pt(face, p + 0.06, lerp(a0 + 0.7, a1 - 0.7, (i + 0.5) / 4), 0.9)); g.fill2([[c[0] - 0.8, c[1]], [c[0] + 0.8, c[1]], [c[0] + 0.8, c[1] - 1.4], [c[0] - 0.8, c[1] - 1.4]], R.pick(['#D98AA4', '#E6C24F', '#7FB7D9', '#C9584B', '#8FBF73', '#F3F1EA']), true); }
   }
+  if (lit) g.mark({ nc: true }, i1);
   const mul = []; for (let i = 1; i < 3; i++) { const a = lerp(a0 + 0.3, a1 - 0.3, i / 3), q = g.P([K.pt(face, p + 0.06, a, 0.35), K.pt(face, p + 0.06, a, rdc - 1.75)]); mul.push(q[0][0], q[0][1], q[1][0], q[1][1]); }
   g.segs2(mul, shade(col, 0.2), 0.4);
   g.outline(gl, { w: 0.35, c: shade(col, 0.5), boil: false, ext: 0 });
@@ -212,7 +221,7 @@ PA.shop = function (g, face, p, a0, a1, rdc, col, kind, seed) {
 /* a red awning (store banne) sloping out from a face, with a scalloped valance and lettering */
 PA.awning = function (g, face, p, a0, a1, z, out, o) {
   o = o || {}; const col = o.col || PC.awn, drop = o.drop || 0.9, P = (a, dd, zz) => face === 'L' ? [a, p + dd, zz] : [p + dd, a, zz];
-  const q = [P(a0, 0, z), P(a1, 0, z), P(a1, out, z - drop), P(a0, out, z - drop)];
+  const q = [P(a0, 0, z), P(a1, 0, z), P(a1, out, z - drop), P(a0, out, z - drop)], i0 = g.cmds.length;
   g.fill(q, col);
   if (o.stripe) { const n = Math.max(2, Math.round(Math.abs(a1 - a0) / 1.0)); for (let i = 0; i < n; i += 2) { const s0 = lerp(a0, a1, i / n), s1 = lerp(a0, a1, (i + 1) / n); g.fill([P(s0, 0, z), P(s1, 0, z), P(s1, out, z - drop), P(s0, out, z - drop)], o.stripe); } }
   const v = [P(a0, out, z - drop), P(a1, out, z - drop), P(a1, out, z - drop - 0.75), P(a0, out, z - drop - 0.75)];
@@ -220,10 +229,15 @@ PA.awning = function (g, face, p, a0, a1, z, out, o) {
   const sc = [], n = Math.max(3, Math.round(Math.abs(a1 - a0) / 0.8));
   for (let i = 0; i < n; i++) { const a = lerp(a0, a1, (i + 0.5) / n), c = g.p.apply(g, P(a, out, z - drop - 0.75)); sc.push([c[0], c[1]]); }
   for (const c of sc) g.fill2(arcPts(c[0], c[1], Math.abs(a1 - a0) / n * 1.4, 0, Math.PI, 5), shade(col, 0.1), true);
-  const c = g.p.apply(g, P((a0 + a1) / 2, out + 0.02, z - drop - 0.38));
+  const c = g.p.apply(g, P((a0 + a1) / 2, out + 0.02, z - drop - 0.38)), i1 = g.cmds.length;
   PA.letters2(g, c, Math.min(Math.abs(a1 - a0) * SX * 0.45, 26), 1.2, o.ink || '#F6EBD0', o.word || PA.CAFES[(o.seed || 7) % PA.CAFES.length], 0.28, PA.dirOf(face));
   g.outline(q, { w: 0.5, c: shade(col, 0.5), boil: false });
   g.line([v[3], v[2]], { w: 0.45, c: shade(col, 0.5), boil: false });
+  // at night the canvas glows with the lamps hung under its edge (the terrace's own light), its name lit
+  PA.nightCol(g, i0, (cc, fill) => (fill ? PA.floodCol(cc, 0.5, '#FFC98E') : undefined));
+  for (let k = i1; k < g.cmds.length; k++) if (g.cmds[k].k === K_SEGS) g.cmds[k].nc = o.ink || '#F6EBD0';
+  const nl = Math.max(1, Math.round(Math.abs(a1 - a0) / 4.5));
+  for (let i = 0; i < nl; i++) { const a = lerp(a0, a1, (i + 0.5) / nl), lp = g.p.apply(g, P(a, out - 0.35, z - drop - 0.5)); g.glow2('lantern', lp, lp, { r: 0.8, col: '#FFD08A' }); }
 };
 
 /* ---------------- the café terrace ---------------- */
@@ -306,7 +320,7 @@ PA.plane = function (g, x, y, o) {
   g.line2([[f[0] - 1.1, f[1]], [top[0] - 0.75, top[1]]], { w: 0.5, c: '#6E6450', boil: false }); g.line2([[f[0] + 1.1, f[1]], [top[0] + 0.75, top[1]]], { w: 0.5, c: '#6E6450', boil: false });
   const cx = top[0], cy = top[1] - r * 0.55, n = 11, pts = [], a0 = R() * TAU;
   for (let i = 0; i < n; i++) { const a = a0 + TAU * i / n, rr = r * (0.86 + R() * 0.26); pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.82]); }
-  const col = o.col || PC.plane;
+  const col = o.col || PC.plane, i0 = g.cmds.length;
   g.fill2(pts, col);
   const sh = pts.filter((p) => (p[0] - cx) * 0.55 + (p[1] - cy) > -r * 0.1); if (sh.length > 1) { sh.push([cx + r * 0.05, cy + r * 0.12]); g.fill2(sortAround(sh), shade(col, 0.14)); }
   // autumn patches: ochre and rust blobs on the lit side and the edges
@@ -320,6 +334,9 @@ PA.plane = function (g, x, y, o) {
   g.outline2(pts, { c: o.ink || PC.planeInk, w: 0.85, ext: 0.4 });
   const segs = []; for (let i = 0; i < 5; i++) { const a = R() * TAU, d = r * (0.2 + R() * 0.55), px = cx + Math.cos(a) * d, py = cy + Math.sin(a) * d * 0.8, l = r * 0.13; segs.push(px, py, px + l, py - l * 0.5, px + l, py - l * 0.5, px + l * 1.8, py + l * 0.2); }
   g.segs2(segs, o.ink || PC.planeInk, 0.5);
+  // at night the crown keeps a little of its autumn colour, a faint glow round it and motes rising
+  PA.nightCol(g, i0, (c, fill) => (fill ? PA.mixA(nightColour(c), c, 0.2) : undefined));
+  g.glow2('tree', [cx, cy], f, { r: r * 0.95 });
 };
 /* a clipped chestnut / lime in a box shape (Luxembourg, Tuileries alleys) */
 PA.clipped = function (g, x, y, o) {
@@ -329,6 +346,7 @@ PA.clipped = function (g, x, y, o) {
   K.box(g, x - s, y - s, x + s, y + s, h, h + hh, { t: shade(col, -0.18), l: col, r: shade(col, 0.14) }, { w: 0.7, c: '#56702F', nohid: true });
   g.scuff(K.on('L', y + s, x - s, x + s, h, h + hh), { c: shade(col, 0.25), len: 1.0, dir: -1.2, spread: 1.2, dens: 0.9, w: 0.45 });
   if (o.turn) g.scuff(K.on('L', y + s, x - s, x + s, h, h + hh), { c: PC.planeY, len: 0.9, dir: -1.1, spread: 1.4, dens: 0.5, w: 0.55 });
+  g.glow('tree', x, y, h + hh * 0.55, { r: s * 3.4 });
 };
 /* a Paris street lamp: a dark green cast-iron post with a lantern */
 PA.lamp = function (g, x, y, o) {
@@ -336,7 +354,11 @@ PA.lamp = function (g, x, y, o) {
   g.fill2([[f[0] - 1.0, f[1]], [f[0] + 1.0, f[1]], [f[0] + 0.7, f[1] - 2.4], [f[0] - 0.7, f[1] - 2.4]], col, true);
   g.fill2([[f[0] - 0.4, f[1] - 2.2], [f[0] + 0.4, f[1] - 2.2], [t[0] + 0.3, t[1]], [t[0] - 0.3, t[1]]], col, true);
   const L = [[t[0] - 1.5, t[1] - 0.6], [t[0] + 1.5, t[1] - 0.6], [t[0] + 1.9, t[1] - 4.0], [t[0] - 1.9, t[1] - 4.0]];
-  g.fill2(L, '#F3E5B0', true); g.fill2([[t[0] + 0.2, t[1] - 0.6], [t[0] + 1.5, t[1] - 0.6], [t[0] + 1.9, t[1] - 4.0], [t[0] + 0.3, t[1] - 4.0]], '#E2CC86', true);
+  g.fill2(L, '#F3E5B0', true); g.mark({ nc: '#FFF0C2' }); g.fill2([[t[0] + 0.2, t[1] - 0.6], [t[0] + 1.5, t[1] - 0.6], [t[0] + 1.9, t[1] - 4.0], [t[0] + 0.3, t[1] - 4.0]], '#E2CC86', true); g.mark({ nc: '#FFD98A' });
+  // at night the lantern is lit. o.refl: [x, y, z] of the water its reflection lies on (a lamp on a bridge: the river
+  // in front of the arches, not under the deck); its pool then lies on the deck as a 'spill'
+  if (o.refl) { g.glow2('lamp', [t[0], t[1] - 2.3], g.p(o.refl[0], o.refl[1], o.refl[2]), { r: 1.7, pool: false }); g.glow2('spill', [t[0], t[1] - 2.3], f, { r: 5 }); }
+  else g.glow2('lamp', [t[0], t[1] - 2.3], f, { r: 1.7 });
   g.fill2([[t[0] - 2.3, t[1] - 4.0], [t[0] + 2.3, t[1] - 4.0], [t[0], t[1] - 5.6]], col, true);
   g.line2(L, { w: 0.35, c: col, close: true, boil: false, wob: 0.2 });
   g.disc2([t[0], t[1] - 5.9], 0.45, col);
@@ -367,9 +389,10 @@ PA.morris = function (g, x, y, o) {
   for (let i = 0; i < 3; i++) {
     const a = Math.PI * 0.25 + (i - 1) * 0.75, z0 = 1.4, z1 = h - 1.0;
     const q = [[x + Math.cos(a - 0.3) * (r + 0.03), y + Math.sin(a - 0.3) * (r + 0.03), z0], [x + Math.cos(a + 0.3) * (r + 0.03), y + Math.sin(a + 0.3) * (r + 0.03), z0], [x + Math.cos(a + 0.3) * (r + 0.03), y + Math.sin(a + 0.3) * (r + 0.03), z1], [x + Math.cos(a - 0.3) * (r + 0.03), y + Math.sin(a - 0.3) * (r + 0.03), z1]];
-    g.fill(q, R.pick(cols));
-    const c = g.p(x + Math.cos(a) * r, y + Math.sin(a) * r, (z0 + z1) / 2); PA.letters2(g, [c[0], c[1] - 3], 2.6, 1.2, '#F6F1E4', ['OPÉRA', 'CINÉMA', 'EXPO', 'JAZZ'][(i + Math.round(Math.abs(x))) % 4], 0.25);
+    g.fill(q, R.pick(cols)); g.mark({ nc: true });                 // the posters are lit from inside at night
+    const c = g.p(x + Math.cos(a) * r, y + Math.sin(a) * r, (z0 + z1) / 2), i1 = g.cmds.length; PA.letters2(g, [c[0], c[1] - 3], 2.6, 1.2, '#F6F1E4', ['OPÉRA', 'CINÉMA', 'EXPO', 'JAZZ'][(i + Math.round(Math.abs(x))) % 4], 0.25); PA.litLines(g, i1);
   }
+  { const c = g.p(x + 0.7, y + 0.7, h * 0.5); g.glow2('neon', c, g.p(x, y, 0), { r: 2.4, col: '#FFF0D2' }); }
   K.cyl(g, x, y, r + 0.35, h, h + 0.6, { t: '#2F5D4B', l: '#3E7560', r: '#21443A' }, { w: 0.55, n: 10 });
   const c = g.p(x, y, h + 0.6); g.fill2(K.curve([[c[0] - 4.2, c[1]], [c[0] - 2.6, c[1] - 2.6], [c[0], c[1] - 3.4], [c[0] + 2.6, c[1] - 2.6], [c[0] + 4.2, c[1]]], 3, false), '#2F5D4B', true);
   g.disc2([c[0], c[1] - 4.0], 0.55, '#2F5D4B');
@@ -387,9 +410,9 @@ PA.metro = function (g, x, y, o) {
   rail(P(-L, -W, 0), P(L, -W, 0)); rail(P(-L, -W, 0), P(-L, W, 0)); rail(P(-L, W, 0), P(L, W, 0));
   // two stalks at the open end, the sign between, the orange "eye" lamps
   const s1 = g.p.apply(g, P(L, -W, 0)), s2 = g.p.apply(g, P(L, W, 0)), h = 10.5 * VZ / 3.46 * 3.46;
-  for (const s of [s1, s2]) { g.line2(K.curve([[s[0], s[1]], [s[0] + 0.3, s[1] - h * 0.5], [s[0] - 0.4, s[1] - h * 0.85], [s[0] + 0.6, s[1] - h]], 3, false), { w: 0.75, c: G, boil: false, wob: 0.2 }); g.fill2(arcPts(s[0] + 0.6, s[1] - h - 1.2, 1.2, 0, TAU, 8).map((q) => [q[0], s[1] - h - 1.2 + (q[1] - s[1] + h + 1.2) * 1.5]), '#E9873C', true); g.ring2([s[0] + 0.6, s[1] - h - 1.2], 1.2, { c: '#8A4A1E', w: 0.3 }); }
+  for (const s of [s1, s2]) { g.line2(K.curve([[s[0], s[1]], [s[0] + 0.3, s[1] - h * 0.5], [s[0] - 0.4, s[1] - h * 0.85], [s[0] + 0.6, s[1] - h]], 3, false), { w: 0.75, c: G, boil: false, wob: 0.2 }); g.fill2(arcPts(s[0] + 0.6, s[1] - h - 1.2, 1.2, 0, TAU, 8).map((q) => [q[0], s[1] - h - 1.2 + (q[1] - s[1] + h + 1.2) * 1.5]), '#E9873C', true); g.mark({ nc: '#FFA44A' }); g.ring2([s[0] + 0.6, s[1] - h - 1.2], 1.2, { c: '#8A4A1E', w: 0.3 }); g.glow2('lantern', [s[0] + 0.6, s[1] - h - 1.2], s, { r: 1.5, col: '#FF9A40' }); }   // the two "eyes" are lamps
   const zs = 7.2, a = [s1[0], s1[1] - zs * VZ], b = [s2[0], s2[1] - zs * VZ], ab = [[a[0], a[1] + 0.3], [b[0], b[1] + 0.3], [b[0], b[1] - 2.3], [a[0], a[1] - 2.3]];
-  g.fill2(ab, '#EAD9A4', true); g.outline2(ab, { w: 0.4, c: GD, boil: false, ext: 0 });
+  g.fill2(ab, '#EAD9A4', true); g.mark({ nc: '#F6E6B4' }); g.outline2(ab, { w: 0.4, c: GD, boil: false, ext: 0 });
   PA.letters2(g, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2 - 1.0], Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.8, 1.1, '#3B6B55', 'MÉTROPOLITAIN', 0.28);
   g.line2([[a[0], a[1] + 0.5], [lerp(a[0], b[0], 0.5), lerp(a[1], b[1], 0.5) - 1.0], [b[0], b[1] + 0.5]], { w: 0.5, c: G, boil: false });
 };
@@ -406,7 +429,7 @@ PA.kiosk = function (g, x, y, o) {
   const c = g.p(x, y, 5.2); g.fill2(K.curve([[c[0] - 9.6, c[1] + 1.2], [c[0] - 6, c[1] - 3.2], [c[0], c[1] - 5.2], [c[0] + 6, c[1] - 3.2], [c[0] + 9.6, c[1] + 1.2]], 3, false), '#2F5D4B', true);
   g.line2(K.curve([[c[0] - 9.6, c[1] + 1.2], [c[0] - 6, c[1] - 3.2], [c[0], c[1] - 5.2], [c[0] + 6, c[1] - 3.2], [c[0] + 9.6, c[1] + 1.2]], 3, false), { w: 0.5, c: '#16302A', boil: false });
   g.disc2([c[0], c[1] - 5.8], 0.6, PC.gold);
-  PA.sign(g, 'L', y + 1.8, x - 1.6, x + 1.6, 4.4, 5.1, '#E9E2CC', { ink: '#2F5D4B', seed: 4, line: false });
+  PA.sign(g, 'L', y + 1.8, x - 1.6, x + 1.6, 4.4, 5.1, '#E9E2CC', { ink: '#2F5D4B', seed: 4, line: false, lit: false });   // shut at night
 };
 /* a Vélib' dock: a row of mint-green bikes in their posts along an axis */
 PA.velibDock = function (g, x, y, n, ax) {
@@ -538,10 +561,12 @@ PA.car = function (g, ang, o) {
 };
 /* a Paris taxi: black, the lit TAXI PARISIEN sign on the roof */
 PA.taxi = function (g, ang) {
-  PA.car(g, ang, { col: '#2E3134', L: 4.4, W: 2.2, roof: (gg, cab) => { K.rbox(gg, cab.cx, cab.cy, 0.42, 0.9, ang + Math.PI / 2, 3.55, 4.15, { t: '#F3F1EA', l: '#9FD0A8', r: '#86BC90' }, { w: 0.4 }); } });
+  // the roof sign shines green at night: the taxi is free
+  const TX = { '#F3F1EA': '#C8F7D6', '#9FD0A8': '#6EE08E', '#86BC90': '#52C474' };
+  PA.car(g, ang, { col: '#2E3134', L: 4.4, W: 2.2, roof: (gg, cab) => { gg.lit({ nc: (c) => TX[c], light: true }, () => K.rbox(gg, cab.cx, cab.cy, 0.42, 0.9, ang + Math.PI / 2, 3.55, 4.15, { t: '#F3F1EA', l: '#9FD0A8', r: '#86BC90' }, { w: 0.4 })); } });
 };
-/* the green-and-white bus */
-PA.bus = function (g, ang) { K.bus(g, ang, { col: '#EEF0EC', band: '#3E8E6E', L: 6.6, W: 2.6, h: 5.6, n: 5 }); };
+/* the green-and-white bus (its windows lit at night) */
+PA.bus = function (g, ang) { const i0 = g.cmds.length; K.bus(g, ang, { col: '#EEF0EC', band: '#3E8E6E', L: 6.6, W: 2.6, h: 5.6, n: 5 }); PA.nightCol(g, i0, (c, fill) => (fill && c === C.glass ? '#FFE3A6' : undefined)); };
 /* a delivery van */
 PA.van = function (g, ang, col) { K.bus(g, ang, { col: col || '#F1EFE8', band: '#C9584B', L: 4.8, W: 2.3, h: 5.0, n: 2 }); };
 /* a Vélib': the mint-green city bike with its front basket; o.empty: parked, no rider */
@@ -603,10 +628,10 @@ PA.bateau = function (g, dirY, u0, u1, o) {
       const w = PA.who(idx * 7 + (o.seed || 0)), p = g.p.apply(g, P(u, v, zD + 0.1));
       PA.bust2(g, p, w, 0.62);
     }
-    g.fill([P(s0, sw, zD), P(s1, sw, zD), P(s1, sw, zr), P(s0, sw, zr)], 'rgba(185,205,214,0.62)');
+    g.fill([P(s0, sw, zD), P(s1, sw, zD), P(s1, sw, zr), P(s0, sw, zr)], 'rgba(185,205,214,0.62)'); g.mark({ nc: 'rgba(255,214,140,0.66)' });   // the saloon is lit at night
     const mul = []; for (let u = Math.ceil((s0 + L) / 1.4) * 1.4 - L; u <= s1; u += 1.4) { const a = g.p.apply(g, P(u, sw + 0.02, zD)), b = g.p.apply(g, P(u, sw + 0.02, zr)); mul.push(a[0], a[1], b[0], b[1]); }
     g.segs2(mul, '#E9EEF0', 0.4);
-    g.fill([P(s0, -sw, zr), P(s1, -sw, zr), P(s1, sw, zr), P(s0, sw, zr)], 'rgba(205,224,230,0.55)');
+    g.fill([P(s0, -sw, zr), P(s1, -sw, zr), P(s1, sw, zr), P(s0, sw, zr)], 'rgba(205,224,230,0.55)'); g.mark({ nc: 'rgba(255,226,160,0.5)' });
     const rb = []; for (let u = Math.ceil((s0 + L) / 1.4) * 1.4 - L; u <= s1; u += 1.4) { const a = g.p.apply(g, P(u, -sw, zr)), b = g.p.apply(g, P(u, sw, zr)); rb.push(a[0], a[1], b[0], b[1]); }
     g.segs2(rb, '#E9EEF0', 0.35);
     const gl = []; for (let u = Math.ceil((s0 + L) / 2.8) * 2.8 - L + 0.5; u < s1 - 0.4; u += 2.8) { const a = g.p.apply(g, P(u, sw + 0.03, zD + 0.4)), b = g.p.apply(g, P(u + 0.5, sw + 0.03, zD + 1.3)); gl.push(a[0], a[1], b[0], b[1]); }
@@ -619,7 +644,7 @@ PA.bateau = function (g, dirY, u0, u1, o) {
   if (w1 > w0) {
     const ww = W - 0.6, zt = zD + 1.95;
     g.fill([P(w0, ww, zD), P(w1, ww, zD), P(w1, ww, zt), P(w0, ww, zt)], '#F3F0E6');
-    g.fill([P(w0 + 0.2, ww + 0.02, zD + 0.9), P(w1 - 0.1, ww + 0.02, zD + 0.9), P(w1 - 0.1, ww + 0.02, zt - 0.25), P(w0 + 0.2, ww + 0.02, zt - 0.25)], '#3F4D63');
+    g.fill([P(w0 + 0.2, ww + 0.02, zD + 0.9), P(w1 - 0.1, ww + 0.02, zD + 0.9), P(w1 - 0.1, ww + 0.02, zt - 0.25), P(w0 + 0.2, ww + 0.02, zt - 0.25)], '#3F4D63'); g.mark({ nc: '#FFE3A6', light: true });
     if (w1 >= L - 1.5 - 1e-6 && s > 0) { g.fill([P(w1, -ww, zD), P(w1, ww, zD), P(w1, ww, zt), P(w1, -ww, zt)], '#E2DED2'); g.fill([P(w1 + 0.01, -ww + 0.3, zD + 0.9), P(w1 + 0.01, ww - 0.3, zD + 0.9), P(w1 + 0.01, ww - 0.3, zt - 0.25), P(w1 + 0.01, -ww + 0.3, zt - 0.25)], '#3F4D63'); }
     g.fill([P(w0, -ww - 0.15, zt), P(w1, -ww - 0.15, zt), P(w1, ww + 0.15, zt), P(w0, ww + 0.15, zt)], '#E9E6DC');
     g.outline([P(w0, -ww - 0.15, zt), P(w1, -ww - 0.15, zt), P(w1, ww + 0.15, zt), P(w0, ww + 0.15, zt)], { w: 0.45, boil: false });
@@ -644,3 +669,122 @@ PA.boatActors = function (T, x, dirY, per, ph, o) {
       draw(g, st) { g.at(0, -(dirY > 0 ? u1 : -u0), 0, (g2) => PA.bateau(g2, dirY, u0, u1, { seed: o.seed || 0, band: o.band })); } });
   }
 };
+
+/* ---------------- night ----------------
+   Everything in this section and every night line in the helpers above is night-only (cities/BRIEF-NIGHT.md): a night
+   colour (nc) on what is already drawn, and lights (g.glow). By day nothing here draws, moves or consumes a random
+   number, so the day is the same picture. */
+const PN = {
+  flood: '#FFDDA6',                     // sodium / halogen floodlight on stone: warm
+  white: '#FFF3DE',                     // Sacré-Cœur's whiter light
+  win: ['#FFD98A', '#FBC76E', '#FFE4A4', '#FFCF7C'],   // lit interiors (the engine's warm lit colours)
+};
+/* a colour mixed towards another, keeping the first one's alpha (mix() takes only #hex) */
+PA.mixA = function (a, b, t) { const A = parseCol(a), B = parseCol(b); if (!A || !B) return undefined; return fmtCol(lerp(A[0], B[0], t), lerp(A[1], B[1], t), lerp(A[2], B[2], t), A[3]); };
+/* a colour under a floodlight at night: its day colour times the light, mixed into its moonlit colour by k */
+PA.floodCol = function (c, k, light) {
+  const A = typeof c === 'string' ? parseCol(c) : null, L = parseCol(light || PN.flood); if (!A) return undefined;
+  return PA.mixA(nightColour(c), fmtCol(A[0] * L[0] / 255, A[1] * L[1] / 255, A[2] * L[2] / 255, A[3]), k);
+};
+/* night colours for everything drawn since command i0: fn(colour, isFill) gives a colour or undefined (moonlit as
+   usual). Window panes keep their own lit or dark choice. o.lines: strokes too (else the ink keeps the moonlight);
+   o.to: stop before this command */
+PA.nightCol = function (g, i0, fn, o) {
+  const lines = o && o.lines, i1 = o && o.to != null ? o.to : g.cmds.length;
+  for (let k = i0; k < i1; k++) {
+    const d = g.cmds[k]; if (!d || d.win != null) continue;
+    const fill = d.k === K_FILL || d.k === K_DISC || d.k === K_TRIS;
+    if (!fill && !(lines && (d.k === K_SEGS || d.k === K_RIB || d.k === K_STROKE || d.k === K_RING))) continue;
+    const c = fill ? d.c : d.col; if (typeof c !== 'string') continue;
+    const v = fn(c, fill); if (v) d.nc = v;
+  }
+};
+/* floodlight everything drawn since i0 (k: how strongly, light: its colour); gold leaf keeps its own colour, lit */
+PA.GILT = new Set(['#d8ae48', '#a9832c', '#e6c25a', '#c9a955', '#c9a040', '#b89a4e', '#a6883e', '#daad45']);
+PA.flood = function (g, i0, k, light, o) {
+  PA.nightCol(g, i0, (c, fill) => (fill && PA.GILT.has(c.toLowerCase()) ? mix(c, '#FFE9A8', 0.25) : fill ? PA.floodCol(c, k, light) : undefined), o);
+};
+/* strokes drawn since i0 shine in their own colour (lit lettering, neon) or in col */
+PA.litLines = function (g, i0, col) { for (let k = i0; k < g.cmds.length; k++) { const d = g.cmds[k]; if (d && (d.k === K_SEGS || d.k === K_RIB || d.k === K_STROKE)) d.nc = col || d.col; } };
+/* a lit interior colour for a pane at a place (stable, mostly warm) */
+PA.winCol = (seed) => PN.win[Math.floor(h1(seed) * PN.win.length) % PN.win.length];
+/* lights that must be made after every other actor: an actor's number seeds its pen, so a night-only actor added in
+   the middle would redraw every later one. Tiles push makers here; the last tile built (msm) runs them. Each maker
+   gets that tile and places its actors in world coordinates through at(). */
+PA.late = [];
+PA.runLate = function (T) { for (const f of PA.late) f(T); };
+/* Lights do not shine through buildings. The engine lays every halo and lit window over the finished frame, so a lamp
+   behind a six-storey block would glint on its roof. Run late (every place but the last satellite is built by then):
+   a light or a window pane whose centre is covered by an opaque fill of a standing object drawn after it (in front of
+   it) is put out: a hidden street lamp keeps only its pool on the pavement, a hidden tree its leaves, a hidden pane is
+   dark. People and terraces (cast) do not hide lights. Night data only: the day picture is untouched. */
+PA.hideHidden = function () {
+  const t0 = performance.now(), obs = []; for (const t of SF.tiles) if (!t.skip && t.statics) for (const ob of t.statics) obs.push(ob);
+  const G = 48, grid = new Map(), key = (i, j) => i * 100003 + j;
+  obs.forEach((ob, n) => {
+    ob._n = n; if (ob.ground || ob.cast || !ob.list) return;
+    const fills = [];
+    for (const d of ob.list) {
+      if (d.k !== K_FILL && d.k !== K_DISC) continue;
+      const c = parseCol(typeof d.c === 'string' ? d.c : ''); if (!c || c[3] < 0.9) continue;      // glass lets light through
+      if (d.k === K_DISC) { fills.push({ d, b: [d.x - d.r, d.y - d.r, d.x + d.r, d.y + d.r] }); continue; }
+      const p = d.p; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+      for (let i = 0; i < p.length; i += 2) { if (p[i] < x0) x0 = p[i]; if (p[i] > x1) x1 = p[i]; if (p[i + 1] < y0) y0 = p[i + 1]; if (p[i + 1] > y1) y1 = p[i + 1]; }
+      if ((x1 - x0) * (y1 - y0) > 0.6) fills.push({ d, b: [x0, y0, x1, y1] });
+    }
+    ob._fills = fills;
+    for (let i = Math.floor(ob.bb[0] / G); i <= Math.floor(ob.bb[2] / G); i++) for (let j = Math.floor(ob.bb[1] / G); j <= Math.floor(ob.bb[3] / G); j++) { const k = key(i, j); let a = grid.get(k); if (!a) grid.set(k, (a = [])); a.push(ob); }
+  });
+  const covered = (x, y, n) => {
+    for (const ob of grid.get(key(Math.floor(x / G), Math.floor(y / G))) || []) {
+      if (ob._n <= n || x < ob.bb[0] || x > ob.bb[2] || y < ob.bb[1] || y > ob.bb[3]) continue;
+      for (const f of ob._fills) { const b = f.b; if (x < b[0] || x > b[2] || y < b[1] || y > b[3]) continue; if (f.d.k === K_DISC ? Math.hypot(x - f.d.x, y - f.d.y) < f.d.r : pointInPoly(x, y, f.d.p)) return true; }
+    }
+    return false;
+  };
+  // the water a light is reflected in, found as the engine finds it (the first water below the light's ground point);
+  // a reflection on water hidden behind a building or under a bridge is not drawn
+  const S = nightSet(), water = [];
+  for (const ob of obs) if (ob.ground && ob.list) for (const d of ob.list) if (d.k === K_FILL && typeof d.c === 'string' && S.water.has(d.c.toLowerCase())) {
+    const p = d.p; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (let i = 0; i < p.length; i += 2) { if (p[i] < x0) x0 = p[i]; if (p[i] > x1) x1 = p[i]; if (p[i + 1] < y0) y0 = p[i + 1]; if (p[i + 1] > y1) y1 = p[i + 1]; }
+    water.push({ b: [x0, y0, x1, y1], p });
+  }
+  const onWater = (x, y) => water.some((w) => x > w.b[0] && x < w.b[2] && y > w.b[1] && y < w.b[3] && pointInPoly(x, y, w.p));
+  const poolR = (r) => (16 + 3.5 * r) / 1.8;                          // a 'spill' pool as wide as a lamp's
+  let nl = 0, nw = 0, nr = 0;
+  for (const ob of obs) {
+    const extra = [];
+    if (ob.glows) ob.glows = ob.glows.filter((e) => {
+      if (e.k === 'spill') return true;                                // (a pool lies on the ground: the bake hides it)
+      if (covered(e.x, e.y, ob._n)) {
+        nl++;
+        if (e.k === 'lamp' && e.pool) { e.k = 'spill'; e.r = poolR(e.r); e.y = e.gy; return true; }   // the pool stays on the street
+        return false;
+      }
+      if (e.k === 'tree' || e.k === 'bloom') return true;
+      // the engine looks 34 px down for water; a high light's real reflection lies further down (about twice its
+      // height over the water), so if that first water is hidden, look on down for water that can be seen
+      let first = 0;
+      for (let k = 2; k <= 34; k += 2) if (onWater(e.gx, e.gy + k)) { first = k; break; }
+      if (!first) return true;
+      const seen = (k) => !covered(e.gx, e.gy + k + 3, -1) && !covered(e.gx, e.gy + k + 12, -1);
+      if (seen(first)) return true;
+      let k2 = 0; for (let k = first + 2; k <= Math.max(40, (e.gy - e.y) * 2.2); k += 2) if (onWater(e.gx, e.gy + k) && seen(k)) { k2 = k; break; }
+      nr++;
+      if (e.k === 'lamp' && e.pool) extra.push({ k: 'spill', x: e.gx, y: e.gy, gx: e.gx, gy: e.gy, r: poolR(e.r), col: null, pool: true });
+      e.pool = false; e.gy = k2 ? e.gy + k2 - 2 : -1e6;                // the reflection on water that shows, or none
+      return true;
+    });
+    if (extra.length) ob.glows = ob.glows.concat(extra);
+    if (ob.ground || !ob.list) continue;
+    for (const d of ob.list) {
+      if (d.k !== K_FILL || d.win == null || d.win < 0) continue;
+      const p = d.p; let sx = 0, sy = 0; for (let i = 0; i < p.length; i += 2) { sx += p[i]; sy += p[i + 1]; }
+      if (covered(sx / (p.length / 2), sy / (p.length / 2), ob._n)) { d.win = -1; d.nc = undefined; d.spill = undefined; nw++; }
+    }
+  }
+  for (const ob of obs) { ob._fills = undefined; ob._n = undefined; }
+  PA.hidden = { lights: nl, windows: nw, reflections: nr, ms: Math.round(performance.now() - t0) };
+};
+PA.late.push(PA.hideHidden);

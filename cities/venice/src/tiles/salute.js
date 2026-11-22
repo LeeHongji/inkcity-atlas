@@ -29,6 +29,7 @@ SF.tile('salute', 100, 100, { rim: 40 }, function (T) {
     K.dome(g, -4, -28, 4.2, 13.2, 4.0, '#A9B2B5', { w: 0.6, shadow: '#919CA0' });
     K.cyl(g, -4, -28, 0.8, 17.2, 19, ST, { w: 0.45, n: 8 });
     for (const x of [-13, 3]) { K.box(g, x, -36, x + 2.2, -33.8, 0, 14, ST, { w: 0.7 }); K.box(g, x + 0.15, -35.85, x + 2.05, -33.95, 14, 15.8, ST, { w: 0.55 }); K.cone(g, x + 1.1, -34.9, 1.1, 15.8, 2.6, '#A9B2B5', {}); g.fill(VN.archPts('L', -33.78, x + 0.5, x + 1.7, 12.2, 13.6, 'round', 0), '#4A3E34'); }
+    g.mark({ nc: (c) => (c === '#A9B2B5' || c === '#919CA0' ? VN.litStone(0.4)(mix(c, '#E9E4D9', 0.3)) : VN.litStone(0.75)(c)) }, 0);   // floodlit at night
   }, { name: 'salute presbytery', tall: true });
   T.obj([CX - R0 - 1, CY - R0 - 1, CX + R0 + 1, CY + R0 + 1], function (g) {
     g.boilP = 0.2;
@@ -42,7 +43,7 @@ SF.tile('salute', 100, 100, { rim: 40 }, function (T) {
       const tone = mix(ST.l, ST.r, clamp(0.5 + 0.06 * (mx - my), 0, 1));
       g.fill([a, b, hi[(i + 1) % 8], hi[i]], tone);
       const q = (t, z) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), z];
-      g.fill(VN.archPts('L', 0, 0.38, 0.62, 3, 8.6, 'round', 0).map((p) => q(p[0], p[2])), '#55606A');
+      g.fill(VN.archPts('L', 0, 0.38, 0.62, 3, 8.6, 'round', 0).map((p) => q(p[0], p[2])), '#55606A'); g.mark({ win: 0.3 });
       const ps = []; for (const t of [0.08, 0.92]) { const A = g.p.apply(g, q(t, 0)), B = g.p.apply(g, q(t, 10.4)); ps.push(A[0], A[1], B[0], B[1]); } g.segs2(ps, '#D6D0C4', 1.0);
       g.fill([q(0, 10.2), q(1, 10.2), q(1, 11), q(0, 11)], '#E6E1D6');
       g.line([a, b], { w: 0.8 }); g.line([hi[i], hi[(i + 1) % 8]], { w: 0.6 });
@@ -65,6 +66,9 @@ SF.tile('salute', 100, 100, { rim: 40 }, function (T) {
     const pd = [[CX - 3.6, pa + 0.02, 13.2], [CX + 3.6, pa + 0.02, 13.2], [CX, pa + 0.02, 15.4]]; g.fill(pd, '#F6F3EC'); g.outline(pd, { w: 0.55, boil: false });
     g.fill(VN.archPts('L', pa + 0.03, CX - 1.6, CX + 1.6, 0, 8.4, 'round', 0), '#4A3A30');
     const cl = []; for (const a of [CX - 2.8, CX - 2.0, CX + 2.0, CX + 2.8]) { const A = g.p(a, pa + 0.04, 0.6), B = g.p(a, pa + 0.04, 11.8); cl.push(A[0], A[1], B[0], B[1]); } g.segs2(cl, '#DCD6CA', 0.9);
+    // at night the whole church is floodlit, white stone gone gold, the great dome pale over the dark lagoon
+    g.mark({ nc: (c) => (c === '#A9B2B5' || c === '#8E999E' || c === '#C9CFD1' ? VN.litStone(0.55)(mix(c, '#E9E4D9', 0.3)) : VN.litStone(1)(c)) }, 0);
+    for (const [x, y, z, r] of [[CX + 7, CY + 7, 3, 3.0], [CX - 2, CY + 10.5, 3, 2.6], [CX + 10.5, CY - 2, 3, 2.6], [CX + 6.4, CY + 6.4, 13, 2.2]]) g.glow('lantern', x, y, z, { r, col: '#FFD39A' });
   }, { name: 'santa maria della salute', tall: true });
   // the wide flight of steps down to the campo
   T.obj([CX - 6, 1.8, CX + 6, 6.8], function (g) {
@@ -76,6 +80,7 @@ SF.tile('salute', 100, 100, { rim: 40 }, function (T) {
     g.boilP = 0.2;
     K.box(g, 12, -37, 31, -27, VN.WL, 6.6, { t: '#E2D9C8', l: '#EDE3D2', r: '#DACDB8' }, { w: 0.85 });
     for (let a = 13; a < 30; a += 3.0) g.fill(VN.archPts('L', -26.98, a, a + 2.0, 0, 4.6, 'round', 0), '#6E5E50');
+    g.mark({ nc: (c) => (c === '#6E5E50' ? '#8E6644' : VN.litStone(0.6)(c)) }, 0);                       // lit along the quay at night
     K.hip(g, 11.6, -37.4, 31.4, -26.6, 6.6, 2.2, VN.roof, { ridge: 10, c: '#7A3A28' });
   }, { name: 'dogana' });
   T.obj([31, -37, 37, -31], function (g) {
@@ -85,7 +90,9 @@ SF.tile('salute', 100, 100, { rim: 40 }, function (T) {
     K.box(g, 32, -36, 36, -32, 9.4, 11.0, { t: '#E9E3D6', l: '#F3EFE6', r: '#E2DCCF' }, { w: 0.6 });
     const c = g.p(34, -34, 11.0);
     for (const s of [-1, 1]) g.fill2([[c[0] + s * 1.8, c[1]], [c[0] + s * 2.6, c[1]], [c[0] + s * 2.2, c[1] - 3.6], [c[0] + s * 1.4, c[1] - 3.4]], '#C9A44A', true);
-    g.disc2([c[0], c[1] - 5.6], 3.0, '#D9B24A'); g.ring2([c[0], c[1] - 5.6], 3.0, { w: 0.45, c: '#8A6A1E' }); g.fine2(arcPts(c[0], c[1] - 5.6, 3.0, Math.PI * 0.1, Math.PI * 0.9, 8).map((q) => [q[0], c[1] - 5.6 + (q[1] - c[1] + 5.6) * 0.3]), { w: 0.3, c: '#8A6A1E' });
+    g.mark({ nc: (cc) => (cc === '#55606A' ? undefined : cc === '#C9A44A' ? '#E9BE56' : VN.litStone(0.9)(cc)) }, 0);   // the point floodlit at night
+    g.disc2([c[0], c[1] - 5.6], 3.0, '#D9B24A'); g.mark({ nc: '#F6CC58' }); g.ring2([c[0], c[1] - 5.6], 3.0, { w: 0.45, c: '#8A6A1E' });
+    g.glow('lantern', 34, -34, 13.6, { r: 2.6, col: '#FFD27A' }); g.glow('lantern', 37.6, -34, 5, { r: 2.4, col: '#FFD9A0', base: VN.WL }); g.fine2(arcPts(c[0], c[1] - 5.6, 3.0, Math.PI * 0.1, Math.PI * 0.9, 8).map((q) => [q[0], c[1] - 5.6 + (q[1] - c[1] + 5.6) * 0.3]), { w: 0.3, c: '#8A6A1E' });
   }, { name: 'punta della dogana', tall: true });
   // Fortune turning on the golden ball with the wind
   T.actor({ sample: 5, period: 24, grow: false,
@@ -100,12 +107,12 @@ SF.tile('salute', 100, 100, { rim: 40 }, function (T) {
   /* ---------- houses, the Zattere ---------- */
   H({ x0: -37, y0: 10, x1: -25, y1: 24, n: 3, col: P[1], chim: [[-31, 14]], shopR: [12, 20, '#3E5A44', 'OSTERIA'] });
   H({ x0: -37, y0: 26, x1: -24, y1: 37, n: 3, z0: VN.WL, col: P[0], chim: [[-31, 30]], altana: [-30, 31, { wash: ['#F3F1EA', '#5F8FC9', '#E6C24F'] }] });
-  H({ x0: -37, y0: -36, x1: -24, y1: -20, n: 3, col: P[3], chim: [[-31, -30]] });
+  H({ x0: -37, y0: -36, x1: -24, y1: -20, n: 3, col: P[3], chim: [[-31, -30]], lamp: false });   // (its corner lantern would show through the Salute)
   // the floating café terrace on the Giudecca canal
   T.obj([37.2, 12, 40.6, 26], function (g) {
     K.box(g, 37.2, 12, 40.6, 26, VN.WL - 0.1, -0.2, { t: '#8E9690', l: '#B8875A', r: '#9C7450' }, { w: 0.6 });
     g.fill(K.rect(37.3, 12.1, 40.5, 25.9, -0.18), '#C49A68');
-    for (const y of [14.6, 19, 23.4]) { VN.table(g, 39, y, -0.2, { cups: ['#5A3E2E', '#F3F1EA'] }); VN.person(g, 38.2, y - 0.8, 1.1, VN.who(1800 + y * 3, { dir: 0, pose: 'sit' })); VN.person(g, 39.8, y + 0.8, 1.1, VN.who(1810 + y * 3, { dir: 2, pose: 'sit' })); }
+    for (const y of [14.6, 19, 23.4]) { VN.table(g, 39, y, -0.2, { cups: ['#5A3E2E', '#F3F1EA'] }); g.glow('lantern', 39, y, 2.7, { r: 0.7, col: '#FFC870', base: VN.WL }); VN.person(g, 38.2, y - 0.8, 1.1, VN.who(1800 + y * 3, { dir: 0, pose: 'sit' })); VN.person(g, 39.8, y + 0.8, 1.1, VN.who(1810 + y * 3, { dir: 2, pose: 'sit' })); }
     const rl = []; for (let y = 12.2; y < 26; y += 0.8) { const a = g.p(40.6, y, -0.2), b = g.p(40.6, y, 1.0); rl.push(a[0], a[1], b[0], b[1]); } g.segs2(rl, '#6E5A44', 0.3); g.line([[40.6, 12, 1.0], [40.6, 26, 1.0]], { w: 0.45, boil: false, c: '#5E4A3C' });
   }, { name: 'zattere terrace' });
   for (const y of [-20, 4, 30]) T.obj([35.6, y], (g) => VN.lamp(g, 35.6, y, { h: 7 }), { name: 'lamp' });

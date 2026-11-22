@@ -52,7 +52,7 @@ SF.tile('peak', 0, -100, { rim: 4 }, function (T) {
     const z = hAt(x, y), col = R.pick(['#5E8F52', '#6FA06A', '#4E7E46', '#7FAE5E']);
     T.obj([x, y], (g) => K.tree(g, x, y, { r: 2.4 + R() * 1.6, h: 3.0, col, z }), { on: true, name: 'tree' });
   }
-  for (const [x, y, col] of [[-26, 2, '#F3F1EA'], [20, -10, '#F3EFE3'], [-30, -12, '#ECE7DB']]) { const z = hAt(x, y); T.obj([x - 3, y - 2.5, x + 3, y + 2.5], (g) => { K.box(g, x - 3, y - 2.5, x + 3, y + 2.5, z, z + 4.2, { t: '#E9E6DE', l: col, r: shade(col, 0.1) }, { w: 0.7 }); K.win(g, 'L', y + 2.5, x - 2, x - 0.6, z + 1, z + 3, { style: 'glass' }); K.win(g, 'L', y + 2.5, x + 0.6, x + 2, z + 1, z + 3, { style: 'glass' }); K.hip(g, x - 3.4, y - 2.9, x + 3.4, y + 2.9, z + 4.2, 2.0, '#B8564A', { w: 0.6 }); }, { on: true, name: 'villa' }); }
+  for (const [x, y, col] of [[-26, 2, '#F3F1EA'], [20, -10, '#F3EFE3'], [-30, -12, '#ECE7DB']]) { const z = hAt(x, y); T.obj([x - 3, y - 2.5, x + 3, y + 2.5], (g) => { K.box(g, x - 3, y - 2.5, x + 3, y + 2.5, z, z + 4.2, { t: '#E9E6DE', l: col, r: shade(col, 0.1) }, { w: 0.7 }); K.win(g, 'L', y + 2.5, x - 2, x - 0.6, z + 1, z + 3, { style: 'glass' }); K.win(g, 'L', y + 2.5, x + 0.6, x + 2, z + 1, z + 3, { style: 'glass' }); K.hip(g, x - 3.4, y - 2.9, x + 3.4, y + 2.9, z + 4.2, 2.0, '#B8564A', { w: 0.6 }); g.glow('lamp', x, y + 2.6, z + 3.4, { r: 0.9, base: z }); }, { on: true, name: 'villa' }); }   // night: the lamp over the door
 
   /* ---- the tram line: a viaduct of trestles, two rails, the passing loop (in pieces, back to front) ---- */
   for (let y = Y1; y < Y0; y += 9) {
@@ -74,9 +74,10 @@ SF.tile('peak', 0, -100, { rim: 4 }, function (T) {
   // the lower terminus on Garden Road
   T.obj([2, 27, 15, 36], (g) => {
     K.box(g, 2, 31, 15, 36, 0, 5.4, { t: '#E9E2CF', l: '#F3ECD8', r: '#DDD3BA' }, { w: 0.8 });
-    g.fill(K.on('L', 36.02, 5, 11, 0, 3.8), '#5A4E42');
-    K.sign(g, 'L', 36.04, 3, 14, 4.0, 5.2, '#2E6B4E', 'PEAK TRAM', { w: 0.3 });
+    g.fill(K.on('L', 36.02, 5, 11, 0, 3.8), '#5A4E42'); g.mark({ nc: '#F2C887', spill: true });
+    const i0 = g.cmds.length; K.sign(g, 'L', 36.04, 3, 14, 4.0, 5.2, '#2E6B4E', 'PEAK TRAM', { w: 0.3 }); HK.nite(g, i0, { nc: true }); HK.signGlow(g, 'L', 36.04, 3, 14, 4.0, 5.2, '#8FE0B0', 0.2);
     const r = [[1.4, 26.6, 5.0], [15.6, 26.6, 5.0], [15.6, 31, 5.4], [1.4, 31, 5.4]]; g.fill(r, '#3E7A5A'); g.outline(r, { w: 0.5, c: '#1F3A2C', boil: false });
+    for (const x of [4, 8.5, 13]) g.glow('lamp', x, 28.8, 4.8, { r: 1.1 });          // night: lamps under the canopy
   }, { name: 'lower terminus' });
   [[4.4, 37.6, 3], [5.8, 38.0, 3], [7.2, 37.5, 3], [11.6, 38.0, 2], [13.0, 37.6, 3]].forEach(([x, y, d], i) => HK.stand(T, x, y - 1.6, HK.who(9700 + i, { dir: d, pose: i % 2 ? 'hold' : 'stand', phone: i % 2 === 1 }), { name: 'queue' }));
 
@@ -86,14 +87,14 @@ SF.tile('peak', 0, -100, { rim: 4 }, function (T) {
     g.boilP = 0.25;
     const CN = { t: '#DDD8CC', l: '#E9E4D8', r: '#CFC9BC' };
     K.box(g, 1, -35, 15, -21, zb, ZT, CN, { w: 0.85 });
-    for (const [f, p, a0, a1] of [['L', -21, 1, 15], ['R', 15, -35, -21]]) { for (let z = zb + 3; z < ZT - 1; z += 3.2) g.fill(K.on(f, p + 0.02, a0 + 0.8, a1 - 0.8, z, z + 1.4), f === 'L' ? '#93AEBD' : '#7E9AAD'); }
-    g.fill(K.on('L', -20.98, 5.6, 10.4, ZT - 4.2, ZT), '#4A4038');
+    for (const [f, p, a0, a1] of [['L', -21, 1, 15], ['R', 15, -35, -21]]) { for (let z = zb + 3; z < ZT - 1; z += 3.2) { g.fill(K.on(f, p + 0.02, a0 + 0.8, a1 - 0.8, z, z + 1.4), f === 'L' ? '#93AEBD' : '#7E9AAD'); g.mark({ nc: f === 'L' ? '#FFE6B4' : '#F2CF8E' }); } }   // lit at night
+    g.fill(K.on('L', -20.98, 5.6, 10.4, ZT - 4.2, ZT), '#4A4038'); g.mark({ nc: '#E9B96A', spill: true });
     // the terrace deck round the top, with its rail
     g.fill(K.rect(-1.4, -36.6, 17.4, -19.4, ZT), '#E3DED3'); g.outline(K.rect(-1.4, -36.6, 17.4, -19.4, ZT), { w: 0.6, boil: false });
     g.fill([[-1.4, -19.4, ZT - 0.6], [17.4, -19.4, ZT - 0.6], [17.4, -19.4, ZT], [-1.4, -19.4, ZT]], '#C9C3B5'); g.fill([[17.4, -36.6, ZT - 0.6], [17.4, -19.4, ZT - 0.6], [17.4, -19.4, ZT], [17.4, -36.6, ZT]], '#B9B3A6');
     // the 'wok': a long crescent roof on four legs over the terrace, its ends swept up
     const legs = []; for (const [x, y] of [[3, -32], [13, -32], [3, -24], [13, -24]]) { const a = g.p(x, y, ZT), b = g.p(x, y, ZT + 3.8); legs.push(a[0], a[1], b[0], b[1]); } g.segs2(legs, '#9AA3A8', 0.9);
-    const N = 16, cx = PT.x, cy = PT.y, hw = 4.6, top = (u) => ZT + 5.0 + 4.4 * u * u, bot = (u) => ZT + 3.8 + 1.4 * u * u, X = (u) => cx + u * 11;
+    const N = 16, cx = PT.x, cy = PT.y, hw = 4.6, top = (u) => ZT + 5.0 + 4.4 * u * u, bot = (u) => ZT + 3.8 + 1.4 * u * u, X = (u) => cx + u * 11, iw = g.cmds.length;
     const back = [], front = [], under = [];
     for (let i = 0; i <= N; i++) { const u = -1 + 2 * i / N; back.push([X(u), cy - hw * (1 - 0.25 * u * u), top(u)]); front.push([X(u), cy + hw * (1 - 0.25 * u * u), top(u)]); under.push([X(u), cy + hw * 0.7 * (1 - 0.3 * u * u), bot(u)]); }
     g.fill(back.concat(front.slice().reverse()), '#C9CED1');
@@ -102,12 +103,15 @@ SF.tile('peak', 0, -100, { rim: 4 }, function (T) {
     g.line(back, { w: 0.6, boil: false }); g.line(front, { w: 0.85, boil: false }); g.line(under, { w: 0.6, boil: false });
     g.line([front[0], back[0]], { w: 0.6, boil: false }); g.outline(endF, { w: 0.5, boil: false });
     const rib = []; for (let i = 2; i < N; i += 2) { const a = g.p.apply(g, front[i]), b = g.p.apply(g, under[i]); rib.push(a[0], a[1], b[0], b[1]); } g.segs2(rib, '#B3B8BB', 0.3);
+    // at night the bowl is lit from beneath, warm white, and the terrace under it
+    HK.nite(g, iw, { nc: (c) => ({ '#E9E6DE': '#FFEFD0', '#C9CED1': mix(nightColour('#C9CED1'), '#C9CED1', 0.5), '#B9C0C4': '#E9D9B8', '#B3B8BB': '#F2D9A8' })[c] });
+    for (const u of [-0.7, 0, 0.7]) g.glow('lantern', X(u), cy + 2, ZT + 3.6, { r: 3.0, col: '#FFE9C0' });
     HK.board(g, 'L', -20.9, 3.6, 12.4, ZT - 6.0, ZT - 3.4, '#2E6B4E', '山頂', { en: 'THE PEAK', rim: '#F3ECD8' });
   }, { on: true, name: 'peak tower' });
   // the crowd at the terrace rail looking out at the city (backs half to us), a couple taking a selfie
   [[0, -19.8, 1], [2.4, -20.0, 1], [5.2, -19.9, 0], [10.8, -20.1, 1], [13.4, -19.8, 0], [17.0, -22, 0], [17.0, -26, 0], [17.0, -31, 0]].forEach(([x, y, d], i) => HK.stand(T, x, y, HK.who(9720 + i, { dir: d, pose: i % 3 === 1 ? 'hold' : 'stand', phone: i % 3 === 1 }), { z: ZT, name: 'view' }));
   T.obj([16.6, -36.6, 17.6, -19.4], (g) => HK.rail(g, [17.3, -36.4, ZT], [17.3, -19.6, ZT], { h: 1.6 }), { on: true, name: 'rail' });
-  T.obj([-1.4, -19.9, 17.4, -19.3], (g) => HK.rail(g, [-1.2, -19.5, ZT], [17.2, -19.5, ZT], { h: 1.6 }), { on: true, name: 'rail' });
+  T.obj([-1.4, -19.9, 17.4, -19.3], (g) => { HK.rail(g, [-1.2, -19.5, ZT], [17.2, -19.5, ZT], { h: 1.6 }); HK.railLights(g, -1.2, 17.2, -19.5, { base: ZT, z: 1.6, step: 6 }); }, { on: true, name: 'rail' });
 
   /* ---- the two cars: the funicular (each drawn on the slope around its centre) ---- */
   for (let k = 0; k < 2; k++) T.actor({ sample: 0.2, period: HT.PEAK.C, grow: false,
@@ -118,8 +122,8 @@ SF.tile('peak', 0, -100, { rim: 4 }, function (T) {
       const sideB = [P(hw, -hl, 0.3), P(hw, hl, 0.3), P(hw, hl, 1.6), P(hw, -hl, 1.6)], sideT = [P(hw, -hl, 1.6), P(hw, hl, 1.6), P(hw, hl, 3.4), P(hw, -hl, 3.4)];
       const end = [P(-hw, hl, 0.3), P(hw, hl, 0.3), P(hw, hl, 3.4), P(-hw, hl, 3.4)], roof = [P(-hw, -hl, 3.4), P(hw, -hl, 3.4), P(hw, hl, 3.4), P(-hw, hl, 3.4)];
       g.fill(sideB, '#245A41'); g.fill(sideT, shade(cream, 0.1));
-      for (let i = 0; i < 4; i++) { const a = -hl + 0.4 + i * 1.55; g.fill([P(hw + 0.02, a, 1.9), P(hw + 0.02, a + 1.2, 1.9), P(hw + 0.02, a + 1.2, 3.0), P(hw + 0.02, a, 3.0)], i === 1 ? HK.C.litD : '#7E9AAD'); }
-      g.fill(end, green); g.fill([P(-hw * 0.7, hl + 0.02, 1.9), P(hw * 0.7, hl + 0.02, 1.9), P(hw * 0.7, hl + 0.02, 3.0), P(-hw * 0.7, hl + 0.02, 3.0)], '#C9DCE6');
+      for (let i = 0; i < 4; i++) { const a = -hl + 0.4 + i * 1.55; g.fill([P(hw + 0.02, a, 1.9), P(hw + 0.02, a + 1.2, 1.9), P(hw + 0.02, a + 1.2, 3.0), P(hw + 0.02, a, 3.0)], i === 1 ? HK.C.litD : '#7E9AAD'); g.mark({ nc: '#FFE3A6', light: i % 2 === 1 }); }   // lit inside at night
+      g.fill(end, green); g.fill([P(-hw * 0.7, hl + 0.02, 1.9), P(hw * 0.7, hl + 0.02, 1.9), P(hw * 0.7, hl + 0.02, 3.0), P(-hw * 0.7, hl + 0.02, 3.0)], '#C9DCE6'); g.mark({ nc: '#FFEFCC', light: true });
       g.fill(roof, '#D9D3C2');
       for (const q of [sideB, sideT, end, roof]) g.outline(q, { w: 0.5, boil: false });
     } });

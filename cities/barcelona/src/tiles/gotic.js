@@ -51,7 +51,7 @@ SF.tile('gotic', 100, 0, { rim: 40 }, function (T) {
     K.box(g, -36, -36, -16, -17, 0, 13, ST, { w: 0.9 });
     K.gable(g, -36.2, -33, -18, -20, 13, 4.5, 'x', { a: '#C9A27D', b: '#B38B66', e: '#E2D3B4' }, { c: '#7A5A3C' });
     // buttresses with pinnacles along the visible side (L, y = -17)
-    for (let x = -34; x < -18; x += 4) { K.box(g, x - 0.6, -17, x + 0.6, -15.6, 0, 11, ST, { w: 0.6, nohid: true }); const p = g.p(x, -16.3, 11); g.fill2([[p[0] - 1.6, p[1]], [p[0] + 1.6, p[1]], [p[0], p[1] - 7]], '#E2D3B4', true); g.line2([[p[0] - 1.6, p[1]], [p[0], p[1] - 7], [p[0] + 1.6, p[1]]], { w: 0.45, boil: false }); K.win(g, 'L', -17, x + 1.2, x + 2.8, 4, 10, { style: 'navy', arch: true }); }
+    for (let x = -34; x < -18; x += 4) { K.box(g, x - 0.6, -17, x + 0.6, -15.6, 0, 11, ST, { w: 0.6, nohid: true }); const p = g.p(x, -16.3, 11); g.fill2([[p[0] - 1.6, p[1]], [p[0] + 1.6, p[1]], [p[0], p[1] - 7]], '#E2D3B4', true); g.line2([[p[0] - 1.6, p[1]], [p[0], p[1] - 7], [p[0] + 1.6, p[1]]], { w: 0.45, boil: false }); K.win(g, 'L', -17, x + 1.2, x + 2.8, 4, 10, { style: 'navy', arch: true, lit: 0 }); }
     // the cimbori: an octagonal lantern tower with the tall openwork spire, behind the front
     const sx = -25, sy = -26;
     K.cyl(g, sx, sy, 3.6, 13, 22, ST, { w: 0.8, n: 8 });
@@ -74,13 +74,16 @@ SF.tile('gotic', 100, 0, { rim: 40 }, function (T) {
     const rose = g.p(-14.95, -26, 14.2); g.disc2(rose, 3.2, '#4E5A6A'); for (let i = 0; i < 8; i++) { const a = TAU * i / 8; g.segs2([rose[0], rose[1], rose[0] + Math.cos(a) * 3.2, rose[1] + Math.sin(a) * 3.2 * 0.95], '#E6D8BA', 0.35); } g.ring2(rose, 3.2, { w: 0.45, c: '#7A6A4A' });
     for (const y of [-33, -19]) {
       K.box(g, -17.5, y - 1.6, -14.5, y + 1.6, 0, 24, fr, { w: 0.8, nohid: true });
-      for (let z = 18; z < 24; z += 2.6) K.win(g, 'R', -14.5, y - 0.6, y + 0.6, z, z + 1.8, { style: 'slit', arch: true });
+      for (let z = 18; z < 24; z += 2.6) K.win(g, 'R', -14.5, y - 0.6, y + 0.6, z, z + 1.8, { style: 'slit', arch: true, lit: 0 });
       const p = g.p(-16, y, 24); g.fill2([[p[0] - 2.6, p[1] + 1], [p[0] + 2.6, p[1] + 1], [p[0], p[1] - 22]], '#E6D8BA'); g.fill2([[p[0], p[1] + 1], [p[0] + 2.6, p[1] + 1], [p[0], p[1] - 22]], '#D5C3A0');
       g.line2([[p[0] - 2.6, p[1] + 1], [p[0], p[1] - 22], [p[0] + 2.6, p[1] + 1]], { w: 0.65 });
       for (let i = 1; i < 6; i++) { const t = i / 6; g.disc2([lerp(p[0] - 2.6, p[0], t) - 0.6, lerp(p[1] + 1, p[1] - 22, t)], 0.42, '#E6D8BA'); g.disc2([lerp(p[0] + 2.6, p[0], t) + 0.6, lerp(p[1] + 1, p[1] - 22, t)], 0.42, '#D5C3A0'); }
     }
     // the steps up to the door
     for (let i = 0; i < 3; i++) g.fill([[-15 + i * 1.1, -30, 0.35 * (3 - i)], [-13.9 + i * 1.1, -30, 0.35 * (3 - i)], [-13.9 + i * 1.1, -22, 0.35 * (3 - i)], [-15 + i * 1.1, -22, 0.35 * (3 - i)]], i % 2 ? '#E2D3B4' : '#D8C7A4');
+    // at night the Cathedral's front, its towers and the cimbori's spire are floodlit warm from the Pla de la Seu
+    BC.flood(g, 0, 0.8, '#FFE0B0');
+    for (const [x, y, z, r] of [[-14.6, -26, 4, 3.6], [-14.6, -26, 14, 2.0], [-14.6, -33, 22, 1.8], [-14.6, -19, 22, 1.8], [sx, sy, 28, 2.0], [sx, sy, 35, 1.3]]) g.glow('lantern', x, y, z, { r, col: '#FFDFA8' });
   }, { name: 'cathedral' });
 
   /* ---------------- the Palau de la Generalitat (far left, its front faces +x) ---------------- */
@@ -100,11 +103,11 @@ SF.tile('gotic', 100, 0, { rim: 40 }, function (T) {
     g.segs2([md[0] + 0.3, md[1] - 1.6, md[0] + 2.4, md[1] + 1.8], '#7A5A2C', 0.4);                                                         // the lance
     g.fill2([[md[0] + 1.2, md[1] + 2.2], [md[0] + 2.8, md[1] + 1.6], [md[0] + 2.2, md[1] + 2.8]], '#6E8A5A', true);                         // the dragon
     // the principal floor: tall windows with pediments either side, the long balcony in the middle (drawn with its officials below)
-    for (const y of [-9, -5, 19, 23]) { K.win(g, 'R', x1, y - 0.9, y + 0.9, 7.6, 11.4, { style: 'navy' }); const a = g.p(x1 + 0.05, y - 1.3, 11.8), b = g.p(x1 + 0.05, y + 1.3, 11.8), c = g.p(x1 + 0.05, y, 13.0); g.fill2([a, b, c], '#F0DEB8', true); g.line2([a, c, b], { w: 0.35, c: '#9A7A48', boil: false }); }
-    for (const y of [-9, -5, 1, 13, 19, 23]) K.win(g, 'R', x1, y - 0.7, y + 0.7, 1.5, 4.2, { style: 'navy' });
-    for (let y = -9; y <= 23; y += 4) K.win(g, 'R', x1, y - 0.6, y + 0.6, 14, 15.2, { style: 'navy' });
+    for (const y of [-9, -5, 19, 23]) { K.win(g, 'R', x1, y - 0.9, y + 0.9, 7.6, 11.4, { style: 'navy', lit: 0.6 }); const a = g.p(x1 + 0.05, y - 1.3, 11.8), b = g.p(x1 + 0.05, y + 1.3, 11.8), c = g.p(x1 + 0.05, y, 13.0); g.fill2([a, b, c], '#F0DEB8', true); g.line2([a, c, b], { w: 0.35, c: '#9A7A48', boil: false }); }
+    for (const y of [-9, -5, 1, 13, 19, 23]) K.win(g, 'R', x1, y - 0.7, y + 0.7, 1.5, 4.2, { style: 'navy', lit: 0.5 });
+    for (let y = -9; y <= 23; y += 4) K.win(g, 'R', x1, y - 0.6, y + 0.6, 14, 15.2, { style: 'navy', lit: 0.3 });
     // the balcony doors behind the officials
-    for (const y of [1, 5, 9, 13]) K.win(g, 'R', x1, y - 0.8, y + 0.8, 7.6, 11, { style: 'navy' });
+    for (const y of [1, 5, 9, 13]) K.win(g, 'R', x1, y - 0.8, y + 0.8, 7.6, 11, { style: 'navy', lit: 1 });
     // officials on the balcony, then its stone balustrade
     [[0.5, 921], [2.4, 922], [4.6, 923], [9.5, 924], [11.4, 925], [13.6, 926]].forEach(([y, s]) => BC.person(g, x1 + 0.9, y, 7.4, BC.who(s, { dir: 0, pose: s % 3 ? 'stand' : 'hold', top: s % 2 ? '#2F343B' : '#3F4D63', jacket: '#F3F1EA', dress: undefined, shorts: false, noLegs: false })));
     K.box(g, x1, -1, x1 + 1.6, 15, 7.0, 7.4, STONEL, { w: 0.6, nohid: true });
@@ -115,6 +118,9 @@ SF.tile('gotic', 100, 0, { rim: 40 }, function (T) {
     K.box(g, -36.3, -12.3, x1 + 0.4, 26.3, Z, Z + 0.6, STONEL, { w: 0.6, nohid: true });
     const rb = []; for (let y = -12; y < 26; y += 0.7) { const a = g.p(x1 + 0.2, y, Z + 0.6), b = g.p(x1 + 0.2, y, Z + 1.8); rb.push(a[0], a[1], b[0], b[1]); } g.segs2(rb, '#D2B582', 0.4);
     g.line([[x1 + 0.2, -12, Z + 1.9], [x1 + 0.2, 26, Z + 1.9], [-36, 26, Z + 1.9]], { w: 0.55, boil: false });
+    // at night the Palau's Renaissance front is floodlit warm; the portal open and lit, Sant Jordi in the light
+    BC.nightCol(g, 0, (c, fill) => (fill && c === '#4A3A2C' ? '#C98A45' : undefined)); BC.flood(g, 0, 0.78, '#FFDDA6');
+    for (const [y, z, r] of [[7, 3, 3.6], [7, 12.8, 2.6], [-7, 9, 2.0], [21, 9, 2.0]]) g.glow('lantern', x1 + 0.4, y, z, { r, col: '#FFDCA0' });
   }, { name: 'generalitat' });
   BC.flagActor(T, -28, 7, 17.9, { h: 7, w: 4.6, ht: 3.0 });
 
@@ -123,7 +129,8 @@ SF.tile('gotic', 100, 0, { rim: 40 }, function (T) {
     const q = { t: '#E9DDC4', l: '#E2D3B4', r: '#CDBB98' };
     K.box(g, -31, -16, -27, -12, 6.5, 11, q, { w: 0.7, nohid: true });
     const ar = []; for (let i = 0; i <= 8; i++) { const t = Math.PI * i / 8; ar.push(K.pt('R', -26.97, -14 - Math.cos(t) * 1.8, 6.5 + Math.sin(t) * 0.9)); } g.fill(ar, '#CDBB98');
-    for (const y of [-15.2, -12.8]) K.win(g, 'R', -27, y - 0.45, y + 0.45, 7.6, 10, { style: 'navy', arch: true });
+    for (const y of [-15.2, -12.8]) K.win(g, 'R', -27, y - 0.45, y + 0.45, 7.6, 10, { style: 'navy', arch: true, lit: 0.8 });
+    g.glow('lamp', -26.6, -14, 5.7, { r: 1.2, base: 0 });                // at night the lantern hung under the bridge is lit
     const sk = g.p(-26.95, -14, 8.9); g.disc2(sk, 0.55, '#F3EEE0'); g.segs2([sk[0] - 0.9, sk[1] + 0.9, sk[0] + 0.9, sk[1] - 0.9], '#5A4A3C', 0.3);
     for (let i = 0; i < 4; i++) { const p = g.p(-27, -15.6 + i * 1.07, 11); g.fill2([[p[0] - 0.7, p[1]], [p[0] + 0.7, p[1]], [p[0], p[1] - 3]], '#E2D3B4', true); }
   }, { name: 'pont del bisbe', under: 6.5 });
@@ -134,7 +141,11 @@ SF.tile('gotic', 100, 0, { rim: 40 }, function (T) {
     const y1 = -21, Z = 15, ST = { t: '#F2E8D2', l: '#EDE0C4', r: '#D9C9A6' };
     K.box(g, -2, -36, 30, y1, 0, Z, ST, { w: 0.95 });
     const gr = []; for (let z = 1; z < 5.6; z += 0.9) { const a = g.p(-2, y1 + 0.01, z), b = g.p(30, y1 + 0.01, z); gr.push(a[0], a[1], b[0], b[1]); } g.segs2(gr, '#D2BF98', 0.28);
-    for (let x = 0; x < 29; x += 3) if (x < 9 || x > 18) { K.win(g, 'L', y1, x, x + 1.4, 1.4, 4.4, { style: 'navy' }); K.win(g, 'L', y1, x, x + 1.4, 7.2, 10.6, { style: 'navy' }); K.win(g, 'L', y1, x + 0.2, x + 1.2, 12.2, 13.8, { style: 'navy' }); }
+    // at night, during La Mercè: the yearly projection mapping on the façade: the wall washed in deep colour, every
+    // window a block of saturated light, the central bay gold (a still frame of the show, in the city's colours)
+    const MAP = ['#FF4F7A', '#FFC93C', '#3FC8FF', '#8BF07A', '#FF8A3A', '#C77DFF'], mcol = (x, z) => MAP[(Math.round(x / 3) * 3 + Math.round(z / 3) * 2) % MAP.length];
+    const mwin = (x, a0, a1, z0, z1) => { const i = g.cmds.length; K.win(g, 'L', y1, a0, a1, z0, z1, { style: 'navy' }); g.mark({ nc: mcol(x, z0) }, i); };
+    for (let x = 0; x < 29; x += 3) if (x < 9 || x > 18) { mwin(x, x, x + 1.4, 1.4, 4.4); mwin(x, x, x + 1.4, 7.2, 10.6); mwin(x, x + 0.2, x + 1.2, 12.2, 13.8); }
     // the central bay: four columns round the door, niches with Jaume I and Fiveller, the flag balcony above
     g.fill(K.on('L', y1 + 0.03, 9.6, 18.4, 0, 6.2), '#E6D7B8');
     g.fill(K.on('L', y1 + 0.05, 12.6, 15.4, 0, 4.8), '#4A3A2C');
@@ -153,6 +164,9 @@ SF.tile('gotic', 100, 0, { rim: 40 }, function (T) {
     K.box(g, -2.3, -36.3, 30.3, y1 + 0.3, Z, Z + 0.6, ST, { w: 0.6, nohid: true });
     K.box(g, 9, -24, 19, y1 + 0.2, Z + 0.6, Z + 2.6, ST, { w: 0.6, nohid: true });
     K.text(g, 'L', y1 + 0.25, 14, Z + 1.0, 1.1, 'AJUNTAMENT', '#7A6A4A', { center: true });
+    BC.nightCol(g, 0, (c, fill) => (!fill ? undefined : c === ST.l ? '#4B3B9E' : c === '#E2D3B4' ? '#FF5E8E' : c === '#E6D7B8' ? '#FFB43C' : c === '#CDBB98' ? '#3FC8FF' : c === '#BDB7A8' ? '#FFF6E8' : c === '#4A3A2C' ? '#FFD27A' : undefined));
+    BC.nightCol(g, 0, (c, fill) => (fill ? undefined : c === '#D2BF98' ? '#7FE0FF' : c === '#F6EEDB' ? '#FFF8EE' : c === '#B8A57E' ? '#C77DFF' : undefined), { lines: true });   // the rustication lines and the columns in the light of the show
+    for (const [x, z, r, col] of [[3, 9, 3.2, '#FF6A9A'], [14, 3, 3.4, '#FFC24A'], [14, 11, 2.6, '#7FD8FF'], [25, 9, 3.2, '#9BF08A'], [8, 13, 2.0, '#C77DFF'], [21, 4, 2.2, '#FF8A3A']]) g.glow('neon', x, y1 + 0.3, z, { r, col });
   }, { name: 'ajuntament' });
   BC.flagActor(T, 13, -28, 17.6, { h: 6.5, w: 4.2, ht: 2.8 });
 

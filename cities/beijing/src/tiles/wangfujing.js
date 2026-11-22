@@ -25,9 +25,10 @@ SF.tile('wangfujing', 100, 0, { rim: 46 }, function (T) {
   T.obj([-35, -35, -9, -14], function (g) {
     g.boilP = 0.25;
     K.box(g, -35, -35, -9, -14, 0, 16, { t: '#E3DED3', l: '#EDE8DE', r: '#D6D0C4' }, { w: 1 });
-    g.fill(K.on('L', -13.97, -34, -10, 0.3, 4.6), '#3F4A55'); K.win(g, 'L', -14, -33, -27, 0.6, 4.2, { style: 'glass' }); K.win(g, 'L', -14, -18, -11, 0.6, 4.2, { style: 'glass' });
-    g.fill(K.on('R', -8.97, -34, -15, 0.3, 4.6), '#3F4A55'); K.win(g, 'R', -9, -33, -26, 0.6, 4.2, { style: 'glass' }); K.win(g, 'R', -9, -23, -16, 0.6, 4.2, { style: 'glass' });
-    for (const z of [6, 9.2, 12.4]) { for (let x = -34; x < -10; x += 3) K.win(g, 'L', -14, x, x + 2, z, z + 2, { style: 'navy' }); for (let y = -34; y < -15; y += 3) K.win(g, 'R', -9, y, y + 2, z, z + 2, { style: 'navy' }); }
+    // (night: the store is open late: its shop windows always lit, most of its floors lit)
+    g.fill(K.on('L', -13.97, -34, -10, 0.3, 4.6), '#3F4A55'); BN.shopWin(g, 'L', -14, -33, -27, 0.6, 4.2, { style: 'glass' }); BN.shopWin(g, 'L', -14, -18, -11, 0.6, 4.2, { style: 'glass' });
+    g.fill(K.on('R', -8.97, -34, -15, 0.3, 4.6), '#3F4A55'); BN.shopWin(g, 'R', -9, -33, -26, 0.6, 4.2, { style: 'glass' }); BN.shopWin(g, 'R', -9, -23, -16, 0.6, 4.2, { style: 'glass' });
+    for (const z of [6, 9.2, 12.4]) { for (let x = -34; x < -10; x += 3) K.win(g, 'L', -14, x, x + 2, z, z + 2, { style: 'navy', lit: 0.86 }); for (let y = -34; y < -15; y += 3) K.win(g, 'R', -9, y, y + 2, z, z + 2, { style: 'navy', lit: 0.86 }); }
     K.box(g, -35.4, -35.4, -8.6, -13.6, 16, 16.8, { t: '#D6D0C4', l: '#E3DED3', r: '#CFC9BD' }, { w: 0.7 });
     // the name on the roof in big red characters on a white board
     const b0 = -33, b1 = -11; for (const x of [b0 + 1, b1 - 1]) { const a = g.p(x, -18, 16.8), t = g.p(x, -18, 23); g.segs2([a[0], a[1], t[0], t[1]], '#6E6A62', 0.45); }
@@ -38,13 +39,18 @@ SF.tile('wangfujing', 100, 0, { rim: 46 }, function (T) {
   T.obj([-7.4, 0, -6.6, 8], (g) => BJ.pailou(g, 'R', -7, 0.2, 7.8, { bays: 3, h: 9, word: '小吃', roof: '#5E8A6A', board: '#9E2E24' }), { name: 'archway' });
   const STALLS = [[-33, '糖葫芦', '#C9382E'], [-26, '面', '#E2A13A'], [-19, '饺子', '#C9382E'], [-12.4, '北京', '#3E6FB0']];
   STALLS.forEach(([x, w, col], i) => T.obj([x - 3, -9, x + 3, -1.2], function (g) {
+    const i0 = g.cmds.length;
     K.box(g, x - 3, -6.4, x + 3, -1.2, 0, 2.8, { t: '#D9B57E', l: '#C9A26B', r: '#B58F58' }, { w: 0.6, boil: false });
     K.box(g, x - 3, -9, x + 3, -6.4, 0, 7.4, { t: '#B9B6AE', l: '#C6C3BB', r: '#ADAAA2' }, { w: 0.6 });
-    const R = RNG(i * 7 + 1); for (let k = 0; k < 7; k++) { const c = g.p(x - 2.4 + k * 0.8, -1.6, 2.8); if (i === 0) { g.segs2([c[0], c[1], c[0], c[1] - 4.6], '#C9A26B', 0.3); for (let j = 0; j < 4; j++) g.disc2([c[0], c[1] - 1.6 - j * 0.9], 0.55, '#D2342A'); } else g.disc2([c[0], c[1] - 0.6], 0.8, R.pick(i === 3 ? ['#C9382E', '#F3F1EA', '#3E6FB0', '#E6C24F'] : ['#F3E3B8', '#E2B13A', '#C9A26B', '#F7F2E2'])); }
+    const R = RNG(i * 7 + 1), iG = g.cmds.length; for (let k = 0; k < 7; k++) { const c = g.p(x - 2.4 + k * 0.8, -1.6, 2.8); if (i === 0) { g.segs2([c[0], c[1], c[0], c[1] - 4.6], '#C9A26B', 0.3); for (let j = 0; j < 4; j++) g.disc2([c[0], c[1] - 1.6 - j * 0.9], 0.55, '#D2342A'); } else g.disc2([c[0], c[1] - 0.6], 0.8, R.pick(i === 3 ? ['#C9382E', '#F3F1EA', '#3E6FB0', '#E6C24F'] : ['#F3E3B8', '#E2B13A', '#C9A26B', '#F7F2E2'])); }
+    BN.each(g, iG, (c, f) => (f ? { nc: true } : undefined));   // (night: the goods in their colours under the stall's lamps)
+    BN.flood(g, i0, 0.7, '#FFD29A');                            // (and the counter in their light)
     // the red awning and the name board above it
-    const aw = [[x - 3.4, -6.4, 6.0], [x + 3.4, -6.4, 6.0], [x + 3.4, -1.0, 4.8], [x - 3.4, -1.0, 4.8]]; g.fill(aw, col); g.outline(aw, { w: 0.5, c: shade(col, 0.5), boil: false });
+    const aw = [[x - 3.4, -6.4, 6.0], [x + 3.4, -6.4, 6.0], [x + 3.4, -1.0, 4.8], [x - 3.4, -1.0, 4.8]]; g.fill(aw, col); g.mark({ nc: BN.floodCol(col, 0.8, '#FFD8A8') }); g.outline(aw, { w: 0.5, c: shade(col, 0.5), boil: false });
     const st = []; for (let k = 1; k < 6; k++) { const a = lerp(x - 3.4, x + 3.4, k / 6), p0 = g.p(a, -6.4, 6.0), p1 = g.p(a, -1.0, 4.8); st.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(st, shade(col, 0.25), 0.35);
     BJ.sign(g, 'L', -6.4, x - 2.6, x + 2.6, 6.2, 7.2, '#2A2420', w, { ink: '#F2C94C' });
+    // at night two bare bulbs hang under the front of the awning
+    for (const dx of [-1.6, 1.6]) g.glow('lamp', x + dx, -1.6, 4.3, { r: 0.9 });
   }, { name: 'stall' }));
   // stall keepers at the ends of their counters, customers in the lane
   T.cast([-22, 2], (g) => {
@@ -55,18 +61,18 @@ SF.tile('wangfujing', 100, 0, { rim: 46 }, function (T) {
     BJ.person(g, -33, 2.0, 0, BJ.who(1004, { dir: 3, tanghulu: true }));
     BJ.person(g, -10, 2.6, 0, BJ.tourist(1005, '#F2C230', { dir: 3, pose: 'hold', phone: true }));
   }, { on: false });
-  T.actor({ sample: 5, period: 3, grow: false, at(t) { const u = (t % 3) / 3; return { x: -26, y: -2.6, z: 3 + u * 5, key: 's' + Math.floor(u * 10), u }; }, draw(g, st) { const o = g.p(0, 0, 0); g.fill2(arcPts(o[0], o[1], 2 + st.u * 2, 0, TAU, 10), `rgba(240,240,236,${(0.7 * (1 - st.u)).toFixed(2)})`, true); } });
+  T.actor({ sample: 5, period: 3, grow: false, at(t) { const u = (t % 3) / 3; return { x: -26, y: -2.6, z: 3 + u * 5, key: 's' + Math.floor(u * 10), u }; }, draw(g, st) { const o = g.p(0, 0, 0); g.fill2(arcPts(o[0], o[1], 2 + st.u * 2, 0, TAU, 10), `rgba(240,240,236,${(0.7 * (1 - st.u)).toFixed(2)})`, true); g.mark({ nc: `rgba(255,214,168,${(0.42 * (1 - st.u)).toFixed(2)})` }); } });   // (night: lit by the stall's lamps)
   // old shops lower down the street
   [[-14, 10, -7.4, 21, '烤鸭', 1010], [-14, 22, -7.4, 33.4, '茶', 1011]].forEach(([x0, y0, x1, y1, w, s]) => T.obj([x0, y0, x1, y1], (g) => BJ.shop(g, x0, y0, x1, y1, { front: 'R', word: w, seed: s }), { name: 'shop' }));
   BJ.court(T, { x0: -35, y0: 10, x1: -16, y1: 33.4, gate: 'E', ga: 14, east: 'wall', nd: 6, sd: 5 });
 
   /* ---------------- St Joseph's church ---------------- */
   T.obj([8, -35, 33, -18], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     const GR = { t: '#A9A6A0', l: '#B6B3AC', r: '#A09D96' };
     K.box(g, 14, -32, 33, -21, 0, 11, GR, { w: 0.9 });
-    for (let x = 16; x < 32; x += 3.2) K.win(g, 'L', -21, x, x + 1.4, 3, 8.6, { style: 'navy', arch: true });
-    K.win(g, 'R', 33, -29, -24, 3, 8.6, { style: 'navy', arch: true });
+    for (let x = 16; x < 32; x += 3.2) K.win(g, 'L', -21, x, x + 1.4, 3, 8.6, { style: 'navy', arch: true, lit: 0.9 });
+    K.win(g, 'R', 33, -29, -24, 3, 8.6, { style: 'navy', arch: true, lit: 1 });
     BJ.roof(g, 14, -32, 33, -21, 11, 4.2, { type: 'gable', col: '#7E8A86', over: 0.5, lift: 0, ridge: 'x', curl: 0, gcol: '#B6B3AC', tiles: false });
     // the west front: three towers with green domes (the middle one tallest), a rose window
     for (const [y0, y1, h, r] of [[-34.6, -30, 15, 2.0], [-23, -18.4, 15, 2.0], [-30, -23, 18, 2.8]]) {
@@ -76,7 +82,11 @@ SF.tile('wangfujing', 100, 0, { rim: 46 }, function (T) {
       K.dome(g, 11.3, cy, r, h + 1.2, r * 1.5, '#5E9A7A', { w: 0.7, shadow: '#4A7E62' });
       const t = g.p(11.3, cy, h + 1.2 + r * 1.5); g.segs2([t[0], t[1], t[0], t[1] - 5, t[0] - 1.4, t[1] - 3.4, t[0] + 1.4, t[1] - 3.4], '#4A4540', 0.5);
     }
-    const rw = g.p(14.05, -26.5, 9.6); g.disc2(rw, 2.4, '#3E5E8E'); g.ring2(rw, 2.4, { w: 0.5, c: '#4A4540' });
+    const rw = g.p(14.05, -26.5, 9.6); g.disc2(rw, 2.4, '#3E5E8E'); g.mark({ nc: '#7FA8F0' }); g.ring2(rw, 2.4, { w: 0.5, c: '#4A4540' });
+    // at night the church is floodlit warm from the square, its green domes glowing, the rose window lit from inside
+    BN.flood(g, i0, 0.74, BN.FLOOD, { lines: 0.2 });
+    for (const [x, y, z, r] of [[14.2, -32.3, 4, 2.6], [14.2, -20.7, 4, 2.6], [14.2, -26.5, 6, 3.0], [11.3, -26.5, 19.5, 2.4], [22, -20.8, 4, 2.4], [30, -20.8, 4, 2.4], [33.2, -26.5, 4, 2.2]]) g.glow('lantern', x, y, z, { r, col: '#FFD9A0' });
+    g.glow2('lantern', rw, rw, { r: 1.6, col: '#9FC4FF' });
   }, { name: 'east church' });
   // the wedding photo on the church square
   T.cast([20, -9], (g) => {
@@ -85,18 +95,21 @@ SF.tile('wangfujing', 100, 0, { rim: 46 }, function (T) {
     g.disc2(br.hands[0], 1.2, '#E7A9A0'); g.disc2([br.hands[0][0] + 0.8, br.hands[0][1] - 0.6], 0.8, '#F2C230');
     BJ.person(g, 21.0, -10.4, 0, BJ.who(1021, { dir: 1, top: '#2F343B', bot: '#2F343B', jacket: '#FBFAF6', tie: '#2F343B', hairStyle: 'short' }));
     BJ.person(g, 20.4, -4.0, 0, BJ.who(1022, { dir: 3, pose: 'kneel', hands: [[-0.6, -9], [0.8, -9]] }));
-    const r = BJ.person(g, 16.4, -6.4, 0, BJ.who(1023, { dir: 0, pose: 'hold', reach: [2.6, -9] })); const hd = r.hands[0]; g.fill2(arcPts(hd[0] + 2, hd[1] - 2, 3.0, 0, TAU, 12), '#F2E3A0', true); g.ring2([hd[0] + 2, hd[1] - 2], 3.0, { w: 0.35, c: '#A99A5A' });
+    const r = BJ.person(g, 16.4, -6.4, 0, BJ.who(1023, { dir: 0, pose: 'hold', reach: [2.6, -9] })); const hd = r.hands[0]; g.fill2(arcPts(hd[0] + 2, hd[1] - 2, 3.0, 0, TAU, 12), '#F2E3A0', true); g.mark({ nc: '#FFF4D8' }); g.glow2('lantern', [hd[0] + 2, hd[1] - 2], g.p(16.4, -6.4, 0), { r: 2.0, col: '#FFF0D0' }); g.ring2([hd[0] + 2, hd[1] - 2], 3.0, { w: 0.35, c: '#A99A5A' });   // (night: a lit soft-box for the photos)
   }, { on: false });
 
   /* ---------------- the bookstore and the street sign ---------------- */
   T.obj([12, 3, 35, 28], function (g) {
-    g.boilP = 0.25;
+    g.boilP = 0.25; const i0 = g.cmds.length;
     K.box(g, 12, 3, 35, 28, 0, 14, { t: '#D9DEE2', l: '#C9D6DF', r: '#AFBFCB' }, { w: 1 });
     const gr = []; for (let z = 4.4; z < 14; z += 3.2) for (const [f, p, a0, a1] of [['L', 28, 12, 35], ['R', 35, 3, 28]]) { const a = g.p.apply(g, K.pt(f, p + 0.02, a0, z)), b = g.p.apply(g, K.pt(f, p + 0.02, a1, z)); gr.push(a[0], a[1], b[0], b[1]); }
     for (const [f, p, a0, a1] of [['L', 28, 12, 35], ['R', 35, 3, 28]]) for (let a = a0 + 2.3; a < a1; a += 2.3) { const P0 = g.p.apply(g, K.pt(f, p + 0.02, a, 4.4)), P1 = g.p.apply(g, K.pt(f, p + 0.02, a, 14)); gr.push(P0[0], P0[1], P1[0], P1[1]); }
     g.segs2(gr, '#8EA7B6', 0.35);
-    g.fill(K.on('L', 28.03, 13, 34, 0.3, 3.8), '#E9D3A6'); K.win(g, 'L', 28, 14, 21, 0.6, 3.6, { style: 'glass' }); K.win(g, 'L', 28, 25, 33, 0.6, 3.6, { style: 'glass' });
-    K.sign(g, 'L', 28, 14, 33, 9.4, 12.6, '#C42C25', 'BOOKSTORE');
+    // at night the reading rooms glow through the glass wall, its mullions dark against them
+    BN.each(g, i0, (c, f) => (f ? (c === '#D9DEE2' ? undefined : { nc: BN.mixA(nightColour(c), c === '#C9D6DF' ? '#E2A55A' : '#B07E48', 0.5) }) : c === '#8EA7B6' ? { nc: '#3A3E4C' } : undefined));
+    for (const [f, x, y] of [['L', 17, 28], ['L', 29, 28], ['R', 35, 9], ['R', 35, 21]]) { const q = f === 'L' ? [x, y + 0.1, 9] : [x + 0.1, y, 9]; g.glow('lantern', q[0], q[1], q[2], { r: 2.6, col: '#FFD9A0' }); }
+    g.fill(K.on('L', 28.03, 13, 34, 0.3, 3.8), '#E9D3A6'); g.mark({ win: 1, spill: true, nc: '#FFE0A0' }); BN.shopWin(g, 'L', 28, 14, 21, 0.6, 3.6, { style: 'glass' }); BN.shopWin(g, 'L', 28, 25, 33, 0.6, 3.6, { style: 'glass' });
+    BN.kSign(g, 'L', 28, 14, 33, 9.4, 12.6, '#C42C25', 'BOOKSTORE');
   }, { name: 'bookstore' });
   T.obj([6.6, 30.6, 9.4, 31.4], function (g) {
     for (const x of [6.9, 9.1]) { const a = g.p(x, 31, 0), b = g.p(x, 31, 14); g.fill2([[a[0] - 0.35, a[1]], [a[0] + 0.35, a[1]], [b[0] + 0.35, b[1]], [b[0] - 0.35, b[1]]], '#6E6A62'); }

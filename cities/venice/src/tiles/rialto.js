@@ -29,8 +29,9 @@ SF.tile('rialto', 0, 0, { rim: 18 }, function (T) {
   // the Mercerie block (shops on both faces)
   H({ x0: 14, y0: -22, x1: 26, y1: -6, n: 3, col: P[7], chim: [[18, -18], [22, -10, 'square']], shopL: [15.5, 24.5, '#2F3A55', 'COSTUMI'], shopR: [-20, -10, '#7A2E35', 'MERLETTI'], altana: [20, -15, {}] });
   // the houses of the Riva del Ferro, restaurants on the canal
-  H({ x0: -37, y0: 17, x1: -24, y1: 29, n: 4, col: P[5], chim: [[-33, 21], [-28, 25]], shopL: [-35.5, -26, '#3E5A44', 'TRATTORIA'] });
-  H({ x0: -24, y0: 18, x1: -10, y1: 29, n: 3, col: P[8], chim: [[-19, 22]], shopL: [-22.5, -12, '#7A2E35', 'PIZZERIA'], flowers: ['#C9463E', '#E6C24F'] });
+  // (dry: on screen the Rialto stands over the water in front of these two, so their lamps lay no reflection on it)
+  H({ x0: -37, y0: 17, x1: -24, y1: 29, n: 4, col: P[5], chim: [[-33, 21], [-28, 25]], shopL: [-35.5, -26, '#3E5A44', 'TRATTORIA'], dry: true });
+  H({ x0: -24, y0: 18, x1: -10, y1: 29, n: 3, col: P[8], chim: [[-19, 22]], shopL: [-22.5, -12, '#7A2E35', 'PIZZERIA'], flowers: ['#C9463E', '#E6C24F'], dry: true });
 
   /* ---------- the Fondaco dei Tedeschi ---------- */
   T.obj([10, 17, 31, 37], function (g) {
@@ -39,17 +40,17 @@ SF.tile('rialto', 0, 0, { rim: 18 }, function (T) {
     K.box(g, x0, y0, x1, y1, W, Z, { t: '#C9BBA6', l: col, r: shade(col, 0.1) }, { w: 1 });
     g.fill(K.on('L', y1 + 0.01, x0, x1, W, W + 0.6), '#6F8A62');
     // the water portico on the canal, the round-headed windows in rhythm
-    for (let i = 0; i < 4; i++) { const a = 13 + i * 3.8; g.fill(VN.archPts('L', y1 + 0.02, a, a + 2.4, W + 0.6, 3.8, 'round', 0.35), VN.istria); g.fill(VN.archPts('L', y1 + 0.03, a, a + 2.4, W + 0.6, 3.8, 'round', 0), '#4A4E52'); }
+    for (let i = 0; i < 4; i++) { const a = 13 + i * 3.8; g.fill(VN.archPts('L', y1 + 0.02, a, a + 2.4, W + 0.6, 3.8, 'round', 0.35), VN.istria); g.fill(VN.archPts('L', y1 + 0.03, a, a + 2.4, W + 0.6, 3.8, 'round', 0), '#4A4E52'); g.mark({ nc: '#D99A58' }); g.glow('lamp', a + 1.2, y1 + 0.6, 3.2, { r: 1.3, base: W }); }   // at night the water portico is lit, its lamps shine in the Grand Canal
     for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) {
-      for (const zf of [5, 8.4, 11.8]) for (let a = a0 + 1.2; a < a1 - 1; a += 2.2) { if (f === 'L' && zf < 6 && a > 11 && a < 29) continue; VN.win(g, f, p + 0.02, a, a + 1.0, zf, zf + 2.4, { arch: 'round', sh: null, pane: '#55606A' }); }
+      for (const zf of [5, 8.4, 11.8]) for (let a = a0 + 1.2; a < a1 - 1; a += 2.2) { if (f === 'L' && zf < 6 && a > 11 && a < 29) continue; VN.win(g, f, p + 0.02, a, a + 1.0, zf, zf + 2.4, { arch: 'round', sh: null, pane: '#55606A', lit: 0.85 }); }
       g.fill(K.on(f, p + 0.02, a0, a1, 4.4, 4.7), VN.istria);
-      if (f === 'R') for (let a = a0 + 1.2; a < a1 - 1; a += 2.2) VN.win(g, f, p + 0.02, a, a + 1.0, 1.2, 3.4, { arch: 'round', sh: null, pane: '#55606A' });
+      if (f === 'R') for (let a = a0 + 1.2; a < a1 - 1; a += 2.2) VN.win(g, f, p + 0.02, a, a + 1.0, 1.2, 3.4, { arch: 'round', sh: null, pane: '#55606A', lit: 1 });
       const mer = []; for (let a = a0 + 0.5; a < a1; a += 1.2) { const c = g.p.apply(g, K.pt(f, p, a, Z)); mer.push(c[0] - 0.8, c[1], c[0] + 0.8, c[1], c[0], c[1] - 2.4); } g.tris2(mer, '#F3EFE6');
     }
     // the roof terrace: decking, a glass pavilion
     g.fill(K.rect(x0 + 0.5, y0 + 0.5, x1 - 0.5, y1 - 0.5, Z), '#B8875A');
     const dk = []; for (let x = x0 + 1.5; x < x1 - 0.5; x += 1.4) { const a = g.p(x, y0 + 0.5, Z), b = g.p(x, y1 - 0.5, Z); dk.push(a[0], a[1], b[0], b[1]); } g.segs2(dk, '#9C7450', 0.25);
-    K.box(g, x0 + 3, y0 + 3, x0 + 10, y0 + 9, Z, Z + 3.4, { t: '#DCE3E6', l: '#C3D6E0', r: '#A8BECB' }, { w: 0.6 });
+    { const i0 = g.cmds.length; K.box(g, x0 + 3, y0 + 3, x0 + 10, y0 + 9, Z, Z + 3.4, { t: '#DCE3E6', l: '#C3D6E0', r: '#A8BECB' }, { w: 0.6 }); g.mark({ nc: (c) => (c === '#DCE3E6' ? undefined : c === '#C3D6E0' ? '#E6C68E' : '#C9A26E') }, i0); g.glow('lantern', x0 + 6.5, y0 + 9, Z + 1.8, { r: 1.8, col: '#FFE2B0' }); }   // the glass pavilion lit at night
     // a glass balustrade along the canal side
     g.fill(K.on('L', y1 - 0.6, x0 + 0.6, x1 - 0.6, Z, Z + 1.3), 'rgba(207,224,234,0.55)'); g.line([[x0 + 0.6, y1 - 0.6, Z + 1.3], [x1 - 0.6, y1 - 0.6, Z + 1.3], [x1 - 0.6, y0 + 0.6, Z + 1.3]], { w: 0.4, c: '#5E6E7A', boil: false });
   }, { name: 'fondaco dei tedeschi' });
@@ -60,10 +61,10 @@ SF.tile('rialto', 0, 0, { rim: 18 }, function (T) {
 
   /* ---------- the Riva del Ferro: tables, heaters, the gondola station ---------- */
   for (const x of [-34, -29, -24.5]) T.cast([x, 32.6], function (g) {
-    VN.table(g, x, 32.6, 0, { cups: ['#E8712F', '#F3F1EA'] });
+    VN.table(g, x, 32.6, 0, { cups: ['#E8712F', '#F3F1EA'] }); VN.glowDry(g, 'lantern', x, 32.6, 2.9, { r: 0.7, col: '#FFC870' });
     VN.person(g, x - 1.4, 31.8, 1.3, VN.who(1310 + Math.round(-x), { dir: 0, pose: 'sit' })); VN.person(g, x + 1.5, 33.4, 1.3, VN.who(1320 + Math.round(-x), { dir: 2, pose: 'sit' }));
   }, { name: 'riva tables' });
-  for (const x of [-31.5, -26.8]) T.obj([x, 31], (g) => { const b = g.p(x, 31, 0), t = g.p(x, 31, 6.6); g.line2([b, t], { w: 0.6, c: '#5E5A52', boil: false, ext: 0 }); g.fill2([[t[0] - 2.4, t[1] + 1.2], [t[0] + 2.4, t[1] + 1.2], [t[0], t[1] - 0.8]], '#8C8F94', true); g.disc2([t[0], t[1] + 2.4], 0.9, '#E8712F'); }, { name: 'heater' });
+  for (const x of [-31.5, -26.8]) T.obj([x, 31], (g) => { const b = g.p(x, 31, 0), t = g.p(x, 31, 6.6); g.line2([b, t], { w: 0.6, c: '#5E5A52', boil: false, ext: 0 }); g.fill2([[t[0] - 2.4, t[1] + 1.2], [t[0] + 2.4, t[1] + 1.2], [t[0], t[1] - 0.8]], '#8C8F94', true); g.disc2([t[0], t[1] + 2.4], 0.9, '#E8712F'); g.mark({ nc: '#FF8A3C' }); g.glow2('lantern', [t[0], t[1] + 2.4], [t[0], -1e6], { r: 1.4, col: '#FF9A4A', pool: false }); }, { name: 'heater' });   // the patio heaters glow at night (no reflection: the Rialto is in front)
   // gondoliers waiting at their station: one sits on the bollard, two talk, one calls out
   T.cast([-14, 34], function (g) {
     const gd = (x, y, d, pose, s) => { const w = VN.who(1330 + s, { scarf: null, beanie: null, colombina: null, fedora: null }); const r = VN.person(g, x, y, pose === 'sit' ? 0.9 : 0, Object.assign({}, w, { dir: d, pose, top: '#F3F1EA', bot: '#2F2C2E', ph: 0.25 })); VN.gondolierKit(g, r, 1, { stripe: s % 2 ? '#7A2E35' : '#2F3F63' }); };
@@ -85,7 +86,8 @@ SF.tile('rialto', 0, 0, { rim: 18 }, function (T) {
   // the chestnut roaster: a brazier, a little smoke, a queue of two
   T.obj([-14, -10], function (g) {
     K.box(g, -15, -11, -13, -9, 0, 2.6, { t: '#3A3632', l: '#4A4642', r: '#2E2A26' }, { w: 0.5 });
-    const t = g.p(-14, -10, 2.6); g.fill2(arcPts(t[0], t[1], 3.2, 0, TAU, 10).map((q) => [q[0], t[1] + (q[1] - t[1]) * 0.5]), '#5A4A3E', true); for (let i = 0; i < 6; i++) g.disc2([t[0] - 1.6 + i * 0.6, t[1] - 0.2 + (i % 2) * 0.3], 0.35, '#8A5A3A');
+    const t = g.p(-14, -10, 2.6); g.fill2(arcPts(t[0], t[1], 3.2, 0, TAU, 10).map((q) => [q[0], t[1] + (q[1] - t[1]) * 0.5]), '#5A4A3E', true); g.mark({ nc: '#8A3A1E' }); for (let i = 0; i < 6; i++) { g.disc2([t[0] - 1.6 + i * 0.6, t[1] - 0.2 + (i % 2) * 0.3], 0.35, '#8A5A3A'); g.mark({ nc: '#F08A3A' }); }
+    g.glow2('lantern', [t[0], t[1] - 0.6], g.p(-14, -10, 0), { r: 1.6, col: '#FF9040' });               // the embers glow at night
     VN.person(g, -15.8, -9, 0, VN.who(1340, { dir: 0, pose: 'hold', beanie: '#3B3F47', top: '#5A4A3C' }));
   }, { name: 'caldarroste' });
   T.cast([-11, -8], (g) => { VN.person(g, -11.4, -8.4, 0, VN.who(1341, { dir: 2, pose: 'hold' })); VN.person(g, -10.0, -6.6, 0, VN.who(1342, { dir: 2 })); }, { name: 'chestnut queue' });

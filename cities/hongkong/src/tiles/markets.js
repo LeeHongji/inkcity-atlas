@@ -45,33 +45,36 @@ const MARKETS = function (T) {
   /* ---------------- Temple Street ---------------- */
   // the gate at the harbour end: two red pillars, a green-tiled roof, the 廟街 board
   T.obj([37.6, 86, 62.4, 87.6], (g) => {
+    const i0 = g.cmds.length;
     for (const x of [38.4, 61.6]) K.box(g, x - 0.7, 86, x + 0.7, 87.4, 0, 9.4, { t: '#B8322A', l: '#C8372D', r: '#A42C24' }, { w: 0.6 });
     K.box(g, 37.6, 86.1, 62.4, 87.3, 9.4, 10.4, { t: '#A42C24', l: '#B8322A', r: '#8E2620' }, { w: 0.6 });
     K.gable(g, 36.6, 85.6, 63.4, 87.8, 10.4, 1.6, 'x', { a: '#4E8A62', b: '#3E7A5A', e: '#B8322A' }, { w: 0.55 });
+    HK.nite(g, i0, { nc: HK.lift(0.4) }); for (const x of [38.4, 61.6]) g.glow('lantern', x, 87.6, 8.6, { r: 2.0, col: '#FFC27A' });   // the gate lit at night
     HK.board(g, 'L', 87.3, 45.6, 54.4, 9.5, 10.35, '#2C2622', '廟街', { neon: '#F7D046', rim: '#D9A93E' });
-    HK.board(g, 'L', 87.32, 46.4, 53.6, 7.8, 9.3, '#F3E7C6', null); K.text(g, 'L', 87.4, 50, 8.2, 0.8, 'TEMPLE STREET', '#8E2620', { center: true });
+    HK.board(g, 'L', 87.32, 46.4, 53.6, 7.8, 9.3, '#F3E7C6', null); K.text(g, 'L', 87.4, 50, 8.2, 0.8, 'TEMPLE STREET', '#8E2620', { center: true }); HK.nite(g, g.cmds.length - 1, { nc: true });
   }, { name: 'temple street gate' });
   // stalls under striped canopies on both kerbs, strings of bulbs between
   const TRINK = [['#C8372D', '#E6C24F', '#46A6C9', '#F3F1EA'], ['#3F5F8F', '#7FB7D9', '#2F343B', '#B9A27D'], ['#5FA58F', '#8FBF73', '#E7E2D6', '#D98AA4'], ['#E6C24F', '#D9733A', '#7A5A3C', '#F3D0A0']];
   const tstall = (x, y, i) => T.obj([x - 1.6, y - 2.8, x + 1.6, y + 2.8], (g) => {
     g.boilP = 0.3;
     K.box(g, x - 1.5, y - 2.6, x + 1.5, y + 2.6, 0, 2.0, { t: '#E9E2CF', l: '#8E6E4E', r: '#7A5C40' }, { w: 0.5, boil: false });
-    const R = RNG(i * 31 + 7), gd = TRINK[i % TRINK.length]; for (let k = 0; k < 16; k++) { const q = g.p(x - 1.2 + (k % 4) * 0.8, y - 2.2 + Math.floor(k / 4) * 1.4, 2.05); g.fill2([[q[0] - 0.8, q[1] - 0.4], [q[0] + 0.8, q[1] - 0.4], [q[0] + 0.8, q[1] + 0.3], [q[0] - 0.8, q[1] + 0.3]], gd[(k + (R() * 4 | 0)) % gd.length], true); }
+    const R = RNG(i * 31 + 7), gd = TRINK[i % TRINK.length], ig = g.cmds.length; for (let k = 0; k < 16; k++) { const q = g.p(x - 1.2 + (k % 4) * 0.8, y - 2.2 + Math.floor(k / 4) * 1.4, 2.05); g.fill2([[q[0] - 0.8, q[1] - 0.4], [q[0] + 0.8, q[1] - 0.4], [q[0] + 0.8, q[1] + 0.3], [q[0] - 0.8, q[1] + 0.3]], gd[(k + (R() * 4 | 0)) % gd.length], true); }
     // goods hung on the back frame: bags, T-shirts
     const ps = []; for (const yy of [y - 2.6, y + 2.6]) { const a = g.p(x - 1.5, yy, 0), b = g.p(x - 1.5, yy, 6.4); ps.push(a[0], a[1], b[0], b[1]); } g.segs2(ps, '#5A564E', 0.3);
     for (let k = 0; k < 4; k++) { const q = g.p(x - 1.45, y - 2.0 + k * 1.3, 5.6); g.fill2([[q[0] - 0.9, q[1]], [q[0] + 0.9, q[1]], [q[0] + 0.8, q[1] + 2.4], [q[0] - 0.8, q[1] + 2.4]], gd[(k + 1) % gd.length], true); }
+    HK.nite(g, ig, { nc: (c) => (c === '#5A564E' ? undefined : HK.lift(0.65)(c)) });   // the goods lit by the stall's bulb
     // the striped canopy, sloping to the lane
     const z1 = 6.8, z2 = 5.8, x0 = x - 1.9, x1 = x + 2.6, ys = y - 3.0, ye = y + 3.0, n = 6;
     for (let k = 0; k < n; k++) { const a = lerp(ys, ye, k / n), b = lerp(ys, ye, (k + 1) / n); g.fill([[x0, a, z1], [x0, b, z1], [x1, b, z2], [x1, a, z2]], k % 2 ? '#F6F1E6' : '#C8372D'); }
     g.outline([[x0, ys, z1], [x0, ye, z1], [x1, ye, z2], [x1, ys, z2]], { w: 0.45, c: '#7A1E18', boil: false });
-    const bl = g.p(x + 1.4, y, z2 - 0.5); g.disc2(bl, 1.8, 'rgba(255,214,140,0.32)'); g.disc2(bl, 0.45, '#FFF0C8');
+    const bl = g.p(x + 1.4, y, z2 - 0.5), ib = g.cmds.length; g.disc2(bl, 1.8, 'rgba(255,214,140,0.32)'); g.disc2(bl, 0.45, '#FFF0C8'); HK.nite(g, ib, { nc: true }); if (i % 2 === 0) g.glow2(i % 4 === 0 ? 'lamp' : 'lantern', bl, g.p(x + 1.4, y, 0), { r: 1.0, col: '#FFD58A' });   // (not every bulb a halo: the lane would wash out)
   }, { name: 'stall' });
   const tpos = [];
   for (let y = 92; y <= 160; y += 7.4) { if (y > 112 && y < 128) continue; tpos.push([40.2, y]); }
   for (let y = 95; y <= 160; y += 7.4) { if (y > 132 && y < 146) continue; tpos.push([59.8, y]); }
   tpos.forEach(([x, y], i) => tstall(x, y, i));
   // strings of bulbs zig-zagging across the lane (short pieces: each string is its own small object)
-  for (let y = 94; y < 160; y += 14) T.obj([50, y + 3], (g) => { const a = g.p(41.6, y, 7.6), b = g.p(58.4, y + 6, 7.6); const pts = []; for (let k = 0; k <= 12; k++) { const u = k / 12; pts.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u) + Math.sin(Math.PI * u) * 3]); } g.line2(pts, { w: 0.25, c: '#3A3530', boil: false, ext: 0 }); for (let k = 1; k < 12; k += 1) { g.disc2(pts[k], 0.9, 'rgba(255,214,140,0.35)'); g.disc2(pts[k], 0.32, k % 3 ? '#FFF0C8' : '#FF6A3D'); } }, { name: 'bulbs' });
+  for (let y = 94; y < 160; y += 14) T.obj([50, y + 3], (g) => { const a = g.p(41.6, y, 7.6), b = g.p(58.4, y + 6, 7.6); const pts = []; for (let k = 0; k <= 12; k++) { const u = k / 12; pts.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u) + Math.sin(Math.PI * u) * 3]); } g.line2(pts, { w: 0.25, c: '#3A3530', boil: false, ext: 0 }); for (let k = 1; k < 12; k += 1) { g.disc2(pts[k], 0.9, 'rgba(255,214,140,0.35)'); g.mark({ nc: true }); g.disc2(pts[k], 0.32, k % 3 ? '#FFF0C8' : '#FF6A3D'); g.mark({ nc: true }); if (k % 4 === 2) g.glow2('lantern', pts[k], pts[k], { r: 0.5, col: '#FFE7B0' }); } }, { name: 'bulbs' });
   // stall-holders and browsers
   tpos.forEach(([x, y], i) => { if (i % 3 === 1) return; const right = x > 50; HK.stand(T, x + (right ? -3.4 : 3.4), y + 1.2, HK.who(4300 + i, { dir: right ? 0 : 2, pose: i % 2 ? 'hold' : 'stand', phone: i % 4 === 0 }), { name: 'browser' }); });
 
@@ -85,13 +88,13 @@ const MARKETS = function (T) {
     const aw = [[37.8, 112.8, 7.2], [37.8, 121.2, 7.2], [44.0, 121.2, 6.4], [44.0, 112.8, 6.4]]; g.fill(aw, '#E6B83E'); g.outline(aw, { w: 0.45, c: '#8A6A1E', boil: false });
     const ps = []; for (const [x, y] of [[44, 112.8], [44, 121.2]]) { const a = g.p(x, y, 0), b = g.p(x, y, 6.4); ps.push(a[0], a[1], b[0], b[1]); } g.segs2(ps, '#5A564E', 0.32);
     HK.board(g, 'R', 44.02, 113.4, 120.6, 6.45, 7.15, '#C8372D', null);
-    K.text(g, 'R', 44.05, -117, 6.55, 0.5, 'DAI PAI DONG', '#FBF6E4', { center: true });
-    const bl = g.p(42, 117, 5.6); g.disc2(bl, 2.2, 'rgba(255,214,140,0.32)'); g.disc2(bl, 0.5, '#FFF0C8');
+    K.text(g, 'R', 44.05, -117, 6.55, 0.5, 'DAI PAI DONG', '#FBF6E4', { center: true }); HK.nite(g, g.cmds.length - 1, { nc: true });
+    const bl = g.p(42, 117, 5.6), ib = g.cmds.length; g.disc2(bl, 2.2, 'rgba(255,214,140,0.32)'); g.disc2(bl, 0.5, '#FFF0C8'); HK.nite(g, ib, { nc: true }); g.glow2('lamp', bl, g.p(42, 117, 0), { r: 1.4 });
   }, { name: 'dai pai dong' });
   T.cast([43.2, 116], (g) => HK.person(g, 43.2, 116, 0, HK.who(4401, { dir: 2, pose: 'hold', reach: [-5, -8], apron: '#F3F1EA', top: '#F3F1EA', jacket: undefined, cap: undefined })), { on: true, name: 'cook' });
   T.actor({ sample: 0.2, period: 1.2, layer: '', grow: false,
     at(t) { const f = Math.floor(t * 10) % 6; return { x: 41.2, y: 115.6, z: 3.2, key: 'f' + f, f }; },
-    draw(g, st) { const o = g.p(0, 0, 0), f = st.f, h = [3.2, 4.4, 2.6, 3.8, 4.8, 3.0][f]; g.fill2([[o[0] - 1.2, o[1]], [o[0] - 0.4, o[1] - h * 0.6], [o[0] + 0.1, o[1] - h], [o[0] + 0.6, o[1] - h * 0.5], [o[0] + 1.3, o[1]]], 'rgba(255,140,60,0.85)', true); g.fill2([[o[0] - 0.6, o[1]], [o[0], o[1] - h * 0.55], [o[0] + 0.6, o[1]]], '#FFE08A', true); for (let k = 0; k < 3; k++) g.disc2([o[0] - 0.6 + k * 0.8 + (f % 2) * 0.3, o[1] - h - 1.6 - k * 1.4], 1.0 + k * 0.4, 'rgba(240,236,228,' + (0.5 - k * 0.12) + ')'); } });
+    draw(g, st) { const o = g.p(0, 0, 0), f = st.f, h = [3.2, 4.4, 2.6, 3.8, 4.8, 3.0][f]; g.fill2([[o[0] - 1.2, o[1]], [o[0] - 0.4, o[1] - h * 0.6], [o[0] + 0.1, o[1] - h], [o[0] + 0.6, o[1] - h * 0.5], [o[0] + 1.3, o[1]]], 'rgba(255,140,60,0.85)', true); g.mark({ nc: true, light: true }); g.fill2([[o[0] - 0.6, o[1]], [o[0], o[1] - h * 0.55], [o[0] + 0.6, o[1]]], '#FFE08A', true); g.mark({ nc: true }); for (let k = 0; k < 3; k++) g.disc2([o[0] - 0.6 + k * 0.8 + (f % 2) * 0.3, o[1] - h - 1.6 - k * 1.4], 1.0 + k * 0.4, 'rgba(240,236,228,' + (0.5 - k * 0.12) + ')'); } });
   const table = (x, y, seats) => T.cast([x, y], (g) => {
     const order = seats.slice().sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
     const drawSeat = (s) => { const [dx, dy, dir, seed] = s; const sx = x + dx, sy = y + dy; K.box(g, sx - 0.45, sy - 0.45, sx + 0.45, sy + 0.45, 0, 1.3, { t: '#C8372D', l: '#B8322A', r: '#A42C24' }, { w: 0.3, boil: false }); HK.person(g, sx, sy, 0, HK.who(seed, { dir, pose: 'sit', reach: dir < 2 ? [3, -9] : [-3, -9] })); };
@@ -113,7 +116,7 @@ const MARKETS = function (T) {
   T.cast([57.6, 138.6], (g) => {
     K.box(g, 56.4, 137.2, 58.8, 140.0, 0, 2.2, { t: '#C8372D', l: '#B8322A', r: '#A42C24' }, { w: 0.45 });
     K.sign(g, 'L', 140.0, 56.6, 58.6, 0.6, 1.8, '#F3E7C6', 'FORTUNE', { w: 0.3, ink: '#8E2620' });
-    const lp = g.p(57.6, 138.6, 2.2); g.line2([lp, [lp[0], lp[1] - 7]], { w: 0.35, c: '#3A3530', boil: false, ext: 0 }); g.disc2([lp[0], lp[1] - 7.4], 2.6, 'rgba(255,214,140,0.35)'); g.fill2([[lp[0] - 1.2, lp[1] - 7.4], [lp[0] + 1.2, lp[1] - 7.4], [lp[0] + 0.7, lp[1] - 8.4], [lp[0] - 0.7, lp[1] - 8.4]], '#C8372D', true);
+    const lp = g.p(57.6, 138.6, 2.2); g.line2([lp, [lp[0], lp[1] - 7]], { w: 0.35, c: '#3A3530', boil: false, ext: 0 }); g.disc2([lp[0], lp[1] - 7.4], 2.6, 'rgba(255,214,140,0.35)'); g.mark({ nc: true }); g.fill2([[lp[0] - 1.2, lp[1] - 7.4], [lp[0] + 1.2, lp[1] - 7.4], [lp[0] + 0.7, lp[1] - 8.4], [lp[0] - 0.7, lp[1] - 8.4]], '#C8372D', true); g.mark({ nc: true }); g.glow2('lamp', [lp[0], lp[1] - 7.2], lp, { r: 1.2 });   // his lamp lit at night
     K.box(g, 59.4, 137.9, 60.3, 138.8, 0, 1.3, { t: '#5A564E', l: '#4A4540', r: '#3A3530' }, { w: 0.3, boil: false });
     HK.person(g, 59.85, 138.3, 0, HK.elder(4421, { dir: 2, pose: 'sit', reach: [-4, -9], glasses: true, top: '#3B3F47' }));
   }, { name: 'fortune teller' });

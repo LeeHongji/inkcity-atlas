@@ -44,6 +44,9 @@ SF.tile('streets', 0, 0, { order: -99, rim: 0, castAt: 60 }, function (T) {
     // the lagoon's misty outer edge: thin veils of cream laid over the water where it fades into the paper
     const fogs = [[-168, 110, 46], [-80, 172, 52], [40, 176, 50], [130, 172, 46], [176, 120, 50], [178, 10, 44], [176, -90, 46], [110, -172, 42], [-172, -30, 44], [-140, -168, 40]];
     fogs.forEach(([x, y, w], i) => { for (let k = 0; k < 2; k++) { const c = g.p(x + k * 6, y - k * 6, WL), Rr = RNG(70 + i * 3 + k), pts = []; for (let j = 0; j < 9; j++) { const a = TAU * j / 9; pts.push([c[0] + Math.cos(a) * w * (0.75 + Rr() * 0.4), c[1] + Math.sin(a) * w * 0.14 * (0.8 + Rr() * 0.5)]); } K.blob2(g, pts, 'rgba(246,244,238,0.32)', { seed: 80 + i * 2 + k, rag: 1.4 }); } });
+    // the open lagoon round the city, as a mask the lights reflect in at night (a clear fill: nothing shows by day;
+    // the lagoon's own fill runs on under the places, so it cannot be the mask itself). Last, so nothing before it moves.
+    for (const r of [[-152, -152, 152, -137], [-152, 137, 152, 152], [-152, -137, -137, 137], [137, -137, 152, 137]]) g.fill(K.rect(r[0], r[1], r[2], r[3], WL), VN.WMASK);
   }, { rim: true });
 
   /* ---------------- the boats ---------------- */

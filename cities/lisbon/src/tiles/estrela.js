@@ -5,7 +5,9 @@
    Jardim da Estrela: lawns cut by curving gravel paths, a pond with an island and ducks, an iron bandstand where the
    Sunday band plays, jacarandas and palms, a kiosk with tables, benches.
    Who: the band in the bandstand and people listening on folding chairs; children feeding the ducks; a nanny with a
-   pram; a picnic on the lawn; an old man with his newspaper on a bench; a dog walker; two joggers. */
+   pram; a picnic on the lawn; an old man with his newspaper on a bench; a dog walker; two joggers.
+   At night: the basilica floodlit white and warm, its dome pale over the garden; the bandstand lit for the band; the
+   kiosk's lamp over its tables; jacarandas glowing violet, motes over the lawns, the lights in the pond. */
 SF.tile('estrela', -100, -100, { rim: 0 }, function (T) {
   const H = 37, W = { t: '#E9E4D8', l: '#F6F3EB', r: '#E2DCCE' };
   const pond = K.curve([[6, 0], [16, -4], [26, -1], [28, 8], [20, 14], [9, 12], [4, 6]], 6, true);
@@ -39,6 +41,9 @@ SF.tile('estrela', -100, -100, { rim: 0 }, function (T) {
     K.dome(g, -22, -27, 5.9, 19.5, 7.5, '#BFC5C1', { w: 0.9, shadow: '#A3AAA6', band: true, ribs: 10, ribCol: '#9EA5A1', ribW: 0.45 });
     K.cyl(g, -22, -27, 1.3, 27, 29.6, W, { n: 10, w: 0.55 }); K.dome(g, -22, -27, 1.4, 29.6, 1.5, '#BFC5C1', { w: 0.5 });
     const fin = g.p(-22, -27, 31.1); g.line2([fin, [fin[0], fin[1] - 4]], { w: 0.45, c: '#6E665A', boil: false }); g.segs2([fin[0] - 1, fin[1] - 2.8, fin[0] + 1, fin[1] - 2.8], '#6E665A', 0.4);
+    // night: floodlit, the dome on its drum pale against the sky
+    LX.flood(g, 0, 0.8, LX.FLOOD.warm, (c) => (['#B9B4AA', shade('#B9B4AA', 0.16), shade('#B9B4AA', -0.04), shade('#B9B4AA', -0.1), shade('#B9B4AA', 0.1)].indexOf(c) >= 0 ? nightColour(c) : c === '#BFC5C1' || c === '#A3AAA6' ? mix(nightColour(c), '#E8E2D6', 0.35) : undefined));
+    g.glow('lantern', -10.4, -27, 9, { r: 2.2, col: '#FFDDA6' }); g.glow('lantern', -16, -21.6, 22, { r: 2.8, col: '#FFE6C0' });
   }, { name: 'basilica' });
   T.obj([-35, -17, -9, -10], function (g) {       // the front: two towers, the portico with its saints
     g.boilP = 0.35;
@@ -57,6 +62,9 @@ SF.tile('estrela', -100, -100, { rim: 0 }, function (T) {
     K.box(g, -28.4, -12, -15.6, -9.2, 10.4, 11.6, W, { w: 0.7 });
     for (let k = 0; k < 6; k++) { const x = lerp(-27.6, -16.4, k / 5), b = g.p(x, -9.6, 11.6); g.fill2([[b[0] - 0.8, b[1]], [b[0] + 0.8, b[1]], [b[0] + 0.5, b[1] - 4.2], [b[0] - 0.5, b[1] - 4.2]], '#E2DCCE', true); g.disc2([b[0], b[1] - 4.9], 0.75, '#E2DCCE'); }
     K.text(g, 'L', -9.18, -22, 10.6, 0.5, 'CORDI JESU', '#8C8576', { center: true });
+    // night: floodlit from the forecourt
+    LX.flood(g, 0, 0.9, LX.FLOOD.warm, (c) => (c === '#BFC5C1' ? mix(nightColour(c), '#E8E2D6', 0.35) : undefined));
+    for (const [x, z, r] of [[-31.5, 4, 2.4], [-12.5, 4, 2.4], [-22, 3, 2.6], [-22, 9.5, 2.2], [-31.5, 16, 2.0], [-12.5, 16, 2.0]]) g.glow('lantern', x, -8.4, z, { r, col: '#FFDDA6' });
   }, { name: 'basilica front' });
 
   /* ---------------- the garden ---------------- */
@@ -76,13 +84,14 @@ SF.tile('estrela', -100, -100, { rim: 0 }, function (T) {
     for (let k = 0; k < n; k++) { const a = eave[k], b = eave[(k + 1) % n]; const facing = (a[0] + b[0]) / 2 + (a[1] + b[1]) / 2 > c[0] + c[1]; g.fill([a, b, apex], facing ? '#5E8A6A' : '#4F7A5E'); }
     g.outline(eave, { w: 0.7, c: '#22302A' }); for (const k of near) g.line([eave[k], apex], { w: 0.5, c: '#22302A', boil: false });
     const t = g.p.apply(g, apex); g.line2([t, [t[0], t[1] - 2.4]], { w: 0.45, c: '#22302A', boil: false });
+    g.glow('lamp', c[0], c[1], 7.0, { r: 1.8, base: 1.6 });                                    // night: a lamp under the roof for the band
   }, { name: 'bandstand' });
   // listeners on folding chairs before the bandstand
   for (let i = 0; i < 6; i++) { const x = -18 + (i % 3) * 2.6, y = 30 + Math.floor(i / 3) * 2.8; T.cast([x, y], (g) => { K.box(g, x - 0.6, y - 0.6, x + 0.6, y + 0.6, 0.9, 1.3, { t: '#3F6A4E', l: '#4F7A5E', r: '#3A604A' }, { w: 0.3, boil: false }); LX.person(g, x, y, 1.3, LX.who(1010 + i, { dir: 3, pose: 'sit' })); }); }
   // trees: jacarandas, palms, a big shady tree by the pond
   [[-4, -4, 'j'], [30, -22, 'j'], [36, 30, 'j'], [10, 30, 'j'], [24, -28, 'p'], [-2, 32, 'p'], [28, 33, 't']].forEach(([x, y, k], i) => T.obj([x, y], (g) => (k === 'j' ? LX.jacaranda(g, x, y, { r: 4.6, h: 5.2, fallen: true, seed: 400 + i }) : k === 'p' ? K.palm(g, x, y, { h: 13 }) : K.tree(g, x, y, { r: 5.6, h: 5.6, col: '#6E9A4E' })), { name: 'tree' }));
   // the kiosk and its tables
-  T.obj([2, -28, 8, -22], (g) => { const c = [5, -25]; K.cyl(g, c[0], c[1], 2.2, 0, 4.0, { t: '#4F7A5E', l: '#5E8A6A', r: '#46705A' }, { n: 8, w: 0.6 }); K.cyl(g, c[0], c[1], 2.6, 4.0, 4.5, { t: '#3F6A4E', l: '#4F7A5E', r: '#3A604A' }, { n: 8, w: 0.5 }); K.dome(g, c[0], c[1], 2.4, 4.5, 2.0, '#4F7A5E', { w: 0.6 }); }, { name: 'kiosk' });
+  T.obj([2, -28, 8, -22], (g) => { const c = [5, -25]; K.cyl(g, c[0], c[1], 2.2, 0, 4.0, { t: '#4F7A5E', l: '#5E8A6A', r: '#46705A' }, { n: 8, w: 0.6 }); K.cyl(g, c[0], c[1], 2.6, 4.0, 4.5, { t: '#3F6A4E', l: '#4F7A5E', r: '#3A604A' }, { n: 8, w: 0.5 }); K.dome(g, c[0], c[1], 2.4, 4.5, 2.0, '#4F7A5E', { w: 0.6 }); g.glow('lamp', c[0] + 1.6, c[1] + 1.6, 3.6, { r: 1.3, base: 0 }); }, { name: 'kiosk' });   // (its lamp over the tables at night)
   [[10, -22], [4, -16]].forEach(([x, y], i) => T.cast([x, y], function (g) {
     const tt = g.p(x, y, 2.4), tb = g.p(x, y, 0); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#3A3530', 0.45); g.fill2(arcPts(tt[0], tt[1], 2.4, 0, TAU, 12).map((q) => [q[0], tt[1] + (q[1] - tt[1]) * 0.5]), '#F3F1EA', true);
     for (const [dx, d, k] of [[-1.8, 0, 0], [1.8, 1, 1]]) LX.person(g, x + dx, y, 1.3, LX.who(1020 + i * 2 + k, { dir: d, pose: 'sit' }));

@@ -62,6 +62,7 @@ SF.tile('jingshan', 0, -100, { rim: 20 }, function (T) {
     T.obj([px - 2.4, py - 2.4, px + 2.4, py + 2.4], function (g) {
       BJ.hallBody(g, px - 1.8, py - 1.8, px + 1.8, py + 1.8, z, z + 4.2, { bx: 1, by: 1, doors: false });
       BJ.roof(g, px - 1.8, py - 1.8, px + 1.8, py + 1.8, z + 4.2, 3.2, { type: 'pyr', col: '#4F8F6A', over: 1.0, lift: 0.4 });
+      BN.flood(g, 0, 0.7, '#FFD9A0', { lines: 0.2 }); g.glow('lantern', px + 1.8, py + 1.8, z + 2.2, { r: 2.0, col: '#FFC88A' });   // (night: lit on its shoulder of the hill)
     }, { on: true, name: 'pavilion' });
   }
   T.obj([CX - 5, CY - 5, CX + 5, CY + 5], function (g) {
@@ -73,6 +74,9 @@ SF.tile('jingshan', 0, -100, { rim: 20 }, function (T) {
     BJ.roof(g, CX - 2.6, CY - 2.6, CX + 2.6, CY + 2.6, z + 8.2, 2.6, { type: 'pyr', col: BC.yellow, top: 0.42, over: 1.4, lift: 0.5, c: '#3E6E4A' });
     BJ.hallBody(g, CX - 2.0, CY - 2.0, CX + 2.0, CY + 2.0, z + 9.0, z + 10.0, { bx: 2, by: 2, doors: false });
     BJ.roof(g, CX - 2.0, CY - 2.0, CX + 2.0, CY + 2.0, z + 10.0, 4.2, { type: 'pyr', col: BC.yellow, over: 1.3, lift: 0.5, c: '#3E6E4A' });
+    // at night the Wanchun Pavilion is floodlit gold on the top of the hill, seen from all over the old city
+    BN.flood(g, 0, 0.9, '#FFD59A', { lines: 0.25 });
+    for (const [zz, r] of [[z + 2.5, 3.0], [z + 7.6, 2.8], [z + 11.5, 2.6]]) g.glow('lantern', CX + 2.6, CY + 2.6, zz, { r, col: '#FFC27A' });
   }, { on: true, name: 'wanchun pavilion' });
 
   // the park's red wall along its far sides, and trees on the level ground round the hill

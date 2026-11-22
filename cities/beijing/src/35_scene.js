@@ -27,4 +27,8 @@ const SCENE = {
   visit: ['houhai', 'jingshan', 'yonghegong', 'hutong', 'gugong', 'wangfujing', 'qianmen', 'tiananmen', 'tiantan'],
   dive: { hutong: 'lane', tiananmen: 'flag' },
   bounds: { z: [0.65, 10], cx: [60, 1860], cy: [-40, 1100] },
+  // at night: two windows in three lit (the courtyard houses' paper lattices, shop floors and lanterns are marked in
+  // src/36_beijing.js); Houhai and the palace moat (BC.lake) and the Golden Water River (BC.water) hold the lights'
+  // reflections; no fireflies over the lawns in October
+  night: { lit: 0.66, water: ['#A7CAE0', '#9FC4DC'], grass: [] },
 };

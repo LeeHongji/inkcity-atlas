@@ -82,7 +82,7 @@ const ISWATER = function (T) {
   kay.forEach(([cx, cy, rx, ry, per, ph, hull, stripe], i) => {
     const f = loop(cx, cy, rx, ry, per, ph), who = IS.who(700 + i, { fcap: '#3F5F8F', bot: '#3B3F47' });
     T.actor({ grow: false, sample: 0.5, period: per, cast: false,
-      at(t) { const s = f(t), q = Math.round(s.ang / (TAU / 32)); return { x: s.x, y: s.y, z: WL, key: ((q % 32) + 32) % 32, ang: q * TAU / 32 }; },
-      draw(g, st) { IS.kayik(g, st.ang, { hull, stripe, rower: who, ph: 0.3 }); } });
+      at(t) { const s = f(t), q = Math.round(s.ang / (TAU / 32)), n = LOOK.night; return { x: s.x, y: s.y, z: WL, key: (((q % 32) + 32) % 32) + (n ? 'n' : ''), ang: q * TAU / 32, n }; },
+      draw(g, st) { IS.kayik(g, st.ang, { hull, stripe, rower: who, ph: 0.3, night: st.n }); } });   // at night a fishing lamp at the bow
   });
 };

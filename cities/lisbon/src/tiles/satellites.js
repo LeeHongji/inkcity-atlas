@@ -3,7 +3,9 @@
    upper right  Sintra (north of the map): the Pena Palace on its crag above the forest, yellow and red towers, a Moorish dome, the mist;
    lower left   Almada across the river: Cristo Rei on his tall pedestal, arms open over the city, where the 25 de Abril
                 bridge comes down; the Cacilhas ferry pier;
-   right        the Oceanário on the water at Parque das Nações, its glass crown, the cable car along the shore. */
+   right        the Oceanário on the water at Parque das Nações, its glass crown, the cable car along the shore.
+   At night: Cristo Rei floodlit white over the river; the Pena stays dark on its crag in June (it was floodlit for
+   the first time for Christmas 2025, not in summer); the Oceanário's water dark under its few lights. */
 (function () {
   const blob = (g, pts, col, seed) => K.blob2(g, g.P(pts.map((p) => [p[0], p[1], p[2] || 0])), col, { seed, rag: 0.8 });
 
@@ -24,7 +26,7 @@
       const Z = 15;
       K.box(g, -9, -13, 1, -5, Z, Z + 6, { t: '#9C9A92', l: '#B5B2AA', r: '#9C9A92' }, { w: 0.7 });
       K.box(g, -6, -6, 6, 0, Z, Z + 7, { t: '#E9C24F', l: '#F2CC5A', r: '#D9AE40' }, { w: 0.8 });
-      for (let x = -5; x < 6; x += 2) K.win(g, 'L', 0, x, x + 0.9, Z + 2, Z + 4.4, { style: 'navy', arch: true });
+      for (let x = -5; x < 6; x += 2) K.win(g, 'L', 0, x, x + 0.9, Z + 2, Z + 4.4, { style: 'navy', arch: true, lit: 0 });   // (a museum: closed at night)
       K.cyl(g, 3.5, -3, 2.0, Z + 7, Z + 12, { t: '#E9C24F', l: '#F2CC5A', r: '#D9AE40' }, { n: 12, w: 0.7 });
       K.dome(g, 3.5, -3, 2.4, Z + 12, 3.2, '#C9463E', { w: 0.7, band: true });
       K.box(g, -9, -4, -5, 0, Z, Z + 13, { t: '#B84238', l: '#C9463E', r: '#A83A30' }, { w: 0.8 });
@@ -55,6 +57,10 @@
       g.disc2(P(0, -24.4), 2.4, '#E2DCCE');
       g.line2([P(-3, 0), P(-2.6, -17), P(-17, -18.4), P(-17, -20.5), P(-2.2, -21.6), P(-1.6, -22.4)], { w: 0.6, c: '#9C9484', boil: false });
       g.line2([P(3, 0), P(2.6, -17), P(17, -18.4), P(17, -20.5), P(2.2, -21.6)], { w: 0.6, c: '#9C9484', boil: false });
+      // night: floodlit white from the foot of the pedestal, the figure brightest against the sky
+      LX.flood(g, 0, 1, LX.FLOOD.white);
+      for (const [x, y, z, r] of [[16, 0.6, 3, 2.4], [22.6, -6, 3, 2.2], [16, 0.6, 14, 2.0]]) g.glow('lantern', x, y, z, { r, col: '#FFF0D8' });
+      g.glow2('lantern', P(0, -12), P(0, 0), { r: 3.2, col: '#FFF4E0' });
     }, { name: 'cristo rei' });
     [[-20, -6], [-14, 8], [26, 6]].forEach(([x, y], i) => T.obj([x, y], (g) => LX.pine(g, x, y, { h: 8, r: 4.4, seed: 1410 + i }), { name: 'pine' }));
     [[2, 6, 1], [6, 9, 1], [-2, 2, 3]].forEach(([x, y, d], i) => T.cast([x, y], (g) => LX.person(g, x, y, 0, LX.who(1420 + i, { dir: d, pose: 'hold', phone: i === 1, reach: i === 1 ? [0.4, -12.5] : undefined }))));
@@ -63,7 +69,7 @@
   /* ---------------- the Oceanário ---------------- */
   SF.tile('oceanario', 228, 118, { rim: 94, castAt: 160, order: 3.6, half: 30 }, function (T) {
     T.ground(function (g) {
-      blob(g, [[-36, -18], [-12, -32], [20, -30], [36, -8], [30, 22], [2, 32], [-30, 20]], '#A8CDD0', 11);
+      blob(g, [[-36, -18], [-12, -32], [20, -30], [36, -8], [30, 22], [2, 32], [-30, 20]], '#A8CDD0', 11); g.mark({ nc: '#22364F' });   // (dark water at night)
       const w = K.curve([[-28, -8], [-4, -22], [22, -18], [26, 8], [4, 20], [-22, 12]], 6, true); g.water(w.map((p) => [p[0], p[1], 0]), { dens: 0.8 });
       blob(g, [[-36, -30], [10, -38], [36, -30], [30, -22], [-10, -24], [-34, -20]], '#D9CFB6', 13);
     });
@@ -74,7 +80,9 @@
       const az = []; for (let x = -9; x < 10; x += 1.2) for (let z = 0; z < 7.6; z += 1.2) { const p = g.p(x, 8.02, z); az.push(p[0] - 0.4, p[1], p[0] + 0.4, p[1] - 0.4); } g.segs2(az, '#D9E6F0', 0.45);
       K.box(g, -6, -6, 6, 4, 8, 12, { t: '#CFE4EA', l: '#B9D9E2', r: '#A3C9D4' }, { w: 0.7 });
       const ms = []; for (const [x, y] of [[-6, -6], [6, -6], [-6, 4], [6, 4]]) { const a = g.p(x, y, 12), b = g.p(x, y, 17); ms.push(a[0], a[1], b[0], b[1]); } g.segs2(ms, '#4A4540', 0.5);
-      K.sign(g, 'L', 8, -8, 0, 5.2, 6.6, '#F3F1EA', 'OCEANÁRIO', { ink: '#2F4F80' });
+      { const i0 = g.cmds.length; K.sign(g, 'L', 8, -8, 0, 5.2, 6.6, '#F3F1EA', 'OCEANÁRIO', { ink: '#2F4F80' }); g.mark({ nc: '#E8EEF4' }, i0); }
+      g.mark({ nc: (c) => (c === '#CFE4EA' || c === '#B9D9E2' || c === '#A3C9D4' ? mix(nightColour(c), '#BFE6F0', 0.35) : undefined) }, 0);   // night: the glass crown faintly lit
+      g.glow('lantern', -4, 8.4, 6, { r: 2.0, col: '#E6F2FF', base: -1 }); g.glow('lamp', -6, -9.8, 1.6, { r: 1.0, base: 1 });
     }, { name: 'oceanario' });
     // the cable car: towers along the shore, cabins sliding along the cable
     for (const x of [-30, 0, 30]) T.obj([x, -27], (g) => { const a = g.p(x, -27, 0), b = g.p(x, -27, 14); g.line2([a, b], { w: 0.9, c: '#6E6A64', boil: false }); g.segs2([b[0] - 2, b[1], b[0] + 2, b[1]], '#4A4540', 0.6); }, { name: 'cable tower' });

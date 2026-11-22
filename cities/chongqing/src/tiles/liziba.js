@@ -35,6 +35,7 @@ SF.tile('liziba', 100, -100, { rim: 22 }, function (T) {
     CQ.terrace(g, -37, -37, -4, 2, 0, L.TER, { top: '#DCD6C8' });
     CQ.rail(g, 'R', -4.3, -36, 1.5, L.TER, { h: 1.4 });
     CQ.rail(g, 'L', 1.7, -36, -4.5, L.TER, { h: 1.4 });
+    CQ.railLamps(g, [-4.3, -34, L.TER + 1.5], [-4.3, 1.2, L.TER + 1.5], 8.5, { base: L.TER });   // lamps on the railing (night)
     g.fill(K.rect(-34, -34, -10, -26, L.TER), '#C9C3B5');
     // shops built into the foot of the retaining wall, facing the alley under the footbridge
     for (const [y0, y1, sg] of [[-34, -27, ['火锅', CQC.red]], [-24, -17, ['小面', '#E6B84A']], [-13, -6, ['茶馆', '#3F6B4E']]]) {
@@ -43,7 +44,8 @@ SF.tile('liziba', 100, -100, { rim: 22 }, function (T) {
     }
   }, { name: 'hill road' });
   // the long flight up the terrace's front wall: climbs towards -x
-  T.obj([-34, 2, -5, 6.5], (g) => { CQ.steps(g, -34, 2.2, -5, 6.5, 0, L.TER, 'x', { rise: 0.62 }); CQ.rail(g, 'L', 6.4, -34, -5, 0, { h: 1.2 }); }, { name: 'stairs' });
+  T.obj([-34, 2, -5, 6.5], (g) => { CQ.steps(g, -34, 2.2, -5, 6.5, 0, L.TER, 'x', { rise: 0.62 }); CQ.rail(g, 'L', 6.4, -34, -5, 0, { h: 1.2 });
+    for (const x of [-9, -16, -23, -30]) { const z = clamp((-5 - x) / 29, 0, 1) * L.TER; g.glow('lamp', x, 6.4, z + 1.4, { r: 0.9, base: z }); } }, { name: 'stairs' });   // a lamp every few flights (night)
   for (const [x0, y0, x1, y1, n, sg, col] of [[-36, -36, -27, -29, 2, ['茶馆', '#3F6B4E'], CQC.plaster], [-26, -36, -17, -30, 3, null, '#D9CDB4'], [-36, -26, -29, -16, 2, ['小面', '#D9732F'], '#E3DCCB']]) {
     T.obj([x0, y0, x1, y1], (g) => CQ.oldhouse(g, { x0, y0, x1, y1, z: L.TER, n, sign: sg, col, signFace: x1 - x0 > y1 - y0 ? 'L' : 'R' }), { on: true, name: 'hill house' });
   }
@@ -60,6 +62,7 @@ SF.tile('liziba', 100, -100, { rim: 22 }, function (T) {
     CQ.rail(g, 'L', -18.3, -4, 22, z, { h: 1.5, sp: 1.0 }); CQ.rail(g, 'L', -23.7, -4, 22, z, { h: 1.5, sp: 1.0 });
     const p = g.p(8, -18, z - 1.2), q = g.p(8, -18, 0); g.fill2([[p[0] - 1.1, p[1]], [p[0] + 1.1, p[1]], [q[0] + 1.3, q[1]], [q[0] - 1.3, q[1]]], '#C3BCAD'); g.outline2([[p[0] - 1.1, p[1]], [q[0] - 1.3, q[1]], [q[0] + 1.3, q[1]], [p[0] + 1.1, p[1]]], { w: 0.5, boil: false });
     CQH.sign(g, 'L', -18.2, 2, 8, z + 1.7, z + 3.6, '#2F5F8F', '出口');
+    CQ.railLamps(g, [-2, -18.3, z + 1.6], [20, -18.3, z + 1.6], 7.5, { base: z });              // lamps on its railing (night)
     CQ.person(g, 12, -20.5, z, CQ.who(407, { dir: 0, pose: 'hold', phone: true }));
   }, { name: 'footbridge' });
 
@@ -76,9 +79,9 @@ SF.tile('liziba', 100, -100, { rim: 22 }, function (T) {
     K.box(g, x0, y0, x1, y1, 0, ZT, { t: TOP, l: SLAB, r: SLABR }, { w: 0.9 });
     winRows(g, 'L', y1, x0, x1, 0, ZT, true);
     // the station inside: back wall, platform with its edge line, the floor and ceiling seen through the openings
-    g.fill(K.on('R', x1 + 0.02, y0, y1, 3.0, Z + 6.4), '#3E4448'); g.fill(K.on('R', x1 + 0.025, y0, y1, 3.0, Z - 1.6), '#4A5054');
-    g.fill(K.rect(x1, y0, x1 + 1.5, y1, Z), '#BDB8AE');
-    g.fill(K.on('R', x1 + 0.03, y0, y1, Z + 3.6, Z + 5.4), '#5A646C');
+    g.fill(K.on('R', x1 + 0.02, y0, y1, 3.0, Z + 6.4), '#3E4448'); g.mark({ nc: '#BFA982' }); g.fill(K.on('R', x1 + 0.025, y0, y1, 3.0, Z - 1.6), '#4A5054');
+    g.fill(K.rect(x1, y0, x1 + 1.5, y1, Z), '#BDB8AE'); g.mark({ nc: '#F3E4C2' });
+    g.fill(K.on('R', x1 + 0.03, y0, y1, Z + 3.6, Z + 5.4), '#5A646C'); g.mark({ nc: '#FFF1CF' });                   // at night the station is lit inside
     for (let y = y0 + 2; y < y1; y += 4) CQH.sign(g, 'R', x1 + 0.04, y, y + 1.6, Z + 4.0, Z + 5.0, '#2F5F8F', '李子坝站', { line: false });
     // the beams running through the station (drawn here, behind the trains)
     for (const bx of [L.BA, L.BB]) { g.fill([[bx + 0.75, y0, Z - 2], [bx + 0.75, y1, Z - 2], [bx + 0.75, y1, Z], [bx + 0.75, y0, Z]], CQC.concreteD); g.fill(K.rect(bx - 0.75, y0, bx + 0.75, y1, Z), CQC.concrete); g.fill(K.on('L', y1, bx - 0.75, bx + 0.75, Z - 2, Z), CQC.concrete); }
@@ -92,7 +95,7 @@ SF.tile('liziba', 100, -100, { rim: 22 }, function (T) {
     const x0 = L.BA - 2, x1 = 34.7, y1 = L.Y1, zo0 = Z - 2.3, zo1 = Z + 4.8;
     // the end wall in two pieces round the opening, the opening's soffit, the top
     g.fill(K.on('L', y1, x0 - 0.4, x1, 0, zo0), SLAB); g.fill(K.on('L', y1, x0 - 0.4, x1, zo1, ZT), SLAB); g.fill(K.on('L', y1, x0 - 0.4, x0 + 0.4, zo0, zo1), SLAB);
-    g.fill([[x0, y1, zo1], [x1, y1, zo1], [x1, y1 - 2.4, zo1], [x0, y1 - 2.4, zo1]], '#B8B0A0');
+    g.fill([[x0, y1, zo1], [x1, y1, zo1], [x1, y1 - 2.4, zo1], [x0, y1 - 2.4, zo1]], '#B8B0A0'); g.mark({ nc: '#D9BE8A' });   // the station's light spills out of the opening
     g.fill(K.rect(x0, L.Y0, x1, y1, ZT), TOP);
     g.line([[x0, y1, zo0], [x1, y1, zo0], [x1, y1, zo1], [x0, y1, zo1], [x0, y1, zo0]], { w: 0.75 });
     g.line([[x0, y1, ZT], [x1, y1, ZT]], { w: 0.8 }); g.line([[x0, L.Y0, ZT], [x1, L.Y0, ZT]], { w: 0.8 });
@@ -111,9 +114,10 @@ SF.tile('liziba', 100, -100, { rim: 22 }, function (T) {
     for (let y = y0 + 3; y < y1 - 1; y += 3) g.fine([[x1 + 0.05, y, 0.3], [x1 + 0.05, y, 3.4]], { w: 0.3, c: '#9A958A' });
     winRows(g, 'R', x1, y1, y0, 4.2, zs0); winRows(g, 'R', x1, y1, y0, zs1 + 0.1, ZT);
     // the station band: translucent glazing, mullions, a light orange stripe (the line's colour)
-    g.fill(K.on('R', x1, y0, y1, zs0 + 0.6, zs1 - 0.6), 'rgba(196,214,222,0.32)');
+    g.fill(K.on('R', x1, y0, y1, zs0 + 0.6, zs1 - 0.6), 'rgba(196,214,222,0.32)'); g.mark({ nc: 'rgba(255,226,166,0.42)' });   // the lit station glows through its glass
     const m = []; for (let y = y0; y <= y1 + 0.01; y += 2.0) { const a = g.p(x1, y, zs0 + 0.6), b = g.p(x1, y, zs1 - 0.6); m.push(a[0], a[1], b[0], b[1]); } g.segs2(m, '#7A858C', 0.35);
-    g.fill(K.on('R', x1 + 0.02, y0, y1, zs0, zs0 + 0.6), '#E0602F'); g.fill(K.on('R', x1 + 0.02, y0, y1, zs1 - 0.6, zs1), '#BDB5A3');
+    g.fill(K.on('R', x1 + 0.02, y0, y1, zs0, zs0 + 0.6), '#E0602F'); g.mark({ nc: '#FF7A3E' }); g.fill(K.on('R', x1 + 0.02, y0, y1, zs1 - 0.6, zs1), '#BDB5A3');
+    for (let y = y0 + 3; y < y1 - 1; y += 6.5) g.glow('lantern', x1 + 0.3, y, (zs0 + zs1) / 2, { r: 3.0, col: '#FFE0A0' });
     // laundry and air conditioners on the flats
     const R = RNG(77), ac = [];
     for (let k = 9; k < L.N; k++) for (let y = y0 + 2; y < y1 - 1; y += 4.8) { if (R() < 0.45) { const q = K.on('R', x1 + 0.4, y + 1.1, y + 1.9, k * L.ST + 0.5, k * L.ST + 1.1); g.fill(q, '#EEEDE7'); ac.push(q); } else if (R() < 0.2) { for (let j = 0; j < 3; j++) g.fill(K.on('R', x1 + 0.6, y - 0.3 + j * 0.6, y + 0.1 + j * 0.6, k * L.ST + 0.4, k * L.ST + 1.6), R.pick(['#E2725B', '#F4F1E8', '#6E9BC8', '#E6C24F'])); } }
@@ -149,12 +153,13 @@ SF.tile('liziba', 100, -100, { rim: 22 }, function (T) {
     CQH.sign(g, 'L', 6, 25.3, 28.7, 0.6, 2.2, '#E6B84A', '小面', { line: false });
     K.cyl(g, 27.6, 4.4, 1.0, 2.6, 3.8, { t: '#5A564E', l: '#9C9A94', r: '#7A7872' }, { w: 0.45, n: 10 });
     CQ.person(g, 26, 2.3, 0, CQ.who(590, { dir: 0, pose: 'hold', top: '#F3F1EA', cap: '#F3F1EA' }));
+    g.glow('lamp', 26, 4.5, 3.0, { r: 0.9 });                                    // a bulb on the counter (night)
   }, { name: 'noodle stall' });
   CQ.steamActor(T, 27.6, 4.4, 4.2, 0.9);
   for (const [x, y, d, s] of [[25, 10, 3, 591], [28, 10.5, 2, 592], [31, 9.5, 1, 593], [27, 14, 3, 594]]) T.cast([x, y], (g) => { CQ.stool(g, x, y, s % 2 ? '#C9463E' : '#4F7FB8'); CQ.person(g, x, y, 1.3, CQ.who(s, { dir: d, pose: 'sit', bowl: true, reach: [2.6, 3] })); }, { name: 'eater' });
 
   /* ---- the plaza: railing, a souvenir stall, trees ---- */
-  T.obj([17, 22], (g) => K.stall(g, 17, 22, { face: 'R', L: 2.4, D: 1.4, a: '#C8392E', b: '#F3F1EA' }), { name: 'stall' });
+  T.obj([17, 22], (g) => { K.stall(g, 17, 22, { face: 'R', L: 2.4, D: 1.4, a: '#C8392E', b: '#F3F1EA' }); g.glow('lamp', 17, 22, 5.8, { r: 1.0 }); }, { name: 'stall' });   // a bulb under the canopy (night)
   T.obj([-1, 33], (g) => CQ.fig(g, -1, 33, { r: 4.6, h: 4.2 }), { name: 'fig' });
   T.obj([-30, 30], (g) => CQ.bloom(g, -30, 30, { r: 3.6 }), { name: 'plum' });
   T.obj([-20, 34], (g) => K.lamp(g, -20, 34, { h: 8, col: '#4A4E52' }), { name: 'lamp' });

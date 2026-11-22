@@ -5,7 +5,9 @@
    and the river. Behind, the Igreja da Graça: a white church front with a bell tower, the convent's long wing.
    Below the terrace at street level, Graça's tiled houses and a vila (workers' row) with washing over its yard.
    Who: a row of people at the parapet, a couple taking a selfie, a guitarist and his listeners on the steps, people at
-   the kiosk tables, a grandmother on a bench with her grandson, a dog. */
+   the kiosk tables, a grandmother on a bench with her grandson, a dog.
+   At night (the miradouro is busiest after dark): lamps along its parapets, the kiosk lit over its tables, the church
+   and the bell tower floodlit, the pines' aura, the houses below lit. */
 SF.tile('graca', 100, -100, { rim: 36 }, function (T) {
   const H = 37, ZT = 8, W = { t: '#ECE7DC', l: '#F6F3EB', r: '#E1DBCE' };
   T.ground(function (g) { K.slab(g, H, { top: LC.calc, cut: 'x' }); }, { rim: true });
@@ -15,8 +17,8 @@ SF.tile('graca', 100, -100, { rim: 36 }, function (T) {
     for (const [f, p, a0, a1] of [['L', 14, -H, 20], ['R', 20, -H, 14]]) { const n = Math.round((a1 - a0) / 6); for (let b = 0; b < n; b++) { const m = lerp(a0, a1, (b + 0.5) / n); K.win(g, f, p, m - 1.2, m + 1.2, 0, 4.6, { style: 'dark', arch: true }); } }
     LX.azulejo(g, 'L', 14, -6, 6, 5.2, 7.4, 'b', 2);
   }, { name: 'terrace' });
-  for (const [x0, x1] of [[-H, -10], [-10, 19.4]]) T.obj([x0, 13.4, x1, 14], (g) => LX.parapet(g, 'L', 14, x0, x1, ZT, { h: 1.1 }), { on: true, name: 'parapet' });
-  for (const [y0, y1] of [[-H, -6.2], [0.2, 13.4]]) T.obj([19.4, y0, 20, y1], (g) => LX.parapet(g, 'R', 20, y0, y1, ZT, { h: 1.1 }), { on: true, name: 'parapet' });
+  for (const [x0, x1] of [[-H, -10], [-10, 19.4]]) T.obj([x0, 13.4, x1, 14], (g) => LX.parapet(g, 'L', 14, x0, x1, ZT, { h: 1.1, lamps: 9 }), { on: true, name: 'parapet' });
+  for (const [y0, y1] of [[-H, -6.2], [0.2, 13.4]]) T.obj([19.4, y0, 20, y1], (g) => LX.parapet(g, 'R', 20, y0, y1, ZT, { h: 1.1, lamps: 10 }), { on: true, name: 'parapet' });
 
   /* ---------------- the church and the convent ---------------- */
   T.obj([-35, -35, -15, -20], function (g) {
@@ -27,12 +29,16 @@ SF.tile('graca', 100, -100, { rim: 36 }, function (T) {
     const gb = [K.pt('L', -19.98, -35, ZT + 12), K.pt('L', -19.98, -15, ZT + 12), K.pt('L', -19.98, -25, ZT + 16)]; g.fill(gb, '#F6F3EB'); g.outline(gb, { w: 0.8, boil: false });
     K.gable(g, -35, -35, -15, -20, ZT + 12, 4, 'y', { a: '#C96A42', b: '#B85C38', e: '#F6F3EB' }, { c: '#7E3A22', noEnd: true });
     const c = g.p(-25, -20, ZT + 16); g.segs2([c[0], c[1], c[0], c[1] - 4, c[0] - 1.2, c[1] - 3, c[0] + 1.2, c[1] - 3], '#4A4540', 0.5);
+    LX.flood(g, 0, 0.7, LX.FLOOD.warm, (c) => (c === '#C96A42' || c === '#B85C38' ? nightColour(c) : undefined));   // night: its white front lit
+    for (const [x, z] of [[-31, 3], [-19, 3], [-25, 9.5]]) g.glow('lantern', x, -19.2, ZT + z, { r: 2.2, col: '#FFDDA6' });
   }, { on: true, name: 'church' });
   T.obj([-14, -35, -8, -29], function (g) {        // the bell tower beside the front
     K.box(g, -14, -35, -8, -29, ZT, ZT + 20, W, { w: 0.95 });
     for (const [f, p, a] of [['L', -29, -11], ['R', -8, -32]]) { K.win(g, f, p, a - 1.2, a + 1.2, ZT + 15, ZT + 18.4, { style: 'dark', arch: true }); const bl = g.p.apply(g, LX.out(f, p, a, ZT + 16.2, 0.1)); g.disc2(bl, 1.0, '#9C7A3A'); }
     K.box(g, -14.4, -35.4, -7.6, -28.6, ZT + 20, ZT + 20.8, W, { w: 0.6 });
     K.cone(g, -11, -32, 3.0, ZT + 20.8, 4.0, '#9AA9A8', { w: 0.7 }); const t = g.p(-11, -32, ZT + 24.8); g.segs2([t[0], t[1], t[0], t[1] - 2.4, t[0] - 0.9, t[1] - 1.6, t[0] + 0.9, t[1] - 1.6], '#4A4540', 0.45);
+    LX.flood(g, 0, 0.8, LX.FLOOD.warm, (c) => (c === '#9AA9A8' || c === shade('#9AA9A8', 0.14) ? nightColour(c) : undefined));   // night: floodlit
+    g.glow('lantern', -11, -28.4, ZT + 6, { r: 2.2, col: '#FFDDA6' }); g.glow('lantern', -11, -28.4, ZT + 16.5, { r: 2.0, col: '#FFDDA6' });
   }, { on: true, name: 'bell tower' });
   T.obj([-6, -35, 18, -26], (g) => { LX.house(g, { x0: -6, y0: -35, x1: 18, y1: -26, z: ZT, n: 2, col: '#F1ECDF', seed: 900, bal: 0.2, faces: 'LR' }); }, { on: true, name: 'convent' });
 
@@ -42,7 +48,8 @@ SF.tile('graca', 100, -100, { rim: 36 }, function (T) {
     const c = [-21, -14]; K.cyl(g, c[0], c[1], 2.2, ZT, ZT + 4.2, { t: '#4F7A5E', l: '#5E8A6A', r: '#46705A' }, { n: 8, w: 0.6 });
     K.cyl(g, c[0], c[1], 2.6, ZT + 4.2, ZT + 4.7, { t: '#3F6A4E', l: '#4F7A5E', r: '#3A604A' }, { n: 8, w: 0.5 });
     K.dome(g, c[0], c[1], 2.4, ZT + 4.7, 2.2, '#4F7A5E', { w: 0.6 });
-    const w = g.p(c[0], c[1] + 2.2, ZT + 1.4), w2 = g.p(c[0] + 1.6, c[1] + 1.6, ZT + 3.6); g.fill2([[w[0] - 3, w[1]], [w[0] + 3, w[1] - 1.5], [w2[0] + 1, w2[1]], [w2[0] - 4, w2[1] + 1.5]], '#F3E3B0', true);
+    const w = g.p(c[0], c[1] + 2.2, ZT + 1.4), w2 = g.p(c[0] + 1.6, c[1] + 1.6, ZT + 3.6); g.fill2([[w[0] - 3, w[1]], [w[0] + 3, w[1] - 1.5], [w2[0] + 1, w2[1]], [w2[0] - 4, w2[1] + 1.5]], '#F3E3B0', true); g.mark({ nc: '#FFE2A0' });
+    g.glow('lamp', c[0], c[1] + 2.6, ZT + 3.9, { r: 1.4, base: ZT });                           // night: the kiosk's counter lit over its tables
   }, { on: true, name: 'kiosk' });
   [[-18, -5], [-24, 2], [-6, -4]].forEach(([x, y], i) => T.cast([x, y], function (g) {
     const tt = g.p(x, y, ZT + 2.4), tb = g.p(x, y, ZT); g.segs2([tb[0], tb[1], tt[0], tt[1]], '#3A3530', 0.45); g.fill2(arcPts(tt[0], tt[1], 2.4, 0, TAU, 12).map((q) => [q[0], tt[1] + (q[1] - tt[1]) * 0.5]), '#F3F1EA', true);

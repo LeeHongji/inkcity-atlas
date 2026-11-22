@@ -10,7 +10,9 @@
    The Bridge of Sighs (1600): a closed white limestone bridge high over the rio di Palazzo between the Doge's Palace
    and the prisons, a curved soffit, two small barred windows, volutes and a crowning arms on its face. */
 VN.rialto = function (T, role) {
-  role = role || 'both'; const OB = (own, fpp, fn, opt) => { if (role === 'both' || role === own) T.obj(fpp, fn, opt); };
+  // at night the whole bridge is floodlit, white stone gone warm gold (the water under the arch and the roofs stay dark)
+  const LIT = VN.litStone(1), litNc = (c) => (c === VN.waterD ? undefined : LIT(c));
+  role = role || 'both'; const OB = (own, fpp, fn, opt) => { if (role === 'both' || role === own) T.obj(fpp, (g) => { const i0 = g.cmds.length; fn(g); g.mark({ nc: litNc }, i0); }, opt); };
   const ax = 'x', c = 50, b = 0, M = VN.map(ax, c, b), W = 7.5, Y = VN.CW, RY = 24, WL = VN.WL, HS = 5.4, HC = 7.8;
   const ST = VN.istria, STD = VN.istriaD, STR = '#E2DCCF';
   const deck = (v) => { const a = Math.abs(v); if (a >= RY) return 0; if (a >= Y) return HS * (RY - a) / (RY - Y); return HC - (HC - HS) * (a / Y) * (a / Y); };
@@ -82,6 +84,9 @@ VN.rialto = function (T, role) {
     for (const s of [-1, 1]) { const v = s * 8.6, z = (arch(v) + deck(v) - 0.7) / 2; const p = g.p.apply(g, L([[W + 0.06, v, z]])[0]); g.fill2(arcPts(p[0], p[1], 2.0, 0, TAU, 10).map((q) => [q[0], p[1] + (q[1] - p[1]) * 1.15]), '#E9E3D6', true); g.ring2(p, 2.0, { w: 0.3, c: '#A39A8A' }); g.fill2([[p[0] - 0.5, p[1] + 1.2], [p[0] + 0.6, p[1] + 1.2], [p[0] + 0.3, p[1] - 1.3], [p[0] - 0.2, p[1] - 1.3]], '#C9C2B4', true); }
     g.line(L(all.map((v) => [W, v, deck(v)])), { w: 0.75, boil: false });
     const ks = L([[W + 0.07, -0.7, arch(0) - 0.1], [W + 0.07, 0.7, arch(0) - 0.1], [W + 0.07, 0.9, arch(0) + 1.3], [W + 0.07, -0.9, arch(0) + 1.3]]); g.fill(ks, '#FFFFFF'); g.outline(ks, { w: 0.4, boil: false });
+    // at night: floodlit (on screen the Pescheria's roof stands in front of the market half of the face and of the water
+    // under it: the lights are on the other half and lay no reflection)
+    for (const v of [-10.5, -5, 0]) { const q = L([[W + 0.6, v, deck(v) - 0.9]])[0], o = { r: v ? 2.0 : 2.8, col: '#FFD9A0', base: WL }; VN.glowDry(g, 'lantern', q[0], q[1], q[2], o); }
   }, { name: 'rialto span', under: 0 });
   ramp(Y, RY + 0.6, 'rialto near');
   // the shop rows: little units stepping up, an arched opening each on both long faces, terracotta roofs
@@ -130,7 +135,7 @@ VN.sighs = function (T) {
   const L = (pts) => pts.map((p) => { const q = M(p[0], p[1], p[2]); return [q[0] - T.cx, q[1] - T.cy, q[2]]; });
   const soffit = (v) => Z0 + 0.9 * (1 - (v / Y) * (v / Y));
   T.obj([110 - W - T.cx, -63 - T.cy, 110 + W - T.cx, -37 - T.cy], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     const vs = []; for (let i = 0; i <= 20; i++) vs.push(lerp(-Y, Y, i / 20));
     // underside, the face, the top
     g.fill(L(vs.map((v) => [-W, v, soffit(v)]).concat(vs.slice().reverse().map((v) => [W, v, soffit(v)]))), '#BDB5A6');
@@ -152,6 +157,9 @@ VN.sighs = function (T) {
     g.line(L(vs.map((v) => [W, v, soffit(v)])), { w: 0.8, boil: false });
     g.line(L([[W, -Y, Z1], [W, Y, Z1], [-W, Y, Z1]]), { w: 0.8, boil: false });
     g.line(L([[W, Y, soffit(Y)], [W, Y, Z1]]), { w: 0.6, boil: false }); g.line(L([[W, -Y, soffit(-Y)], [W, -Y, Z1]]), { w: 0.6, boil: false });
+    // at night it is floodlit from below, its barred windows dark; the light falls on the rio under it
+    g.mark({ nc: VN.litStone(0.85) }, i0);
+    { const q = L([[W + 0.5, -6, soffit(-6) + 0.4]])[0]; VN.glowDry(g, 'lantern', q[0], q[1], q[2], { r: 2.4, col: '#FFD9A0' }); }   // (one light, on the prisons' half: the palace hides the other; no reflection: the Paglia is in front)
   }, { name: 'bridge of sighs', under: Z0 });
 };
 

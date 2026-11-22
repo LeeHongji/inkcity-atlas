@@ -44,6 +44,8 @@ SF.tile('corcovado', -100, -100, { rim: 4 }, function (T) {
     const fr = []; for (let i = 0; i <= 10; i++) { const a = -Math.PI / 4 + Math.PI * i / 10; fr.push([SX + Math.cos(a) * 4.6, SY + Math.sin(a) * 4.0, TOP]); }
     g.fill(fr.concat(fr.slice().reverse().map((p) => [p[0], p[1], TOP - 2.6])), '#CFC8B8'); g.scratch(fr.concat(fr.slice().reverse().map((p) => [p[0], p[1], TOP - 2.4])), { c: '#B3AB98' }); g.line(fr, { w: 0.6, boil: false });
     g.fine(fr.map((p) => [p[0], p[1], p[2] + 1.0]), { w: 0.35, c: '#5A564E' });
+    // at night: lamps along the platform's rail
+    for (let i = 1; i < 10; i += 2) { const p = fr[i]; g.glow('lamp', p[0], p[1], p[2] + 1.1, { r: 0.8, base: TOP }); }
   }, { name: 'corcovado' });
   // the pedestal and the statue
   T.obj([SX - 1.4, SY - 1.4, SX + 1.4, SY + 1.4], function (g) {
@@ -66,6 +68,12 @@ SF.tile('corcovado', -100, -100, { rim: 4 }, function (T) {
     const hc = P(0.4, ay + 5.0); g.disc2(hc, 2.5, L); g.fill2(arcPts(hc[0] + 0.5, hc[1], 2.5, -Math.PI / 2, Math.PI / 2, 6), D, true);
     g.line2(arcPts(hc[0], hc[1], 2.55, 0, TAU, 14), { w: 0.5, c: ink, boil: false });
     g.line2(robe.concat([robe[0]]), { w: 0.65, c: ink, boil: false }); g.line2(arm.concat([arm[0]]), { w: 0.65, c: ink, boil: false });
+    // at night the statue is floodlit in cold white LED light from the platform (since 2011): it stands out bright over the dark
+    // forest, seen from the whole city; the shaded side a cool blue-grey, the folds still drawn
+    const XN = { '#E9E7DC': '#F3F6FF', '#C8C6B8': '#AEB9D8', '#A9A797': '#8E98B8', '#E9E6DC': '#E6EAF6', '#E4E1D4': '#DDE2F0', '#C9C5B7': '#A3AECB', '#EFECE3': '#EEF1FA', '#CFCBBE': '#AFB9D2', [shade(L, 0.05)]: '#E8ECFA' };
+    RJ.nightEach(g, 0, (c) => XN[c]);
+    for (const [z, r] of [[TOP + 2, 3.2], [TOP + 8, 3.6], [TOP + 13, 3.4], [TOP + 15.5, 2.8]]) g.glow('lantern', SX, SY, z, { r, col: '#DCE8FF', base: TOP });
+    for (const sd of [-1, 1]) g.glow2('lantern', [b[0] + sd * 15, b[1] - ay], g.p(SX, SY, TOP), { r: 2.2, col: '#DCE8FF' });
   }, { name: 'cristo', on: true });
   // tourists on the platform copying the pose, a photographer lying on the ground for the shot
   for (const [dx, dy, s, pose] of [[-2.6, 2.8, 6200, 'arms'], [1.4, 3.3, 6201, 'arms'], [3.2, 1.0, 6202, 'phone'], [-3.4, 0.6, 6203, 'arms']])
@@ -85,7 +93,7 @@ SF.tile('corcovado', -100, -100, { rim: 4 }, function (T) {
       },
       draw(g, st) {
         const B = K.rbox(g, 0, 0, 1.6, 0.9, st.ang, 0.3, 2.3, { t: '#E9E2CC', l: '#C9392E', r: '#A8302A' }, { w: 0.6 });
-        for (const f of ['pv', 'nv']) { K.rwin(g, B, f, -0.85, -0.1, 1.2, 2.0); K.rwin(g, B, f, 0.1, 0.85, 1.2, 2.0); }
+        for (const f of ['pv', 'nv']) g.lit({ nc: '#FFE3A6' }, () => { K.rwin(g, B, f, -0.85, -0.1, 1.2, 2.0); K.rwin(g, B, f, 0.1, 0.85, 1.2, 2.0); });   // (night: lit inside)
         const p = g.p.apply(g, B.pt(0, 0.95, 1.7)); g.disc2([p[0] - 1.2, p[1]], 0.75, looks[0].skin); g.disc2([p[0] + 1.4, p[1] - 0.6], 0.75, looks[1].skin);
         K.rbox(g, 0, 0, 1.75, 1.0, st.ang, 2.3, 2.6, '#F3F1EA', { w: 0.5 });
       } });
@@ -101,16 +109,22 @@ SF.tile('corcovado', -100, -100, { rim: 4 }, function (T) {
     K.box(g, 6, 9, 30, 14, 0, 8.2, PALt, { w: 0.9 });
     for (let x = 7.5; x < 29; x += 2.6) { K.win(g, 'L', 14, x, x + 1.2, 1.4, 3.8, { style: 'dark', arch: true }); K.win(g, 'L', 14, x, x + 1.2, 5.0, 7.0, { style: 'navy' }); }
     K.box(g, 5.6, 8.6, 30.4, 14.4, 8.2, 8.9, '#F1E6CF', { w: 0.6 });
+    RJ.flood(g, 0, 0.55, '#F2C890');                                        // (night: the palazzo floodlit warm)
   }, { name: 'palazzo' });
   T.obj([6, 14, 11, 32], function (g) {    // the left wing
     K.box(g, 6, 14, 11, 32, 0, 8.2, PALt, { w: 0.9 });
     for (let y = 15.5; y < 31; y += 2.6) { K.win(g, 'R', 11, y, y + 1.2, 1.4, 3.8, { style: 'dark', arch: true }); K.win(g, 'R', 11, y, y + 1.2, 5.0, 7.0, { style: 'navy' }); }
     K.box(g, 5.6, 14, 11.4, 32.4, 8.2, 8.9, '#F1E6CF', { w: 0.6 });
+    RJ.flood(g, 0, 0.55, '#F2C890');
   }, { name: 'palazzo' });
   // the courtyard: the pool with its stone rim, tables round it (ground-level things drawn as one low object)
   T.obj([11, 14, 25.5, 27.5], function (g) {
     g.fill(K.rect(11, 14, 25.5, 27.5), '#E9E1CF');
-    const pool = K.rect(14, 17, 23, 24.5); g.fill(pool.map((p) => [p[0], p[1], -0.3]), '#6FB8C8'); g.water(pool.map((p) => [p[0], p[1], -0.3]), { dens: 0.5 }); g.outline(pool, { w: 0.6, c: '#8C8576', boil: false });
+    const pool = K.rect(14, 17, 23, 24.5); g.fill(pool.map((p) => [p[0], p[1], -0.3]), '#6FB8C8'); g.mark({ nc: '#3FA6C4' }); g.water(pool.map((p) => [p[0], p[1], -0.3]), { dens: 0.5 }); g.outline(pool, { w: 0.6, c: '#8C8576', boil: false });
+    // at night the courtyard is lit for dinner at the café: the pool glows from below, lanterns at its corners
+    RJ.nightEach(g, 0, (c, d) => (d.k === K_FILL && c === '#E9E1CF' ? RJ.litCol(c, 0.4) : undefined));
+    g.glow('lantern', 18.5, 20.75, 0.1, { r: 3.6, col: '#6FE0F0', base: -0.3 });
+    for (const [x, y] of [[13.4, 16.4], [23.6, 16.4], [13.4, 25.1], [23.6, 25.1]]) g.glow('lamp', x, y, 2.4, { r: 1.0 });
   }, { name: 'courtyard' });
   const TABLES = [[12.6, 15.6], [12.6, 25.6], [24, 15.6], [16, 26], [21, 26]];
   TABLES.forEach(([x, y], i) => T.cast([x, y], (g) => {
@@ -122,12 +136,14 @@ SF.tile('corcovado', -100, -100, { rim: 4 }, function (T) {
     K.box(g, 25.5, 14, 30, 32, 0, 3.6, PALt, { w: 0.8 });
     for (let y = 15; y < 31; y += 2.4) K.win(g, 'R', 30, y, y + 1.4, 0, 2.8, { style: 'dark', arch: true });
     K.box(g, 25.1, 13.6, 30.4, 32.4, 3.6, 4.1, '#F1E6CF', { w: 0.5 });
+    RJ.flood(g, 0, 0.55, '#F2C890'); for (const y of [17, 23, 29]) RJ.wallLamp(g, 'R', 30, y, 3.0, 1.0);
   }, { name: 'arcade' });
   T.obj([11, 27.5, 25.5, 32], function (g) {
     K.box(g, 11, 27.5, 25.5, 32, 0, 3.6, PALt, { w: 0.8 });
     for (let x = 12; x < 25; x += 2.4) K.win(g, 'L', 32, x, x + 1.4, 0, 2.8, { style: 'dark', arch: true });
     K.box(g, 10.6, 27.1, 25.9, 32.4, 3.6, 4.1, '#F1E6CF', { w: 0.5 });
     K.text(g, 'L', 32.42, 18.2, 3.66, 0.4, 'PARQUE LAGE', '#7A6A55', { center: true, w: 0.34 });
+    RJ.flood(g, 0, 0.55, '#F2C890'); for (const x of [13, 23.5]) RJ.wallLamp(g, 'L', 32, x, 3.0, 1.0);
   }, { name: 'arcade' });
   // the fashion shoot at the front steps, picnickers on the lawn
   T.cast([18, 34], (g) => { RJ.person(g, 17, 33.4, 0, Object.assign(RJ.who(6240), { dir: 1, pose: 'wave', dress: '#E86A9A', fem: true, hairStyle: 'long', ph: 0.2 })); RJ.person(g, 20.6, 35.6, 0, Object.assign(RJ.who(6241, { carnaval: false }), { dir: 2, pose: 'hold', phone: true, top: '#2A2622' })); }, {});

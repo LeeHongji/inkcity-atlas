@@ -76,13 +76,13 @@ SF.tile('parkguell', -100, -100, { rim: 0 }, function (T) {
   }, { name: 'dragon stair' });
 
   /* ---- the boundary wall and the two lodges at the gate ---- */
-  T.obj([-37, 34.5, -21, 36.5], (g) => { BC.prism(g, [[-27, 34.5], [-21, 34.5], [-21, 36.5], [-27, 36.5]], 0, 3.6, RUB, { w: 0.7 }); const f = g.p(-24, 36.55, 2.0); g.disc2(f, 1.3, '#F4EFE3'); K.text(g, 'L', 36.6, -24, 1.4, 0.8, 'PARK', '#3F6FA8', { center: true }); }, { name: 'wall' });
-  T.obj([-5, 34.5, 10, 36.5], (g) => { BC.prism(g, [[-5, 34.5], [10, 34.5], [10, 36.5], [-5, 36.5]], 0, 3.6, RUB, { w: 0.7 }); const f = g.p(4, 36.55, 2.0); g.disc2(f, 1.4, '#F4EFE3'); K.text(g, 'L', 36.6, 4, 1.4, 0.8, 'GÜELL', '#3F6FA8', { center: true }); for (let x = -4; x < 10; x += 1.4) { const p = g.p(x, 36.5, 3.6); g.fill2(arcPts(p[0], p[1], 2.0, Math.PI, TAU, 5), '#F4EFE3', true); } }, { name: 'wall' });
+  T.obj([-37, 34.5, -21, 36.5], (g) => { BC.prism(g, [[-27, 34.5], [-21, 34.5], [-21, 36.5], [-27, 36.5]], 0, 3.6, RUB, { w: 0.7 }); const f = g.p(-24, 36.55, 2.0); g.disc2(f, 1.3, '#F4EFE3'); K.text(g, 'L', 36.6, -24, 1.4, 0.8, 'PARK', '#3F6FA8', { center: true }); g.glow('lamp', -22, 37.1, 3.4, { r: 1.0 }); }, { name: 'wall' });
+  T.obj([-5, 34.5, 10, 36.5], (g) => { BC.prism(g, [[-5, 34.5], [10, 34.5], [10, 36.5], [-5, 36.5]], 0, 3.6, RUB, { w: 0.7 }); const f = g.p(4, 36.55, 2.0); g.disc2(f, 1.4, '#F4EFE3'); K.text(g, 'L', 36.6, 4, 1.4, 0.8, 'GÜELL', '#3F6FA8', { center: true }); for (let x = -4; x < 10; x += 1.4) { const p = g.p(x, 36.5, 3.6); g.fill2(arcPts(p[0], p[1], 2.0, Math.PI, TAU, 5), '#F4EFE3', true); } for (const x of [-2, 8.5]) g.glow('lamp', x, 37.1, 3.4, { r: 1.0 }); }, { name: 'wall' });   // at night: street lamps on the park wall along Carrer d'Olot
   const lodge = (x0, y0, x1, y1, tower, seed) => T.obj([x0, y0, x1, y1], function (g) {
     g.boilP = 0.2;
     K.box(g, x0, y0, x1, y1, 0, 7, RUB, { w: 0.85 });
     const rb = []; const R = RNG(seed); for (let i = 0; i < 40; i++) { const onL = R() < 0.55, p = onL ? g.p(lerp(x0, x1, R()), y1 + 0.02, R() * 6.5) : g.p(x1 + 0.02, lerp(y0, y1, R()), R() * 6.5); rb.push(p[0] - 0.7, p[1], p[0] + 0.7, p[1] - 0.2); } g.segs2(rb, '#8C7458', 0.4);
-    K.win(g, 'L', y1, x0 + 1.5, x0 + 3, 3, 5.4, { style: 'dark', arch: true }); K.win(g, 'R', x1, y0 + 2, y0 + 3.4, 3, 5.4, { style: 'dark', arch: true }); g.fill(K.on('L', y1 + 0.02, x1 - 3.4, x1 - 1.6, 0, 4.4), '#6B4A30');
+    K.win(g, 'L', y1, x0 + 1.5, x0 + 3, 3, 5.4, { style: 'dark', arch: true, lit: 0 }); K.win(g, 'R', x1, y0 + 2, y0 + 3.4, 3, 5.4, { style: 'dark', arch: true, lit: 0 }); g.fill(K.on('L', y1 + 0.02, x1 - 3.4, x1 - 1.6, 0, 4.4), '#6B4A30');
     // the roof: a steep curved cap of brown and cream chequered tile with icing at the eaves
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, r = (x1 - x0) / 2 + 0.8;
     const d = K.dome(g, cx, cy, r, 7, tower ? 7 : 9.5, '#8A6A4A', { w: 0.8, shadow: '#6E5236' });
@@ -112,7 +112,7 @@ SF.tile('parkguell', -100, -100, { rim: 0 }, function (T) {
   /* ---- Gaudí's house: pink, with a little spire ---- */
   T.obj([22, -36, 32, -31], function (g) {
     K.box(g, 22, -36, 32, -31, 0, 9, { t: '#F2D9CF', l: '#EDC9BE', r: '#D9AFA2' }, { w: 0.8 });
-    for (const x of [23.5, 26.5, 29.5]) K.win(g, 'L', -31, x, x + 1.2, 4.5, 7.2, { style: 'glass' });
+    for (const x of [23.5, 26.5, 29.5]) K.win(g, 'L', -31, x, x + 1.2, 4.5, 7.2, { style: 'glass', lit: 0.3 });
     K.hip(g, 21.6, -36.4, 32.4, -30.6, 9, 2.2, '#C9734F', { ridge: 4 });
     const s = g.p(29, -33, 11); g.fill2([[s[0] - 2, s[1]], [s[0] + 2, s[1]], [s[0], s[1] - 14]], '#7FA65A', true); g.line2([[s[0] - 2, s[1]], [s[0], s[1] - 14], [s[0] + 2, s[1]]], { w: 0.5, boil: false }); g.segs2([s[0], s[1] - 14, s[0], s[1] - 17, s[0] - 1.2, s[1] - 15.8, s[0] + 1.2, s[1] - 15.8], '#3A3530', 0.45);
   }, { name: 'gaudi house' });

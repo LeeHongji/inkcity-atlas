@@ -26,15 +26,19 @@ SF.tile('chinatown', 0, -100, { rim: 16 }, function (T) {
   };
   /* a Chinese signboard on a face: vertical (a column of glyphs) or horizontal */
   const hsign = (g, face, p, a0, a1, z0, z1, col, ink, seed) => {
-    const q = K.on(face, p + 0.06, a0, a1, z0, z1); g.fill(q, col); g.outline(q, { w: 0.4, c: shade(col, 0.5), boil: false });
+    const q = K.on(face, p + 0.06, a0, a1, z0, z1); g.fill(q, col); g.mark({ nc: true }); g.outline(q, { w: 0.4, c: shade(col, 0.5), boil: false });   // lit at night
+    { const c = g.p.apply(g, K.pt(face, p + 0.1, (a0 + a1) / 2, (z0 + z1) / 2)); g.glow2('neon', c, c, { r: Math.min(6, 0.22 * Math.max(Math.abs(a1 - a0) * 2.92, (z1 - z0) * 3.46)), col }); }
+    const iG = g.cmds.length;
     const vert = (z1 - z0) > Math.abs(a1 - a0), n = Math.max(1, Math.floor(vert ? (z1 - z0) / Math.abs(a1 - a0) : Math.abs(a1 - a0) / (z1 - z0)));
     const cell = vert ? (z1 - z0) / n : (a1 - a0) / n, s = Math.min(Math.abs(cell), vert ? Math.abs(a1 - a0) : z1 - z0) * 0.62 * 3.3;
     for (let i = 0; i < n; i++) { const c = vert ? g.p.apply(g, K.pt(face, p + 0.1, (a0 + a1) / 2, z1 - cell * (i + 0.5))) : g.p.apply(g, K.pt(face, p + 0.1, a0 + cell * (i + 0.5), (z0 + z1) / 2)); glyph2(g, c, s, ink, seed * 7 + i); }
+    NK.nmark(g, iG, { nc: true }, true);
   };
   /* a paper lantern hanging at wide-px point c */
   const lantern2 = (g, c, r, col) => {
     const pts = []; for (let i = 0; i < 14; i++) { const t = TAU * i / 14; pts.push([c[0] + Math.cos(t) * r * 0.8, c[1] + Math.sin(t) * r]); }
-    g.fill2(pts, col, true); g.fill2(pts.filter((p) => p[0] > c[0]), shade(col, 0.15), true);
+    g.fill2(pts, col, true); g.mark({ nc: (cc) => mix(cc, '#FF9A5A', 0.25) }); g.fill2(pts.filter((p) => p[0] > c[0]), shade(col, 0.15), true); g.mark({ nc: true });   // a light burns inside at night
+    g.glow2('lantern', c, c, { r: r * 1.15, col: '#FF6A42' });
     g.fill2([[c[0] - r * 0.5, c[1] - r * 1.1], [c[0] + r * 0.5, c[1] - r * 1.1], [c[0] + r * 0.5, c[1] - r * 0.85], [c[0] - r * 0.5, c[1] - r * 0.85]], '#2A2622', true);
     g.fill2([[c[0] - r * 0.5, c[1] + r * 0.85], [c[0] + r * 0.5, c[1] + r * 0.85], [c[0] + r * 0.5, c[1] + r * 1.1], [c[0] - r * 0.5, c[1] + r * 1.1]], '#2A2622', true);
     g.segs2([c[0], c[1] + r * 1.1, c[0], c[1] + r * 1.8], '#E6C24F', 0.35);
@@ -86,8 +90,9 @@ SF.tile('chinatown', 0, -100, { rim: 16 }, function (T) {
     const pts = []; for (let k = 0; k <= 8; k++) { const y = lerp(y0, y1, k / 8); pts.push(g.p(x, y, zAt(y))); }
     g.line2(pts, { w: 0.9, c: '#4A4640', boil: false });
     const pts2 = []; for (let k = 0; k <= 8; k++) { const y = lerp(y0, y1, k / 8); pts2.push(g.p(x, y, zAt(y) - 0.9)); } g.fine2(pts2, { w: 0.3, c: '#5A5650' });
-    for (let k = 0; k <= 8; k++) { const y = lerp(y0, y1, k / 8); for (const dz of [0.45, -0.45]) { const p = g.p(x, y, zAt(y) + dz - 0.45); g.disc2(p, 0.85, ['#D23A33', '#F6F2E8', '#3E9A55'][(k + (dz > 0 ? 0 : 1)) % 3]); } }
-    if (!half) { const c = g.p(x, LANE0 + 0.5, Z + 0.6); g.disc2(c, 1.6, '#F6F2E8'); g.ring2(c, 1.6, { w: 0.4, c: '#C9463E' }); g.disc2(c, 0.7, '#3E9A55'); }
+    const BULB = { '#D23A33': '#FF5A4A', '#F6F2E8': '#FFF6DE', '#3E9A55': '#5CE07C' };
+    for (let k = 0; k <= 8; k++) { const y = lerp(y0, y1, k / 8); for (const dz of [0.45, -0.45]) { const p = g.p(x, y, zAt(y) + dz - 0.45), col = ['#D23A33', '#F6F2E8', '#3E9A55'][(k + (dz > 0 ? 0 : 1)) % 3]; g.disc2(p, 0.85, col); g.mark({ nc: BULB[col] }); if (dz > 0 && k % 4 === (half ? 3 : 1)) g.glow2('lantern', p, p, { r: 0.8, col: BULB[col] }); } }
+    if (!half) { const c = g.p(x, LANE0 + 0.5, Z + 0.6); g.disc2(c, 1.6, '#F6F2E8'); g.mark({ nc: '#FFF6DE' }); g.ring2(c, 1.6, { w: 0.4, c: '#C9463E' }); g.disc2(c, 0.7, '#3E9A55'); g.mark({ nc: '#5CE07C' }); g.glow2('lantern', c, c, { r: 1.6, col: '#FFF0C8' }); }
   }, { name: 'arch' });
   for (const x of [-29, -23, -17, -11, -5]) { arch(x, false); arch(x, true); }
   const lanterns = (x, half) => T.obj(half ? [x - 0.3, MID, x + 0.3, LANE1 + 0.3] : [x - 0.3, LANE0 - 0.3, x + 0.3, MID], (g) => {
@@ -111,6 +116,7 @@ SF.tile('chinatown', 0, -100, { rim: 16 }, function (T) {
     const cl = []; for (let a = 0; a < 4; a++) if (a % 2 === 0) { const p = g.p(x - 0.9 + a * 0.45 + 0.22, y + 0.8, 1.5); cl.push(p[0] - 0.5, p[1] - 0.3, p[0] + 0.5, p[1] + 0.3); } g.segs2(cl, '#D23A33', 0.9);
     for (const [dx, dy] of [[-0.35, -0.25], [0.35, 0.3]]) { const p = wh(dx, dy); g.disc2(p, 0.75, '#F6F2E8'); g.disc2(p, 0.42, i % 2 ? '#D2643A' : '#E9C46A'); }
     const wg = wh(0.15, -0.5); g.segs2([wg[0], wg[1], wg[0], wg[1] - 1.6], '#7A2A3A', 0.6);
+    g.glow('lantern', x - 0.3, y + 0.3, 2.3, { r: 0.8, col: '#FFC27A' });            // a candle on the table at night
     chair(g, x + 0.2, y + 1.5, false);
     NK.person(g, x + 0.2, y + 1.5, 0.55, NK.who(1501 + i * 3, { dir: 3, pose: 'sit' }));
     K.box(g, x - 0.35, y + 1.95, x + 0.75, y + 2.15, 1.35, 3.1, { t: '#2F6B4A', l: '#3A7A56', r: '#2A5A40' }, { w: 0.35, boil: false });
@@ -180,18 +186,22 @@ SF.tile('chinatown', 0, -100, { rim: 16 }, function (T) {
     const H = NK.walkup(g, 19, 4, 31, 16.5, 2, { col: '#D9CDB8', face: 'R', shop: { word: '', sign: false, col: '#C9363E', goods: ['#E08A3C', '#C9463E'] }, tank: false, fire: false });
     hsign(g, 'R', 31, 4.6, 16, 3.2, 4.4, '#C9363E', '#F2D25A', 51); hsign(g, 'L', 16.5, 19.6, 21, 6, 12, '#E6C24F', '#C9463E', 52); void H;
     NK.awning(g, 'R', 31, 5, 16, 3.0, 2.6, '#E6C24F', { stripe: '#C9363E', drop: 0.8 });
+    for (const y of [6.8, 10.8, 14.6]) g.glow('lamp', 32.8, y, 2.4, { r: 0.9 });       // bare bulbs under the awning at night
   }, { name: 'fruit shop' });
   T.obj([19, 16.5, 31, 29], (g) => {
     NK.walkup(g, 19, 16.5, 31, 29, 2, { col: '#B9654C', face: 'R', shop: { word: '', sign: false, col: '#2F6B4A', goods: ['#C9C3B6', '#8FA3B5'] }, tank: true, tx: 0.5, ty: 0.5, fire: true });
     hsign(g, 'R', 31, 17, 28.5, 3.2, 4.4, '#2F6B4A', '#F6F2E8', 61); hsign(g, 'L', 29, 20, 21.4, 5.5, 12, '#C9363E', '#F6F2E8', 62);
     NK.awning(g, 'R', 31, 17.5, 28.5, 3.0, 2.6, '#3E8E5A', { stripe: '#F3F1EA', drop: 0.8 });
+    for (const y of [19.8, 23.8, 27.4]) g.glow('lamp', 32.8, y, 2.4, { r: 0.9 });     // bare bulbs under the awning at night
   }, { name: 'fish shop' });
   // the stands out on the sidewalk: crates heaped with fruit and greens, ice with fish
   const stand = (y0, y1, goods, ice) => T.obj([31.3, y0, 34.2, y1], (g) => {
+    const i0 = g.cmds.length;
     K.box(g, 31.4, y0, 34.0, y1, 0, 1.6, { t: '#B98F58', l: '#C9A26B', r: '#A8814E' }, { w: 0.5, boil: false });
     const top = g.P(K.rect(31.5, y0 + 0.1, 33.9, y1 - 0.1, 1.62)); g.fill2(top, ice ? '#EEF3F5' : '#8E6E44', true);
     const R = RNG(Math.round(y0 * 13)), d = [];
     for (let k = 0; k < (y1 - y0) * 5; k++) { const p = g.p(31.8 + R() * 1.9, y0 + 0.3 + R() * (y1 - y0 - 0.6), 1.7 + R() * 0.3); const col = R.pick(goods); if (ice) g.fill2([[p[0] - 1, p[1]], [p[0] + 0.9, p[1] - 0.3], [p[0] + 1.3, p[1] + 0.1], [p[0] + 0.9, p[1] + 0.4]], col, true); else g.disc2(p, 0.55, col); void d; }
+    NK.floodMark(g, i0, 0.75, '#FFD08A');                                             // in the light of the bulbs above, at night
   }, { name: 'stand' });
   stand(5, 8.5, ['#E8892E', '#F0A040', '#E8892E']); stand(9, 12.5, ['#D9468C', '#E85A9A', '#8FBF73']); stand(13, 16, ['#6FAE4A', '#8FC46A', '#4E8A3A']);
   stand(18, 21.5, ['#9AA8B4', '#B9C3CC', '#C9A69A'], true); stand(22, 25.5, ['#C9463E', '#9AA8B4', '#B9C3CC'], true);

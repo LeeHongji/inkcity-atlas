@@ -24,4 +24,17 @@ const SCENE = {
   visit: ['eling', 'kuixing', 'liziba', 'huoguo', 'jiefangbei', 'hongyadong', 'suodao', 'shibati', 'chaotianmen'],
   dive: { shibati: 'climb' },
   bounds: { z: [0.7, 10], cx: [60, 1860], cy: [60, 1100] },
+  // at night: flats two windows in three lit; shop floors, Hongyadong's halls, the old houses' paper lattices and the
+  // stilt houses mostly lit; the lights reflect in the green Jialing and the brown Yangtze; no lawn fireflies in March
+  night: {
+    lit: 0.66,
+    windows: {
+      '#56606A': 0.66, '#5E6872': 0.66,                       // flats (CQ.block, Kuixing, Liziba)
+      '#4A4744': 1, '#4E4A44': 1, '#4E555B': 1, '#E9C98A': 1,  // shop floors, lobbies, the shops in Liziba's wall
+      '#F4C96A': 1, '#E9DEC0': 1,                              // Hongyadong's halls (and the cableway's ticket window)
+      '#EFE6CF': 0.85, '#E8DDC0': 0.8, '#DCD0B2': 0.75, '#F2D58A': 1,   // old houses' lattices, stilt houses, the pavilion's gallery
+    },
+    water: ['#9FC2B3', '#BFAE8E'],                            // CQC.jl, CQC.yz
+    grass: [],
+  },
 };

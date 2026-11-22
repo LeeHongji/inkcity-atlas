@@ -24,6 +24,7 @@ SF.tile('galata', -100, -100, { rim: 0 }, function (T) {
     for (let k = 1; k < 4; k++) { const rr = []; for (let i = 0; i <= 28; i++) { const a = TAU * i / 28; rr.push([TW.x + Math.cos(a) * (TW.r + 1 + k * 2), TW.y + Math.sin(a) * (TW.r + 1 + k * 1.6), 0]); } g.fine(rr, { w: 0.3, c: '#C9BB9E' }); }
     // the quay along the Horn
     g.fill(K.rect(-H, 21, H, 28), '#DCD3C0'); g.fill(K.rect(-H, 27.1, H, 28), IS.C.quayTop); g.line([[-H, 21, 0], [H, 21, 0]], { w: 0.4, c: '#B9AF9A', boil: false });
+    IS.quayLights(g, [[-33, 27.4], [-22, 27.4], [-4, 27.4], [6, 27.4], [21, 27.4], [31, 27.4]]);   // at night low lights along the quay, broken on the Horn
   }, { rim: true });
 
   /* ---- the north ramp of the Galata Bridge (on the avenue at the tile's east edge) ---- */
@@ -39,9 +40,9 @@ SF.tile('galata', -100, -100, { rim: 0 }, function (T) {
   // the Tünel station at the avenue's west end
   T.obj([-37, -19.5, -28, -11], function (g) {
     K.box(g, -37, -19.5, -28, -11, 0, 7.5, { t: '#E3D6BE', l: '#EDE2CC', r: '#D8C9AE' }, { w: 0.85 });
-    IS.arcade(g, 'R', -27.98, -18.6, -12, 0, 5.2, 3, { dark: '#5E584E' });
+    { const j0 = g.cmds.length; IS.arcade(g, 'R', -27.98, -18.6, -12, 0, 5.2, 3, { dark: '#5E584E' }); IS.litCols(g, j0, { '#5E584E': '#FFD98A' }, { win: 1, spill: true }); }   // at night the station's hall is lit
     K.box(g, -37.4, -19.9, -27.6, -10.6, 7.5, 8.3, '#CDBFA3', { w: 0.6 });
-    K.sign(g, 'R', -27.6, -18.4, -12.2, 5.8, 7.1, '#B8322A', 'TÜNEL', { w: 0.35 });
+    { const j0 = g.cmds.length; K.sign(g, 'R', -27.6, -18.4, -12.2, 5.8, 7.1, '#B8322A', 'TÜNEL', { w: 0.35 }); IS.litSign(g, j0); }
   }, { name: 'tunel' });
 
   /* ---- the near side of İstiklal at the east end: a café block, the ice-cream stall ---- */
@@ -49,17 +50,18 @@ SF.tile('galata', -100, -100, { rim: 0 }, function (T) {
   T.obj([-25, -18.5, -20.5, -15.5], function (g) {   // the Maraş ice-cream cart: copper lids, a striped canopy
     K.box(g, -25, -18.5, -20.5, -15.5, 0, 3.2, { t: '#C9A26B', l: '#B8322A', r: '#9E2A22' }, { w: 0.6 });
     for (const x of [-23.8, -22.6, -21.4]) { const c = g.p(x, -17, 3.2); g.fill2(arcPts(c[0], c[1], 1.5, Math.PI, TAU, 8).concat([[c[0] + 1.5, c[1]]]), '#C98A4A', true); g.disc2([c[0], c[1] - 1.6], 0.35, '#8A5A2A'); }
-    K.text(g, 'L', -15.48, -24.6, 0.8, 0.9, 'DONDURMA', '#F6F1E2', { w: 0.35 });
+    { const j0 = g.cmds.length; K.text(g, 'L', -15.48, -24.6, 0.8, 0.9, 'DONDURMA', '#F6F1E2', { w: 0.35 }); IS.litLines(g, j0); }
     for (const [x, y] of [[-24.8, -15.7], [-20.7, -15.7]]) { const a = g.p(x, y, 3.2), b = g.p(x, y, 7.4); g.line2([a, b], { w: 0.45, c: '#5A4A3C', boil: false }); }
     const can = [[-25.6, -19.2, 7.8], [-19.9, -19.2, 7.8], [-19.9, -14.8, 7.2], [-25.6, -14.8, 7.2]]; g.fill(can, '#E9E2D2');
     for (let i = 0; i < 6; i += 2) g.fill([[-25.6 + i * 0.95, -19.2, 7.8], [-25.6 + (i + 1) * 0.95, -19.2, 7.8], [-25.6 + (i + 1) * 0.95, -14.8, 7.2], [-25.6 + i * 0.95, -14.8, 7.2]], '#B8322A');
     g.outline(can, { w: 0.5, boil: false });
+    g.glow('lantern', -22.75, -17, 6.6, { r: 1.5, col: IS.N.bulb });   // at night a bulb under the canopy
   }, { name: 'ice cream' });
 
   /* ---- the Galata Tower ---- */
   T.obj([TW.x - TW.r - 0.6, TW.y - TW.r - 0.6, TW.x + TW.r + 0.6, TW.y + TW.r + 0.6], function (g) {
     g.boilP = 0.3;
-    const { x, y, r } = TW, S = { t: '#D9CDB4', l: '#E4D9C2', r: '#C3B597' };
+    const { x, y, r } = TW, S = { t: '#D9CDB4', l: '#E4D9C2', r: '#C3B597' }, i0 = g.cmds.length; let iUp, iGal, iCone;
     K.cyl(g, x, y, r + 0.5, 0, 2.2, { t: '#D2C6AC', l: '#DCD0B6', r: '#BBAD90' }, { n: 20, w: 0.8, nt: true });
     K.cyl(g, x, y, r, 2.2, 31, S, { n: 20, w: 1.0, nt: true });
     // rough stone courses and small arched slits climbing the shaft
@@ -71,18 +73,27 @@ SF.tile('galata', -100, -100, { rim: 0 }, function (T) {
     { const a = Math.PI * 0.42, da = 0.11, q = [[x + (r + 0.55) * Math.cos(a - da), y + (r + 0.55) * Math.sin(a - da), 0], [x + (r + 0.55) * Math.cos(a + da), y + (r + 0.55) * Math.sin(a + da), 0]]; for (let j = 0; j <= 6; j++) { const t = Math.PI * j / 6, aa = a + da * Math.cos(t); q.push([x + (r + 0.55) * Math.cos(aa), y + (r + 0.55) * Math.sin(aa), 2.6 + 0.8 * Math.sin(t)]); } g.fill(q, '#3E3A34'); }
     // the cornice, the upper storeys with big arched windows, the gallery ring and its rail
     K.cyl(g, x, y, r + 0.45, 31, 31.8, { t: '#CFC3A8', l: '#D6CAAE', r: '#B9AB8E' }, { n: 20, w: 0.7, nt: true });
-    K.cyl(g, x, y, r - 0.2, 31.8, 37.2, S, { n: 20, w: 0.85, nt: true });
+    iUp = g.cmds.length; K.cyl(g, x, y, r - 0.2, 31.8, 37.2, S, { n: 20, w: 0.85, nt: true });
     for (let k = 0; k < 6; k++) { const a = A_L + (A_R - A_L) * (k + 0.5) / 6, da = 0.12, rr = r - 0.17, q = [[x + rr * Math.cos(a - da), y + rr * Math.sin(a - da), 32.4], [x + rr * Math.cos(a + da), y + rr * Math.sin(a + da), 32.4]]; for (let j = 0; j <= 5; j++) { const t = Math.PI * j / 5, aa = a + da * Math.cos(t); q.push([x + rr * Math.cos(aa), y + rr * Math.sin(aa), 35.4 + 0.8 * Math.sin(t)]); } g.fill(q, '#4E5866'); }
-    K.cyl(g, x, y, r + 0.9, 32.9, 33.3, { t: '#B9AB8E', l: '#C9BB9E', r: '#A89A7E' }, { n: 20, w: 0.55 });
+    iGal = g.cmds.length; K.cyl(g, x, y, r + 0.9, 32.9, 33.3, { t: '#B9AB8E', l: '#C9BB9E', r: '#A89A7E' }, { n: 20, w: 0.55 });
     const rl = []; for (let k = 0; k < 18; k++) { const a = A_L + (A_R - A_L) * k / 17, p0 = g.p(x + (r + 0.85) * Math.cos(a), y + (r + 0.85) * Math.sin(a), 33.3), p1 = g.p(x + (r + 0.85) * Math.cos(a), y + (r + 0.85) * Math.sin(a), 34.4); rl.push(p0[0], p0[1], p1[0], p1[1]); }
     g.segs2(rl, '#3A3530', 0.32); g.line(K.arc(x, y, 34.4, r + 0.85, A_L, A_R, 16), { w: 0.4, c: '#3A3530', boil: false });
     // the lead cone and the finial
-    K.cyl(g, x, y, r + 0.2, 37.2, 37.8, { t: '#B9AB8E', l: '#C9BB9E', r: '#A89A7E' }, { n: 20, w: 0.55 });
+    iCone = g.cmds.length; K.cyl(g, x, y, r + 0.2, 37.2, 37.8, { t: '#B9AB8E', l: '#C9BB9E', r: '#A89A7E' }, { n: 20, w: 0.55 });
     const ap = g.p(x, y, 47.5), base = g.P(K.arc(x, y, 37.8, r + 0.35, A_R, A_L, 16));
     g.fill2(base.concat([ap]), IS.C.lead); g.fill2(base.slice(0, 7).concat([ap]), shade(IS.C.lead, 0.14));
     const sm = []; for (let k = 1; k < 8; k++) { const q = base[k * 2]; sm.push(q[0], q[1], ap[0], ap[1]); } g.segs2(sm, shade(IS.C.lead, 0.22), 0.3);
     g.line2(base, { w: 0.8, c: IS.C.leadInk }); g.line2([base[0], ap], { w: 0.8, c: IS.C.leadInk }); g.line2([base[16], ap], { w: 0.8, c: IS.C.leadInk });
     IS.alem2(g, ap, 1.0);
+    // at night (its lighting today): the stone shaft floodlit warm, the café storey under the gallery lit in a fired-brick
+    // glow with its windows bright, the gallery and the cone lit, the crescent shining; its light lies on the Horn
+    for (let i = iUp; i < iGal; i++) { const d = g.cmds[i]; if (d && d.k === K_FILL && d.c === '#4E5866') { d.nc = '#FFF0C8'; d.win = 1; } }
+    IS.flood(g, iCone, 0.84, '#FFD9A6'); IS.flood(g, iGal, 0.82, '#FFD49A'); IS.flood(g, iUp, 0.8, '#FF8A5C'); IS.flood(g, i0, 0.78, '#FFCB8E');
+    // the floodlights at its foot (one lays the tower's light on the Horn: the water straight below it on screen)
+    g.glow2('lantern', g.p(x + r * 0.95, y + r * 0.95, 0.8), g.p(9, 28, 0), { r: 2.8, col: '#FFC98A', pool: false });
+    IS.glowDry(g, 'lantern', x - r * 0.35, y + r * 1.25, 0.8, { r: 2.4, col: '#FFC98A' });
+    IS.glowDry(g, 'lantern', x + (r + 0.9) * 0.71, y + (r + 0.9) * 0.71, 33.8, { r: 2.2, col: '#FFC98A' });   // the gallery's ring of lights
+    g.glow2('lantern', [ap[0], ap[1] - 4.5], [ap[0], -1e6], { r: 1.1, col: '#FFE9A8', pool: false });
   }, { name: 'galata tower' });
   // the tower's flag on the gallery
   IS.flag(T, TW.x + TW.r + 0.9, TW.y + 0.4, 38.6, { L: 2.6, H: 1.7 });
@@ -128,7 +139,7 @@ SF.tile('galata', -100, -100, { rim: 0 }, function (T) {
   const lanes = [[-21.2, 1.25], [-26.8, 1.15], [-22, 1.35], [-26.5, 1.2]];
   for (let i = 0; i < 10; i++) { const [y, sp] = lanes[i % 4], fw = i % 2 === 0; IS.walker(T, IS.who(1160 + i, i === 3 ? { tray: true, top: '#F3F1EA', scarf: undefined } : {}), fw ? [[-27, y], [36, y]] : [[36, y], [-27, y]], sp, { phase: i * 0.137 }); }
   // the quay: anglers on the edge, a cat, walkers
-  for (const [x, s] of [[-30, 1171], [-12, 1172], [14, 1173]]) T.cast([x, 26.4], (g) => { IS.person(g, x, 26.4, 0, IS.who(s, { dir: 1, pose: 'hold', fcap: '#3B3F47' })); const a = g.p(x - 0.2, 27, 4.2), b = g.p(x - 0.2, 31.5, 7.5), c = g.p(x - 0.2, 33.5, IT.WL); g.line2([a, b], { w: 0.45, c: '#3A3128', boil: false, ext: 0 }); g.fine2([b, c], { w: 0.22, c: '#5A564E' }); const bk = g.p(x + 1.2, 25.6, 0); g.fill2([[bk[0] - 1, bk[1]], [bk[0] + 1, bk[1]], [bk[0] + 1.3, bk[1] - 2], [bk[0] - 1.3, bk[1] - 2]], '#3F7FB8', true); }, { on: true });
+  for (const [x, s] of [[-30, 1171], [-12, 1172], [14, 1173]]) T.cast([x, 26.4], (g) => { IS.person(g, x, 26.4, 0, IS.who(s, { dir: 1, pose: 'hold', fcap: '#3B3F47' })); const a = g.p(x - 0.2, 27, 4.2), b = g.p(x - 0.2, 31.5, 7.5), c = g.p(x - 0.2, 33.5, IT.WL); g.line2([a, b], { w: 0.45, c: '#3A3128', boil: false, ext: 0 }); g.fine2([b, c], { w: 0.22, c: '#5A564E' }); const bk = g.p(x + 1.2, 25.6, 0); g.fill2([[bk[0] - 1, bk[1]], [bk[0] + 1, bk[1]], [bk[0] + 1.3, bk[1] - 2], [bk[0] - 1.3, bk[1] - 2]], '#3F7FB8', true); IS.glowWet(g, 'lantern', x - 0.2, 31.5, 7.5, { r: 0.7, col: IS.N.tip }); }, { on: true });   // at night a glow stick on the rod tip
   IS.cat(T, 15.6, 25, 0, { c: 0, pose: 'sit', fl: -1 });
   IS.cat(T, -24.2, 1.2, 1.3, { c: 3, pose: 'loaf' });
   IS.catWalk(T, [[-30, 22.5], [30, 22.5]], { c: 2, speed: 1.0, sit: 5 });

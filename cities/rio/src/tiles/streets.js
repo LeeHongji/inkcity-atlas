@@ -7,6 +7,9 @@
    (y -163..-157) and Guanabara Bay to y = -184. Traffic is a timetable (src/37_traffic.js). Boats: the Niterói ferry
    in the bay, fishing boats and a cargo ship on the ocean, breakers rolling in along the whole beach. */
 const RS = { E: 166, KH: 43, CAL0: 157, CAL1: 167, SEA1: 205, BAYQ: -163, BAY1: -184, WZ: -0.6 };
+/* (night) the promenade's lamp posts along the calçadão's kerb, Leme to Arpoador: drawn only at night (a night-only
+   actor, so the day is untouched), their light from the streets' ground */
+RS.POSTX = 157.9; RS.POSTS = []; for (let y = -146; y < 160; y += 17) RS.POSTS.push(y);
 RS.shore = function (y) {
   const base = 186 + Math.sin(y * 0.07) * 1.0 + Math.sin(y * 0.023 + 1) * 0.9;
   return y < -105 ? lerp(RS.CAL1, base, smooth((y + 128) / 23)) : base;
@@ -82,6 +85,15 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     g.line([[se, E, WZ], [S1, E, WZ], [S1, B1, WZ]], { w: 0.8, boil: false, c: '#3F6F78' });
     g.line([[se, E, -2.4], [S1, E, -2.4], [S1, B1, -2.4]], { w: 0.8, boil: false }); g.line([[S1, E, -2.4], [S1, E, WZ]], { w: 0.7, boil: false });
     g.line([[-E, E, 0], [-E, E, -D]], { w: 0.7, boil: false }); g.line([[se, E, -D], [se, E, -2.4]], { w: 0.6, boil: false });
+    /* ---- at night (nothing below draws by day) ---- */
+    // the open sea and the bay a light can reflect in: clear fills (the sea's own fill runs on under the sand)
+    g.fill([[C1, BQ, WZ]].concat(sh.map((p) => [p[0], p[1], WZ])).concat([[S1, E, WZ], [S1, BQ, WZ]]), RP.WMASK);
+    g.fill([[-E, B1, WZ], [S1, B1, WZ], [S1, BQ - 6, WZ], [-E, BQ - 6, WZ]], RP.WMASK);   // (short of the quay: a column of light below needs room)
+    // the promenade's lamps (the "pearl necklace" along the orla; their posts: RS.POSTS) and the floodlights on the sand
+    RS.POSTS.forEach((y, i) => {
+      g.glow('lamp', RS.POSTX + 0.5, y, 10.3, { r: 1.3 });
+      if (y > -128 && i % 2 === 0) g.glow2('lamp', g.p(RS.POSTX + 0.5, y, 10.6), g.p(RS.shore(y) - 9, y + 3, 0), { r: 1.8 });
+    });
   });
 
   /* ---- the traffic ---- */
@@ -129,11 +141,11 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   // sailboats in the bay
   for (let i = 0; i < 2; i++) T.actor({ cast: false, sample: 0.4, period: 90, grow: false,
     at(t) { const u = ((t / 90 + i * 0.5) % 1), x = lerp(-160, 200, u), a = Math.min(1, (x + 160) / 10, (200 - x) / 10, Math.abs(x - 1) > 46 ? 1 : 0); if (a <= 0.02) return null; return { x, y: -170 - i * 8, z: WZ, key: 's' + i, alpha: a < 1 ? a : null }; },
-    draw(g) { K.boat(g, 0.15, { kind: 'sail', L: 3.2, W: 1.2, hull: ['#F3F1EA', '#2F4A63'][i], mast: 9 }); } });
+    draw(g) { K.boat(g, 0.15, { kind: 'sail', L: 3.2, W: 1.2, hull: ['#F3F1EA', '#2F4A63'][i], mast: 9 }); RJ.navLight(g, g.p(0, 0, 8.4), '#FFF4DC', 0.35); } });   // (night: the masthead light)
   // out on the ocean: fishing boats and a cargo ship on the horizon line
   for (let i = 0; i < 2; i++) T.actor({ cast: false, sample: 0.5, period: 120, grow: false,
     at(t) { const u = ((t / 120 + i * 0.45) % 1), y = lerp(-170, 170, u), a = Math.min(1, (168 - Math.abs(y)) / 10, (Math.abs(y - 48) - 16) / 6); if (a <= 0.02) return null; return { x: 203, y, z: WZ, key: 'f' + i, alpha: a < 1 ? a : null }; },
-    draw(g) { K.boat(g, Math.PI / 2, { kind: 'motor', L: 3.4, W: 1.3, hull: ['#3F78B5', '#D9463B'][i], stripe: '#F3F1EA' }); } });
+    draw(g) { const i0 = g.cmds.length; K.boat(g, Math.PI / 2, { kind: 'motor', L: 3.4, W: 1.3, hull: ['#3F78B5', '#D9463B'][i], stripe: '#F3F1EA' }); RJ.nightEach(g, i0, (c, d) => (d.k === K_FILL && c === C.navy ? '#FFE3A6' : undefined)); RJ.navLight(g, g.p(-0.4, 0, 2.7), '#FFE6B0', 0.5); } });   // (night: the fishing boats' lamps)
   // breakers rolling in along the whole beach: a curl of white water that runs up the sand and fades
   for (let i = 0; i < 14; i++) {
     const y0 = -110 + i * 20 + h1(i * 7) * 6, per = 5.5 + h1(i * 3) * 2, off = h1(i * 11) * per;
@@ -143,8 +155,22 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
         const pts = [], n = 10, len = 18;
         for (let k = 0; k <= n; k++) { const v = -len + len * k / n; pts.push(g.p(Math.sin(k / n * Math.PI) * 0.9 - 0.1 * st.q, v, 0)); }
         const back = pts.map((p) => [p[0] - 2.6, p[1] - 1.5]).reverse();
-        g.fill2(pts.concat(back), 'rgba(246,248,243,0.75)');
-        g.line2(pts, { w: 0.7, c: '#FFFFFF', boil: false });
+        g.fill2(pts.concat(back), 'rgba(246,248,243,0.75)'); g.mark({ nc: 'rgba(196,212,236,0.62)' });   // (night: moonlit surf)
+        g.line2(pts, { w: 0.7, c: '#FFFFFF', boil: false }); g.cmds[g.cmds.length - 1].nc = '#C9D8F0';
       } });
   }
+
+  /* ---- night only: the promenade's lamp posts (made last of all: RJ.late) ---- */
+  RJ.late(0, 0, (A) => RS.POSTS.forEach((y) => A.actor({ cast: false, sample: 5, period: 10, grow: false,
+    at() { return LOOK.night ? { x: RS.POSTX, y, key: 'n' } : null; },
+    draw(g) {
+      // a tall slender post with a short arm each way, a lamp at each end, a third lamp on top
+      const b = g.p(0, 0, 0), t = g.p(0, 0, 10.6);
+      g.fill2([[b[0] - 0.65, b[1]], [b[0] + 0.65, b[1]], [t[0] + 0.35, t[1]], [t[0] - 0.35, t[1]]], '#C9CDCF');
+      g.line2([[b[0] - 0.65, b[1]], [t[0] - 0.35, t[1]]], { w: 0.45, c: '#5A5F64', boil: false, ext: 0 });
+      const a0 = g.p(0.5, -0.9, 10.2), a1 = g.p(0.5, 0.9, 10.2);
+      g.line2([a0, [t[0], t[1] + 0.6], a1], { w: 0.45, c: '#5A5F64', boil: false, ext: 0 });
+      for (const q of [a0, a1]) { g.fill2([[q[0] - 1.1, q[1] - 0.2], [q[0] + 1.1, q[1] - 0.2], [q[0] + 0.7, q[1] + 1.0], [q[0] - 0.7, q[1] + 1.0]], '#F2E9C8', true); g.mark({ nc: '#FFF1C8' }); }
+      g.disc2([t[0], t[1] - 0.7], 0.75, '#F2E9C8'); g.mark({ nc: '#FFF1C8' });
+    } })));
 });

@@ -43,9 +43,12 @@
       const GL = (c) => ({ t: shade(c, -0.25), l: c, r: shade(c, 0.12) });
       // stacked glass volumes like decks of a ship, the bow towards the river (-x), a white roof plate on top
       K.box(g, -16, -18, 18, 12, 0, 6, { t: '#E9E6DE', l: '#D9D6CC', r: '#C2BEB2' }, { w: 0.85 });
+      const i0 = g.cmds.length;
       K.box(g, -12, -16, 16, 8, 6, 14, GL('#9FC4B7'), { w: 0.8 });
       K.box(g, -6, -13, 14, 4, 14, 21, GL('#B3D3C6'), { w: 0.8 });
       K.box(g, 0, -10, 12, 0, 21, 26, GL('#C9E0D6'), { w: 0.75 });
+      CQ.nmark(g, i0, null, { nc: (c) => mix(nightColour(c), '#9FF2CF', 0.55) });   // at night it glows jade through its green glass
+      for (const [x, y, z, r] of [[16.3, -4, 10, 4.2], [2, 8.3, 10, 4.2], [14.3, -4.5, 17.5, 3.4], [12.3, -5, 23.5, 2.6]]) g.glow('lantern', x, y, z, { r, col: '#9FF2CF' });
       const ln = []; for (const [x0, y0, x1, y1, z0, z1] of [[-12, -16, 16, 8, 6, 14], [-6, -13, 14, 4, 14, 21], [0, -10, 12, 0, 21, 26]]) { for (let x = x0 + 1.6; x < x1; x += 1.6) { const a = g.p(x, y1, z0), b = g.p(x, y1, z1); ln.push(a[0], a[1], b[0], b[1]); } for (let y = y0 + 1.6; y < y1; y += 1.6) { const a = g.p(x1, y, z0), b = g.p(x1, y, z1); ln.push(a[0], a[1], b[0], b[1]); } }
       g.segs2(ln, '#6F9488', 0.28);
       K.box(g, -2, -12, 14, 2, 26, 26.8, '#F3F1EA', { w: 0.7 });

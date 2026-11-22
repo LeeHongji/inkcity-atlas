@@ -20,6 +20,7 @@ SF.tile('tower', -100, -100, { rim: 0 }, function (T) {
   const LEVELS = [0, 3.5, 7.5, 11.5, 15.5, 19.5, 23.5, 27, 31, 34.5, 38, 41.5, 45, 48.5, 52.5, 55, 59, 63, 67, TOP];
   const white = (z0) => (z0 >= 31 && Math.floor((z0 - 31) / 3.5) % 2 === 1) || (z0 >= 11.5 && z0 < 15.5) || (z0 >= 55 && Math.floor((z0 - 55) / 4) % 2 === 1);
   T.obj([CX - 14.5, CY - 14.5, CX + 14.5, CY + 14.5], function (g) {
+    const i0 = g.cmds.length;
     g.boilP = 0.25;
     const C3 = (sx, sy, z) => { const w = wAt(z); return [CX + sx * w, CY + sy * w, z]; };
     // the base building between the legs
@@ -55,6 +56,10 @@ SF.tile('tower', -100, -100, { rim: 0 }, function (T) {
     const t = g.p(CX, CY, TOP), b = g.p(CX, CY, 55); g.line2([b, t], { w: 1.1, c: ORANGE, boil: false });
     for (let k = 0; k < 4; k++) { const p = g.p(CX, CY, 57 + k * 3.4); g.line2([[p[0] - 1.4, p[1]], [p[0] + 1.4, p[1]]], { w: 0.7, c: k % 2 ? '#F3F1EA' : ORANGE, boil: false }); }
     g.disc2(t, 0.7, '#E0503E');
+    // at night the tower is lit from below in warm orange (the Landmark Light), white bands turned to amber
+    const LITN = { [ORANGE]: '#FF8A4E', [OTINT]: '#FFB27A', [WTINT]: '#FFD9A6' };
+    g.mark({ nc: (c) => LITN[c] }, i0);
+    for (const [z, r] of [[5, 7], [13, 5.5], [21, 4.5], [DECK + 1.5, 5], [36, 3.2], [45, 2.6], [DECK2 + 1, 2.6], [62, 1.8]]) g.glow('lantern', CX, CY, z, { r, col: '#FF9A4E' });
   }, { name: 'tokyo tower' });
 
   /* ---------------- Zōjō-ji: the great gate, the jizō ---------------- */

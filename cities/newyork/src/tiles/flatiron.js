@@ -62,13 +62,13 @@ SF.tile('flatiron', -100, 0, { rim: 14 }, function (T) {
     const rows = [], piers = [];
     for (const [B, n] of [[B1, nL], [B2, nR]]) {
       const L = Math.hypot(B[0] - P[0], B[1] - P[1]), at = (s, z) => [P[0] + (B[0] - P[0]) * s / L + n[0] * 0.04, P[1] + (B[1] - P[1]) * s / L + n[1] * 0.04, z];
-      for (let z = Z0 + 0.4; z < Z1 - 0.6; z += 1.3) g.fill([at(1.2, z), at(L - 0.4, z), at(L - 0.4, z + 0.62), at(1.2, z + 0.62)], n === nL ? '#5E6670' : '#4F5760');
+      for (let z = Z0 + 0.4; z < Z1 - 0.6; z += 1.3) { g.fill([at(1.2, z), at(L - 0.4, z), at(L - 0.4, z + 0.62), at(1.2, z + 0.62)], n === nL ? '#5E6670' : '#4F5760'); const nc = NK.stripLit(Math.round(z * 10) + (n === nL ? 0 : 300), 0.55, 5); if (nc) g.mark({ nc }); }   // lit floors at night
       for (let s = 1.2; s < L - 0.3; s += 1.7) { const a = g.p.apply(g, at(s, Z0 + 0.2)), b = g.p.apply(g, at(s, Z1 - 0.2)); piers.push(a[0], a[1], b[0], b[1]); }
       // the rusticated base: shop windows and coursing
-      for (let s = 2.5; s < L - 2; s += 3.6) g.fill([at(s, 0.3), at(s + 2.6, 0.3), at(s + 2.6, 2.6), at(s, 2.6)], '#CFE0EA');
+      for (let s = 2.5; s < L - 2; s += 3.6) { g.fill([at(s, 0.3), at(s + 2.6, 0.3), at(s + 2.6, 2.6), at(s, 2.6)], '#CFE0EA'); g.mark({ win: 1, spill: true }); }   // lit shops at night
       for (let z = 0.9; z < Z0; z += 0.9) { const a = g.p.apply(g, at(0.5, z)), b = g.p.apply(g, at(L, z)); rows.push(a[0], a[1], b[0], b[1]); }
       // the crown: arched windows in the top floors, the deep cornice above them
-      for (let s = 1.6; s < L - 0.6; s += 1.7) { const c = at(s, Z1 + 0.3), d = at(s + 0.9, Z1 + 0.3); g.fill([c, d, [d[0], d[1], Z1 + 1.3], [(c[0] + d[0]) / 2, (c[1] + d[1]) / 2, Z1 + 1.6], [c[0], c[1], Z1 + 1.3]], '#5E6670'); }
+      for (let s = 1.6; s < L - 0.6; s += 1.7) { const c = at(s, Z1 + 0.3), d = at(s + 0.9, Z1 + 0.3); g.fill([c, d, [d[0], d[1], Z1 + 1.3], [(c[0] + d[0]) / 2, (c[1] + d[1]) / 2, Z1 + 1.6], [c[0], c[1], Z1 + 1.3]], '#5E6670'); g.mark({ win: 0.6 }); }
       const k0 = [P[0] + n[0] * 0.7 - (B[0] - P[0]) / L * 0.4, P[1] + n[1] * 0.7 - (B[1] - P[1]) / L * 0.4], k1 = [B[0] + n[0] * 0.7, B[1] + n[1] * 0.7];
       g.fill([[P[0], P[1], ZT - 0.3], [B[0], B[1], ZT - 0.3], [k1[0], k1[1], ZT + 0.3], [k0[0], k0[1], ZT + 0.3]], shade(tone(n, lit), 0.12));
       g.fill([[k0[0], k0[1], ZT + 0.3], [k1[0], k1[1], ZT + 0.3], [k1[0], k1[1], ZT + 0.75], [k0[0], k0[1], ZT + 0.75]], tone(n, lit));
@@ -83,7 +83,7 @@ SF.tile('flatiron', -100, 0, { rim: 14 }, function (T) {
     // the rounded prow: a slim drum with its own windows
     K.cyl(g, P[0] - 0.5, P[1] - 0.5, 0.9, 0, ZT + 0.75, { t: '#EFE6D4', l: '#E7D7BB', r: '#C9B79A' }, { w: 0.9, n: 10 });
     const pw = []; for (let z = Z0 + 0.4; z < Z1; z += 1.3) { const a = g.p(P[0] - 0.6, P[1] + 0.3, z), b = g.p(P[0] + 0.2, P[1] - 0.6, z); pw.push(a[0], a[1] + 0.3, b[0], b[1] + 0.3); }
-    g.segs2(pw, '#5E6670', 1.2);
+    g.segs2(pw, '#5E6670', 1.2); g.cmds[g.cmds.length - 1].nc = '#E6BC72';            // the prow's windows lit at night
   }, { name: 'flatiron' });
 
   /* ---------------- the edges: lofts and walk-ups ---------------- */
@@ -113,10 +113,13 @@ SF.tile('flatiron', -100, 0, { rim: 14 }, function (T) {
   // the burger kiosk: a small pavilion with a green roof and a big menu board
   T.obj([-9, 22, -4, 27], function (g) {
     K.box(g, -9, 22, -4, 27, 0, 3.4, { t: '#B9B4AA', l: '#8E9A8A', r: '#77836F' }, { w: 0.8 });
-    K.win(g, 'L', 27, -8.5, -4.5, 1.2, 3.0, { style: 'glass' }); K.win(g, 'R', -4, 22.5, 26.5, 1.2, 3.0, { style: 'glass' });
+    g.lit({ win: 1, spill: true }, () => { K.win(g, 'L', 27, -8.5, -4.5, 1.2, 3.0, { style: 'glass' }); K.win(g, 'R', -4, 22.5, 26.5, 1.2, 3.0, { style: 'glass' }); });   // lit at night
     K.box(g, -9.8, 21.2, -3.2, 27.8, 3.4, 4.0, '#6F8C5E', { w: 0.7 });
+    const iB = g.cmds.length;
     K.box(g, -8.6, 22.4, -4.4, 26.6, 4.0, 5.4, { t: '#D9D3C6', l: '#E9E1CC', r: '#CFC6B4' }, { w: 0.6 });
-    NK.text(g, 'L', 26.6, -6.5, 4.3, 0.85, 'BURGERS', '#3E6B4F', { center: true, w: 0.35 });
+    g.mark({ nc: (c) => ({ '#E9E1CC': '#FFF0C8', '#CFC6B4': '#EAD9AE' })[c] }, iB);   // the lit menu board at night
+    NK.text(g, 'L', 26.6, -6.5, 4.3, 0.85, 'BURGERS', '#3E6B4F', { center: true, w: 0.35, nc: true });
+    g.glow('neon', -6.5, 26.8, 4.7, { r: 3, col: '#FFE6B0' }); g.glow('lamp', -6.5, 28.4, 3.3, { r: 1.2 });
   }, { name: 'kiosk' });
   // a statue on a plinth
   T.obj([-29.5, 11.5], (g) => { K.box(g, -30.5, 10.5, -28.5, 12.5, 0, 2.6, K.STONE, { w: 0.6 }); const p = g.p(-29.5, 11.5, 2.6); g.fill2([[p[0] - 1, p[1]], [p[0] + 1, p[1]], [p[0] + 0.7, p[1] - 6], [p[0] - 0.7, p[1] - 6]], '#5C7F72', true); g.disc2([p[0], p[1] - 6.9], 0.9, '#5C7F72'); });

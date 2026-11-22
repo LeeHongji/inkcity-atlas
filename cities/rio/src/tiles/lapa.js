@@ -68,6 +68,10 @@ SF.tile('lapa', 0, 0, { rim: 26 }, function (T) {
       K.box(g, xa, AY0 - 0.3, xb, AY1 + 0.3, PZ - 1.0, PZ, WHITE, { w: 0.8 });
       g.fine([[xa, AY1 + 0.25, PZ + 0.7], [xb, AY1 + 0.25, PZ + 0.7]], { w: 0.4, c: '#8C8576' });
       g.line([[xa, -22, PZ], [xb, -22, PZ]], { w: 0.35, c: '#5A564E', boil: false }); g.line([[xa, -21.2, PZ], [xb, -21.2, PZ]], { w: 0.35, c: '#5A564E', boil: false });
+      // at night the arches are floodlit white from projectors at the piers' feet (RioLuz's permanent lighting, 2026), the
+      // soffits glowing deeper in the openings
+      RJ.flood(g, 0, 1.2, '#FFE9C4', (c, d) => (d.k === K_FILL && c === '#D9D4C8' ? '#D9B98A' : undefined));
+      for (const px of ps) g.glow2('lantern', g.p(px + 0.2, AY1 + 0.9, 0.6), g.p(px, AY1 + 2.5, 0), { r: 1.7, col: '#FFEBC8' });
     }, { name: 'arcos', under: PZ });
   }
   // the tram station at the far end of the arches
@@ -75,7 +79,8 @@ SF.tile('lapa', 0, 0, { rim: 26 }, function (T) {
     K.box(g, AX1 + 1.4, -27, 37, -17, 0, PZ, { t: '#E9E4D6', l: '#F3E3B8', r: '#E2CFA2' }, { w: 0.9 });
     for (let z = 1; z < PZ - 2; z += 4) K.win(g, 'L', -17, AX1 + 2.4, 36, z, z + 2.4, { style: 'navy', arch: true });
     K.box(g, AX1 + 1, -27.4, 37.4, -16.6, PZ, PZ + 0.6, '#C9704F', { w: 0.6 });
-    K.sign(g, 'L', -17, AX1 + 2, 36.6, PZ - 1.8, PZ - 0.5, '#2F5A3A', 'BONDE');
+    RJ.litSign(g, 'L', -17, AX1 + 2, 36.6, PZ - 1.8, PZ - 0.5, '#2F5A3A', 'BONDE');
+    RJ.flood(g, 0, 0.6, '#F5D29A'); for (const a of [AX1 + 2.6, 35.8]) RJ.wallLamp(g, 'L', -17, a, 4.6, 1.1);
   }, { name: 'estação' });
 
   /* ---------------- the Selarón Steps ---------------- */
@@ -97,6 +102,9 @@ SF.tile('lapa', 0, 0, { rim: 26 }, function (T) {
     for (let k = 0; k < 120; k++) { const t = R(), y = lerp(SY0, SY1, t), ztop = lerp(1.6, PZ + 1.6, t), z = R() * (ztop - 0.6), q = [[SX1 + 0.02, y - 0.35, z], [SX1 + 0.02, y + 0.35, z], [SX1 + 0.02, y + 0.35, z + 0.55], [SX1 + 0.02, y - 0.35, z + 0.55]]; g.fill(q, R.pick(TILE)); }
     g.outline(wall, { w: 0.7, boil: false });
     g.line([[SX0, SY1, PZ + 1.6], [SX0, SY0, 1.6]], { w: 0.5, boil: false });
+    // at night lamps on the side wall light the flight, the tiles keeping their colours
+    RJ.lit(g, 0, 0.5);
+    for (const t of [0.12, 0.42, 0.72]) { const y = lerp(SY0, SY1, t), z = lerp(1.6, PZ + 1.6, t); g.glow('lamp', SX1 + 0.5, y, z + 0.6, { r: 1.2, base: lerp(0, PZ, t) }); }
   }, { name: 'escadaria selarón' });
   // tourists posing and sitting on the steps
   const STEP = (t) => [lerp(SX0 + 1, SX1 - 1, 0.5), lerp(SY0, SY1, t), lerp(0, PZ, t) + 0.05];
@@ -121,8 +129,8 @@ SF.tile('lapa', 0, 0, { rim: 26 }, function (T) {
     g.boilP = 0.25; const h = 8.4 + (i % 3) * 0.8;
     K.box(g, x0, y0, x1, y1, 0, h, c, { w: 0.85 });
     const face = y1 > 36 ? 'L' : 'R', p = face === 'L' ? y1 : x1, a0 = face === 'L' ? x0 : y0, a1 = face === 'L' ? x1 : y1;
-    RJ.colonial(g, face, p, a0 + 0.3, a1 - 0.3, 0, h - 0.2, c, 4450 + i);
-    K.sign(g, face, p + 0.05, a0 + 1.2, a1 - 1.2, 3.6, 4.6, shade(c, 0.45), word);
+    RJ.colonial(g, face, p, a0 + 0.3, a1 - 0.3, 0, h - 0.2, c, 4450 + i, { bar: true, lamps: true });   // (night: Lapa's bars open)
+    RJ.litSign(g, face, p + 0.05, a0 + 1.2, a1 - 1.2, 3.6, 4.6, shade(c, 0.45), word);
     K.hip(g, x0 - 0.5, y0 - 0.5, x1 + 0.5, y1 + 0.5, h, 2.0, '#C9704F');
   }, { name: 'sobrado' }));
   // people at the bar doors on the pavement outside
@@ -134,7 +142,7 @@ SF.tile('lapa', 0, 0, { rim: 26 }, function (T) {
   T.obj([22, -12], (g) => K.tree(g, 22, -12, { r: 5.2, h: 5.4, col: '#5E8F4E' }), { name: 'árvore' });
   // the roda de samba: musicians round a table, a cavaquinho, a pandeiro, a surdo
   T.cast([6, 12], (g) => {
-    const f = g.p(6, 12, 0); g.fill2(arcPts(f[0], f[1] - 4, 6, 0, TAU, 14).map((q) => [q[0], f[1] - 4 + (q[1] - f[1] + 4) * 0.5]), '#F3F1EA', true); g.segs2([f[0] - 3, f[1], f[0] - 3, f[1] - 4, f[0] + 3, f[1], f[0] + 3, f[1] - 4], '#8C8576', 0.5);
+    const f = g.p(6, 12, 0); g.glow2('lantern', [f[0], f[1] - 6.2], f, { r: 1.6, col: '#FFCF7C' }); /* (night: a lamp on the musicians' table) */ g.fill2(arcPts(f[0], f[1] - 4, 6, 0, TAU, 14).map((q) => [q[0], f[1] - 4 + (q[1] - f[1] + 4) * 0.5]), '#F3F1EA', true); g.segs2([f[0] - 3, f[1], f[0] - 3, f[1] - 4, f[0] + 3, f[1], f[0] + 3, f[1] - 4], '#8C8576', 0.5);
     for (let k = 0; k < 4; k++) g.fill2([[f[0] - 3 + k * 1.8, f[1] - 4.6], [f[0] - 2.4 + k * 1.8, f[1] - 4.6], [f[0] - 2.5 + k * 1.8, f[1] - 6.4], [f[0] - 2.9 + k * 1.8, f[1] - 6.4]], '#F2C230', true);
     const M = [[3.4, 9.6, 2, 'pandeiro'], [8.6, 9.8, 2, 'cav'], [3.2, 14.4, 1, 'surdo'], [8.8, 14.2, 0, 'cav'], [6, 15.6, 1, 'voz']];
     for (const [x, y, d, ins] of M) { const r = RJ.person(g, x, y, 1.3, Object.assign(RJ.who(4470 + x * 3), { dir: d, pose: 'sit', hands: ins === 'cav' ? [[2.6, -10.6], [-1.2, -10.2]] : ins === 'pandeiro' ? [[1.6, -14], [2.2, -11]] : undefined, drum: ins === 'surdo' ? 'caixa' : undefined }));
@@ -159,6 +167,7 @@ SF.tile('lapa', 0, 0, { rim: 26 }, function (T) {
   // caipirinha carts with fruit, revellers in costume walking through
   for (const [x, y, a] of [[16, -6, '#3A9A5B'], [-4, 24, '#F2C230']]) T.obj([x, y], (g) => {
     K.stall(g, x, y, { face: 'L', L: 2.2, D: 1.4, a, b: '#F6F3EA', goods: (g2, D, L) => { for (let i = 0; i < 6; i++) { const p = g2.p(-D + 0.5 + (i % 3) * 0.9, -L + 0.6 + Math.floor(i / 3) * 1.6, 2.9); g2.disc2(p, 0.7, ['#9CCB4A', '#F2C230', '#E04A3A'][i % 3]); } } });
+    RJ.bulb(g, x, y, 5.9, { r: 1.3 }); RJ.lit(g, 0, 0.45);                  // (night: a bulb under the awning)
   }, { name: 'barraca' });
   T.cast([17.6, -3.6], (g) => RJ.person(g, 17.6, -3.6, 0, Object.assign(RJ.who(4510), { dir: 1, pose: 'hold', cup: '#C9E39A' })), {});
   RJ.walker(T, RJ.who(4511, { set: { asas: '#BFE3EE', dress: '#F3D3E6', fem: true } }), [[-10, -16], [26, -16], [26, 24], [-10, 24]], 1.0, { phase: 0.1 });

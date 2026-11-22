@@ -31,7 +31,7 @@ SF.tile('grand', -100, 100, { rim: 24 }, function (T) {
     const stripes = (x0, y0, x1, y1, z0, z1, step) => {
       const s = [];
       for (const [f, pl, A0, A1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) for (let a = A0 + step / 2; a < A1 - 0.2; a += step) { const p0 = g.p.apply(g, K.pt(f, pl + 0.02, a, z0 + 0.6)), p1 = g.p.apply(g, K.pt(f, pl + 0.02, a, z1 - 0.4)); s.push(p0[0], p0[1], p1[0], p1[1]); }
-      g.segs2(s, '#5E6672', 0.55);
+      g.segs2(s, '#5E6672', 0.55); g.cmds[g.cmds.length - 1].nc = '#B8935A';        // at night: lit office windows
       const b = []; for (const [f, pl, A0, A1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) for (let z = z0 + 2.2; z < z1 - 0.5; z += 3.1) { const p0 = g.p.apply(g, K.pt(f, pl + 0.03, A0, z)), p1 = g.p.apply(g, K.pt(f, pl + 0.03, A1, z)); b.push(p0[0], p0[1], p1[0], p1[1]); }
       g.segs2(b, '#B9B6AE', 0.3);
     };
@@ -42,7 +42,7 @@ SF.tile('grand', -100, 100, { rim: 24 }, function (T) {
     K.box(g, -27, -27, -18, -18, 24, 40, W, { w: 0.9 }); stripes(-27, -27, -18, -18, 24, 40, 1.3);
     // the crown: six tiers of sunburst arches, each smaller and set back, drawn top first so every lower (nearer)
     // tier covers the foot of the one above and leaves its crescent showing, triangular windows round each crescent
-    const STEEL = '#DCE1E5', WIN = '#46505C', NT = 6, H0 = 40.2, TH = 1.5;
+    const STEEL = '#DCE1E5', WIN = '#46505C', NT = 6, H0 = 40.2, TH = 1.5, iCrown = g.cmds.length;
     for (let k = NT - 1; k >= 0; k--) {
       const w = 4.5 - k * 0.62, z = H0 + k * TH, zt = z + 0.5, R = w * 1.05;
       K.box(g, cx - w, cy - w, cx + w, cy + w, z, zt, { t: STEEL, l: STEEL, r: '#C3CBD1' }, { w: 0.5, boil: false, faces: 'lr' });
@@ -64,6 +64,10 @@ SF.tile('grand', -100, 100, { rim: 24 }, function (T) {
     const sp0 = g.p(cx, cy, 46.8), sp1 = g.p(cx, cy, 58.5);
     g.fill2([[sp0[0] - 1.6, sp0[1]], [sp0[0] + 1.6, sp0[1]], [sp1[0], sp1[1]]], '#DCE1E5'); g.fill2([[sp0[0], sp0[1]], [sp0[0] + 1.6, sp0[1]], [sp1[0], sp1[1]]], '#B7C0C7');
     g.line2([[sp0[0] - 1.6, sp0[1]], sp1, [sp0[0] + 1.6, sp0[1]]], { w: 0.5, c: '#6E7A86', boil: false });
+    // at night the crown's triangular windows are lit white (tubes framing each one) and floodlights silver the steel
+    const CRN = { [WIN]: '#FBFCFF', [STEEL]: '#E4EAF4', '#C3CBD1': '#B9C4D6', '#C6CED4': '#C2CCDC', '#B7C0C7': '#BCC8DA', '#B9C0C6': '#D6DEEA' };
+    g.mark({ nc: (c) => CRN[c] }, iCrown);
+    for (const [z, r] of [[41.5, 3.6], [44.5, 3.0], [47.5, 2.2], [51, 1.4]]) g.glow('lantern', cx, cy, z, { r, col: '#EEF4FF' });
   }, { name: 'chrysler' });
 
   /* ---------------- behind the terminal: the office slab, shops on 5th ---------------- */
@@ -82,17 +86,20 @@ SF.tile('grand', -100, 100, { rim: 24 }, function (T) {
   /* ---------------- Grand Central Terminal ---------------- */
   // the concourse block behind the front, under its low copper roof
   T.obj([-12, Y0, X1, Y1], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     K.box(g, -12, Y0, X1 - 0.5, Y1, 0, 12.5, LIME, { w: 0.9 });
     K.box(g, -12.4, Y0 - 0.4, X1 - 0.1, Y1 + 0.4, 11.5, 12.5, { t: '#E9E1CC', l: '#DCD2BA', r: '#C9BEA3' }, { w: 0.6, boil: false });
+    const iH = g.cmds.length;                                                         // the roof is not floodlit
     K.hip(g, -11, Y0 + 0.6, X1 - 2.5, Y1 - 0.6, 12.5, 4.6, '#9DB3A3', { ridge: 12, c: '#5E7A6A' });
+    const iH1 = g.cmds.length;
     // the north side (towards us on the left): three big arched windows over a granite base, end bays
     g.fill(K.on('L', Y1 + 0.02, -12, X1 - 0.5, 0, 2), GRAN.l);
-    for (let i = 0; i < 3; i++) { const a0 = -6 + i * 6.4; K.win(g, 'L', Y1 + 0.03, a0, a0 + 4.4, 3, 10.4, { style: 'glass', arch: true, w: 0.5 }); const m = []; for (let k = 1; k < 4; k++) { const p0 = g.p(a0 + k * 1.1, Y1 + 0.05, 3), p1 = g.p(a0 + k * 1.1, Y1 + 0.05, 9.4); m.push(p0[0], p0[1], p1[0], p1[1]); } for (let z = 4.6; z < 9.5; z += 1.6) { const p0 = g.p(a0, Y1 + 0.05, z), p1 = g.p(a0 + 4.4, Y1 + 0.05, z); m.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(m, '#8C9AA4', 0.3); }
+    NK.floodMark(g, i0, 0.5, '#FFD08A', iH); NK.floodMark(g, iH1, 0.5, '#FFD08A');      // the walls floodlit at night
+    for (let i = 0; i < 3; i++) { const a0 = -6 + i * 6.4; g.lit({ nc: '#FFD98A' }, () => K.win(g, 'L', Y1 + 0.03, a0, a0 + 4.4, 3, 10.4, { style: 'glass', arch: true, w: 0.5 })); const m = []; for (let k = 1; k < 4; k++) { const p0 = g.p(a0 + k * 1.1, Y1 + 0.05, 3), p1 = g.p(a0 + k * 1.1, Y1 + 0.05, 9.4); m.push(p0[0], p0[1], p1[0], p1[1]); } for (let z = 4.6; z < 9.5; z += 1.6) { const p0 = g.p(a0, Y1 + 0.05, z), p1 = g.p(a0 + 4.4, Y1 + 0.05, z); m.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(m, '#8C9AA4', 0.3); }
   }, { name: 'concourse' });
   // the 42nd Street front, turned to face us (plane x = X1)
   T.obj([X1 - 0.6, Y0, X1 + 1.2, Y1], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     const P = (a, z, d) => [X1 + (d || 0), a, z];
     K.box(g, X1 - 0.6, Y0, X1, Y1, 0, 12.5, LIME, { w: 0.9 });
     g.fill(K.on('R', X1 + 0.01, Y0, Y1, 0, 2.2), GRAN.r);
@@ -102,7 +109,7 @@ SF.tile('grand', -100, 100, { rim: 24 }, function (T) {
     const c0 = Y0 + 7, c1 = Y1 - 7, bw = (c1 - c0) / 3;
     for (let i = 0; i < 3; i++) {
       const a0 = c0 + i * bw + 0.95, a1 = c0 + (i + 1) * bw - 0.95;
-      K.win(g, 'R', X1 + 0.02, a0, a1, 3.0, 11.0, { style: 'glass', arch: true, w: 0.55, col: '#C8DAE4' });
+      g.lit({ nc: '#FFD98A' }, () => K.win(g, 'R', X1 + 0.02, a0, a1, 3.0, 11.0, { style: 'glass', arch: true, w: 0.55, col: '#C8DAE4' }));   // the concourse's light
       const m = []; for (let k = 1; k < 4; k++) { const a = a0 + (a1 - a0) * k / 4, p0 = g.p.apply(g, P(a, 3, 0.04)), p1 = g.p.apply(g, P(a, 10.2, 0.04)); m.push(p0[0], p0[1], p1[0], p1[1]); } for (let z = 4.4; z < 10; z += 1.5) { const p0 = g.p.apply(g, P(a0, z, 0.04)), p1 = g.p.apply(g, P(a1, z, 0.04)); m.push(p0[0], p0[1], p1[0], p1[1]); } g.segs2(m, '#8C9AA4', 0.32);
       g.fill([P(a0, 0, 0.04), P(a1, 0, 0.04), P(a1, 2.6, 0.04), P(a0, 2.6, 0.04)], '#4A3A2E');      // the doors under each arch
     }
@@ -118,10 +125,15 @@ SF.tile('grand', -100, 100, { rim: 24 }, function (T) {
     g.segs2(grp, '#A8987A', 0.45);
     fig([[-3.6, 18.2], [-1.0, 19.6], [-0.8, 18.6], [-3.4, 17.6]], '#D9CDB0'); fig([[3.6, 18.2], [1.0, 19.6], [0.8, 18.6], [3.4, 17.6]], '#D9CDB0');   // Mercury's spread arms
     fig([[-1.6, 20.2], [1.6, 20.2], [2.6, 21.2], [0.4, 20.9], [0, 21.6], [-0.4, 20.9], [-2.6, 21.2]], '#B9AE92');                              // the eagle
-    g.disc2(cc, 5.6, '#E9E1C8'); g.disc2(cc, 4.4, '#F6F1E2'); g.ring2(cc, 4.4, { w: 0.6, c: '#B08A3A' }); g.ring2(cc, 5.6, { w: 0.5, c: '#8C7E62' });
+    NK.floodMark(g, i0, 0.78, '#FFD9A0');                                             // the front floodlit at night
+    g.disc2(cc, 5.6, '#E9E1C8'); g.mark({ nc: '#F6E2B0' }); g.disc2(cc, 4.4, '#F6F1E2'); g.mark({ nc: '#FFF6DC' }); g.ring2(cc, 4.4, { w: 0.6, c: '#B08A3A' }); g.ring2(cc, 5.6, { w: 0.5, c: '#8C7E62' });
     const hd = []; for (let k = 0; k < 12; k++) { const a = TAU * k / 12; hd.push(cc[0] + Math.cos(a) * 3.6, cc[1] + Math.sin(a) * 3.6, cc[0] + Math.cos(a) * 4.1, cc[1] + Math.sin(a) * 4.1); } g.segs2(hd, '#8C7E62', 0.3);
     g.segs2([cc[0], cc[1], cc[0] + 0.6, cc[1] - 2.8, cc[0], cc[1], cc[0] + 2.0, cc[1] + 0.6], '#2A2622', 0.45);
     NK.text(g, 'R', X1 + 0.62, mid, 12.45, 0.9, 'GRAND CENTRAL TERMINAL', '#6E5A44', { center: true, w: 0.3 });
+    // the floodlights at the foot of the front and the clock's own light
+    g.glow2('lantern', cc, cc, { r: 1.8, col: '#FFE6B0' });
+    for (const a of [c0 - 0.5, mid, c1 + 0.5]) g.glow('lantern', X1 + 1.2, a, 1.2, { r: 2.4, col: '#FFD08A' });
+    for (let i = 0; i < 3; i++) g.glow('lamp', X1 + 1.0, c0 + (i + 0.5) * bw, 2.9, { r: 1.2 });   // the lanterns over the doors
   }, { name: 'gct front' });
 
   /* ---------------- the north side: two walk-ups, a pizza place ---------------- */

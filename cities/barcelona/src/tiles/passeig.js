@@ -39,13 +39,14 @@ SF.tile('passeig', 0, 0, { rim: 24 }, function (T) {
     const F = BC.house(g, { poly, z: Z, seed: 21, col: '#F1E6CF', bay: 2.8, flags: 0.3, curvy: true, tribune: [2, 2, 6], tribColor: '#F4ECDA', roofItems: false });
     // the rotunda on the corner: a round tower of bay windows, a little dome
     K.cyl(g, -31.5, 31.5, 2.8, 4.6, Z + 1, { t: '#F4ECDA', l: '#F1E6CF', r: '#DCCDB0' }, { w: 0.8, n: 16 });
-    for (let z = 6; z < Z; z += 3.3) for (let i = 0; i < 3; i++) { const a = Math.PI * (0.2 + i * 0.22), c = [-31.5 + Math.cos(a) * 2.85, 31.5 + Math.sin(a) * 2.85]; g.fill([[c[0] - 0.5, c[1] + 0.5, z], [c[0] + 0.5, c[1] - 0.5, z], [c[0] + 0.5, c[1] - 0.5, z + 2.1], [c[0] - 0.5, c[1] + 0.5, z + 2.1]], BP.pane); }
+    for (let z = 6; z < Z; z += 3.3) for (let i = 0; i < 3; i++) { const a = Math.PI * (0.2 + i * 0.22), c = [-31.5 + Math.cos(a) * 2.85, 31.5 + Math.sin(a) * 2.85]; g.fill([[c[0] - 0.5, c[1] + 0.5, z], [c[0] + 0.5, c[1] - 0.5, z], [c[0] + 0.5, c[1] - 0.5, z + 2.1], [c[0] - 0.5, c[1] + 0.5, z + 2.1]], BP.pane); g.mark({ win: 0.8 }); }
     K.cyl(g, -31.5, 31.5, 3.1, Z + 1, Z + 1.6, '#F4ECDA', { w: 0.6, n: 16 });
     const cols = []; for (let i = 0; i < 5; i++) { const a = Math.PI * (0.05 + i * 0.22), b = g.p(-31.5 + Math.cos(a) * 2.4, 31.5 + Math.sin(a) * 2.4, Z + 1.6), t2 = g.p(-31.5 + Math.cos(a) * 2.4, 31.5 + Math.sin(a) * 2.4, Z + 4.2); cols.push(b[0], b[1], t2[0], t2[1]); } g.segs2(cols, '#F4ECDA', 0.9);
     K.dome(g, -31.5, 31.5, 2.8, Z + 4.2, 3.0, '#E2D7BE', { w: 0.7, shadow: '#C9BB9C', ribs: 8, ribCol: '#B8A988', ribW: 0.3 });
     const t = g.p(-31.5, 31.5, Z + 7.2); g.disc2([t[0], t[1] - 1], 0.8, '#D8AE48');
     // carved flowers over the windows: little rosettes
     for (const f of F) if (f.vis && f.L > 3) for (let a = 1.4; a < f.L - 1; a += 2.8) { const c = g.p.apply(g, f.P(a, 15.6, 0.05)); g.disc2(c, 0.7, '#E2C9A0'); g.disc2(c, 0.3, '#C9A06A'); }
+    BC.flood(g, 0, 0.5); g.glow('lantern', -31.5, 31.5, Z + 5, { r: 1.6, col: '#FFE2B0' });   // at night: the modernista front in a soft floodlight
   }, { name: 'lleo morera' });
 
   /* ---- Casa Amatller: sgraffito and the stepped gable ---- */
@@ -62,6 +63,9 @@ SF.tile('passeig', 0, 0, { rim: 24 }, function (T) {
     for (let r = 0; r < 4; r++) { const z0 = Z + 1.6 + r * 1.5; g.fill(f.q(1.6 + r * 1.3, f.L - 1.6 - r * 1.3, z0, z0 + 0.5, 0.03), r % 2 ? '#C9584B' : '#D8AE48'); }
     g.line(st.map(([a, z]) => f.P(f.L - a, z, 0)), { w: 0.7, boil: false });
     const c = g.p.apply(g, f.P(f.L / 2, Z + 8.4, 0)); g.disc2(c, 0.6, '#D8AE48');
+    // at night: the front floodlit, the stepped gable's red and gold tiles catching the light
+    BC.nightCol(g, 0, (cc, fill) => (fill && (cc === '#C9584B' || cc === '#D8AE48') ? mix(cc, '#FFE2A8', 0.1) : undefined)); BC.flood(g, 0, 0.62);
+    { const t = f.P(f.L / 2, Z + 4, 0.4); g.glow('lantern', t[0], t[1], t[2], { r: 2.4, col: '#FFDDA6' }); }
   }, { name: 'amatller' });
 
   /* ---- Casa Batlló ---- */
@@ -82,13 +86,13 @@ SF.tile('passeig', 0, 0, { rim: 24 }, function (T) {
     for (let i = 0; i + 1 < cols.length; i++) {
       const a0 = cols[i] + 0.35, a1 = cols[i + 1] - 0.35, m = (a0 + a1) / 2, w = (a1 - a0) / 2, op = [];
       for (let k = 0; k <= 12; k++) { const t = TAU * k / 12; op.push(f.P(m + Math.cos(t) * w, 6.2 + Math.sin(t) * 2.4 * (Math.sin(t) > 0 ? 1.15 : 0.9), 0.04)); }
-      g.fill(op, '#4E5A62'); g.line(op, { w: 0.35, c: '#7A7466', boil: false, close: true });
-      g.fill(f.q(a0 + 0.2, a1 - 0.2, 0.2, 3.4, 0.04), i === 2 ? '#5A4632' : '#C9DCE2');
+      g.fill(op, '#4E5A62'); g.mark({ nc: '#FFC874', win: 1 }); g.line(op, { w: 0.35, c: '#7A7466', boil: false, close: true });
+      g.fill(f.q(a0 + 0.2, a1 - 0.2, 0.2, 3.4, 0.04), i === 2 ? '#5A4632' : '#C9DCE2'); if (i !== 2) g.mark({ nc: '#FFD98A', win: 1, spill: true });
     }
     for (const a of cols) { const b0 = g.p.apply(g, f.P(a, 0, 0.1)), b1 = g.p.apply(g, f.P(a, 4.2, 0.1)), b2 = g.p.apply(g, f.P(a, 9.2, 0.1)); g.line2(K.curve([b0, [b1[0] + 0.5, b1[1]], [b1[0] - 0.4, b1[1] - 3], b2], 3, false), { w: 1.6, c: '#EFE9DC', boil: false, ext: 0 }); g.disc2([b1[0] + 0.2, b1[1] - 1.5], 0.9, '#EFE9DC'); g.line2([b0, b2], { w: 0.25, c: '#A39A88', boil: false }); }
     // windows of the upper floors with the skull-mask balconies
     for (let z = 10.6; z < Z - 2; z += 3.0) for (let i = 0; i < 4; i++) {
-      const m = 1.9 + i * 3.4, op = f.q(m - 0.8, m + 0.8, z, z + 2.3, 0.04); g.fill(op, '#4E5A62');
+      const m = 1.9 + i * 3.4, op = f.q(m - 0.8, m + 0.8, z, z + 2.3, 0.04); g.fill(op, '#4E5A62'); g.mark({ nc: BC.winCol(Math.round(z * 7 + i)), win: 1 });
       const mk = []; for (let k = 0; k <= 10; k++) { const t = Math.PI * k / 10; mk.push(g.p.apply(g, f.P(m + Math.cos(t) * 1.2, z + 0.25 + Math.sin(t) * 1.1, 0.6))); }
       mk.push(g.p.apply(g, f.P(m - 1.2, z - 0.2, 0.6)), g.p.apply(g, f.P(m + 1.2, z - 0.2, 0.6)));
       g.fill2(mk, '#F1ECE0', true); g.outline2(mk, { w: 0.3, c: '#8C8576', boil: false });
@@ -108,6 +112,11 @@ SF.tile('passeig', 0, 0, { rim: 24 }, function (T) {
     const tb = g.p(tp[0], tp[1], Z + 7.6); g.disc2(tb, 1.4, '#D8C7A0'); g.ring2(tb, 1.4, { w: 0.35, c: '#7A6A4A' });
     g.segs2([tb[0], tb[1] - 1.4, tb[0], tb[1] - 5.2, tb[0] - 1.8, tb[1] - 3.6, tb[0] + 1.8, tb[1] - 3.6], '#D8AE48', 0.9);
     g.disc2([tb[0], tb[1] - 5.4], 0.5, '#D8AE48');
+    // at night (lit every evening): the stone and the bone columns floodlit warm, the trencadís wall and the dragon's
+    // scales keep their glass colours and glitter, the windows lit from inside behind the skull masks
+    const KEEP = new Set(['#bfd3d6', '#7fb0c4', '#9ac7b4', '#d9a6c4', '#e9d27a', '#6f98b8', '#f3f1ea', '#a7c79a', '#d98aa4', '#7fb09c', '#6fa894', '#7fa7c4', '#b79ac0', '#d9a6b4', '#f3efe4']);
+    BC.nightCol(g, 0, (cc, fill) => (fill && cc === '#BFD3D6' ? '#7FBFC6' : fill && KEEP.has(cc.toLowerCase()) ? BC.mixA(cc, '#FFF2D8', 0.08) : fill ? BC.floodCol(cc, 0.9, '#FFE6C4') : cc === '#EFE9DC' ? '#FFF1DA' : undefined), { lines: true });
+    for (const [a, z, r] of [[f.L * 0.5, 5, 3.6], [f.L * 0.3, 13, 2.4], [f.L * 0.72, 13, 2.4], [f.L * 0.5, 20, 2.0]]) { const p = f.P(a, z, 0.8); g.glow('lantern', p[0], p[1], p[2], { r, col: '#FFE7C2' }); }
   }, { name: 'batllo' });
 
   /* ---- an ordinary house, then La Pedrera on the near chamfer ---- */
@@ -127,7 +136,7 @@ SF.tile('passeig', 0, 0, { rim: 24 }, function (T) {
           const a0 = f.L * i / n + 0.55, a1 = f.L * (i + 1) / n - 0.55, op = [];
           for (let j = 0; j <= 6; j++) { const a = lerp(a0, a1, j / 6); op.push(f.P(a, zb + 0.5 + wav(a, k) * 0.4, 0.03)); }
           for (let j = 6; j >= 0; j--) { const a = lerp(a0, a1, j / 6); op.push(f.P(a, zb + 2.6 + wav(a, k + 1) * 0.3 - Math.pow((j / 6 - 0.5) * 2, 2) * 0.35, 0.03)); }
-          g.fill(op, '#525C62');
+          g.fill(op, '#525C62'); g.mark({ win: k === 0 ? 0.9 : 0.62 });
           if (k > 0) { const ir = []; for (let j = 0; j < 9; j++) { const a = lerp(a0 + 0.1, a1 - 0.1, j / 8), c = g.p.apply(g, f.P(a, zb + 0.55 + wav(a, k) * 0.4 + R() * 0.9, 0.5)); ir.push(c); } g.line2(ir, { w: 0.55, c: '#2E3230', boil: false, wob: 1.6 }); for (let j = 0; j < 3; j++) { const c = ir[1 + j * 3]; g.segs2([c[0], c[1], c[0] + (R() - 0.5) * 2, c[1] - 1.6, c[0], c[1], c[0] + (R() - 0.5) * 2.4, c[1] + 1.2], '#2E3230', 0.35); } }
         }
         const band = []; for (let j = 0; j <= 20; j++) { const a = f.L * j / 20; band.push(f.P(a, zb + 0.35 + wav(a, k) * 0.4, 0.06)); }
@@ -148,6 +157,9 @@ SF.tile('passeig', 0, 0, { rim: 24 }, function (T) {
       g.fill2([[t[0] - hw * 0.5, t[1] - h * 0.6], [t[0] + hw * 0.5, t[1] - h * 0.6], [t[0] + hw * 0.5, t[1] - h * 0.4], [t[0] - hw * 0.5, t[1] - h * 0.4]], '#5A5F62', true);   // the warrior's eye slit
       g.line2([[t[0] - hw, t[1]], [t[0] - hw * 0.4, t[1] - h * 1.1], [t[0], t[1] - h * 1.3], [t[0] + hw * 0.4, t[1] - h * 1.1], [t[0] + hw, t[1]]], { w: 0.45, c: '#6E6450', boil: false });
     }
+    // at night La Pedrera is floodlit warm from the street; the warriors on the roof lit for the night visits
+    BC.flood(g, 0, 0.78, '#FFE0B4');
+    for (const [x, y, z, r] of [[37, 22, 9, 3.2], [32, 32, 9, 3.4], [24, 37, 9, 3.0], [27, 27, 24, 2.2]]) g.glow('lantern', x, y, z, { r, col: '#FFE2B8' });
   }, { name: 'pedrera' });
 
   /* ---- the pavements: trees, bench-lamps, the chamfer furniture ---- */

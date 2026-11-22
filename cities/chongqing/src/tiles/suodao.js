@@ -30,12 +30,14 @@ SF.tile('suodao', -100, 100, { rim: 52 }, function (T) {
     CQ.terrace(g, -30, -22, 22, 14, 0, ZT, { top: '#D7D0C0' });
     CQ.rail(g, 'L', 13.6, 6, 21.5, ZT, { h: 1.4 }); CQ.rail(g, 'R', 21.6, -21, 13.5, ZT, { h: 1.4 });
     CQ.rail(g, 'L', 13.6, -29.5, -16, ZT, { h: 1.4 });
+    CQ.railLamps(g, [21.6, -20, ZT + 1.5], [21.6, 13, ZT + 1.5], 8, { base: ZT }); CQ.railLamps(g, [7, 13.6, ZT + 1.5], [21, 13.6, ZT + 1.5], 7, { base: ZT, ends: false });   // lamps on the cliff railing (night)
   }, { name: 'cliff' });
   T.obj([-15, 0, 5, 14], (g) => {
     const z = ZT; g.boilP = 0.25;
     K.box(g, -15, 0, 5, 14, z, z + 9, { t: '#D9D6CE', l: '#E6E1D5', r: '#CFC9BC' }, { w: 0.9 });
     // the opening the cables leave through, dark inside, the bull wheels just visible
-    g.fill(K.on('L', 14.02, -10, 1, z + 3.4, z + 7.6), '#3A3F44');
+    g.fill(K.on('L', 14.02, -10, 1, z + 3.4, z + 7.6), '#3A3F44'); g.mark({ nc: '#C9A46E' });   // the hall lit inside at night
+    g.glow('lantern', -4.5, 14.3, z + 5.5, { r: 3.0, col: '#FFD9A0' });
     for (const x of TRK) { const c = g.p(x, 13.5, z + 5.6); g.ring2(c, 2.2, { w: 0.6, c: '#8C8576' }); }
     K.box(g, -15.6, -0.6, 5.6, 14.6, z + 9, z + 9.8, '#B9B3A6', { w: 0.7 });
     CQH.sign(g, 'L', 14.65, -13, 3, z + 9.9, z + 12.2, '#C23B2F', '长江索道');
@@ -58,6 +60,7 @@ SF.tile('suodao', -100, 100, { rim: 52 }, function (T) {
     g.fill(K.rect(-16, 14.2, -12, 23.5, 8), '#D9D2C2'); K.box(g, -16, 17, -12, 20, 0, 8, { t: '#D9D2C2', l: CQC.wall, r: CQC.wallD }, { w: 0.6 });
     const n = 14; for (let i = 0; i < n; i++) { const xa = -12 + 15 * i / n, xb = -12 + 15 * (i + 1) / n, z = 8 + 8 * (i + 1) / n; g.fill(K.rect(xa, 14.2, xb, 17, z), i % 2 ? '#DAD3C3' : '#D0C8B6'); g.fill(K.on('L', 17, xa, xb, z - 8 / n, z), '#C2BAA8'); }
     CQ.rail(g, 'L', 23.4, -15, 3, 0, { h: 1.1 });
+    g.glow('lamp', 2.6, 23.4, 1.3, { r: 0.9, base: 0 }); g.glow('lamp', -12.2, 17.1, 9.3, { r: 0.9, base: 8 });   // lamps at the foot and the landing (night)
   }, { name: 'zigzag' });
 
   /* ---- people ---- */

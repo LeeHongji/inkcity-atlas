@@ -23,7 +23,7 @@ SF.tile('opera', 100, 0, { rim: 48 }, function (T) {
   /* ---------------- Palais Garnier ---------------- */
   // the stage house (far) with Apollo on its gable
   T.obj([-6, -28, 18, -14], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     K.box(g, -6, -28, 18, -14, 0, 17, STN, { w: 0.9 });
     for (let a = -4; a < 17; a += 3) PA.win(g, 'L', -14, a, a + 1.2, 8, 12, { pane: '#5E6B76' });
     K.gable(g, -6.3, -28.3, 18.3, -13.7, 17, 6.5, 'y', { a: COP, b: COPD, e: '#EFE6D0' }, { c: '#3E6B58' });
@@ -31,26 +31,30 @@ SF.tile('opera', 100, 0, { rim: 48 }, function (T) {
     const ap = g.p(6, -13.7, 23.5); g.fill2([[ap[0] - 1.2, ap[1]], [ap[0] + 1.2, ap[1]], [ap[0] + 0.8, ap[1] - 6.2], [ap[0] - 0.8, ap[1] - 6.2]], GOLD, true); g.disc2([ap[0], ap[1] - 7.0], 0.9, GOLD);
     g.line2([[ap[0], ap[1] - 6.6], [ap[0] + 1.4, ap[1] - 11.4]], { w: 0.6, c: GOLD, boil: false }); g.fill2([[ap[0] + 0.4, ap[1] - 12.8], [ap[0] + 2.6, ap[1] - 12.2], [ap[0] + 2.0, ap[1] - 10.0], [ap[0] + 0.8, ap[1] - 10.4]], '#E6C25A', true);
     for (const x of [-5.5, 17.5]) { const c = g.p(x, -13.7, 17.2); g.fill2([[c[0] - 2.4, c[1]], [c[0] + 2.0, c[1] - 0.4], [c[0] + 2.8, c[1] - 3.0], [c[0] + 1.0, c[1] - 3.4], [c[0] - 1.8, c[1] - 2.6]], '#4E8A70', true); }
+    // at night the stage house is lit softly, Apollo and his lyre shine gold on the gable
+    PA.flood(g, i0, 0.4); g.glow2('lantern', [ap[0], ap[1] - 7], g.p(6, -13.7, 0), { r: 2.4, col: '#FFC864' });
   }, { name: 'stage house' });
   // the auditorium drum and its green dome with the gilded crown
   T.obj([-4, -14, 16, 4], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     K.box(g, -4, -14, 16, 4, 0, 13.5, STN, { w: 0.85 });
     K.cyl(g, 6, -5, 7.6, 13.5, 15.2, STN, { w: 0.75, n: 20 });
     const ms = []; for (let k = 0; k < 10; k++) { const a = -Math.PI * 0.2 + Math.PI * 0.95 * k / 9; ms.push(g.p(6 + Math.cos(a) * 7.65, -5 + Math.sin(a) * 7.65, 14.4)); } for (const p of ms) g.disc2(p, 0.6, GOLD);
     K.dome(g, 6, -5, 7.2, 15.2, 3.8, COP, { w: 0.85, ribs: 16, ribCol: '#3E6B58', ribW: 0.45, shadow: COPD, band: true });
     const cr = g.p(6, -5, 19.0); g.fill2([[cr[0] - 2.2, cr[1]], [cr[0] + 2.2, cr[1]], [cr[0] + 1.6, cr[1] - 2.2], [cr[0] - 1.6, cr[1] - 2.2]], GOLD, true); for (let k = 0; k < 5; k++) g.disc2([cr[0] - 2 + k, cr[1] - 2.6], 0.45, GOLD); g.disc2([cr[0], cr[1] - 3.6], 0.6, GOLD);
+    // the drum lit, the copper dome catching the light, its gilded crown shining
+    PA.flood(g, i0, 0.5); g.glow2('lantern', [cr[0], cr[1] - 2], g.p(6, -5, 0), { r: 1.8, col: '#FFC864' });
   }, { name: 'auditorium' });
   // the front block: arcade, loggia, attic, the corner pavilions with the gilded groups
   T.obj([OX0, 4, OX1, OY1], function (g) {
     g.boilP = 0.3;
-    const p = OY1, Z = 13.5;
+    const p = OY1, Z = 13.5, i0 = g.cmds.length;
     K.box(g, OX0, 4, OX1, OY1, 0, Z, STN, { w: 1.0 });
     // ground floor: seven arches
     for (let i = 0; i < 7; i++) { const m = OX0 + 4.6 + i * (OX1 - OX0 - 9.2) / 6, hw = 1.05, ar = [K.pt('L', p + 0.03, m - hw, 0.8), K.pt('L', p + 0.03, m + hw, 0.8)]; for (let k = 0; k <= 6; k++) { const t = Math.PI * k / 6; ar.push(K.pt('L', p + 0.03, m + Math.cos(t) * hw, 3.6 + Math.sin(t) * hw)); } g.fill(ar, '#4A4238'); g.line(ar.slice(2), { w: 0.45, boil: false }); }
     g.fill(K.on('L', p + 0.03, OX0, OX1, 5.0, 5.5), '#E2D6B8');
     // the loggia: paired columns with dark bays and gilded busts between
-    for (let i = 0; i < 7; i++) { const m = OX0 + 4.6 + i * (OX1 - OX0 - 9.2) / 6; g.fill(K.on('L', p + 0.04, m - 1.0, m + 1.0, 5.8, 10.4), '#5A5246'); const w2 = g.P([K.pt('L', p + 0.05, m - 0.6, 6.6), K.pt('L', p + 0.05, m + 0.6, 9.6)]); g.fill2([[w2[0][0], w2[0][1]], [w2[1][0], w2[0][1] - 0.6], [w2[1][0], w2[1][1]], [w2[0][0], w2[1][1] + 0.6]], '#8C9AA6', true); }
+    for (let i = 0; i < 7; i++) { const m = OX0 + 4.6 + i * (OX1 - OX0 - 9.2) / 6; g.fill(K.on('L', p + 0.04, m - 1.0, m + 1.0, 5.8, 10.4), '#5A5246'); const w2 = g.P([K.pt('L', p + 0.05, m - 0.6, 6.6), K.pt('L', p + 0.05, m + 0.6, 9.6)]); g.fill2([[w2[0][0], w2[0][1]], [w2[1][0], w2[0][1] - 0.6], [w2[1][0], w2[1][1]], [w2[0][0], w2[1][1] + 0.6]], '#8C9AA6', true); g.mark({ nc: i % 2 ? '#FFD98A' : '#FFE4A4', win: 1 }); }
     const cols = []; for (let i = 0; i <= 7; i++) { const m = OX0 + 3.5 + i * (OX1 - OX0 - 7) / 7; for (const d of [-0.35, 0.35]) { const a = g.p(m + d, p + 0.2, 5.6), b = g.p(m + d, p + 0.2, 10.8); cols.push(a[0], a[1], b[0], b[1]); } } g.segs2(cols, '#F4EEDF', 1.3);
     for (let i = 0; i < 6; i++) { const m = OX0 + 4.6 + (i + 0.5) * (OX1 - OX0 - 9.2) / 6, c = g.p(m, p + 0.1, 11.6); g.disc2(c, 0.9, GOLD); }
     // attic with lettering and masks
@@ -69,10 +73,17 @@ SF.tile('opera', 100, 0, { rim: 48 }, function (T) {
       g.fill2([[c[0] - 1.0, c[1] - 7.6], [c[0] - 6.4, c[1] - 11.6], [c[0] - 5.4, c[1] - 8.2]], '#E6C25A', true); g.fill2([[c[0] + 1.0, c[1] - 7.6], [c[0] + 6.4, c[1] - 11.6], [c[0] + 5.4, c[1] - 8.2]], '#C9A040', true);
       for (const d of [-2.6, 2.6]) { g.fill2([[c[0] + d - 0.9, c[1] - 0.4], [c[0] + d + 0.9, c[1] - 0.4], [c[0] + d + 0.6, c[1] - 4.6], [c[0] + d - 0.6, c[1] - 4.6]], GOLD, true); g.disc2([c[0] + d, c[1] - 5.2], 0.7, GOLD); }
       g.line2([[c[0] - 3.8, c[1]], [c[0] - 3.0, c[1] - 3.2], [c[0] + 3.0, c[1] - 3.2], [c[0] + 3.8, c[1]]], { w: 0.4, c: '#7A5A1E', boil: false });
+      g.glow2('lantern', [c[0], c[1] - 7], g.p((x0 + x1) / 2, OY1, 0), { r: 2.2, col: '#FFC864' });
     }
+    // at night the Palais Garnier is floodlit warm: the stone glows, the gilded groups and busts shine, the arcade's
+    // doors are lit, and the lettering of the attic catches the light
+    PA.flood(g, i0, 0.85, '#FFDCA0');
+    PA.nightCol(g, i0, (c, fill) => (fill && c === '#4A4238' ? '#B07A40' : !fill && c === '#A9832C' ? '#FFD06A' : undefined), { lines: true });
+    for (const x of [OX0 + 6, (OX0 + OX1) / 2, OX1 - 6]) g.glow('lantern', x, OY1 + 0.3, 7.5, { r: 3.2, col: '#FFD9A0' });
+    g.glow('lantern', (OX0 + OX1) / 2, OY1 + 0.3, 12.6, { r: 2.4, col: '#FFE0A8' });
   }, { name: 'opera front' });
   // the candelabra lamps with their bronze figures flanking the steps
-  for (const x of [OX0 - 2.5, OX1 + 2.5]) T.obj([x, 15.5], (g) => { const f = g.p(x, 15.5, 0); g.fill2([[f[0] - 1.6, f[1]], [f[0] + 1.6, f[1]], [f[0] + 1.2, f[1] - 6], [f[0] - 1.2, f[1] - 6]], '#4E5A52', true); g.fill2([[f[0] - 0.5, f[1] - 6], [f[0] + 0.5, f[1] - 6], [f[0] + 0.35, f[1] - 30], [f[0] - 0.35, f[1] - 30]], '#4E5A52', true); for (const d of [-4, 0, 4]) { g.segs2([f[0], f[1] - 27, f[0] + d, f[1] - 29], '#4E5A52', 0.5); g.disc2([f[0] + d, f[1] - 30.5], 1.5, '#F2E3A6'); g.ring2([f[0] + d, f[1] - 30.5], 1.5, { c: '#7A6A3A', w: 0.35 }); } g.disc2([f[0], f[1] - 34], 1.6, '#F2E3A6'); }, { name: 'candelabra' });
+  for (const x of [OX0 - 2.5, OX1 + 2.5]) T.obj([x, 15.5], (g) => { const f = g.p(x, 15.5, 0); g.fill2([[f[0] - 1.6, f[1]], [f[0] + 1.6, f[1]], [f[0] + 1.2, f[1] - 6], [f[0] - 1.2, f[1] - 6]], '#4E5A52', true); g.fill2([[f[0] - 0.5, f[1] - 6], [f[0] + 0.5, f[1] - 6], [f[0] + 0.35, f[1] - 30], [f[0] - 0.35, f[1] - 30]], '#4E5A52', true); for (const d of [-4, 0, 4]) { g.segs2([f[0], f[1] - 27, f[0] + d, f[1] - 29], '#4E5A52', 0.5); g.disc2([f[0] + d, f[1] - 30.5], 1.5, '#F2E3A6'); g.ring2([f[0] + d, f[1] - 30.5], 1.5, { c: '#7A6A3A', w: 0.35 }); } g.disc2([f[0], f[1] - 34], 1.6, '#F2E3A6'); g.glow2('lamp', [f[0], f[1] - 31.5], f, { r: 2.4 }); }, { name: 'candelabra' });   // its globes lit at night
 
   /* ---------------- the Grand Hôtel and the Café de la Paix ---------------- */
   const CAFE = { x0: -36, y0: -6, x1: -21, y1: 16 };
@@ -87,7 +98,7 @@ SF.tile('opera', 100, 0, { rim: 48 }, function (T) {
   /* ---------------- Galeries Lafayette and the right-hand block ---------------- */
   T.obj([24, -36, 36, -10], function (g) {
     const top = PA.haus(g, { x0: 24, y0: -36, x1: 36, y1: -10, et: 5, seed: 803, shopsL: [[25, 35, '#1E2A3A', 'glass']], shopsR: [[-35, -12, '#1E2A3A', 'glass']], mans: { dormers: 0, h: 1.6, h2: 0 } });
-    K.dome(g, 30, -23, 3.6, top, 3.6, 'rgba(190,214,222,0.9)', { w: 0.7, ribs: 10, ribCol: '#5E7A86', ribW: 0.4 });
+    { const i0 = g.cmds.length; K.dome(g, 30, -23, 3.6, top, 3.6, 'rgba(190,214,222,0.9)', { w: 0.7, ribs: 10, ribCol: '#5E7A86', ribW: 0.4 }); PA.nightCol(g, i0, (c, fill) => (fill ? PA.floodCol(c, 0.8, '#FFD69A') : undefined)); g.glow('lantern', 30, -23, top + 1.6, { r: 2.4, col: '#FFDCA0' }); }   // lit inside at night
     for (const [x, y] of [[25, -10.5], [35, -10.5], [35.6, -23]]) { const b = g.p(x, y, top - 0.6), t = g.p(x, y, top + 5); g.line2([b, t], { w: 0.4, c: '#3A3530', boil: false }); g.fill2([[t[0], t[1]], [t[0] + 3.4, t[1] + 0.8], [t[0] + 3.4, t[1] + 3.0], [t[0], t[1] + 2.2]], ['#2F4A8F', '#C9463E', '#E6C24F'][Math.round(x + y) % 3 < 0 ? 0 : Math.round(x + y) % 3], true); }
     PA.sign(g, 'L', -10, 26, 34, 18.4, 19.8, '#1E2A3A', { seed: 61, word: 'GALERIES LAFAYETTE', ink: '#E6C24F' });
   }, { name: 'galeries lafayette' });

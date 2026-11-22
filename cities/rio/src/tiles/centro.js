@@ -55,6 +55,11 @@ SF.tile('centro', 0, -100, { rim: 10 }, function (T) {
     g.fill2([[e[0] - 6, e[1] - 2.4], [e[0] - 1, e[1] - 0.6], [e[0], e[1] - 3.6], [e[0] + 1, e[1] - 0.6], [e[0] + 6, e[1] - 2.4], [e[0] + 1.4, e[1] + 1.6], [e[0] - 1.4, e[1] + 1.6]], GOLD, true);
     g.line2([[e[0] - 6, e[1] - 2.4], [e[0] - 1, e[1] - 0.6], [e[0], e[1] - 3.6], [e[0] + 1, e[1] - 0.6], [e[0] + 6, e[1] - 2.4]], { w: 0.45, c: '#8A6A1E', boil: false });
     K.text(g, 'L', TY1 + 0.08, (TX0 + TX1) / 2, 10.5, 0.75, 'THEATRO MUNICIPAL', '#8A6A1E', { center: true, w: 0.45 });
+    // at night the theatre is floodlit gold: the stone warm, the gilding and the eagle shining, the copper domes lit green
+    RJ.flood(g, 0, 1.0, '#F5C47A', (c, d) => (d.k === K_FILL || d.k === K_DISC) && (c === GOLD || c === '#E2D2A8') ? (c === GOLD ? '#FFD36A' : '#F2D9A0') : (d.k === K_FILL && (c === COPPER || c === shade(COPPER, 0.15) || c === shade(COPPER, 0.16))) ? mix(RJ.litCol(c, 0.6), '#9FE0C4', 0.12) : (d.k !== K_FILL && c === '#8A6A1E') ? '#F0C060' : undefined);
+    for (let x = TX0 + 5; x < TX1 - 3; x += 5.2) g.glow2('lantern', g.p(x, TY1 + 0.6, 4.6), g.p(x, TY1 + 3, 0), { r: 2.0, col: '#FFCF7C' });
+    for (const [x, y, z, r] of [[DC[0], DC[1], TH_ + 10.4, 2.0], [DC[0], DC[1], TH_ + 6, 3.6], [TX0 + 2.4, TY1 - 2.4, TH_ + 4, 2.2], [TX1 - 2.4, TY1 - 2.4, TH_ + 4, 2.2], [TX1 - 2.4, TY0 + 2.4, TH_ + 4, 2.2]]) g.glow('lantern', x, y, z, { r, col: '#FFD27A', base: TH_ });
+    for (let y = TY0 + 4; y < TY1 - 2; y += 6) g.glow2('lantern', g.p(TX1 + 0.6, y, 4.6), g.p(TX1 + 3, y, 0), { r: 1.8, col: '#FFCF7C' });
   }, { name: 'theatro municipal' });
   // the steps in front of the theatre and people on them
   T.obj([TX0 + 3, TY1, TX1 - 3, TY1 + 2.4], (g) => { for (let k = 0; k < 3; k++) K.box(g, TX0 + 3, TY1, TX1 - 3, TY1 + 2.4 - k * 0.8, 0, 0.35 + k * 0.35, '#E9E2CF', { w: 0.5, nb: true }); }, { name: 'escadaria' });
@@ -65,10 +70,11 @@ SF.tile('centro', 0, -100, { rim: 10 }, function (T) {
   ROW.forEach(([x0, y0, x1, y1, h, c], i) => T.obj([x0, y0, x1, y1], (g) => {
     g.boilP = 0.25; K.box(g, x0, y0, x1, y1, 0, h, c, { w: 0.9 });
     for (let z = 4.2; z < h - 1.5; z += 2.6) for (let x = x0 + 1; x < x1 - 1; x += 2.2) K.win(g, 'L', y1, x, x + 1.2, z, z + 1.7, { style: 'navy' });
-    g.fill(K.on('L', y1 + 0.03, x0 + 0.5, x1 - 0.5, 0.2, 3.4), i === 0 ? '#F2C230' : '#9FB9C4');
+    g.fill(K.on('L', y1 + 0.03, x0 + 0.5, x1 - 0.5, 0.2, 3.4), i === 0 ? '#F2C230' : '#9FB9C4'); g.mark({ win: 1, nc: i === 0 ? '#FFD86A' : '#FFE4A4', spill: true });   // (night: the bar and the shops lit)
     K.box(g, x0 - 0.3, y0 - 0.3, x1 + 0.3, y1 + 0.3, h, h + 0.6, shade(c, 0.1), { w: 0.6 });
-    if (i === 0) K.sign(g, 'L', y1 + 0.05, x0 + 1, x1 - 1, 3.5, 4.5, '#F2C230', 'AMARELINHO');
-    if (i === 1) K.sign(g, 'L', y1 + 0.05, x0 + 1.5, x1 - 1.5, 3.5, 4.4, '#2F3A4F', 'CINE ODEON');
+    if (i === 0) RJ.litSign(g, 'L', y1 + 0.05, x0 + 1, x1 - 1, 3.5, 4.5, '#F2C230', 'AMARELINHO');
+    if (i === 1) RJ.litSign(g, 'L', y1 + 0.05, x0 + 1.5, x1 - 1.5, 3.5, 4.4, '#2F3A4F', 'CINE ODEON');
+    for (const a of [x0 + 1.2, (x0 + x1) / 2, x1 - 1.2]) RJ.wallLamp(g, 'L', y1, a, 4.9, 1.0);
   }, { name: 'prédio' }));
   for (const [x, y] of [[-5, -21.5], [0.5, -20], [-2.5, -17.5]]) T.cast([x, y], (g) => {
     const f = g.p(x, y, 0); RJ.table2(g, f, '#F2C230', '#F2C230');
@@ -84,11 +90,12 @@ SF.tile('centro', 0, -100, { rim: 10 }, function (T) {
     g.segs2([a[0], a[1], a2[0], a2[1], b[0], b[1], b2[0], b2[1], a2[0], a2[1], b2[0], b2[1]], '#6E6A60', 0.5);
     const R = RNG(1620);
     for (let k = 0; k < 7; k++) { const t = (k + 0.5) / 7, p = [lerp(a2[0], b2[0], t), lerp(a2[1], b2[1], t) + 1]; const kind = k % 3; if (kind === 0) RJ.fan2(g, [p[0], p[1] + 2], 4, -Math.PI * 0.9, -Math.PI * 0.1, 5, [R.pick(['#E86A9A', '#F2C230', '#5FC0B0', '#D9463B'])]); else if (kind === 1) { g.fill2([[p[0] - 1.6, p[1]], [p[0] + 1.6, p[1]], [p[0] + 1.2, p[1] + 6], [p[0] - 1.2, p[1] + 6]], R.pick(['#9B7FC9', '#F2C230', '#E86A9A']), true); } else { g.fill2([[p[0] - 2, p[1] + 1], [p[0], p[1] + 4], [p[0] + 2, p[1] + 1], [p[0], p[1] + 2]], '#BFE3EE', true); } }
-    K.sign(g, 'L', 4.1, -23.4, -20.6, 6.2, 7.2, '#E86A9A', 'FANTASIAS');
+    RJ.litSign(g, 'L', 4.1, -23.4, -20.6, 6.2, 7.2, '#E86A9A', 'FANTASIAS');
+    RJ.bulb(g, -22, 4, 6.0, { r: 1.1 });
   }, { name: 'fantasias' });
   T.cast([-19, 7], (g) => { RJ.person(g, -19, 7, 0, Object.assign(RJ.who(1621, { carnaval: false }), { dir: 1, pose: 'hold', sunhat: true })); RJ.person(g, -22, 8.6, 0, Object.assign(RJ.who(1622, { set: { fem: true, hairStyle: 'long' } }), { dir: 2, pose: 'hold', asas: '#F3D3E6' })); }, {});
   for (const [x, y] of [[-30, -4], [-30, 10]]) T.cast([x, y], (g) => { K.bench(g, x, y, { face: 'R', L: 2.4 }); RJ.person(g, x + 1.1, y - 0.8, 1.3, Object.assign(RJ.who(1630 + y, { carnaval: false }), { dir: 0, pose: 'sit', hair: '#C9C6BD' })); RJ.person(g, x + 1.1, y + 1.0, 1.3, Object.assign(RJ.who(1631 + y), { dir: 0, pose: 'sit', cup: '#F2C230' })); }, {});
-  T.obj([-16, 16], (g) => K.stall(g, -16, 16, { face: 'L', L: 2.0, D: 1.3, a: '#D9463B', b: '#F6F3EA', goods: (g2, D, L) => { for (let i = 0; i < 4; i++) { const p = g2.p(-D + 0.6 + (i % 2) * 1.2, -L + 0.8 + Math.floor(i / 2) * 2, 2.9); g2.fill2([[p[0] - 1, p[1] - 0.4], [p[0] + 1, p[1] - 0.4], [p[0] + 1, p[1] + 0.4], [p[0] - 1, p[1] + 0.4]], '#E2B07A', true); } } }), { name: 'cachorro-quente' });
+  T.obj([-16, 16], (g) => { K.stall(g, -16, 16, { face: 'L', L: 2.0, D: 1.3, a: '#D9463B', b: '#F6F3EA', goods: (g2, D, L) => { for (let i = 0; i < 4; i++) { const p = g2.p(-D + 0.6 + (i % 2) * 1.2, -L + 0.8 + Math.floor(i / 2) * 2, 2.9); g2.fill2([[p[0] - 1, p[1] - 0.4], [p[0] + 1, p[1] - 0.4], [p[0] + 1, p[1] + 0.4], [p[0] - 1, p[1] + 0.4]], '#E2B07A', true); } } }); RJ.bulb(g, -16, 16, 5.9, { r: 1.3 }); }, { name: 'cachorro-quente' });
   T.cast([-14, 19.2], (g) => RJ.person(g, -14, 19.2, 0, Object.assign(RJ.who(1640), { dir: 2, pose: 'hold', cup: '#D9463B' })), {});
   /* ---------------- more street life round the square ---------------- */
   RJ.banca(T, -20, -5.5, 1650);
@@ -98,7 +105,7 @@ SF.tile('centro', 0, -100, { rim: 10 }, function (T) {
   RJ.parked(T, -36, 33.5, 6, 'x', 1680); RJ.parked(T, 26, 32.5, 4, 'x', 1686);
   RJ.busker(T, 6, 32, 1690);
   for (const [x, y, a, word] of [[32.5, -3, '#E86A9A', 'AÇAÍ'], [32.5, 4.5, '#F2C230', 'PIPOCA']]) {
-    T.obj([x, y], (g) => K.stall(g, x, y, { L: 2.2, D: 1.4, a, b: '#F6F3EA', goods: (g2, D, L) => { for (let i = 0; i < 4; i++) { const p = g2.p(-D + 0.6 + (i % 2) * 1.4, -L + 0.7 + Math.floor(i / 2) * 2.2, 2.9); g2.disc2(p, 0.8, a); } } }), { name: 'carrinho' });
+    T.obj([x, y], (g) => { K.stall(g, x, y, { L: 2.2, D: 1.4, a, b: '#F6F3EA', goods: (g2, D, L) => { for (let i = 0; i < 4; i++) { const p = g2.p(-D + 0.6 + (i % 2) * 1.4, -L + 0.7 + Math.floor(i / 2) * 2.2, 2.9); g2.disc2(p, 0.8, a); } } }); RJ.bulb(g, x, y, 5.9, { r: 1.3 }); }, { name: 'carrinho' });
     T.cast([x - 3.2, y + 0.8], (g) => { RJ.person(g, x - 3.2, y + 0.8, 0, Object.assign(RJ.who(1700 + y * 3), { dir: 0, pose: 'hold', cup: a })); RJ.person(g, x - 4.8, y + 2.0, 0, Object.assign(RJ.who(1701 + y * 3), { dir: 0, pose: 'stand' })); }, {});
   }
   // a living statue painted silver, kids chasing pigeons, a dog
@@ -165,7 +172,7 @@ SF.tile('centro', 0, -100, { rim: 10 }, function (T) {
   T.actor({ sample: 0.25, period: 26, grow: false,
     at(t) { const u = (t / 26) % 1, x = lerp(-60, 60, u), a = clamp(Math.min((x + 44) / 8, (44 - x) / 8), 0, 1); if (a <= 0.02) return null; return { x: x + 7.5, y: 27.4, key: 'v', alpha: a < 1 ? a : null }; },
     draw(g) { g.at(-7.5, -1.4, 0, (g2) => RJ.vlt(g2, 0)); } });
-  T.obj([-24, 29.4, -18, 31], (g) => { K.box(g, -24, 29.4, -18, 31, 0, 0.3, '#D9D3C6', { w: 0.4 }); for (const x of [-23.6, -18.4]) { const a = g.p(x, 30.6, 0.3), b = g.p(x, 30.6, 4.6); g.segs2([a[0], a[1], b[0], b[1]], '#6E6A60', 0.5); } g.fill([[-24.4, 29, 4.6], [-17.6, 29, 4.6], [-17.6, 31.4, 4.6], [-24.4, 31.4, 4.6]], 'rgba(200,226,236,0.7)'); g.outline([[-24.4, 29, 4.6], [-17.6, 29, 4.6], [-17.6, 31.4, 4.6], [-24.4, 31.4, 4.6]], { w: 0.5, boil: false }); }, { name: 'parada vlt' });
+  T.obj([-24, 29.4, -18, 31], (g) => { K.box(g, -24, 29.4, -18, 31, 0, 0.3, '#D9D3C6', { w: 0.4 }); for (const x of [-23.6, -18.4]) { const a = g.p(x, 30.6, 0.3), b = g.p(x, 30.6, 4.6); g.segs2([a[0], a[1], b[0], b[1]], '#6E6A60', 0.5); } g.fill([[-24.4, 29, 4.6], [-17.6, 29, 4.6], [-17.6, 31.4, 4.6], [-24.4, 31.4, 4.6]], 'rgba(200,226,236,0.7)'); g.outline([[-24.4, 29, 4.6], [-17.6, 29, 4.6], [-17.6, 31.4, 4.6], [-24.4, 31.4, 4.6]], { w: 0.5, boil: false }); for (const x of [-22.6, -19.4]) g.glow('lamp', x, 30.2, 4.3, { r: 1.2 }); }, { name: 'parada vlt' });
   for (const [x, s] of [[-22.5, 1590], [-20, 1591]]) T.cast([x, 30.4], (g) => RJ.person(g, x, 30.4, 0.3, Object.assign(RJ.who(s, { carnaval: false }), { dir: 3, pose: 'hold', phone: s % 2 === 0 })), {});
   RJ.walker(T, RJ.who(1592), [[-36, 33], [36, 33]], 1.2, { phase: 0.2 });
   RJ.walker(T, RJ.who(1593, { set: { marin: true } }), [[36, 21], [-36, 21]], 1.0, { phase: 0.7 });
@@ -191,6 +198,11 @@ SF.tile('centro', 0, -100, { rim: 10 }, function (T) {
     g.line(spine, { w: 0.9, boil: false });
     g.line([[-28, -69.4, z0 + 4.4], [31, -69.4, z0 + 4.4]], { w: 0.7, boil: false });
     for (const x of [27, 31]) { const a = g.p(x, -69.6, z0), b = g.p(x, -69.6, z0 + 4.6); g.segs2([a[0], a[1], b[0], b[1]], '#9A9890', 0.5); }
+    // at night the museum glows on its pier: its glass lit from inside, the white spine and fins washed in cool light
+    RJ.nightEach(g, 0, (c, d) => (d.k === K_FILL ? (c === '#AFC9D3' ? '#E2F0FF' : RJ.floodCol(c, 0.55, '#B8D2F2')) : undefined));
+    for (let x = -20; x <= 20; x += 8) g.glow2('lantern', g.p(x, -69.6, z0 + 1.9), g.p(x, -67.5, z0), { r: 1.8, col: '#CFE6FF' });
+    for (const x of [-20, 0, 20]) g.glow('lantern', x, -74.5, z0 + 8, { r: 1.3, col: '#BFDDFF', base: z0 });
+    g.glow2('lantern', g.p(30, -69.4, z0 + 4.6), g.p(30, -66, z0), { r: 2.4, col: '#DCEBFF' });
   }, { name: 'museu do amanhã' });
   for (const [x, y, s, d] of [[-14, -66, 1600, 0], [-4, -65.6, 1601, 1], [10, -66.2, 1602, 3], [20, -65.4, 1603, 0]]) T.cast([x, y], (g) => RJ.person(g, x, y, 0.4, Object.assign(RJ.who(s), { dir: d, pose: s % 2 ? 'hold' : 'stand', phone: s % 2 === 1 })), {});
   RJ.walker(T, RJ.who(1605), [[-30, -66.8], [30, -66.8]], 0.9, { phase: 0.4, z: 0.4 });

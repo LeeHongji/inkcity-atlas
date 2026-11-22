@@ -24,17 +24,20 @@
     });
     T.obj([-28, -26, -16, 26], function (g) {
       g.boilP = 0.25;
-      const ST = { t: '#F2EBDA', l: '#EFE2CC', r: '#D9C9AC' };
+      const ST = { t: '#F2EBDA', l: '#EFE2CC', r: '#D9C9AC' }, i0 = g.cmds.length;
       K.box(g, -28, -26, -16, 26, 0, 7.6, ST, { w: 0.9 });
       K.box(g, -24, -10, -14, 10, 0, 8.4, ST, { w: 0.9 });
-      for (let a = -25; a < 25; a += 1.8) { const fx = a > -10 && a < 10 ? -14 : -16; PA.win(g, 'R', fx, a, a + 0.8, 1.0, 3.6, { pane: '#5E6B76' }); PA.win(g, 'R', fx, a, a + 0.8, 4.6, 6.6, { pane: '#5E6B76' }); }
-      for (let a = -24; a < -16.4; a += 1.8) PA.win(g, 'L', 26, a, a + 0.8, 1.0, 3.6, { pane: '#5E6B76' });
+      for (let a = -25; a < 25; a += 1.8) { const fx = a > -10 && a < 10 ? -14 : -16; PA.win(g, 'R', fx, a, a + 0.8, 1.0, 3.6, { pane: '#5E6B76', lit: 0.2 }); PA.win(g, 'R', fx, a, a + 0.8, 4.6, 6.6, { pane: '#5E6B76', lit: 0.2 }); }
+      for (let a = -24; a < -16.4; a += 1.8) PA.win(g, 'L', 26, a, a + 0.8, 1.0, 3.6, { pane: '#5E6B76', lit: 0.2 });
       const bal = []; for (let a = -26; a <= 26; a += 0.5) { const fx = a > -10 && a < 10 ? -14 : -16, zz = a > -10 && a < 10 ? 8.4 : 7.6, p = g.p(fx, a, zz), q = g.p(fx, a, zz + 0.9); bal.push(p[0], p[1], q[0], q[1]); } g.segs2(bal, '#CDBF9E', 0.4);
       for (let a = -24; a < 25; a += 4) { const fx = a > -10 && a < 10 ? -14 : -16, zz = a > -10 && a < 10 ? 9.3 : 8.5, c = g.p(fx, a, zz); g.fill2([[c[0] - 0.6, c[1]], [c[0] + 0.6, c[1]], [c[0], c[1] - 2.2]], PC.gold, true); }
       // a flat roof behind the balustrade, its trophies and urns in gilt, a glimpse of slate behind
       g.fill(K.rect(-27.6, -25.6, -16.4, 25.6, 8.5), '#D9CDB2'); g.fill(K.rect(-23.6, -9.6, -14.4, 9.6, 9.3), '#D9CDB2');
       K.hip(g, -27, -25, -20, 25, 8.5, 2.2, '#6C7580', { ridge: 44, c: '#3E444B' });
       for (let a = -23; a < 24; a += 6) { const c = g.p(-16, a, 8.6); g.fill2([[c[0] - 0.8, c[1]], [c[0] + 0.8, c[1]], [c[0] + 0.5, c[1] - 2.8], [c[0] - 0.5, c[1] - 2.8]], '#E6D9B8', true); g.disc2([c[0], c[1] - 3.2], 0.7, PC.gold); }
+      // the garden front floodlit in the evening, its gilt shining
+      PA.flood(g, i0, 0.66);
+      for (const y of [-18, 0, 18]) g.glow('lantern', y ? -16 : -14, y, 4, { r: 3, col: '#FFDDA6' });
     }, { name: 'palace' });
     // Latona's fountain on the terrace, rowing boats on the canal, strollers
     T.actor({ sample: 5, period: 10, grow: false,
@@ -55,11 +58,14 @@
       const gr = []; for (let y = -8; y < 30; y += 3) { const a = g.p(-10, y, 0), b = g.p(10, y, 0); gr.push(a[0], a[1], b[0], b[1]); } g.segs2(gr, '#D9D3C4', 0.3);
     });
     // the glass towers behind
-    for (const [x0, y0, x1, y1, h, col] of [[-26, -28, -16, -18, 30, '#B9CCD6'], [14, -28, 24, -20, 24, '#A9BCC8'], [-24, -8, -16, 4, 18, '#C3D3DA']]) T.obj([x0, y0, x1, y1], (g) => { K.box(g, x0, y0, x1, y1, 0, h, { t: '#DCE3E6', l: col, r: shade(col, 0.12) }, { w: 0.85 }); const gr = []; for (let z = 2; z < h; z += 2) for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) { const a = g.p.apply(g, K.pt(f, p + 0.02, a0, z)), b = g.p.apply(g, K.pt(f, p + 0.02, a1, z)); gr.push(a[0], a[1], b[0], b[1]); } g.segs2(gr, '#8EA7B6', 0.3); }, { name: 'tower' });
+    for (const [x0, y0, x1, y1, h, col] of [[-26, -28, -16, -18, 30, '#B9CCD6'], [14, -28, 24, -20, 24, '#A9BCC8'], [-24, -8, -16, 4, 18, '#C3D3DA']]) T.obj([x0, y0, x1, y1], (g) => { const i0 = g.cmds.length; K.box(g, x0, y0, x1, y1, 0, h, { t: '#DCE3E6', l: col, r: shade(col, 0.12) }, { w: 0.85 }); const gr = []; for (let z = 2; z < h; z += 2) for (const [f, p, a0, a1] of [['L', y1, x0, x1], ['R', x1, y0, y1]]) { const a = g.p.apply(g, K.pt(f, p + 0.02, a0, z)), b = g.p.apply(g, K.pt(f, p + 0.02, a1, z)); gr.push(a[0], a[1], b[0], b[1]); } g.segs2(gr, '#8EA7B6', 0.3);
+      // at night the office floors are lit: bands of light across the dark glass
+      PA.nightCol(g, i0, (c, fill) => (fill ? (c === '#DCE3E6' ? undefined : PA.mixA(nightColour(c), '#3A5878', 0.3)) : c === '#8EA7B6' ? '#FFE0A0' : undefined), { lines: true });
+      g.glow('lantern', (x0 + x1) / 2, y1, h * 0.5, { r: 2.4, col: '#FFE6B8' }); }, { name: 'tower' });
     // the Grande Arche: a hollow cube facing down the axis (+y)
     T.obj([-12, -16, 12, -6], function (g) {
       g.boilP = 0.3;
-      const x0 = -12, x1 = 12, y0 = -16, y1 = -6, Z = 24, W = 3.2, WH = { t: '#F6F4EE', l: '#F3F1EA', r: '#DCD8CE' };
+      const x0 = -12, x1 = 12, y0 = -16, y1 = -6, Z = 24, W = 3.2, WH = { t: '#F6F4EE', l: '#F3F1EA', r: '#DCD8CE' }, i0 = g.cmds.length;
       K.box(g, x0, y0, x0 + W, y1, 0, Z, WH, { w: 0.9 }); K.box(g, x1 - W, y0, x1, y1, 0, Z, WH, { w: 0.9 });
       K.box(g, x0, y0, x1, y1, Z - W, Z, WH, { w: 0.95 });
       // the inner faces of the frame, in shade, and a grid of panels on the outer face
@@ -69,6 +75,8 @@
       g.line([[x0 + W, y1, 0], [x0 + W, y1, Z - W], [x1 - W, y1, Z - W], [x1 - W, y1, 0]], { w: 0.75, boil: false });
       // the "cloud": a white canopy hung in the opening
       const c = g.p(0, (y0 + y1) / 2, 8.5); g.fill2(K.curve([[c[0] - 16, c[1]], [c[0] - 8, c[1] - 3.4], [c[0] + 6, c[1] - 2.6], [c[0] + 16, c[1] + 0.4], [c[0] + 6, c[1] + 3.0], [c[0] - 8, c[1] + 2.4]], 3, true), 'rgba(246,244,238,0.85)');
+      PA.flood(g, i0, 0.66, '#EEF2FF');                                 // floodlit white at night
+      for (const x of [x0 + W / 2, x1 - W / 2]) g.glow('lantern', x, y1, 6, { r: 2.4, col: '#EEF3FF' });
     }, { name: 'grande arche' });
     // the giant steps in front, people sitting on them
     T.obj([-10, -6, 10, 2], (g) => { for (let i = 0; i < 6; i++) { const y = -6 + i * 1.3, z = 3.2 - i * 0.55; g.fill(K.rect(-10, y, 10, y + 1.3, z), '#ECE8DE'); g.fill([[-10, y + 1.3, z], [10, y + 1.3, z], [10, y + 1.3, z - 0.55], [-10, y + 1.3, z - 0.55]], '#D5D0C4'); g.line([[-10, y + 1.3, z], [10, y + 1.3, z]], { w: 0.35, c: '#A9A296', boil: false }); } }, { name: 'steps' });
@@ -88,7 +96,7 @@
       g.fill([[-1.5, 6, 0.4], [1.5, 6, 0.4], [1.5, 32, 0.4], [-1.5, 32, 0.4]], '#D6CDBA'); g.line([[1.5, 6, 0.4], [1.5, 32, 0.4]], { w: 0.5, boil: false });
     });
     T.obj([-13, -13, 13, 9], function (g) {
-      g.boilP = 0.25;
+      g.boilP = 0.25; const i0 = g.cmds.length;
       // the rock: a mound of granite
       const rk = (h) => { const pts = []; for (let i = 0; i < 24; i++) { const a = TAU * i / 24, r = 12 * (1 - h / 30) * (0.9 + 0.1 * Math.sin(a * 3)); pts.push([Math.cos(a) * r, -2 + Math.sin(a) * r, h]); } return pts; };
       g.fill(rk(0).slice(0, 13).concat(rk(10).slice(0, 13).reverse()), '#A8A08E');
@@ -105,6 +113,10 @@
       K.box(g, 3, -6.5, 5.6, -3.5, 17, 21, { t: '#CFC6B2', l: '#C9BFA9', r: '#AFA48C' }, { w: 0.7 });
       const b = g.p(4.3, -5, 21), t = g.p(4.3, -5, 34); g.fill2([[b[0] - 2.6, b[1]], [b[0] + 2.6, b[1]], [t[0] + 0.3, t[1]], [t[0] - 0.3, t[1]]], '#6C7580'); g.fill2([[b[0] + 0.2, b[1]], [b[0] + 2.6, b[1]], [t[0] + 0.3, t[1]], [t[0], t[1]]], '#5A626C'); g.line2([[b[0] - 2.6, b[1]], t, [b[0] + 2.6, b[1]]], { w: 0.55, c: '#3E444B', boil: false });
       g.fill2([[t[0] - 0.6, t[1]], [t[0] + 0.6, t[1]], [t[0] + 0.4, t[1] - 3.2], [t[0] - 0.4, t[1] - 3.2]], PC.gold, true); g.fill2([[t[0], t[1] - 2.6], [t[0] + 2.0, t[1] - 4.2], [t[0] + 0.4, t[1] - 2.0]], PC.gold, true); g.disc2([t[0], t[1] - 3.6], 0.5, PC.gold);
+      // at night the abbey and the ramparts are floodlit gold over the dark bay, the archangel shining on the spire
+      PA.flood(g, i0, 0.8, '#FFD08A');
+      for (const [x, y, z, r] of [[0, -1, 14, 4.4], [4.3, -5, 26, 2.2], [9, 4, 2, 3], [-6, 9, 2, 3]]) g.glow('lantern', x, y, z, { r, col: '#FFC874' });
+      g.glow2('lantern', [t[0], t[1] - 3], [t[0], t[1] - 3], { r: 1.2, col: '#FFE08A' });
     }, { name: 'mont saint michel' });
     // the shuttle bus on the causeway, walkers on it, gulls
     T.actor({ sample: 0.3, period: 20, grow: false,
@@ -114,5 +126,7 @@
     T.actor({ layer: 'top', sample: 5, period: 10, grow: false,
       at(t) { const f = Math.floor(t * 3) % 4, u = (t * 0.05) % 1; return { x: -14 + Math.cos(u * TAU) * 10, y: -6 + Math.sin(u * TAU) * 8, z: 26, key: f, f }; },
       draw(g, st) { const p = g.p(0, 0, 0), w = [3, 2, 1, 2][st.f]; for (const d of [0, 7]) g.line2([[p[0] + d - 2, p[1] - w * 0.5], [p[0] + d, p[1]], [p[0] + d + 2, p[1] - w * 0.5]], { w: 0.4, c: '#5E574A', boil: false }); } });
+    // this is the last tile built: the night-only actors other places asked for are made here, after every other one
+    PA.runLate(T);
   });
 })();

@@ -38,11 +38,12 @@ SF.tile('chelsea', 100, 0, { rim: 38 }, function (T) {
     NK.windows(g, 'R', 6, -30.6, -12.4, 4.6, fh, nf, 6, { style: 'glass', arch: true, hfill: 0.62, sillCol: '#D9CDB8' });
     // the ground floor: dark brick piers, shop windows, the entrance with its name
     for (let x = -30; x < 5; x += 4.4) K.win(g, 'L', -11.98, x, x + 3.0, 0.3, 3.6, { style: 'glass', arch: true });
-    g.fill(K.on('L', -11.96, -14, -9, 0, 3.8), '#3A3028');
-    NK.sign(g, 'L', -12, -18.5, -4.5, 4.0, 5.0, '#2F2C2A', 'CHELSEA MARKET', { ink: '#E9D9A8' });
+    g.fill(K.on('L', -11.96, -14, -9, 0, 3.8), '#3A3028'); g.mark({ nc: '#FBC76E', spill: true });   // the market hall's light through the door at night
+    NK.sign(g, 'L', -12, -18.5, -4.5, 4.0, 5.0, '#2F2C2A', 'CHELSEA MARKET', { ink: '#E9D9A8', lit: true, halo: 0.12 });
     // the loading-dock canopy on its steel brackets
     K.box(g, -30, -12, -19, -9.8, 4.2, 4.6, '#5C6B66', { w: 0.6, boil: false });
     const br = []; for (let x = -29; x < -19; x += 3) { const a = g.p(x, -9.9, 4.2), b = g.p(x, -12, 3.0); br.push(a[0], a[1], b[0], b[1]); } g.segs2(br, '#3E4A45', 0.4);
+    for (const x of [-27.5, -24.5, -21.5]) g.glow('lamp', x, -10.4, 4.0, { r: 0.9 });   // bulbs under the canopy at night
     NK.cornice(g, -31, -31, 6, -12, H - 0.2, { t: '#C9BCA8', l: '#8C4434', r: '#763A2C' }, { h: 0.7, d: 0.4 });
     NK.tank(g, -24, -25, H + 0.4, { r: 2.0, h: 3.8 }); NK.tank(g, -8, -27, H + 0.4, { r: 1.6, h: 3.0, leg: 1.5 });
     NK.roofStuff(g, -30, -30, 4, -14, H + 0.4, 11);
@@ -53,8 +54,10 @@ SF.tile('chelsea', 100, 0, { rim: 38 }, function (T) {
     K.box(g, -31, -6, -12, 8, 0, 9.4, { t: '#E9E6DE', l: '#F3F1EA', r: '#DCD8CE' }, { w: 0.9 });
     g.fill(K.on('L', 8.02, -30, -13, 0.3, 6.6), '#F4F3EE');
     // a huge canvas and two smaller ones inside the white room
+    const iC = g.cmds.length;
     g.fill(K.on('L', 8.04, -27.5, -22, 1.6, 5.6), '#2F6DB5'); g.fill(K.on('L', 8.05, -26.5, -24, 2.6, 4.4), '#E6C24F');
     g.fill(K.on('L', 8.04, -19.5, -17, 2.2, 4.8), '#C9463E'); g.fill(K.on('L', 8.04, -16, -14, 2.6, 4.2), '#2F2C2A');
+    g.mark({ nc: NK.flood(0.8) }, iC);                                                 // in the lit room at night
     const mu = []; for (let x = -30; x <= -13; x += 4.25) { const a = g.p(x, 8.06, 0.3), b = g.p(x, 8.06, 6.6); mu.push(a[0], a[1], b[0], b[1]); } g.segs2(mu, '#5E5A52', 0.45);
     g.outline(K.on('L', 8.06, -30, -13, 0.3, 6.6), { w: 0.6, boil: false });
     NK.text(g, 'L', 8.06, -21.5, 7.4, 1.0, 'GALLERY', '#2C271C', { center: true, w: 0.4 });
@@ -62,7 +65,7 @@ SF.tile('chelsea', 100, 0, { rim: 38 }, function (T) {
     for (let x = -29; x < -14; x += 5) { K.box(g, x, -3, x + 3, 5, 9.4, 10.2, { t: '#CFE0EA', l: '#B9CCD8', r: '#9DB6C8' }, { w: 0.5, boil: false }); }
     NK.roofStuff(g, -30, -5, -13, 7, 9.4, 21);
   }, { name: 'gallery' });
-  T.obj([10, -31, 19, -20], (g) => { NK.block(g, 10, -31, 19, -20, 8.5, { t: '#D9D2C4', l: '#B9B2A2', r: '#9F9888' }); g.fill(K.on('R', 19.02, -29, -23, 0, 5), '#7A756C'); const sl = []; for (let z = 0.5; z < 5; z += 0.5) { const a = g.p(19.04, -29, z), b = g.p(19.04, -23, z); sl.push(a[0], a[1], b[0], b[1]); } g.segs2(sl, '#5E5A52', 0.3); NK.sign(g, 'L', -20, 11, 18, 5.6, 7.4, '#E6C24F', 'ART'); }, { name: 'garage gallery' });
+  T.obj([10, -31, 19, -20], (g) => { NK.block(g, 10, -31, 19, -20, 8.5, { t: '#D9D2C4', l: '#B9B2A2', r: '#9F9888' }); g.fill(K.on('R', 19.02, -29, -23, 0, 5), '#7A756C'); const sl = []; for (let z = 0.5; z < 5; z += 0.5) { const a = g.p(19.04, -29, z), b = g.p(19.04, -23, z); sl.push(a[0], a[1], b[0], b[1]); } g.segs2(sl, '#5E5A52', 0.3); NK.sign(g, 'L', -20, 11, 18, 5.6, 7.4, '#E6C24F', 'ART', { lit: true, halo: 0.18 }); }, { name: 'garage gallery' });
   T.obj([10, -17, 19, -3], (g) => NK.walkup(g, 10, -17, 19, -3, 4, { face: 'R', col: NYC.brick2, shop: { col: '#3E6B4F', word: 'COFFEE', awning: '#3E6B4F' }, tx: 0.5, ty: 0.3 }), { name: 'walkup coffee' });
   T.obj([10, -1, 19, 9], (g) => NK.walkup(g, 10, -1, 19, 9, 3, { face: 'R', col: NYC.brick, shop: { col: '#2F2C2A', word: 'WINE', awning: '#7A2E3A' }, tank: false }), { name: 'walkup wine' });
 
@@ -88,6 +91,8 @@ SF.tile('chelsea', 100, 0, { rim: 38 }, function (T) {
     for (let i = 0; i < 2; i++) { const x = i ? HX1 - 1.2 : HX0 + 1.3, y = y0 + 3 + i * 5; if (y < y1 - 1) K.tree(g, x, y, { r: 1.7, h: 4.2, z: DZ, col: '#A6CB7E', tw: 0.5 }); }
     // railings on both edges
     for (const x of [HX0 + 0.15, HX1 - 0.15]) { const rl = []; for (let y = y0; y <= y1; y += 1.4) { const a = g.p(x, y, DZ), b = g.p(x, y, DZ + 1.3); rl.push(a[0], a[1], b[0], b[1]); } g.segs2(rl, '#3E4A45', 0.3); g.fine([[x, y0, DZ + 1.3], [x, y1, DZ + 1.3]], { w: 0.4, c: '#3E4A45' }); }
+    // at night low lights under the railings light the walk, alternating sides
+    for (let y = y0 + 2.5, i = k; y < y1 - 0.5; y += 5.5, i++) g.glow('lamp', i % 2 ? HX1 - 0.6 : HX0 + 0.6, y, DZ + 0.9, { r: 0.6, base: DZ });
   }, { name: 'high line', under: DZ }));
   // the stair down at the north end
   T.obj([HX0 + 2, HY1, HX1 - 1, 30.5], function (g) {
@@ -100,7 +105,7 @@ SF.tile('chelsea', 100, 0, { rim: 38 }, function (T) {
   /* ---------------- the Vessel ---------------- */
   const VX = -12, VY = 19, VZ = 15;
   T.obj([VX - 6.5, VY - 6.5, VX + 6.5, VY + 6.5], function (g) {
-    g.boilP = 0.3;
+    g.boilP = 0.3; const i0 = g.cmds.length;
     const rAt = (z) => 3.0 + 3.6 * Math.pow(z / VZ, 0.85), CU = '#C98A5C', CUD = '#A86E48', IN = '#94593A';
     const ring = (z, a0, a1, n) => { const p = []; for (let i = 0; i <= n; i++) { const a = lerp(a0, a1, i / n); p.push(g.p(VX + Math.cos(a) * rAt(z), VY + Math.sin(a) * rAt(z), z)); } return p; };
     // the inside of the bowl (the far half), seen over the near rim
@@ -127,6 +132,10 @@ SF.tile('chelsea', 100, 0, { rim: 38 }, function (T) {
     const R = RNG(77);
     for (let i = 0; i < 9; i++) { const z = VZ * (0.25 + R() * 0.7), a = lerp(A_L + 0.3, A_R - 0.3, R()), p = g.p(VX + Math.cos(a) * (rAt(z) + 0.1), VY + Math.sin(a) * (rAt(z) + 0.1), z); g.fill2([[p[0] - 0.8, p[1]], [p[0] + 0.8, p[1]], [p[0] + 0.6, p[1] - 2.2], [p[0] - 0.6, p[1] - 2.2]], R.pick(['#C9463E', '#F3F1EA', '#2F6DB5', '#E6C24F', '#2F2C2A']), true); g.disc2([p[0], p[1] - 2.9], 0.65, R.pick(SKIN)); }
     void outer;
+    // at night: lights below every landing make the shell glow pale gold and the inside copper
+    g.mark({ nc: (c) => ({ [IN]: '#C98A5C', [CU]: '#DCC8B0', [CUD]: '#B9A28A' })[c] }, i0);
+    NK.nmark(g, i0, { nc: (c) => (c === '#EBC097' ? '#FFE6BC' : c === '#7A4A2E' ? '#C9824E' : undefined) }, true);
+    for (const z of [4, 11]) g.glow('lantern', VX, VY, z, { r: 2.4, col: '#FFC890' });
   }, { name: 'vessel' });
 
   /* ---------------- furniture ---------------- */
@@ -136,7 +145,7 @@ SF.tile('chelsea', 100, 0, { rim: 38 }, function (T) {
   T.obj([-2, 33.4], (g) => NK.basket(g, -2, 33.4));
   T.obj([-4, 13.5], (g) => NK.citibikes(g, -4, 13.5, 'x', 5), { name: 'citibikes' });
   // the food truck parked on the square
-  T.obj([4, 21], (g) => g.at(4, 21, 0, (g2) => { NK.truck(g2, -Math.PI / 2, { col: '#E6C24F', cab: '#E6C24F', stripe: '#C9463E' }); g2.fill(K.on('R', 2.64, -1.2, 3.6, 3.6, 5.6), '#3A3530'); NK.text(g2, 'R', 2.62, -1.2, 6.0, 0.9, 'TACOS', '#C9463E', { center: true, w: 0.4 }); }), { name: 'food truck' });
+  T.obj([4, 21], (g) => g.at(4, 21, 0, (g2) => { NK.truck(g2, -Math.PI / 2, { col: '#E6C24F', cab: '#E6C24F', stripe: '#C9463E' }); g2.fill(K.on('R', 2.64, -1.2, 3.6, 3.6, 5.6), '#3A3530'); g2.mark({ nc: '#FFD98A', spill: true }); NK.text(g2, 'R', 2.62, -1.2, 6.0, 0.9, 'TACOS', '#C9463E', { center: true, w: 0.4, nc: '#FF5A48' }); g2.glow('lantern', 2.8, 1.2, 4.6, { r: 1.8, col: '#FFD08A' }); }), { name: 'food truck' });
 
   /* ---------------- the living layer ---------------- */
   // loungers on the High Line sundeck with sunbathers
