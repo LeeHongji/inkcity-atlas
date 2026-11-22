@@ -2,8 +2,9 @@ import React from 'react';
 import {ShotContext} from './film-store.js';
 import {shots} from './engine.js';
 import {SHOT_VIEWS} from './shots/index.js';
+import {SQ} from './format.js';
 export function Film() {
-  return <main id="film" className="film-theme">
+  return <main id="film" className={'film-theme' + (SQ ? ' sq' : '')}>
     {shots.map((s, i) => {
       const View = SHOT_VIEWS[s.id];
       if (!View) throw new Error(`No view for shot "${s.id}" in src/shots/index.js`);

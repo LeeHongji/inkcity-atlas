@@ -1,0 +1,26 @@
+{
+ "fps": 30,
+ "frames": 252,
+ "size": [
+  1080,
+  935
+ ],
+ "scroll": {
+  "from": 128,
+  "to": 152
+ },
+ "events": [
+  {
+   "frame": 96,
+   "text": "The Hutongs",
+   "x": 785,
+   "y": 425.4296875
+  },
+  {
+   "frame": 162,
+   "text": "A family round a table",
+   "x": 785,
+   "y": 819.453125
+  }
+ ]
+}

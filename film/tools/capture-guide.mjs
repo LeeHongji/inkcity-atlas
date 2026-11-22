@@ -4,6 +4,7 @@
 // and a rerun gives the same frames. The clicks are real mouse events on the guidebook.
 //   node tools/capture-guide.mjs            -> public/clips/guide/0000.jpg ... and public/clips/guide.json
 //   STILLS=0,96,200 node tools/capture-guide.mjs   -> only those frames, to evidence/guide-stills/
+//   FORMAT=square node tools/capture-guide.mjs     -> the square cut's clip: public/clips/guide-sq/ and guide-sq.json
 import {chromium} from 'playwright';
 import {mkdir, rm, writeFile} from 'node:fs/promises';
 import path from 'node:path';
@@ -17,6 +18,12 @@ const PLACE = {at: 96, text: 'The Hutongs'};
 const LOOK = {at: 162, text: 'A family round a table'};
 const SCROLL = {from: 128, to: 152};             // the panel scrolls down to its "Look for" list (a wheel, eased)
 const STILLS = process.env.STILLS ? process.env.STILLS.split(',').map(Number) : null;
+// 16:9: 1280 x 720 CSS px at 1.5x, the real layout with its text at video scale (15.5 px -> 23 px), drawn at 1920 x 1080.
+// Square: the narrowest window that keeps the guidebook beside the map (Guide.tsx sideAt: width >= 840, w/h >= 1.15),
+// 864 x 748 at 1.25x = 1080 x 935; the film puts a strip of paper above it for the caption.
+const SQ = process.env.FORMAT === 'square';
+const VIEW = SQ ? {width: 864, height: 748} : {width: 1280, height: 720}, DPR = SQ ? 1.25 : 1.5;
+const NAME = SQ ? 'guide-sq' : 'guide';
 
 const INIT = `(() => {
   const realNow = performance.now.bind(performance), realDate = Date.now;
@@ -57,13 +64,12 @@ const INIT = `(() => {
   };
 })();`;
 
-const out = path.join(FILM, STILLS ? 'evidence/guide-stills' : 'public/clips/guide');
+const out = path.join(FILM, STILLS ? 'evidence/guide-stills' + (SQ ? '-sq' : '') : 'public/clips/' + NAME);
 if (!STILLS) await rm(out, {recursive: true, force: true});
 await mkdir(out, {recursive: true});
 const browser = await chromium.launch({channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist']});
 try {
-  // 1280 x 720 CSS px at 1.5x: the real layout, its text at video scale (15.5 px -> 23 px), drawn natively at 1920 x 1080
-  const ctx = await browser.newContext({viewport: {width: 1280, height: 720}, deviceScaleFactor: 1.5});
+  const ctx = await browser.newContext({viewport: VIEW, deviceScaleFactor: DPR});
   const page = await ctx.newPage(); const errs = [];
   page.on('pageerror', e => errs.push(e.message));
   page.on('console', m => { if (m.type() === 'error') errs.push(m.text()); });
@@ -103,12 +109,12 @@ try {
       const c = await centre(act.text);
       if (!c) throw new Error('guidebook item not found: ' + act.text);
       await page.mouse.move(c.x, c.y); await page.mouse.down(); await page.mouse.up();
-      events.push({frame: i, text: act.text, x: c.x * 1.5, y: c.y * 1.5});
+      events.push({frame: i, text: act.text, x: c.x * DPR, y: c.y * DPR});
     }
     await step();
     if (!STILLS || STILLS.includes(i)) await page.screenshot({path: path.join(out, String(i).padStart(4, '0') + '.jpg'), type: 'jpeg', quality: 92});
   }
   if (!scroll) throw new Error('no scroll box found for the look-for list');
-  if (!STILLS) await writeFile(path.join(FILM, 'public/clips/guide.json'), JSON.stringify({fps: FPS, frames: FRAMES, size: [1920, 1080], scroll: SCROLL, events}, null, 1));
+  if (!STILLS) await writeFile(path.join(FILM, `public/clips/${NAME}.json`), JSON.stringify({fps: FPS, frames: FRAMES, size: [VIEW.width * DPR, VIEW.height * DPR], scroll: SCROLL, events}, null, 1));
   console.log(STILLS ? 'stills ' + STILLS.join(',') : FRAMES + ' frames', JSON.stringify(events), errs.length ? 'ERRORS ' + errs.join(' | ') : 'no page errors');
 } finally { await browser.close(); }

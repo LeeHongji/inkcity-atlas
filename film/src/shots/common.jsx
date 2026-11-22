@@ -1,6 +1,7 @@
 import React from 'react';
 import {Paper} from '@/components/ui/paper';
 import {Lettering} from '@/components/ui/lettering';
+import {FW, FH} from '../format.js';
 
 /** Text written on by a pen: a clip that opens left to right at handwriting speed. */
 export function W({id, children, className = ''}) {
@@ -37,7 +38,7 @@ export function arrowPath(ax, ay, bx, by, seed, hs = 14) {
 }
 export function PenArrow({id, from, to, seed}) {
   const p = arrowPath(from[0], from[1], to[0], to[1], seed);
-  return <svg className="pen-arrow" width="1920" height="1080" viewBox="0 0 1920 1080">
+  return <svg className="pen-arrow" width={FW} height={FH} viewBox={`0 0 ${FW} ${FH}`}>
     <path id={id + '-l'} d={p.line} pathLength="1" />
     <path id={id + '-h'} d={p.head} pathLength="1" />
   </svg>;

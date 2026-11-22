@@ -1,6 +1,7 @@
 // The real city pages, used as renderers. Each runs in a hidden same-origin iframe in ?f=0 mode, where
 // SF.seek(n, cam) draws film frame n at any camera, from nothing (the call the skill's record.mjs makes).
 // A shot copies that canvas into its own <canvas>, so one page can feed several shots and sizes.
+import {SQ} from './format.js';
 const pool = new Map();
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const page = slug => slug === 'starter' ? '/starter.html?f=0' : `/atlas/cities/${slug}/index.html?f=0`;
@@ -34,8 +35,9 @@ export function release(keep) {
 /** The page's own scene data (SHOTS, SCENE, SF) once loaded. */
 export const page$ = slug => pool.get(slug)?.win || null;
 
-/** Draw film frame n of a city at camera cam ({z,cx,cy} in wide px; null = the film's own camera) into ctx. */
-export async function paint(slug, n, cam, ctx, dx = 0, dy = 0, dw = ctx.canvas.width, dh = ctx.canvas.height, sx = 0, sy = 0, sw = 1920, sh = 1080) {
+/** Draw film frame n of a city at camera cam ({z,cx,cy} in wide px; null = the film's own camera) into ctx.
+    The square cut takes the middle 1080 x 1080 of the picture, so the camera's centre stays the frame's centre. */
+export async function paint(slug, n, cam, ctx, dx = 0, dy = 0, dw = ctx.canvas.width, dh = ctx.canvas.height, sx = SQ ? 420 : 0, sy = 0, sw = SQ ? 1080 : 1920, sh = 1080) {
   const c = await load(slug);
   c.win.SF.seek(Math.max(0, Math.round(n)), cam || undefined);
   ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';

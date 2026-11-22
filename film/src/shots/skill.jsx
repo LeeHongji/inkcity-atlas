@@ -6,10 +6,13 @@ import {IndexCard} from '@/components/ui/index-card';
 import {Highlight} from '@/components/ui/highlight';
 import {Lettering} from '@/components/ui/lettering';
 import {W, write, lift, cut, PenArrow, drawArrow} from './common.jsx';
+import {SQ, FW, FH} from '../format.js';
 
 // The skill's own starter town (skill/inkcity/assets/starter), the page a new scene starts from.
 // Placed right of centre so the card has the left half.
-export const TOWN_CAM = {z: 1.7, cx: 700, cy: 560};
+// Square: the card takes the top, the town the bottom.
+export const TOWN_CAM = SQ ? {z: 1.3, cx: 960, cy: 447} : {z: 1.7, cx: 700, cy: 560};
+const ARROW = SQ ? [[840, 410], [690, 560]] : [[930, 700], [1040, 640]];
 const PROMPT = 'Draw my home town as a living hand-inked map.';
 const TYPE = [0.95, 2.05];                                  // shot-local seconds the prompt is typed over
 // the town: drawn over 1.9..3.7 s (frames 0..118), then it lives on toward its own ghost fade (frames 575..598)
@@ -23,7 +26,7 @@ function Prompt() {
 
 export function SkillView() {
   return <div className="skill">
-    <canvas id="skill-cv" className="full" width="1920" height="1080" />
+    <canvas id="skill-cv" className="full" width={FW} height={FH} />
     <div className="sk-card-wrap" id="sk-card">
       <IndexCard seed="skill-card" tilt={-1.2} className="sk-card">
         <p className="sk-kicker">the skill behind the atlas</p>
@@ -32,7 +35,7 @@ export function SkillView() {
         <p className="sk-foot">inkcity · a skill for Claude Code · MIT</p>
       </IndexCard>
     </div>
-    <PenArrow id="sk-arrow" from={[930, 700]} to={[1040, 640]} seed="town" />
+    <PenArrow id="sk-arrow" from={ARROW[0]} to={ARROW[1]} seed="town" />
   </div>;
 }
 
@@ -48,7 +51,7 @@ export function buildSkill(tl) {
 /* ---------- the end card: the same town goes on living and fades to a ghost underneath ---------- */
 export function EndView() {
   return <div className="end">
-    <canvas id="end-cv" className="full" width="1920" height="1080" />
+    <canvas id="end-cv" className="full" width={FW} height={FH} />
     <div className="end-card">
       <Lettering as="h1" tone="marker" wobble={0.6} seed="title" className="end-name"><W id="end-a">inkcity Atlas</W></Lettering>
       <p className="end-url"><span id="end-url" className="w"><Highlight tone="yellow" seed="end-url">leehongji.github.io/inkcity-atlas</Highlight></span></p>

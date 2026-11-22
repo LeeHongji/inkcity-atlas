@@ -27,6 +27,34 @@ node render.mjs --audio assets/master.wav --output renders/inkcity-atlas-promo.m
 node stills.mjs evidence/stills 2.5 7 25                         # any frames, in any order
 ```
 
+## The square cut for X
+
+The same film at 1080×1080, the shape X shows at the same size on a phone and on the web. It has the same shots, timing and sound. `src/format.js` switches the layout (`?format=square`): city shots take the middle of the picture at a camera of their own, captions move clear of X's player bar, and the guide shot records the real page in a 864×748 window. That is the narrowest window that keeps the guidebook beside the map, and the caption sits on a strip of paper above it.
+
+```sh
+FORMAT=square node tools/capture-guide.mjs                       # public/clips/guide-sq/*.jpg
+npm run build
+FILM_FORMAT=square node stills.mjs public/poster-sq 4.6 && mv public/poster-sq/t004.60.png public/poster-sq.png && rmdir public/poster-sq && npm run build
+FILM_FORMAT=square node render.mjs --audio assets/master.wav --output renders/inkcity-atlas-x-square-master.mp4
+# for upload: BT.709 in TV range (the frames are full-range BT.601 JPEGs), about 8 Mbps, the sound copied
+ffmpeg -y -i renders/inkcity-atlas-x-square-master.mp4 \
+  -vf 'scale=in_range=pc:in_color_matrix=bt601:out_range=pc,format=rgb24,scale=out_range=tv:out_color_matrix=bt709,format=yuv420p' \
+  -c:v libx264 -profile:v high -preset slow -b:v 8M -maxrate 10M -bufsize 16M -g 60 \
+  -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -pass 1 -an -f mp4 /dev/null
+ffmpeg -y -i renders/inkcity-atlas-x-square-master.mp4 \
+  -vf 'scale=in_range=pc:in_color_matrix=bt601:out_range=pc,format=rgb24,scale=out_range=tv:out_color_matrix=bt709,format=yuv420p' \
+  -c:v libx264 -profile:v high -preset slow -b:v 8M -maxrate 10M -bufsize 16M -g 60 \
+  -color_range tv -colorspace bt709 -color_primaries bt709 -color_trc bt709 -pass 2 -c:a copy -movflags +faststart \
+  renders/inkcity-atlas-x-1080x1080.mp4
+```
+
+Pictures of the twelve cities for posting: each page draws its whole city at 2× (3840×2160), then the second script makes JPEGs under X's 5 MB limit and one sheet of all twelve.
+
+```sh
+node tools/city-images.mjs renders/city-images
+node tools/city-sheet.mjs renders/city-images renders/x
+```
+
 `render.mjs` and `stills.mjs` drive system Chrome on the GPU (ANGLE on Metal). Set `FILM_SWIFTSHADER=1` to use SwiftShader instead (about 10 times slower). Set `FFMPEG` to point at a working ffmpeg if the one on `PATH` is broken.
 
 The score and the pen, paper and desk sounds are original, synthesised from seeded noise and sines. The click and typing sounds come from the video skill's built-in set. Sources are listed in `evidence/audio-selection.json`.

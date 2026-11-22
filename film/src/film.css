@@ -63,3 +63,37 @@ html,body { margin:0; background:#F0EEE4; }
 .sk-h { margin:14px 0 0; font-size:96px !important; line-height:.9 !important; }
 .end-name { margin:0; font-size:156px !important; line-height:.9 !important; }
 .end-en { margin:34px 0 0; font-family:var(--en); font-size:36px; color:var(--ink2); }
+
+/* ---------- the square cut for X (1080 x 1080): the same shots and timing, re-laid out ---------- */
+#film.sq { width:1080px; }
+#film.sq .full { width:1080px; }
+/* 1 · opening: the title takes the empty top-left corner of the diamond */
+#film.sq .open-title { left:64px; top:60px; width:620px; }
+#film.sq .ot-name { font-size:150px !important; }
+#film.sq .ot-sub { margin-top:26px; font-size:48px; }
+/* moments: the taped label bottom-left, clear of X's player bar (the bottom 10 %) */
+#film.sq .label-wrap { left:48px; bottom:132px; max-width:760px; }
+/* the guide: the real page under a strip of paper, the caption in the strip */
+#film.sq #guide-img { top:145px; height:935px; -webkit-mask-image:linear-gradient(to bottom, transparent 0, #000 26px); mask-image:linear-gradient(to bottom, transparent 0, #000 26px); }
+#film.sq .shot-guide .label-wrap { top:12px; bottom:auto; left:40px; }
+#film.sq .shot-guide .label-paper { padding:12px 28px 12px !important; }
+#film.sq .shot-guide .label-name { font-size:58px !important; }
+#film.sq .shot-guide .label-note { margin-top:2px; font-size:26px; }
+/* the twelve: the heading on top, the Polaroids four by three under it */
+#film.sq .twelve-head { left:64px; top:56px; width:952px; }
+#film.sq .tw-h { font-size:96px !important; }
+#film.sq .tw-note { margin-top:16px; font-size:34px; }
+#film.sq .tw-note br { display:none; }
+#film.sq #tw-c { margin-left:.3em; }
+#film.sq .twelve-grid { left:61px; top:282px; transform:scale(.75); transform-origin:0 0; }
+/* the skill: the card on top, the town drawing itself under it */
+#film.sq .sk-card-wrap { left:56px; top:44px; width:968px; }
+#film.sq .sk-card { width:968px !important; padding:28px 40px 24px !important; }
+#film.sq .sk-h { font-size:88px !important; }
+#film.sq .sk-prompt { margin-top:22px; min-height:0; font-size:27px; }
+/* the end card on top, the town fading to its ghost underneath */
+#film.sq .end-card { left:64px; top:70px; width:952px; }
+#film.sq .end-name { font-size:140px !important; }
+#film.sq .end-url { margin-top:30px; font-size:36px; }
+#film.sq .end-repo { font-size:26px; }
+#film.sq .end-en { margin-top:24px; font-size:34px; }

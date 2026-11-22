@@ -8,6 +8,8 @@ import path from 'node:path';
 import {serve} from './server.mjs';
 const args = process.argv.slice(2), option = (k, d) => { const i = args.indexOf(k); return i < 0 ? d : args[i + 1]; };
 const plan = JSON.parse(await readFile('plan.json', 'utf8'));
+// FILM_FORMAT=square renders the 1:1 cut for X (src/format.js): same plan and sound, a 1080 x 1080 frame
+const SQUARE = process.env.FILM_FORMAT === 'square', FILM_W = SQUARE ? 1080 : plan.width;
 const output = option('--output', 'renders/technical-demo.mp4'), still = option('--still', null), audio = option('--audio', null);
 const from = Number(option('--from', 0)), to = Number(option('--to', plan.duration)), partial = from > 0 || to < plan.duration;
 const approvedSilent = !plan.demo && plan.audioRequired === false && typeof plan.audioExceptionReason === 'string' && plan.audioExceptionReason.trim();
@@ -28,12 +30,12 @@ const browser = await chromium.launch(process.env.FILM_SWIFTSHADER ? {headless: 
   : {channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist']});
 let frames;
 try {
-  const page = await browser.newPage({viewport: {width: plan.width, height: plan.height}, deviceScaleFactor: 1});
+  const page = await browser.newPage({viewport: {width: FILM_W, height: plan.height}, deviceScaleFactor: 1});
   const failures = [];
   page.on('pageerror', e => failures.push(e.message));
   page.on('requestfailed', r => failures.push('failed ' + r.url()));
   page.on('response', r => { if (r.status() >= 400) failures.push(`${r.status()} ${r.url()}`); });
-  await page.goto(url, {waitUntil: 'networkidle'});
+  await page.goto(url + (SQUARE ? '/?format=square' : ''), {waitUntil: 'networkidle'});
   await page.evaluate(async () => { await window.__filmReady; await document.fonts.ready; await Promise.all([...document.images].map(i => i.decode().catch(() => {}))); });
   if (failures.length) throw new Error(failures.join('\n'));
   if (still !== null) {

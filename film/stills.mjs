@@ -4,17 +4,19 @@ import {readFile, mkdir} from 'node:fs/promises';
 import {serve} from './server.mjs';
 const [out = 'evidence/stills', ...times] = process.argv.slice(2);
 const plan = JSON.parse(await readFile('plan.json', 'utf8'));
+// FILM_FORMAT=square renders the 1:1 cut for X (src/format.js): same plan and sound, a 1080 x 1080 frame
+const SQUARE = process.env.FILM_FORMAT === 'square', FILM_W = SQUARE ? 1080 : plan.width;
 await mkdir(out, {recursive: true});
 const {server, url} = await serve();
 const browser = await chromium.launch(process.env.FILM_SWIFTSHADER ? {headless: true, args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']}
   // the city pages are 2D canvas: the Mac's GPU (system Chrome, ANGLE on Metal) draws them ~10x faster than SwiftShader
   : {channel: 'chrome', headless: true, args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist']});
 try {
-  const page = await browser.newPage({viewport: {width: plan.width, height: plan.height}});
+  const page = await browser.newPage({viewport: {width: FILM_W, height: plan.height}});
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror ' + e.message));
   page.on('response', r => { if (r.status() >= 400) errors.push(r.status() + ' ' + r.url()); });
-  await page.goto(url, {waitUntil: 'networkidle'});
+  await page.goto(url + (SQUARE ? '/?format=square' : ''), {waitUntil: 'networkidle'});
   await page.evaluate(() => window.__filmReady);
   for (const t of times) { await page.evaluate(x => window.seek(x), Number(t)); await page.screenshot({path: `${out}/t${Number(t).toFixed(2).padStart(6, '0')}.png`}); }
   console.log(JSON.stringify({stills: times.length, errors, api: await page.evaluate(() => [...new Set(window.__filmApiLog || [])])}));
