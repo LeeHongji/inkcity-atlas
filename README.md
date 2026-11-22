@@ -1,31 +1,47 @@
-# inkcity Atlas
+<p align="center">
+  <a href="https://leehongji.github.io/inkcity-atlas/media/inkcity-atlas-film.mp4"><img src="docs/media/preview.webp" alt="inkcity Atlas: a city draws itself in pen lines, then colour, then people; six cities' clever moments; twelve Polaroids on a desk. Click to watch the 43-second film." width="100%"></a>
+</p>
 
-**Twelve cities, drawn alive.** Each city is a hand-inked isometric map built entirely in code: its districts stitched
-together on one ground, full of small lives (traffic on a timetable, crowds that gather and scatter, boats, trams,
-a wedding, a game) and one clever moment that only that city could have. Every map is a single offline HTML page.
+<h1 align="center">inkcity Atlas</h1>
+
+<p align="center">
+  <b>Twelve cities, drawn alive.</b><br>
+  Hand-inked isometric maps, built entirely in code. Each one draws itself, then lives:<br>
+  traffic on a timetable, crowds that gather and scatter, and one clever moment only that city could have.
+</p>
+
+<p align="center">
+  <a href="https://leehongji.github.io/inkcity-atlas/"><img alt="Explore the Atlas" src="https://img.shields.io/badge/%E2%96%B6%20EXPLORE-the%20atlas-df6b3c?style=for-the-badge&labelColor=2C271C"></a>
+  <a href="https://leehongji.github.io/inkcity-atlas/media/inkcity-atlas-film.mp4"><img alt="Watch the film" src="https://img.shields.io/badge/FILM-43%20s-fbd63a?style=for-the-badge&labelColor=2C271C"></a>
+  <a href="#draw-your-own-city-the-inkcity-skill"><img alt="Draw your own city" src="https://img.shields.io/badge/SKILL-draw%20your%20own%20city-5db85c?style=for-the-badge&labelColor=2C271C"></a>
+  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/LICENCE-MIT-a8c8bb?style=for-the-badge&labelColor=2C271C"></a>
+</p>
+
+<p align="center">
+  <a href="#the-twelve-cities">The cities</a> ·
+  <a href="#see-it">See it</a> ·
+  <a href="#draw-your-own-city-the-inkcity-skill">The skill</a> ·
+  <a href="#the-film">The film</a> ·
+  <a href="#what-is-here">What is here</a> ·
+  <a href="#credits-and-licences">Credits</a>
+</p>
+
+---
 
 Open a city and it draws itself: the pen scaffold first, then broken colour, then the people. Then it is yours to
 explore: drag, zoom, click a place. Handwritten notes sit in the margins, and a guidebook tells each place's history
-and the life you can see in it, with details to find.
+and the life you can see in it, with details to find. Every map is a single offline HTML page.
+
+## The twelve cities
+
+Click a city to open it.
 
 | | | |
 |---|---|---|
-| ![Tokyo](thumbs/tokyo-wide.jpg) **Tokyo** 東京 | ![Paris](thumbs/paris-wide.jpg) **Paris** | ![New York](thumbs/newyork-wide.jpg) **New York** |
-| ![London](thumbs/london-wide.jpg) **London** | ![Barcelona](thumbs/barcelona-wide.jpg) **Barcelona** | ![Venice](thumbs/venice-wide.jpg) **Venice** |
-| ![Lisbon](thumbs/lisbon-wide.jpg) **Lisbon** | ![Istanbul](thumbs/istanbul-wide.jpg) **Istanbul** | ![Rio de Janeiro](thumbs/rio-wide.jpg) **Rio de Janeiro** |
-| ![Beijing](thumbs/beijing-wide.jpg) **Beijing** 北京 | ![Hong Kong](thumbs/hongkong-wide.jpg) **Hong Kong** 香港 | ![Chongqing](thumbs/chongqing-wide.jpg) **Chongqing** 重庆 |
-
-## See it
-
-Open `index.html` in a browser. It works straight from disk, and so does every city. Or serve the folder:
-
-```sh
-python3 -m http.server 8000      # then open http://localhost:8000
-```
-
-Keys in a city: `1`–`9` jump to places, `0` or `Esc` frames the whole city, `Space` pauses, `R` plays the guided tour.
-
-## The cities
+| [![Tokyo](thumbs/tokyo-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/tokyo/index.html) **Tokyo** 東京 | [![Paris](thumbs/paris-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/paris/index.html) **Paris** | [![New York](thumbs/newyork-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/newyork/index.html) **New York** |
+| [![London](thumbs/london-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/london/index.html) **London** | [![Barcelona](thumbs/barcelona-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/barcelona/index.html) **Barcelona** | [![Venice](thumbs/venice-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/venice/index.html) **Venice** |
+| [![Lisbon](thumbs/lisbon-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/lisbon/index.html) **Lisbon** | [![Istanbul](thumbs/istanbul-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/istanbul/index.html) **Istanbul** | [![Rio de Janeiro](thumbs/rio-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/rio/index.html) **Rio de Janeiro** |
+| [![Beijing](thumbs/beijing-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/beijing/index.html) **Beijing** 北京 | [![Hong Kong](thumbs/hongkong-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/hongkong/index.html) **Hong Kong** 香港 | [![Chongqing](thumbs/chongqing-wide.jpg)](https://leehongji.github.io/inkcity-atlas/cities/chongqing/index.html) **Chongqing** 重庆 |
 
 | City | Street fingerprint | The moment |
 |---|---|---|
@@ -42,25 +58,15 @@ Keys in a city: `1`–`9` jump to places, `0` or `Esc` frames the whole city, `S
 | Hong Kong | Towers and neon on a harbour, trams keeping left | One Star Ferry berths at Central as the other casts off |
 | Chongqing | A city stacked on mountains where two rivers meet | The monorail runs straight through a residential tower |
 
-## What is here
+## See it
 
+Online: **https://leehongji.github.io/inkcity-atlas/**. Offline: open `index.html` in a browser. It works straight from disk, and so does every city. Or serve the folder:
+
+```sh
+python3 -m http.server 8000      # then open http://localhost:8000
 ```
-index.html, gallery/      the gallery page (built from gallery-src/)
-thumbs/                   the gallery's photos of each city
-cities/<slug>/            one city
-  index.html              the built page: one self-contained file
-  dev.html                the same page loading the sources below (for editing)
-  src/35_scene.js         the film: shots, timing, the explore bounds
-  src/36_<slug>.js        the city's own kit: its people, vehicles, roofs, signs
-  src/tiles/*.js          one file per district, the streets, the satellites
-  src/guide.js            the guidebook's words: notes, places, stories, things to find
-  brief.md, refs/         the plan and the landmark data cards behind the drawing
-  tools/                  timetable searches and checks for that city's traffic
-cities/BRIEF-*.md         the briefs every city follows (drawing, and writing its guide)
-engine/                   the shared engine: projection, pen, kit, world, render, app
-skill/inkcity/            the skill that makes all of this (see below)
-gallery-src/              the gallery and guide overlay source (React, Vite, Tailwind, Looseleaf)
-```
+
+Keys in a city: `1`–`9` jump to places, `0` or `Esc` frames the whole city, `Space` pauses, `R` plays the guided tour.
 
 ## Draw your own city: the inkcity skill
 
@@ -85,6 +91,42 @@ python3 ../../skill/inkcity/scripts/build.py dev.html index.html
 node ../../skill/inkcity/scripts/verify.mjs index.html
 ```
 
+## The film
+
+[**Watch it (43 s, 1080p)**](https://leehongji.github.io/inkcity-atlas/media/inkcity-atlas-film.mp4): a city draws itself, six cities show their moment,
+the Beijing guidebook leads into a hutong courtyard, twelve Polaroids land on the desk, and a sentence becomes a town.
+
+There are no screen recordings. Every frame is drawn by the real pages:
+- **City shots:** in `?f=0` mode a city draws any film frame at any camera through `SF.seek(n, cam)`.
+- **The guidebook:** the real Beijing page and overlay, clicked by a script on a controlled clock.
+- **The desk and lettering:** the gallery's own Looseleaf components.
+- **Sound:** the score and the pen, paper and desk sounds are original, made in code.
+
+The source, the shot list and the rebuild steps are in [`film/`](film/).
+
+## What is here
+
+```
+index.html, gallery/      the gallery page (built from gallery-src/)
+thumbs/                   the gallery's photos of each city
+cities/<slug>/            one city
+  index.html              the built page: one self-contained file
+  dev.html                the same page loading the sources below (for editing)
+  src/35_scene.js         the film: shots, timing, the explore bounds
+  src/36_<slug>.js        the city's own kit: its people, vehicles, roofs, signs
+  src/tiles/*.js          one file per district, the streets, the satellites
+  src/guide.js            the guidebook's words: notes, places, stories, things to find
+  brief.md, refs/         the plan and the landmark data cards behind the drawing
+  tools/                  timetable searches and checks for that city's traffic
+cities/BRIEF-*.md         the briefs every city follows (drawing, and writing its guide)
+engine/                   the shared engine: projection, pen, kit, world, render, app
+skill/inkcity/            the skill that makes all of this (see below)
+gallery-src/              the gallery and guide overlay source (React, Vite, Tailwind, Looseleaf)
+film/                     the promo film: direction, shots, capture tools, score (see film/README.md)
+media/                    the film, as served by the site
+docs/media/               the README's preview and poster
+```
+
 ## Rebuilding the gallery
 
 ```sh
@@ -96,6 +138,9 @@ npm run publish        # builds ../index.html, ../gallery/ (with guide.js) and t
 ## Credits and licences
 
 - Code, cities, engine and skill: MIT, see `LICENSE`.
+- `film/` is built on the starter project of [guizang-product-video-skill](https://github.com/op7418/guizang-product-video-skill)
+  (© op7418, GNU AGPL-3.0): that folder keeps its own licence, see `film/LICENSE` and `film/NOTICE.md`. The film's
+  music and sound effects are original to this project; the click and typing sounds come from that skill.
 - The gallery and the guide are set with [Looseleaf](https://kevintngo.github.io/looseleaf/) components and the
   Kevin Sans typeface by Kevin T. Ngo (MIT, `licenses/Looseleaf-and-Kevin-Sans.txt`). The copy of Kevin Sans here adds
   a few accented letters (ā ē ī ō ū ğ ş İ Ç Ş Ğ) built from the font's own glyphs.

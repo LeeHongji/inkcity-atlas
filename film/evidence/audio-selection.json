@@ -1,0 +1,112 @@
+{
+  "music": {
+    "source": "code-original",
+    "script": "audio/score.py",
+    "seed": 1121,
+    "duration": 43.2,
+    "bpm": 100,
+    "key": "F major",
+    "instruments": [
+      "felt piano",
+      "marimba",
+      "plucked string (Karplus-Strong)",
+      "bass",
+      "glockenspiel",
+      "shaker",
+      "wood knock",
+      "soft kick"
+    ],
+    "sections": {
+      "intro": [
+        0,
+        4.8
+      ],
+      "montage": [
+        4.8,
+        21.0
+      ],
+      "guide": [
+        21.0,
+        29.4
+      ],
+      "twelve": [
+        29.4,
+        34.2
+      ],
+      "skill": [
+        34.2,
+        39.0
+      ],
+      "end": [
+        39.0,
+        43.2
+      ]
+    },
+    "notes": "Harmony changes on every city cut; the glockenspiel plays one note per Polaroid landing (29.7 + 0.15 i). High-passed at 55 Hz to keep the low end light."
+  },
+  "sfx": [
+    {
+      "files": [
+        "pen-065.wav",
+        "pen-080.wav",
+        "pen-090.wav",
+        "pen-105.wav",
+        "pen-110.wav",
+        "pen-130.wav",
+        "pen-140.wav",
+        "pen-150.wav"
+      ],
+      "role": "a soft pen gliding as each caption is written; one length per caption",
+      "source": "code-original, audio/sfx.py: pinkish noise band-passed 500-3200 Hz, raised-cosine stroke swells, no grain modulation, no gaps (rev. 2 after the user found rev. 1 jagged)",
+      "license": "original to this project"
+    },
+    {
+      "files": [
+        "pen-build-long.wav",
+        "pen-build-mid.wav",
+        "pen-build-short.wav"
+      ],
+      "role": "construction lines sketched during the engine's build",
+      "source": "code-original, audio/sfx.py",
+      "license": "original to this project"
+    },
+    {
+      "files": [
+        "pen-loop.wav"
+      ],
+      "role": "the guide's red pen loop",
+      "source": "code-original, audio/sfx.py",
+      "license": "original to this project"
+    },
+    {
+      "files": [
+        "paper-slap.wav"
+      ],
+      "role": "the taped label pressed down",
+      "source": "code-original, audio/sfx.py",
+      "license": "original to this project"
+    },
+    {
+      "files": [
+        "tap-0.wav",
+        "tap-1.wav",
+        "tap-2.wav"
+      ],
+      "role": "Polaroids landing on the desk",
+      "source": "code-original, audio/sfx.py",
+      "license": "original to this project"
+    },
+    {
+      "files": [
+        "click.wav",
+        "typing.wav"
+      ],
+      "role": "guidebook clicks; typing the prompt",
+      "source": "guizang-product-video-skill built-in originals (assets/audio/sfx)",
+      "license": "skill's own procedural sounds"
+    }
+  ],
+  "fallbackReason": "No recorded sound library is installed on this machine and the stock sites need interactive downloads; pen, paper and desk sounds were synthesised instead, the click and typing sounds are the skill's built-ins.",
+  "listening": "Not auditioned: checked by numbers only (spectrogram, band energy, LUFS, true peak, per-cue SFX vs music peaks).",
+  "revision": "2026-11-21 rev 2: the pen was rebuilt as a smooth glide. Near-silent gaps dropped from about 25% to 0%, the spectral centroid from about 6 kHz to 3.5 kHz, and envelope grit (20-300 Hz) from 0.34 to about 0.2."
+}

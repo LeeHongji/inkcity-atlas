@@ -1,0 +1,22 @@
+{
+ "fps": 30,
+ "frames": 144,
+ "size": [
+  272,
+  170
+ ],
+ "slugs": [
+  "tokyo",
+  "paris",
+  "newyork",
+  "london",
+  "barcelona",
+  "venice",
+  "lisbon",
+  "istanbul",
+  "rio",
+  "beijing",
+  "hongkong",
+  "chongqing"
+ ]
+}

@@ -1,0 +1,951 @@
+{
+  "demo": false,
+  "product": "inkcity Atlas",
+  "style": "repo",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "duration": 43.2,
+  "repo": "..",
+  "scope": {
+    "versions": "main@198f611 (published 2026-11-21)",
+    "platforms": [
+      "web-desktop"
+    ]
+  },
+  "audioRequired": true,
+  "sfxRequired": true,
+  "typography": {
+    "mode": "english",
+    "enFont": "Kevin Sans: Looseleaf Lettering (script, riso offset) for titles, the hand for notes; IBM Plex Mono for the prompt and links",
+    "zhFont": null,
+    "zhStyle": null,
+    "exceptionReason": "User, 2026-11-21: \"不需要中文…把那个字体都做成英文的。参考那个 UI 设计库的内容，然后突出它的这个手写手绘风格即可\" (English only, in the UI library's hand-drawn style)."
+  },
+  "audio": {
+    "ducking": {
+      "enabled": true
+    },
+    "beatGrid": {
+      "bpm": 100,
+      "offset": 0
+    },
+    "music": {
+      "file": "assets/music.wav",
+      "gain": 0.7
+    },
+    "cues": [
+      {
+        "at": 0.315,
+        "syncOffset": 0.285,
+        "actionId": "open-lines",
+        "file": "assets/sfx/pen-build-long.wav",
+        "gain": 1.3,
+        "role": "sfx",
+        "kind": "pen-build-long",
+        "duck": {
+          "db": 2,
+          "attack": 0.2,
+          "hold": 2.6,
+          "release": 0.5
+        }
+      },
+      {
+        "at": 0.832,
+        "syncOffset": 0.068,
+        "actionId": "open-title",
+        "file": "assets/sfx/pen-105.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "pen-105",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.7,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 2.01,
+        "syncOffset": 0.06,
+        "actionId": "open-sub",
+        "file": "assets/sfx/pen-065.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "pen-065",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.45,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 4.788,
+        "syncOffset": 0.062,
+        "actionId": "tokyo-name",
+        "file": "assets/sfx/pen-110.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-110",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.77,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 4.8,
+        "syncOffset": 0.0,
+        "actionId": "tokyo-cut",
+        "file": "assets/sfx/paper-slap.wav",
+        "gain": 1.6,
+        "role": "sfx",
+        "kind": "paper-slap"
+      },
+      {
+        "at": 7.796,
+        "syncOffset": 0.054,
+        "actionId": "paris-cut",
+        "file": "assets/sfx/pen-140.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-140",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.95,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 10.182,
+        "syncOffset": 0.068,
+        "actionId": "london-cut",
+        "file": "assets/sfx/pen-105.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-105",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.73,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 13.194,
+        "syncOffset": 0.056,
+        "actionId": "venice-cut",
+        "file": "assets/sfx/pen-080.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-080",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.56,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 15.532,
+        "syncOffset": 0.068,
+        "actionId": "barcelona-build",
+        "file": "assets/sfx/pen-build-short.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-build-short",
+        "duck": {
+          "db": 2,
+          "attack": 0.2,
+          "hold": 0.6,
+          "release": 0.5
+        }
+      },
+      {
+        "at": 15.688,
+        "syncOffset": 0.062,
+        "actionId": "barcelona-name",
+        "file": "assets/sfx/pen-110.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-110",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.76,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 18.588,
+        "syncOffset": 0.062,
+        "actionId": "chongqing-cut",
+        "file": "assets/sfx/pen-130.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-130",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.91,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 24.199,
+        "syncOffset": 0.001,
+        "actionId": "guide-place",
+        "file": "assets/sfx/click.wav",
+        "gain": 1.8,
+        "role": "sfx",
+        "kind": "click"
+      },
+      {
+        "at": 24.624,
+        "syncOffset": 0.076,
+        "actionId": "guide-label",
+        "file": "assets/sfx/pen-150.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "pen-150",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 1.05,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 26.399,
+        "syncOffset": 0.001,
+        "actionId": "guide-look",
+        "file": "assets/sfx/click.wav",
+        "gain": 2.4,
+        "role": "sfx",
+        "kind": "click"
+      },
+      {
+        "at": 27.111,
+        "syncOffset": 0.089,
+        "actionId": "guide-loop",
+        "file": "assets/sfx/pen-loop.wav",
+        "gain": 0.8,
+        "role": "sfx",
+        "kind": "pen-loop",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.49,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 29.7,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop",
+        "file": "assets/sfx/tap-0.wav",
+        "gain": 1.7,
+        "role": "sfx",
+        "kind": "tap-0",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 29.85,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-2",
+        "file": "assets/sfx/tap-1.wav",
+        "gain": 1.655,
+        "role": "sfx",
+        "kind": "tap-1",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 30.0,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-3",
+        "file": "assets/sfx/tap-2.wav",
+        "gain": 1.61,
+        "role": "sfx",
+        "kind": "tap-2",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 30.15,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-4",
+        "file": "assets/sfx/tap-0.wav",
+        "gain": 1.565,
+        "role": "sfx",
+        "kind": "tap-0",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 30.3,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-5",
+        "file": "assets/sfx/tap-1.wav",
+        "gain": 1.52,
+        "role": "sfx",
+        "kind": "tap-1",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 30.45,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-6",
+        "file": "assets/sfx/tap-2.wav",
+        "gain": 1.475,
+        "role": "sfx",
+        "kind": "tap-2",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 30.6,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-7",
+        "file": "assets/sfx/tap-0.wav",
+        "gain": 1.43,
+        "role": "sfx",
+        "kind": "tap-0",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 30.75,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-8",
+        "file": "assets/sfx/tap-1.wav",
+        "gain": 1.385,
+        "role": "sfx",
+        "kind": "tap-1",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 30.9,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-9",
+        "file": "assets/sfx/tap-2.wav",
+        "gain": 1.34,
+        "role": "sfx",
+        "kind": "tap-2",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 31.05,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-10",
+        "file": "assets/sfx/tap-0.wav",
+        "gain": 1.295,
+        "role": "sfx",
+        "kind": "tap-0",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 31.2,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-11",
+        "file": "assets/sfx/tap-1.wav",
+        "gain": 1.25,
+        "role": "sfx",
+        "kind": "tap-1",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 31.342,
+        "syncOffset": 0.058,
+        "actionId": "twelve-head",
+        "file": "assets/sfx/pen-090.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-090",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.63,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 31.35,
+        "syncOffset": 0.0,
+        "actionId": "twelve-drop-12",
+        "file": "assets/sfx/tap-2.wav",
+        "gain": 1.205,
+        "role": "sfx",
+        "kind": "tap-2",
+        "duck": {
+          "db": 2,
+          "attack": 0.02,
+          "hold": 0.08,
+          "release": 0.15
+        }
+      },
+      {
+        "at": 32.321,
+        "syncOffset": 0.054,
+        "actionId": "twelve-note",
+        "file": "assets/sfx/pen-140.wav",
+        "gain": 1.2000000000000002,
+        "role": "sfx",
+        "kind": "pen-140",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.94,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 34.344,
+        "syncOffset": 0.056,
+        "actionId": "skill-head",
+        "file": "assets/sfx/pen-080.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-080",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.56,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 35.149,
+        "syncOffset": 0.001,
+        "actionId": "skill-type",
+        "file": "assets/sfx/typing.wav",
+        "gain": 4.0,
+        "role": "sfx",
+        "kind": "typing"
+      },
+      {
+        "at": 35.749,
+        "syncOffset": 0.001,
+        "actionId": "skill-type-2",
+        "file": "assets/sfx/typing.wav",
+        "gain": 3.6,
+        "role": "sfx",
+        "kind": "typing"
+      },
+      {
+        "at": 35.985,
+        "syncOffset": 0.115,
+        "actionId": "skill-build",
+        "file": "assets/sfx/pen-build-mid.wav",
+        "gain": 1.4,
+        "role": "sfx",
+        "kind": "pen-build-mid",
+        "duck": {
+          "db": 2,
+          "attack": 0.2,
+          "hold": 1.4,
+          "release": 0.5
+        }
+      },
+      {
+        "at": 39.044,
+        "syncOffset": 0.056,
+        "actionId": "end-card",
+        "file": "assets/sfx/pen-080.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "pen-080",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.56,
+          "release": 0.35
+        }
+      },
+      {
+        "at": 39.954,
+        "syncOffset": 0.056,
+        "actionId": "end-url",
+        "file": "assets/sfx/pen-080.wav",
+        "gain": 0.8,
+        "role": "sfx",
+        "kind": "pen-080",
+        "duck": {
+          "db": 1.5,
+          "attack": 0.08,
+          "hold": 0.56,
+          "release": 0.35
+        }
+      }
+    ]
+  },
+  "shots": [
+    {
+      "id": "open",
+      "start": 0,
+      "end": 4.8,
+      "type": "title",
+      "headlineEn": "inkcity Atlas",
+      "headline": "inkcity Atlas",
+      "plainExplanation": "Open a city and it draws itself: pen lines, then colour, then the people, and then it lives.",
+      "claim": true,
+      "source": [
+        "repo:engine/80_render.js",
+        "repo:README.md"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek)",
+      "actions": [
+        {
+          "id": "open-lines",
+          "at": 0.6,
+          "action": "Tokyo construction lines sweep across the paper",
+          "soundRequired": true
+        },
+        {
+          "id": "open-title",
+          "at": 0.9,
+          "action": "\"inkcity Atlas\" is lettered on",
+          "soundRequired": true
+        },
+        {
+          "id": "open-sub",
+          "at": 2.07,
+          "action": "\"twelve cities, drawn alive.\" is written on",
+          "soundRequired": false
+        }
+      ],
+      "description": "twelve cities, drawn alive.",
+      "descriptionAt": 2.07
+    },
+    {
+      "id": "tokyo",
+      "start": 4.8,
+      "end": 7.8,
+      "type": "montage",
+      "headlineEn": "Tokyo",
+      "headline": "Tokyo",
+      "plainExplanation": "Every car light turns red and the crowds at all four corners cross at once.",
+      "claim": true,
+      "source": [
+        "repo:README.md:32",
+        "repo:cities/tokyo/src/35_scene.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek)",
+      "actions": [
+        {
+          "id": "tokyo-cut",
+          "at": 0.0,
+          "action": "Hard cut; the taped label is pressed down",
+          "soundRequired": true
+        },
+        {
+          "id": "tokyo-name",
+          "at": 0.05,
+          "action": "Label: \"Tokyo\", \"the scramble crossing\"",
+          "soundRequired": false
+        }
+      ],
+      "description": "the scramble crossing",
+      "descriptionAt": 0.4
+    },
+    {
+      "id": "paris",
+      "start": 7.8,
+      "end": 10.2,
+      "type": "montage",
+      "headlineEn": "Paris",
+      "headline": "Paris",
+      "plainExplanation": "Cars pour into the Etoile and weave round the Arc de Triomphe without touching.",
+      "claim": true,
+      "source": [
+        "repo:README.md:33"
+      ],
+      "component": "repo:cities/paris/index.html (SF.seek)",
+      "actions": [
+        {
+          "id": "paris-cut",
+          "at": 0.05,
+          "action": "Hard cut; label: \"Paris\", \"round the Arc, never touching\"",
+          "soundRequired": true
+        }
+      ],
+      "description": "round the Arc, never touching",
+      "descriptionAt": 0.4
+    },
+    {
+      "id": "london",
+      "start": 10.2,
+      "end": 13.2,
+      "type": "montage",
+      "headlineEn": "London",
+      "headline": "London",
+      "plainExplanation": "Tower Bridge raises its bascules for a tall ship while the traffic waits.",
+      "claim": true,
+      "source": [
+        "repo:README.md:35"
+      ],
+      "component": "repo:cities/london/index.html (SF.seek)",
+      "actions": [
+        {
+          "id": "london-cut",
+          "at": 0.05,
+          "action": "Hard cut; label: \"London\", \"Tower Bridge lifts\"",
+          "soundRequired": true
+        }
+      ],
+      "description": "Tower Bridge lifts",
+      "descriptionAt": 0.4
+    },
+    {
+      "id": "venice",
+      "start": 13.2,
+      "end": 15.6,
+      "type": "montage",
+      "headlineEn": "Venice",
+      "headline": "Venice",
+      "plainExplanation": "High water spreads over San Marco and people walk the raised boards.",
+      "claim": true,
+      "source": [
+        "repo:README.md:37"
+      ],
+      "component": "repo:cities/venice/index.html (SF.seek)",
+      "actions": [
+        {
+          "id": "venice-cut",
+          "at": 0.05,
+          "action": "Hard cut; label: \"Venice\", \"acqua alta\"",
+          "soundRequired": true
+        }
+      ],
+      "description": "acqua alta",
+      "descriptionAt": 0.4
+    },
+    {
+      "id": "barcelona",
+      "start": 15.6,
+      "end": 18.6,
+      "type": "montage",
+      "headlineEn": "Barcelona",
+      "headline": "Barcelona",
+      "plainExplanation": "The plaza draws itself, then the castellers stack up into a human tower.",
+      "claim": true,
+      "source": [
+        "repo:README.md:36",
+        "repo:engine/80_render.js"
+      ],
+      "component": "repo:cities/barcelona/index.html (SF.seek)",
+      "actions": [
+        {
+          "id": "barcelona-build",
+          "at": 0.0,
+          "action": "The plaza draws itself at the moment camera",
+          "soundRequired": true
+        },
+        {
+          "id": "barcelona-name",
+          "at": 0.15,
+          "action": "Label: \"Barcelona\", \"a human tower\"",
+          "soundRequired": false
+        }
+      ],
+      "description": "a human tower",
+      "descriptionAt": 0.75
+    },
+    {
+      "id": "chongqing",
+      "start": 18.6,
+      "end": 21.0,
+      "type": "montage",
+      "headlineEn": "Chongqing",
+      "headline": "Chongqing",
+      "plainExplanation": "The monorail runs straight through a residential tower.",
+      "claim": true,
+      "source": [
+        "repo:README.md:43"
+      ],
+      "component": "repo:cities/chongqing/index.html (SF.seek)",
+      "actions": [
+        {
+          "id": "chongqing-cut",
+          "at": 0.05,
+          "action": "Hard cut; label: \"Chongqing\", \"through the building\"",
+          "soundRequired": true
+        }
+      ],
+      "description": "through the building",
+      "descriptionAt": 0.4
+    },
+    {
+      "id": "guide",
+      "start": 21.0,
+      "end": 29.4,
+      "type": "detail",
+      "headlineEn": "Every place has a story.",
+      "headline": "Every place has a story.",
+      "plainExplanation": "Each city has a handwritten guidebook: choose a place and the camera glides there with its history; choose a detail and the red pen circles it.",
+      "claim": true,
+      "source": [
+        "repo:gallery-src/src/guide/Guide.tsx",
+        "repo:cities/beijing/src/guide.js"
+      ],
+      "component": "repo:cities/beijing/index.html + gallery/guide.js (captured by tools/capture-guide.mjs)",
+      "actions": [
+        {
+          "id": "guide-place",
+          "at": 3.2,
+          "action": "Click \"The Hutongs\" in the guidebook; the camera glides in",
+          "soundRequired": true
+        },
+        {
+          "id": "guide-label",
+          "at": 3.7,
+          "action": "Label: \"Every place has a story.\"",
+          "soundRequired": false
+        },
+        {
+          "id": "guide-look",
+          "at": 5.4,
+          "action": "Click \"A family round a table of dumplings\"",
+          "soundRequired": true
+        },
+        {
+          "id": "guide-loop",
+          "at": 6.2,
+          "action": "The red pen loop is drawn round the family",
+          "soundRequired": true
+        }
+      ],
+      "description": "open one, and the map takes you there",
+      "descriptionAt": 3.65
+    },
+    {
+      "id": "twelve",
+      "start": 29.4,
+      "end": 34.2,
+      "type": "workspace",
+      "headlineEn": "Twelve cities.",
+      "headline": "Twelve cities.",
+      "plainExplanation": "Every city is one self-contained HTML page that opens offline in a browser.",
+      "claim": true,
+      "source": [
+        "repo:README.md:5",
+        "repo:README.md:28"
+      ],
+      "component": "repo:gallery-src/src/components/ui/polaroid.tsx + 12 x cities/*/index.html via SF.seek (tools/capture-twelve.mjs)",
+      "actions": [
+        {
+          "id": "twelve-drop",
+          "at": 0.3,
+          "action": "Polaroid 1 of 12 lands on the desk",
+          "soundRequired": true
+        },
+        {
+          "id": "twelve-drop-2",
+          "at": 0.45,
+          "action": "Polaroid 2 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-3",
+          "at": 0.6,
+          "action": "Polaroid 3 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-4",
+          "at": 0.75,
+          "action": "Polaroid 4 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-5",
+          "at": 0.9,
+          "action": "Polaroid 5 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-6",
+          "at": 1.05,
+          "action": "Polaroid 6 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-7",
+          "at": 1.2,
+          "action": "Polaroid 7 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-8",
+          "at": 1.35,
+          "action": "Polaroid 8 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-9",
+          "at": 1.5,
+          "action": "Polaroid 9 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-10",
+          "at": 1.65,
+          "action": "Polaroid 10 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-11",
+          "at": 1.8,
+          "action": "Polaroid 11 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-drop-12",
+          "at": 1.95,
+          "action": "Polaroid 12 of 12 lands on the desk",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-head",
+          "at": 2.0,
+          "action": "\"Twelve cities.\" is lettered on",
+          "soundRequired": false
+        },
+        {
+          "id": "twelve-note",
+          "at": 2.975,
+          "action": "\"each one a single page that works offline\" is written on",
+          "soundRequired": false
+        }
+      ],
+      "description": "each one a single page that works offline",
+      "descriptionAt": 2.0
+    },
+    {
+      "id": "skill",
+      "start": 34.2,
+      "end": 39.0,
+      "type": "detail",
+      "headlineEn": "Draw your own city.",
+      "headline": "Draw your own city.",
+      "plainExplanation": "The inkcity skill that made the Atlas is open source: give Claude Code a place and it builds a page like these.",
+      "claim": true,
+      "source": [
+        "repo:skill/inkcity/SKILL.md",
+        "repo:README.md:65"
+      ],
+      "component": "repo:gallery-src/src/components/ui/index-card.tsx + skill/inkcity/assets/starter (SF.seek)",
+      "actions": [
+        {
+          "id": "skill-head",
+          "at": 0.2,
+          "action": "\"Draw your own city.\" is lettered on",
+          "soundRequired": false
+        },
+        {
+          "id": "skill-type",
+          "at": 0.95,
+          "action": "The prompt is typed into the card",
+          "soundRequired": true
+        },
+        {
+          "id": "skill-type-2",
+          "at": 1.55,
+          "action": "Typing continues",
+          "soundRequired": false
+        },
+        {
+          "id": "skill-build",
+          "at": 1.9,
+          "action": "The skill's starter town draws itself",
+          "soundRequired": true
+        }
+      ],
+      "description": "the skill behind the atlas",
+      "descriptionAt": 0.2
+    },
+    {
+      "id": "end",
+      "start": 39.0,
+      "end": 43.2,
+      "type": "end",
+      "headlineEn": "inkcity Atlas",
+      "headline": "inkcity Atlas",
+      "plainExplanation": "The site and the code are public; open the address in a browser to explore.",
+      "claim": true,
+      "source": [
+        "repo:LICENSE"
+      ],
+      "component": null,
+      "actions": [
+        {
+          "id": "end-card",
+          "at": 0.1,
+          "action": "End card: \"inkcity Atlas\" is lettered on",
+          "soundRequired": true
+        },
+        {
+          "id": "end-url",
+          "at": 1.01,
+          "action": "The address is written on",
+          "soundRequired": false
+        }
+      ],
+      "description": "leehongji.github.io/inkcity-atlas · open source, MIT",
+      "descriptionAt": 0.9
+    }
+  ]
+}

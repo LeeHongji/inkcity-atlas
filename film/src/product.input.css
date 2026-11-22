@@ -1,0 +1,4 @@
+/* The gallery's real stylesheet (Looseleaf tokens, Kevin Sans, Plex Mono), scanned over the gallery and the film. */
+@import "../../gallery-src/src/styles/looseleaf.css";
+@source "../../gallery-src/src";
+@source "./";

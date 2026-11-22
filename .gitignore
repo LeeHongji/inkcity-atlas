@@ -1,6 +1,7 @@
 # renders and probes made while drawing (large, regenerable)
 out/
 *.mp4
+!media/inkcity-atlas-film.mp4
 thumbs/raw/
 # landmark lookups cached by skill/inkcity/scripts/landmark.py
 **/refs/.cache/
@@ -9,3 +10,18 @@ gallery-src/node_modules/
 gallery-src/dist/
 gallery-src/dist-guide/
 .DS_Store
+
+# the film: dependencies, builds, renders and everything its tools regenerate
+film/node_modules/
+film/dist/
+film/.build/
+film/renders/
+film/public/clips/*
+!film/public/clips/*.json
+film/assets/
+film/src/product.css
+film/evidence/stills/
+film/evidence/review/
+film/evidence/guide-stills/
+film/evidence/component-imports.json
+film/evidence/environment.json
