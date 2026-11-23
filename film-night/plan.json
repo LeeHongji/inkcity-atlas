@@ -1,0 +1,812 @@
+{
+  "demo": false,
+  "product": "inkcity Atlas",
+  "style": "repo",
+  "width": 1080,
+  "height": 1080,
+  "fps": 30,
+  "duration": 30.0,
+  "repo": "..",
+  "scope": {
+    "versions": "main@32b81e5 (published 2026-11-22)",
+    "platforms": [
+      "web-desktop"
+    ],
+    "feature": "night (key N, ?night, the guide switch)"
+  },
+  "audioRequired": true,
+  "sfxRequired": true,
+  "typography": {
+    "mode": "english",
+    "enFont": "Kevin Sans: Looseleaf Lettering (script, riso offset) for the title and city names, the hand for the one line; IBM Plex Mono for the address",
+    "zhFont": null,
+    "zhStyle": null,
+    "exceptionReason": "User, 2026-11-21: \"不需要中文…把那个字体都做成英文的。参考那个 UI 设计库的内容，然后突出它的这个手写手绘风格即可\" (English only, in the UI library's hand-drawn style)."
+  },
+  "audio": {
+    "ducking": {
+      "enabled": true
+    },
+    "beatGrid": {
+      "bpm": 96,
+      "offset": 0
+    },
+    "music": {
+      "file": "assets/music.wav",
+      "gain": 0.7
+    },
+    "cues": [
+      {
+        "at": 1.874,
+        "syncOffset": 0.001,
+        "actionId": "switch-press",
+        "file": "assets/sfx/key.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "key",
+        "duck": {
+          "db": 2,
+          "attack": 0.05,
+          "hold": 0.2,
+          "release": 0.3
+        }
+      },
+      {
+        "at": 1.918,
+        "syncOffset": 0.032,
+        "actionId": "switch-drop",
+        "file": "assets/sfx/drop.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "drop"
+      },
+      {
+        "at": 2.029,
+        "syncOffset": 0.001,
+        "actionId": "switch-lamps-1",
+        "file": "assets/sfx/tink-0.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "tink-0"
+      },
+      {
+        "at": 2.341,
+        "syncOffset": 0.001,
+        "actionId": "switch-lamps-2",
+        "file": "assets/sfx/tink-1.wav",
+        "gain": 0.94,
+        "role": "sfx",
+        "kind": "tink-1"
+      },
+      {
+        "at": 2.654,
+        "syncOffset": 0.001,
+        "actionId": "switch-lamps-3",
+        "file": "assets/sfx/tink-2.wav",
+        "gain": 0.88,
+        "role": "sfx",
+        "kind": "tink-2"
+      },
+      {
+        "at": 2.966,
+        "syncOffset": 0.001,
+        "actionId": "switch-lamps-4",
+        "file": "assets/sfx/tink-3.wav",
+        "gain": 0.8200000000000001,
+        "role": "sfx",
+        "kind": "tink-3"
+      },
+      {
+        "at": 3.279,
+        "syncOffset": 0.001,
+        "actionId": "switch-lamps-5",
+        "file": "assets/sfx/tink-4.wav",
+        "gain": 0.76,
+        "role": "sfx",
+        "kind": "tink-4"
+      },
+      {
+        "at": 3.591,
+        "syncOffset": 0.001,
+        "actionId": "switch-lamps-6",
+        "file": "assets/sfx/tink-5.wav",
+        "gain": 0.7,
+        "role": "sfx",
+        "kind": "tink-5"
+      },
+      {
+        "at": 3.67,
+        "syncOffset": 0.08,
+        "actionId": "switch-line",
+        "file": "assets/sfx/shimmer.wav",
+        "gain": 1.4,
+        "role": "sfx",
+        "kind": "shimmer"
+      },
+      {
+        "at": 3.904,
+        "syncOffset": 0.001,
+        "actionId": "switch-lamps-7",
+        "file": "assets/sfx/tink-6.wav",
+        "gain": 0.64,
+        "role": "sfx",
+        "kind": "tink-6"
+      },
+      {
+        "at": 7.499,
+        "syncOffset": 0.001,
+        "actionId": "tokyo-cut",
+        "file": "assets/sfx/light-0.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-0"
+      },
+      {
+        "at": 7.87,
+        "syncOffset": 0.08,
+        "actionId": "tokyo-note",
+        "file": "assets/sfx/shimmer.wav",
+        "gain": 0.55,
+        "role": "sfx",
+        "kind": "shimmer"
+      },
+      {
+        "at": 9.999,
+        "syncOffset": 0.001,
+        "actionId": "paris-cut",
+        "file": "assets/sfx/light-1.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-1"
+      },
+      {
+        "at": 11.249,
+        "syncOffset": 0.001,
+        "actionId": "venice-cut",
+        "file": "assets/sfx/light-2.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-2"
+      },
+      {
+        "at": 12.499,
+        "syncOffset": 0.001,
+        "actionId": "newyork-cut",
+        "file": "assets/sfx/light-3.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-3"
+      },
+      {
+        "at": 13.749,
+        "syncOffset": 0.001,
+        "actionId": "london-cut",
+        "file": "assets/sfx/light-0.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-0"
+      },
+      {
+        "at": 14.999,
+        "syncOffset": 0.001,
+        "actionId": "chongqing-cut",
+        "file": "assets/sfx/light-1.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-1"
+      },
+      {
+        "at": 16.249,
+        "syncOffset": 0.001,
+        "actionId": "hongkong-cut",
+        "file": "assets/sfx/light-2.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-2"
+      },
+      {
+        "at": 17.499,
+        "syncOffset": 0.001,
+        "actionId": "istanbul-cut",
+        "file": "assets/sfx/light-3.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-3"
+      },
+      {
+        "at": 18.749,
+        "syncOffset": 0.001,
+        "actionId": "rio-cut",
+        "file": "assets/sfx/light-0.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-0"
+      },
+      {
+        "at": 19.999,
+        "syncOffset": 0.001,
+        "actionId": "beijing-cut",
+        "file": "assets/sfx/light-1.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-1"
+      },
+      {
+        "at": 21.249,
+        "syncOffset": 0.001,
+        "actionId": "barcelona-cut",
+        "file": "assets/sfx/light-2.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-2"
+      },
+      {
+        "at": 22.499,
+        "syncOffset": 0.001,
+        "actionId": "lisbon-cut",
+        "file": "assets/sfx/light-3.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "light-3"
+      },
+      {
+        "at": 24.374,
+        "syncOffset": 0.001,
+        "actionId": "grid-press",
+        "file": "assets/sfx/key.wav",
+        "gain": 1.5,
+        "role": "sfx",
+        "kind": "key",
+        "duck": {
+          "db": 2,
+          "attack": 0.05,
+          "hold": 0.2,
+          "release": 0.3
+        }
+      },
+      {
+        "at": 24.594,
+        "syncOffset": 0.001,
+        "actionId": "grid-wave-1",
+        "file": "assets/sfx/tink-1.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tink-1"
+      },
+      {
+        "at": 24.734,
+        "syncOffset": 0.001,
+        "actionId": "grid-wave-2",
+        "file": "assets/sfx/tink-2.wav",
+        "gain": 0.85,
+        "role": "sfx",
+        "kind": "tink-2"
+      },
+      {
+        "at": 24.794,
+        "syncOffset": 0.001,
+        "actionId": "grid-wave-3",
+        "file": "assets/sfx/tink-3.wav",
+        "gain": 0.8,
+        "role": "sfx",
+        "kind": "tink-3"
+      },
+      {
+        "at": 24.864,
+        "syncOffset": 0.001,
+        "actionId": "grid-wave-4",
+        "file": "assets/sfx/tink-4.wav",
+        "gain": 0.75,
+        "role": "sfx",
+        "kind": "tink-4"
+      },
+      {
+        "at": 25.545,
+        "syncOffset": 0.08,
+        "actionId": "grid-title",
+        "file": "assets/sfx/shimmer.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "shimmer"
+      },
+      {
+        "at": 27.57,
+        "syncOffset": 0.08,
+        "actionId": "end-name",
+        "file": "assets/sfx/shimmer.wav",
+        "gain": 2.0,
+        "role": "sfx",
+        "kind": "shimmer",
+        "duck": {
+          "db": 4,
+          "attack": 0.08,
+          "hold": 0.5,
+          "release": 0.6
+        }
+      },
+      {
+        "at": 28.099,
+        "syncOffset": 0.001,
+        "actionId": "end-press",
+        "file": "assets/sfx/light-1.wav",
+        "gain": 0.6,
+        "role": "sfx",
+        "kind": "light-1"
+      }
+    ]
+  },
+  "shots": [
+    {
+      "id": "switch",
+      "start": 0,
+      "end": 7.5,
+      "type": "title",
+      "headlineEn": "Press N",
+      "headline": "Press N",
+      "plainExplanation": "Press N in any city and it turns to night: the day fades and the lamps come on in a wave from the middle of the view.",
+      "claim": true,
+      "source": [
+        "repo:engine/90_app.js",
+        "repo:engine/80_render.js",
+        "repo:gallery-src/src/guide/Guide.tsx"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek by day; the night draw with lightT)",
+      "actions": [
+        {
+          "id": "switch-press",
+          "at": 1.875,
+          "action": "The keycap N is pressed",
+          "soundRequired": true
+        },
+        {
+          "id": "switch-drop",
+          "at": 1.95,
+          "action": "The day begins to fade",
+          "soundRequired": false
+        },
+        {
+          "id": "switch-lamps-1",
+          "at": 2.03,
+          "action": "Lamps come on, step 1 of the wave from the middle",
+          "soundRequired": true
+        },
+        {
+          "id": "switch-lamps-2",
+          "at": 2.342,
+          "action": "Lamps come on, step 2 of the wave from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "switch-lamps-3",
+          "at": 2.655,
+          "action": "Lamps come on, step 3 of the wave from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "switch-lamps-4",
+          "at": 2.967,
+          "action": "Lamps come on, step 4 of the wave from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "switch-lamps-5",
+          "at": 3.28,
+          "action": "Lamps come on, step 5 of the wave from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "switch-lamps-6",
+          "at": 3.592,
+          "action": "Lamps come on, step 6 of the wave from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "switch-lamps-7",
+          "at": 3.905,
+          "action": "Lamps come on, step 7 of the wave from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "switch-line",
+          "at": 3.75,
+          "action": "\"and the city turns to night.\" glows on",
+          "soundRequired": true
+        }
+      ],
+      "description": "and the city turns to night.",
+      "descriptionAt": 3.75
+    },
+    {
+      "id": "tokyo",
+      "start": 7.5,
+      "end": 10.0,
+      "type": "montage",
+      "headlineEn": "Tokyo",
+      "headline": "Tokyo",
+      "plainExplanation": "The Sumida bank at night: cherry blossom lit under paper lanterns, the river doubling the lights.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/tokyo/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "tokyo-cut",
+          "at": 0.0,
+          "action": "Hard cut to Tokyo at night; its name glows on",
+          "soundRequired": true
+        },
+        {
+          "id": "tokyo-note",
+          "at": 0.45,
+          "action": "\"each city lit the way it is lit today\" glows on",
+          "soundRequired": false
+        }
+      ],
+      "description": "each city lit the way it is lit today",
+      "descriptionAt": 0.45
+    },
+    {
+      "id": "paris",
+      "start": 10.0,
+      "end": 11.25,
+      "type": "montage",
+      "headlineEn": "Paris",
+      "headline": "Paris",
+      "plainExplanation": "The Eiffel Tower in its golden lighting, its beacon turning.",
+      "claim": false,
+      "source": [
+        "repo:cities/paris/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/paris/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "paris-cut",
+          "at": 0.0,
+          "action": "Hard cut to Paris at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "venice",
+      "start": 11.25,
+      "end": 12.5,
+      "type": "montage",
+      "headlineEn": "Venice",
+      "headline": "Venice",
+      "plainExplanation": "San Marco floodlit, every canal lamp doubled in the water.",
+      "claim": false,
+      "source": [
+        "repo:cities/venice/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/venice/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "venice-cut",
+          "at": 0.0,
+          "action": "Hard cut to Venice at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "newyork",
+      "start": 12.5,
+      "end": 13.75,
+      "type": "montage",
+      "headlineEn": "New York",
+      "headline": "New York",
+      "plainExplanation": "Times Square's screens, the brightest place on the map.",
+      "claim": false,
+      "source": [
+        "repo:cities/newyork/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/newyork/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "newyork-cut",
+          "at": 0.0,
+          "action": "Hard cut to New York at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "london",
+      "start": 13.75,
+      "end": 15.0,
+      "type": "montage",
+      "headlineEn": "London",
+      "headline": "London",
+      "plainExplanation": "The Palace of Westminster floodlit, Big Ben's dials lit, the London Eye.",
+      "claim": false,
+      "source": [
+        "repo:cities/london/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/london/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "london-cut",
+          "at": 0.0,
+          "action": "Hard cut to London at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "chongqing",
+      "start": 15.0,
+      "end": 16.25,
+      "type": "montage",
+      "headlineEn": "Chongqing",
+      "headline": "Chongqing",
+      "plainExplanation": "Hongyadong lit gold from top to bottom.",
+      "claim": false,
+      "source": [
+        "repo:cities/chongqing/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/chongqing/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "chongqing-cut",
+          "at": 0.0,
+          "action": "Hard cut to Chongqing at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "hongkong",
+      "start": 16.25,
+      "end": 17.5,
+      "type": "montage",
+      "headlineEn": "Hong Kong",
+      "headline": "Hong Kong",
+      "plainExplanation": "Central at night: the harbour, the Bank of China Tower's lines, December's Christmas lights.",
+      "claim": false,
+      "source": [
+        "repo:cities/hongkong/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/hongkong/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "hongkong-cut",
+          "at": 0.0,
+          "action": "Hard cut to Hong Kong at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "istanbul",
+      "start": 17.5,
+      "end": 18.75,
+      "type": "montage",
+      "headlineEn": "Istanbul",
+      "headline": "Istanbul",
+      "plainExplanation": "The Galata Tower floodlit over the Golden Horn.",
+      "claim": false,
+      "source": [
+        "repo:cities/istanbul/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/istanbul/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "istanbul-cut",
+          "at": 0.0,
+          "action": "Hard cut to Istanbul at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "rio",
+      "start": 18.75,
+      "end": 20.0,
+      "type": "montage",
+      "headlineEn": "Rio de Janeiro",
+      "headline": "Rio de Janeiro",
+      "plainExplanation": "The Sambadrome under its floodlights, the parade going on through the night.",
+      "claim": false,
+      "source": [
+        "repo:cities/rio/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/rio/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "rio-cut",
+          "at": 0.0,
+          "action": "Hard cut to Rio de Janeiro at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "beijing",
+      "start": 20.0,
+      "end": 21.25,
+      "type": "montage",
+      "headlineEn": "Beijing",
+      "headline": "Beijing",
+      "plainExplanation": "Tiananmen floodlit, its lanterns lit.",
+      "claim": false,
+      "source": [
+        "repo:cities/beijing/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/beijing/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "beijing-cut",
+          "at": 0.0,
+          "action": "Hard cut to Beijing at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "barcelona",
+      "start": 21.25,
+      "end": 22.5,
+      "type": "montage",
+      "headlineEn": "Barcelona",
+      "headline": "Barcelona",
+      "plainExplanation": "Montjuic: the Magic Fountain in its light show below the Palau Nacional.",
+      "claim": false,
+      "source": [
+        "repo:cities/barcelona/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/barcelona/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "barcelona-cut",
+          "at": 0.0,
+          "action": "Hard cut to Barcelona at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "lisbon",
+      "start": 22.5,
+      "end": 23.75,
+      "type": "montage",
+      "headlineEn": "Lisbon",
+      "headline": "Lisbon",
+      "plainExplanation": "The Santo Antonio street party under its strings of lights.",
+      "claim": false,
+      "source": [
+        "repo:cities/lisbon/index.html",
+        "repo:cities/BRIEF-NIGHT.md"
+      ],
+      "component": "repo:cities/lisbon/index.html?night (SF.seek)",
+      "actions": [
+        {
+          "id": "lisbon-cut",
+          "at": 0.0,
+          "action": "Hard cut to Lisbon at night; its name glows on",
+          "soundRequired": true
+        }
+      ],
+      "illustrates": "tokyo"
+    },
+    {
+      "id": "grid",
+      "start": 23.75,
+      "end": 27.5,
+      "type": "workspace",
+      "headlineEn": "Twelve cities. One key.",
+      "headline": "Twelve cities. One key.",
+      "plainExplanation": "All twelve cities have the night: the same key turns each of them.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/index.html",
+        "repo:cities/paris/index.html",
+        "repo:cities/newyork/index.html",
+        "repo:cities/london/index.html",
+        "repo:cities/barcelona/index.html",
+        "repo:cities/venice/index.html",
+        "repo:cities/lisbon/index.html",
+        "repo:cities/istanbul/index.html",
+        "repo:cities/rio/index.html",
+        "repo:cities/beijing/index.html",
+        "repo:cities/hongkong/index.html",
+        "repo:cities/chongqing/index.html",
+        "repo:README.md"
+      ],
+      "component": "tools/grid-images.mjs (each page's own wide view, by day and at night)",
+      "actions": [
+        {
+          "id": "grid-press",
+          "at": 0.625,
+          "action": "The keycap N is pressed again",
+          "soundRequired": true
+        },
+        {
+          "id": "grid-wave-1",
+          "at": 0.845,
+          "action": "Tiles turn to night, ring 1 from the middle",
+          "soundRequired": true
+        },
+        {
+          "id": "grid-wave-2",
+          "at": 0.985,
+          "action": "Tiles turn to night, ring 2 from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "grid-wave-3",
+          "at": 1.045,
+          "action": "Tiles turn to night, ring 3 from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "grid-wave-4",
+          "at": 1.115,
+          "action": "Tiles turn to night, ring 4 from the middle",
+          "soundRequired": false
+        },
+        {
+          "id": "grid-title",
+          "at": 1.875,
+          "action": "\"Twelve cities. One key.\" glows on",
+          "soundRequired": true
+        }
+      ],
+      "keep": 30.0,
+      "description": "Twelve cities. One key.",
+      "descriptionAt": 1.875
+    },
+    {
+      "id": "end",
+      "start": 27.5,
+      "end": 30.0,
+      "type": "end",
+      "headlineEn": "inkcity Atlas",
+      "headline": "inkcity Atlas",
+      "plainExplanation": "The site, where every city can be opened and turned to night.",
+      "claim": false,
+      "source": [
+        "repo:README.md"
+      ],
+      "component": "end card",
+      "actions": [
+        {
+          "id": "end-name",
+          "at": 0.15,
+          "action": "\"inkcity Atlas\" glows on",
+          "soundRequired": true
+        },
+        {
+          "id": "end-press",
+          "at": 0.6,
+          "action": "\"press N for night\" glows on",
+          "soundRequired": false
+        }
+      ],
+      "description": "leehongji.github.io/inkcity-atlas",
+      "descriptionAt": 0.6
+    }
+  ]
+}

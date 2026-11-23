@@ -25,3 +25,17 @@ film/evidence/review/
 film/evidence/guide-stills/
 film/evidence/component-imports.json
 film/evidence/environment.json
+
+# the night film: the same (its node_modules is a link to film's)
+film-night/node_modules
+film-night/dist/
+film-night/.build/
+film-night/renders/
+film-night/public/clips/*
+!film-night/public/clips/*.json
+film-night/assets/
+film-night/src/product.css
+film-night/evidence/stills/
+film-night/evidence/review/
+film-night/evidence/component-imports.json
+film-night/evidence/environment.json

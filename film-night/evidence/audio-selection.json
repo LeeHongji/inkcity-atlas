@@ -1,0 +1,27 @@
+{
+  "music": {
+    "source": "code-original",
+    "script": "audio/score.py",
+    "seed": 1123,
+    "duration": 30.0,
+    "bpm": 96,
+    "key": "E-flat major (lydian colour at night)",
+    "instruments": ["felt piano", "soft pad", "bass", "soft kick", "shaker", "wood knock", "glockenspiel"],
+    "sections": {
+      "day": [0, 1.875],
+      "switch": [1.875, 7.5],
+      "cities": [7.5, 23.75],
+      "twelve": [23.75, 27.5],
+      "end": [27.5, 30.0]
+    },
+    "notes": "Day is one rolled E-flat chord; the key turns it to A-flat major 7 #11 under a pad; the cities ride a light pulse with a felt-piano arpeggio, one chord per bar; the pulse stops for the twelve; the end rings on E-flat add 9 and fades over the last 1.2 s."
+  },
+  "sfx": [
+    {"files": ["key.wav"], "role": "the keycap N pressed (switch 1.875 s, grid 24.375 s)", "source": "code-original, audio/sfx.py: a muted thock", "license": "original to this project"},
+    {"files": ["drop.wav"], "role": "the day dropping away after the press", "source": "code-original, audio/sfx.py: a soft low swoop", "license": "original to this project"},
+    {"files": ["tink-0.wav", "tink-1.wav", "tink-2.wav", "tink-3.wav", "tink-4.wav", "tink-5.wav", "tink-6.wav", "tink-7.wav"], "role": "the lamps coming on in a wave (switch) and the tiles turning (grid)", "source": "code-original, audio/sfx.py: glockenspiel notes, E-flat major pentatonic, MIDI 75-91", "license": "original to this project"},
+    {"files": ["shimmer.wav"], "role": "a caption glowing on", "source": "code-original, audio/sfx.py: an airy shimmer", "license": "original to this project"},
+    {"files": ["light-0.wav", "light-1.wav", "light-2.wav", "light-3.wav"], "role": "a city cut in (one per cut, cycling)", "source": "code-original, audio/sfx.py: a warm bulb-on tick", "license": "original to this project"}
+  ],
+  "placement": "audio/cues.py writes plan.json audio.cues at the action times from the shot code; syncOffset is each file's onset measured with sfx_landmarks.py; mix_audio.py mixes and ducks the music 2-4 dB under each cue."
+}

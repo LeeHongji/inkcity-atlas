@@ -1,0 +1,54 @@
+/* inkcity Atlas, "Press N": the frame design system from DIRECTION.md, plus the mechanics every film needs. */
+* { box-sizing:border-box; }
+html,body { margin:0; background:#1B1F33; }
+#film { position:relative; width:1080px; height:1080px; overflow:hidden; background:#F0EEE4; color:#2C271C;
+  --ink:#2C271C; --pale:#ECE5D5; --dark:#181C2E; --lamp:#FFC979;
+  --en:"Kevin Sans Hand", "Kevin Sans", sans-serif; --script:"Kevin Sans Script", "Kevin Sans", sans-serif; --mono:"IBM Plex Mono", ui-monospace, monospace;
+  font-family:var(--en); -webkit-font-smoothing:antialiased; }
+/* the film clock owns motion: freeze CSS transitions/animations so any frame renders in isolation */
+#film *, #film *::before, #film *::after { transition:none !important; animation-duration:0s !important; animation-delay:0s !important; }
+.shot { position:absolute; inset:0; overflow:hidden; opacity:0; visibility:hidden; }
+.full { position:absolute; left:0; top:0; width:1080px; height:1080px; display:block; }
+
+/* words at night: pale ink with a dark halo (the guide's night notes); --bloom: the warm flare as they come on */
+.night-note, .name-wrap, .end-card { --bloom:0; }
+.night-note { color:var(--pale); text-shadow:0 0 2px var(--dark), 0 0 6px var(--dark), 0 0 12px var(--dark), 0 0 calc(var(--bloom) * 26px) rgba(255,201,121,calc(var(--bloom) * 0.95)); }
+
+/* the keycap: Looseleaf's Kbd drawn at film scale */
+.key-wrap { display:inline-block; vertical-align:middle; }
+.key-n { transform:scale(3.4); transform-origin:left center; margin-right:72px; font-size:15px !important; color:#2C271C !important; }
+
+/* 1 · the switch: the words start in ink by day and turn pale as the night falls (--cap, --halo) */
+#poster { z-index:50; }
+.sw-title { position:absolute; left:56px; top:52px; width:520px; --cap:#2C271C; --halo:rgba(240,238,228,0.95); z-index:5; }
+.sw-press { display:flex; align-items:center; gap:26px; }
+.sw-l { font-size:112px !important; line-height:.95 !important; color:var(--cap) !important; filter: drop-shadow(0 0 6px var(--halo)) drop-shadow(0 0 14px var(--halo)); }
+.sw-title .key-n { margin-left:6px; }
+.sw-line { margin:30px 0 0; font-size:54px; line-height:1.15; opacity:0; }
+
+/* the cities: a pale lettered name in the top-left corner */
+.name-wrap { position:absolute; left:52px; top:44px; max-width:960px; z-index:5; }
+.name-l { font-size:96px !important; line-height:.95 !important; color:var(--pale) !important;
+  filter:drop-shadow(0 0 6px var(--dark)) drop-shadow(0 0 calc(var(--bloom) * 18px) rgba(255,201,121,calc(var(--bloom) * 0.9))); }
+.name-note { margin-top:14px; font-size:46px; color:var(--pale); opacity:0; --bloom:0;
+  text-shadow:0 0 2px var(--dark), 0 0 6px var(--dark), 0 0 12px var(--dark), 0 0 calc(var(--bloom) * 22px) rgba(255,201,121,calc(var(--bloom) * 0.9)); }
+
+/* 14 · the twelve: three by four on paper that turns to night */
+.grid { position:absolute; inset:0; background:#F0EEE4; }
+.gr-paper { position:absolute; inset:0; background:rgb(27,31,51); -webkit-mask-image:linear-gradient(transparent, transparent); mask-image:linear-gradient(transparent, transparent); }
+.gr-head { position:absolute; left:56px; top:56px; right:48px; height:110px; display:flex; align-items:center; gap:18px; }
+.gr-title { font-size:56px; opacity:0; }
+.gr-tiles { position:absolute; left:54px; top:196px; margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(3, 312px); column-gap:18px; row-gap:18px; }
+.gr-tile { position:relative; width:312px; height:176px; }
+.gr-tile img { position:absolute; inset:0; width:312px; height:176px; display:block; object-fit:cover; }
+.gr-night { opacity:0; }
+
+/* 15 · the end card over the twelve dimmed */
+.end { position:absolute; inset:0; }
+.end-card { position:absolute; left:0; right:0; top:330px; text-align:center; }
+.end-name { font-size:120px !important; line-height:.95 !important; color:var(--pale) !important; opacity:0;
+  filter:drop-shadow(0 0 8px var(--dark)) drop-shadow(0 0 calc(var(--bloom) * 22px) rgba(255,201,121,calc(var(--bloom) * 0.9))); }
+.end-press { margin:46px 0 0; font-size:54px; opacity:0; }
+.end-press .key-n { margin:0 64px 0 14px; transform-origin:left center; }
+.end-url { margin:40px 0 0; font-family:var(--mono); font-weight:500; font-size:34px; color:var(--pale); opacity:0; --bloom:0;
+  text-shadow:0 0 6px var(--dark), 0 0 calc(var(--bloom) * 20px) rgba(255,201,121,calc(var(--bloom) * 0.9)); }

@@ -1,0 +1,884 @@
+{
+  "planSha256": "876dbe722d9c2583a385c0e760382dcc9f76d232e59c531a2839b616f695b476",
+  "music": {
+    "file": "assets/music.wav",
+    "gain": 0.7,
+    "sha256": "fcd5b5d0fcbb29658fc352a29a2f4bda03047113c4dea18d4ae5bc3d24628a91"
+  },
+  "cues": [
+    {
+      "at": 1.874,
+      "syncOffset": 0.001,
+      "actionId": "switch-press",
+      "file": "assets/sfx/key.wav",
+      "gain": 1.5,
+      "role": "sfx",
+      "kind": "key",
+      "duck": {
+        "db": 2,
+        "attack": 0.05,
+        "hold": 0.2,
+        "release": 0.3
+      },
+      "sha256": "ba145ea02cb359407880370b1cc3b49bba5405a79a5242e7de4b8389902cffc5"
+    },
+    {
+      "at": 1.918,
+      "syncOffset": 0.032,
+      "actionId": "switch-drop",
+      "file": "assets/sfx/drop.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "drop",
+      "sha256": "1652d756d601459b942008e2ba69d7b25d35d6091f44aa9d7d2f29350b9510f8"
+    },
+    {
+      "at": 2.029,
+      "syncOffset": 0.001,
+      "actionId": "switch-lamps-1",
+      "file": "assets/sfx/tink-0.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "tink-0",
+      "sha256": "77fc2104332cb6a1f0a5ae2b789326cee63cceed59d17d4d581b9c03d3dfc6d1"
+    },
+    {
+      "at": 2.341,
+      "syncOffset": 0.001,
+      "actionId": "switch-lamps-2",
+      "file": "assets/sfx/tink-1.wav",
+      "gain": 0.94,
+      "role": "sfx",
+      "kind": "tink-1",
+      "sha256": "62da9f450a72783ef647f0d71c6c225fd749d5e12c3918a3b265dc90d49cf518"
+    },
+    {
+      "at": 2.654,
+      "syncOffset": 0.001,
+      "actionId": "switch-lamps-3",
+      "file": "assets/sfx/tink-2.wav",
+      "gain": 0.88,
+      "role": "sfx",
+      "kind": "tink-2",
+      "sha256": "a1d3b73135efa9cdff75eeebfdb5893df99dbc71db63ffef861332fe5161d119"
+    },
+    {
+      "at": 2.966,
+      "syncOffset": 0.001,
+      "actionId": "switch-lamps-4",
+      "file": "assets/sfx/tink-3.wav",
+      "gain": 0.8200000000000001,
+      "role": "sfx",
+      "kind": "tink-3",
+      "sha256": "b11692620f47e1a3800a2b8582d5c6057757ce9100aeef3fecedaabfa828f30f"
+    },
+    {
+      "at": 3.279,
+      "syncOffset": 0.001,
+      "actionId": "switch-lamps-5",
+      "file": "assets/sfx/tink-4.wav",
+      "gain": 0.76,
+      "role": "sfx",
+      "kind": "tink-4",
+      "sha256": "3cf26d4ca477d539234f9911b6c81c4307f9a092b7c8513d5422d580a133dbc2"
+    },
+    {
+      "at": 3.591,
+      "syncOffset": 0.001,
+      "actionId": "switch-lamps-6",
+      "file": "assets/sfx/tink-5.wav",
+      "gain": 0.7,
+      "role": "sfx",
+      "kind": "tink-5",
+      "sha256": "0a898e36872df9de9b6905bd71859dd9b7ae827d5cd80bab64a45d25278acc9d"
+    },
+    {
+      "at": 3.67,
+      "syncOffset": 0.08,
+      "actionId": "switch-line",
+      "file": "assets/sfx/shimmer.wav",
+      "gain": 1.4,
+      "role": "sfx",
+      "kind": "shimmer",
+      "sha256": "3bd5bb57953217952a88200f9ef4e4b7bdd48523a9e8ef4412c0e57460a291d4"
+    },
+    {
+      "at": 3.904,
+      "syncOffset": 0.001,
+      "actionId": "switch-lamps-7",
+      "file": "assets/sfx/tink-6.wav",
+      "gain": 0.64,
+      "role": "sfx",
+      "kind": "tink-6",
+      "sha256": "22817352768fa72dc92c93a2d1ccfa2ea1dcf611f894cfe9805116943215dbba"
+    },
+    {
+      "at": 7.499,
+      "syncOffset": 0.001,
+      "actionId": "tokyo-cut",
+      "file": "assets/sfx/light-0.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-0",
+      "sha256": "8e3d64ce768e0920548bc6c632ac9bebec9f252c816a43bfdf36f95256a7be56"
+    },
+    {
+      "at": 7.87,
+      "syncOffset": 0.08,
+      "actionId": "tokyo-note",
+      "file": "assets/sfx/shimmer.wav",
+      "gain": 0.55,
+      "role": "sfx",
+      "kind": "shimmer",
+      "sha256": "3bd5bb57953217952a88200f9ef4e4b7bdd48523a9e8ef4412c0e57460a291d4"
+    },
+    {
+      "at": 9.999,
+      "syncOffset": 0.001,
+      "actionId": "paris-cut",
+      "file": "assets/sfx/light-1.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-1",
+      "sha256": "b71f9a36908cb41d14a8e9ebe80dcb5b44735d1c2d8d3a6aeec2470cea800060"
+    },
+    {
+      "at": 11.249,
+      "syncOffset": 0.001,
+      "actionId": "venice-cut",
+      "file": "assets/sfx/light-2.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-2",
+      "sha256": "e49d1a6006813875c5e118f1a1357df7fe5048bc4006887cbf0f0c8ba15558b2"
+    },
+    {
+      "at": 12.499,
+      "syncOffset": 0.001,
+      "actionId": "newyork-cut",
+      "file": "assets/sfx/light-3.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-3",
+      "sha256": "9b68a1276720b27f017171a3c9799c40196bcb3a7080dfce0715623f69b310bf"
+    },
+    {
+      "at": 13.749,
+      "syncOffset": 0.001,
+      "actionId": "london-cut",
+      "file": "assets/sfx/light-0.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-0",
+      "sha256": "8e3d64ce768e0920548bc6c632ac9bebec9f252c816a43bfdf36f95256a7be56"
+    },
+    {
+      "at": 14.999,
+      "syncOffset": 0.001,
+      "actionId": "chongqing-cut",
+      "file": "assets/sfx/light-1.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-1",
+      "sha256": "b71f9a36908cb41d14a8e9ebe80dcb5b44735d1c2d8d3a6aeec2470cea800060"
+    },
+    {
+      "at": 16.249,
+      "syncOffset": 0.001,
+      "actionId": "hongkong-cut",
+      "file": "assets/sfx/light-2.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-2",
+      "sha256": "e49d1a6006813875c5e118f1a1357df7fe5048bc4006887cbf0f0c8ba15558b2"
+    },
+    {
+      "at": 17.499,
+      "syncOffset": 0.001,
+      "actionId": "istanbul-cut",
+      "file": "assets/sfx/light-3.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-3",
+      "sha256": "9b68a1276720b27f017171a3c9799c40196bcb3a7080dfce0715623f69b310bf"
+    },
+    {
+      "at": 18.749,
+      "syncOffset": 0.001,
+      "actionId": "rio-cut",
+      "file": "assets/sfx/light-0.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-0",
+      "sha256": "8e3d64ce768e0920548bc6c632ac9bebec9f252c816a43bfdf36f95256a7be56"
+    },
+    {
+      "at": 19.999,
+      "syncOffset": 0.001,
+      "actionId": "beijing-cut",
+      "file": "assets/sfx/light-1.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-1",
+      "sha256": "b71f9a36908cb41d14a8e9ebe80dcb5b44735d1c2d8d3a6aeec2470cea800060"
+    },
+    {
+      "at": 21.249,
+      "syncOffset": 0.001,
+      "actionId": "barcelona-cut",
+      "file": "assets/sfx/light-2.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-2",
+      "sha256": "e49d1a6006813875c5e118f1a1357df7fe5048bc4006887cbf0f0c8ba15558b2"
+    },
+    {
+      "at": 22.499,
+      "syncOffset": 0.001,
+      "actionId": "lisbon-cut",
+      "file": "assets/sfx/light-3.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "light-3",
+      "sha256": "9b68a1276720b27f017171a3c9799c40196bcb3a7080dfce0715623f69b310bf"
+    },
+    {
+      "at": 24.374,
+      "syncOffset": 0.001,
+      "actionId": "grid-press",
+      "file": "assets/sfx/key.wav",
+      "gain": 1.5,
+      "role": "sfx",
+      "kind": "key",
+      "duck": {
+        "db": 2,
+        "attack": 0.05,
+        "hold": 0.2,
+        "release": 0.3
+      },
+      "sha256": "ba145ea02cb359407880370b1cc3b49bba5405a79a5242e7de4b8389902cffc5"
+    },
+    {
+      "at": 24.594,
+      "syncOffset": 0.001,
+      "actionId": "grid-wave-1",
+      "file": "assets/sfx/tink-1.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tink-1",
+      "sha256": "62da9f450a72783ef647f0d71c6c225fd749d5e12c3918a3b265dc90d49cf518"
+    },
+    {
+      "at": 24.734,
+      "syncOffset": 0.001,
+      "actionId": "grid-wave-2",
+      "file": "assets/sfx/tink-2.wav",
+      "gain": 0.85,
+      "role": "sfx",
+      "kind": "tink-2",
+      "sha256": "a1d3b73135efa9cdff75eeebfdb5893df99dbc71db63ffef861332fe5161d119"
+    },
+    {
+      "at": 24.794,
+      "syncOffset": 0.001,
+      "actionId": "grid-wave-3",
+      "file": "assets/sfx/tink-3.wav",
+      "gain": 0.8,
+      "role": "sfx",
+      "kind": "tink-3",
+      "sha256": "b11692620f47e1a3800a2b8582d5c6057757ce9100aeef3fecedaabfa828f30f"
+    },
+    {
+      "at": 24.864,
+      "syncOffset": 0.001,
+      "actionId": "grid-wave-4",
+      "file": "assets/sfx/tink-4.wav",
+      "gain": 0.75,
+      "role": "sfx",
+      "kind": "tink-4",
+      "sha256": "3cf26d4ca477d539234f9911b6c81c4307f9a092b7c8513d5422d580a133dbc2"
+    },
+    {
+      "at": 25.545,
+      "syncOffset": 0.08,
+      "actionId": "grid-title",
+      "file": "assets/sfx/shimmer.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "shimmer",
+      "sha256": "3bd5bb57953217952a88200f9ef4e4b7bdd48523a9e8ef4412c0e57460a291d4"
+    },
+    {
+      "at": 27.57,
+      "syncOffset": 0.08,
+      "actionId": "end-name",
+      "file": "assets/sfx/shimmer.wav",
+      "gain": 2.0,
+      "role": "sfx",
+      "kind": "shimmer",
+      "duck": {
+        "db": 4,
+        "attack": 0.08,
+        "hold": 0.5,
+        "release": 0.6
+      },
+      "sha256": "3bd5bb57953217952a88200f9ef4e4b7bdd48523a9e8ef4412c0e57460a291d4"
+    },
+    {
+      "at": 28.099,
+      "syncOffset": 0.001,
+      "actionId": "end-press",
+      "file": "assets/sfx/light-1.wav",
+      "gain": 0.6,
+      "role": "sfx",
+      "kind": "light-1",
+      "sha256": "b71f9a36908cb41d14a8e9ebe80dcb5b44735d1c2d8d3a6aeec2470cea800060"
+    }
+  ],
+  "master": {
+    "file": "assets/master.wav",
+    "sha256": "fb72df9475f4cd51baa1a4a4ff5bad8ad89e0ea2116c7652cb292d4914030653"
+  },
+  "sfxStem": {
+    "file": "assets/sfx-stem.wav",
+    "sha256": "615487b6e0a26879ba60376120d7633b822d7681440aa9ed10aa58a8b1f77c6e"
+  },
+  "musicStem": {
+    "file": "assets/music-ducked.wav",
+    "sha256": "e4a1cbb241a7ec146f9ff98e1e6b2d5fc991ef660ef450f4cd762284b3eb878c"
+  },
+  "ducking": {
+    "method": "cue-envelope",
+    "windows": [
+      {
+        "actionId": "switch-press",
+        "kind": "key",
+        "start": 1.825,
+        "attackEnd": 1.875,
+        "holdEnd": 2.075,
+        "end": 2.375,
+        "db": 2
+      },
+      {
+        "actionId": "switch-drop",
+        "kind": "drop",
+        "start": 1.91,
+        "attackEnd": 1.95,
+        "holdEnd": 2.13,
+        "end": 2.4299999999999997,
+        "db": 4
+      },
+      {
+        "actionId": "switch-lamps-1",
+        "kind": "tink-0",
+        "start": 1.9899999999999998,
+        "attackEnd": 2.03,
+        "holdEnd": 2.21,
+        "end": 2.51,
+        "db": 4
+      },
+      {
+        "actionId": "switch-lamps-2",
+        "kind": "tink-1",
+        "start": 2.302,
+        "attackEnd": 2.342,
+        "holdEnd": 2.5220000000000002,
+        "end": 2.822,
+        "db": 4
+      },
+      {
+        "actionId": "switch-lamps-3",
+        "kind": "tink-2",
+        "start": 2.6149999999999998,
+        "attackEnd": 2.655,
+        "holdEnd": 2.835,
+        "end": 3.135,
+        "db": 4
+      },
+      {
+        "actionId": "switch-lamps-4",
+        "kind": "tink-3",
+        "start": 2.927,
+        "attackEnd": 2.967,
+        "holdEnd": 3.1470000000000002,
+        "end": 3.447,
+        "db": 4
+      },
+      {
+        "actionId": "switch-lamps-5",
+        "kind": "tink-4",
+        "start": 3.2399999999999998,
+        "attackEnd": 3.28,
+        "holdEnd": 3.46,
+        "end": 3.76,
+        "db": 4
+      },
+      {
+        "actionId": "switch-lamps-6",
+        "kind": "tink-5",
+        "start": 3.552,
+        "attackEnd": 3.592,
+        "holdEnd": 3.7720000000000002,
+        "end": 4.072,
+        "db": 4
+      },
+      {
+        "actionId": "switch-line",
+        "kind": "shimmer",
+        "start": 3.71,
+        "attackEnd": 3.75,
+        "holdEnd": 3.93,
+        "end": 4.23,
+        "db": 4
+      },
+      {
+        "actionId": "switch-lamps-7",
+        "kind": "tink-6",
+        "start": 3.8649999999999998,
+        "attackEnd": 3.905,
+        "holdEnd": 4.085,
+        "end": 4.385,
+        "db": 4
+      },
+      {
+        "actionId": "tokyo-cut",
+        "kind": "light-0",
+        "start": 7.46,
+        "attackEnd": 7.5,
+        "holdEnd": 7.68,
+        "end": 7.9799999999999995,
+        "db": 4
+      },
+      {
+        "actionId": "tokyo-note",
+        "kind": "shimmer",
+        "start": 7.91,
+        "attackEnd": 7.95,
+        "holdEnd": 8.13,
+        "end": 8.430000000000001,
+        "db": 4
+      },
+      {
+        "actionId": "paris-cut",
+        "kind": "light-1",
+        "start": 9.96,
+        "attackEnd": 10.0,
+        "holdEnd": 10.18,
+        "end": 10.48,
+        "db": 4
+      },
+      {
+        "actionId": "venice-cut",
+        "kind": "light-2",
+        "start": 11.21,
+        "attackEnd": 11.25,
+        "holdEnd": 11.43,
+        "end": 11.73,
+        "db": 4
+      },
+      {
+        "actionId": "newyork-cut",
+        "kind": "light-3",
+        "start": 12.46,
+        "attackEnd": 12.5,
+        "holdEnd": 12.68,
+        "end": 12.98,
+        "db": 4
+      },
+      {
+        "actionId": "london-cut",
+        "kind": "light-0",
+        "start": 13.71,
+        "attackEnd": 13.75,
+        "holdEnd": 13.93,
+        "end": 14.23,
+        "db": 4
+      },
+      {
+        "actionId": "chongqing-cut",
+        "kind": "light-1",
+        "start": 14.96,
+        "attackEnd": 15.0,
+        "holdEnd": 15.18,
+        "end": 15.48,
+        "db": 4
+      },
+      {
+        "actionId": "hongkong-cut",
+        "kind": "light-2",
+        "start": 16.21,
+        "attackEnd": 16.25,
+        "holdEnd": 16.43,
+        "end": 16.73,
+        "db": 4
+      },
+      {
+        "actionId": "istanbul-cut",
+        "kind": "light-3",
+        "start": 17.46,
+        "attackEnd": 17.5,
+        "holdEnd": 17.68,
+        "end": 17.98,
+        "db": 4
+      },
+      {
+        "actionId": "rio-cut",
+        "kind": "light-0",
+        "start": 18.71,
+        "attackEnd": 18.75,
+        "holdEnd": 18.93,
+        "end": 19.23,
+        "db": 4
+      },
+      {
+        "actionId": "beijing-cut",
+        "kind": "light-1",
+        "start": 19.96,
+        "attackEnd": 20.0,
+        "holdEnd": 20.18,
+        "end": 20.48,
+        "db": 4
+      },
+      {
+        "actionId": "barcelona-cut",
+        "kind": "light-2",
+        "start": 21.21,
+        "attackEnd": 21.25,
+        "holdEnd": 21.43,
+        "end": 21.73,
+        "db": 4
+      },
+      {
+        "actionId": "lisbon-cut",
+        "kind": "light-3",
+        "start": 22.46,
+        "attackEnd": 22.5,
+        "holdEnd": 22.68,
+        "end": 22.98,
+        "db": 4
+      },
+      {
+        "actionId": "grid-press",
+        "kind": "key",
+        "start": 24.325,
+        "attackEnd": 24.375,
+        "holdEnd": 24.575,
+        "end": 24.875,
+        "db": 2
+      },
+      {
+        "actionId": "grid-wave-1",
+        "kind": "tink-1",
+        "start": 24.555000000000003,
+        "attackEnd": 24.595000000000002,
+        "holdEnd": 24.775000000000002,
+        "end": 25.075000000000003,
+        "db": 4
+      },
+      {
+        "actionId": "grid-wave-2",
+        "kind": "tink-2",
+        "start": 24.695000000000004,
+        "attackEnd": 24.735000000000003,
+        "holdEnd": 24.915000000000003,
+        "end": 25.215000000000003,
+        "db": 4
+      },
+      {
+        "actionId": "grid-wave-3",
+        "kind": "tink-3",
+        "start": 24.755000000000003,
+        "attackEnd": 24.795,
+        "holdEnd": 24.975,
+        "end": 25.275000000000002,
+        "db": 4
+      },
+      {
+        "actionId": "grid-wave-4",
+        "kind": "tink-4",
+        "start": 24.825000000000003,
+        "attackEnd": 24.865000000000002,
+        "holdEnd": 25.045,
+        "end": 25.345000000000002,
+        "db": 4
+      },
+      {
+        "actionId": "grid-title",
+        "kind": "shimmer",
+        "start": 25.585,
+        "attackEnd": 25.625,
+        "holdEnd": 25.805,
+        "end": 26.105,
+        "db": 4
+      },
+      {
+        "actionId": "end-name",
+        "kind": "shimmer",
+        "start": 27.57,
+        "attackEnd": 27.65,
+        "holdEnd": 28.15,
+        "end": 28.75,
+        "db": 4
+      },
+      {
+        "actionId": "end-press",
+        "kind": "light-1",
+        "start": 28.060000000000002,
+        "attackEnd": 28.1,
+        "holdEnd": 28.28,
+        "end": 28.580000000000002,
+        "db": 4
+      }
+    ],
+    "overlap": "deepest-envelope-wins"
+  },
+  "timing": [
+    {
+      "actionId": "switch-press",
+      "fileStart": 1.874,
+      "audibleLandmark": 1.875,
+      "actionTime": 1.875,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-drop",
+      "fileStart": 1.918,
+      "audibleLandmark": 1.95,
+      "actionTime": 1.95,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-lamps-1",
+      "fileStart": 2.029,
+      "audibleLandmark": 2.03,
+      "actionTime": 2.03,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-lamps-2",
+      "fileStart": 2.341,
+      "audibleLandmark": 2.342,
+      "actionTime": 2.342,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-lamps-3",
+      "fileStart": 2.654,
+      "audibleLandmark": 2.655,
+      "actionTime": 2.655,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-lamps-4",
+      "fileStart": 2.966,
+      "audibleLandmark": 2.967,
+      "actionTime": 2.967,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-lamps-5",
+      "fileStart": 3.279,
+      "audibleLandmark": 3.28,
+      "actionTime": 3.28,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-lamps-6",
+      "fileStart": 3.591,
+      "audibleLandmark": 3.592,
+      "actionTime": 3.592,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-line",
+      "fileStart": 3.67,
+      "audibleLandmark": 3.75,
+      "actionTime": 3.75,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "switch-lamps-7",
+      "fileStart": 3.904,
+      "audibleLandmark": 3.905,
+      "actionTime": 3.905,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "tokyo-cut",
+      "fileStart": 7.499,
+      "audibleLandmark": 7.5,
+      "actionTime": 7.5,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "tokyo-note",
+      "fileStart": 7.87,
+      "audibleLandmark": 7.95,
+      "actionTime": 7.95,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "paris-cut",
+      "fileStart": 9.999,
+      "audibleLandmark": 10.0,
+      "actionTime": 10.0,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "venice-cut",
+      "fileStart": 11.249,
+      "audibleLandmark": 11.25,
+      "actionTime": 11.25,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "newyork-cut",
+      "fileStart": 12.499,
+      "audibleLandmark": 12.5,
+      "actionTime": 12.5,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "london-cut",
+      "fileStart": 13.749,
+      "audibleLandmark": 13.75,
+      "actionTime": 13.75,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "chongqing-cut",
+      "fileStart": 14.999,
+      "audibleLandmark": 15.0,
+      "actionTime": 15.0,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "hongkong-cut",
+      "fileStart": 16.249,
+      "audibleLandmark": 16.25,
+      "actionTime": 16.25,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "istanbul-cut",
+      "fileStart": 17.499,
+      "audibleLandmark": 17.5,
+      "actionTime": 17.5,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "rio-cut",
+      "fileStart": 18.749,
+      "audibleLandmark": 18.75,
+      "actionTime": 18.75,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "beijing-cut",
+      "fileStart": 19.999,
+      "audibleLandmark": 20.0,
+      "actionTime": 20.0,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "barcelona-cut",
+      "fileStart": 21.249,
+      "audibleLandmark": 21.25,
+      "actionTime": 21.25,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "lisbon-cut",
+      "fileStart": 22.499,
+      "audibleLandmark": 22.5,
+      "actionTime": 22.5,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "grid-press",
+      "fileStart": 24.374,
+      "audibleLandmark": 24.375,
+      "actionTime": 24.375,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "grid-wave-1",
+      "fileStart": 24.594,
+      "audibleLandmark": 24.595000000000002,
+      "actionTime": 24.595,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "grid-wave-2",
+      "fileStart": 24.734,
+      "audibleLandmark": 24.735000000000003,
+      "actionTime": 24.735,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "grid-wave-3",
+      "fileStart": 24.794,
+      "audibleLandmark": 24.795,
+      "actionTime": 24.795,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "grid-wave-4",
+      "fileStart": 24.864,
+      "audibleLandmark": 24.865000000000002,
+      "actionTime": 24.865,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "grid-title",
+      "fileStart": 25.545,
+      "audibleLandmark": 25.625,
+      "actionTime": 25.625,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "end-name",
+      "fileStart": 27.57,
+      "audibleLandmark": 27.65,
+      "actionTime": 27.65,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "end-press",
+      "fileStart": 28.099,
+      "audibleLandmark": 28.1,
+      "actionTime": 28.1,
+      "errorFrames": 0.0
+    }
+  ],
+  "warnings": [],
+  "normalization": {
+    "requested": "linear",
+    "normalization_type": "dynamic",
+    "measurement": {
+      "input_i": "-22.33",
+      "input_tp": "-6.09",
+      "input_lra": "6.10",
+      "input_thresh": "-32.59",
+      "output_i": "-16.98",
+      "output_tp": "-1.50",
+      "output_lra": "5.90",
+      "output_thresh": "-27.07",
+      "normalization_type": "dynamic",
+      "target_offset": "0.98"
+    },
+    "output": {
+      "input_i": "-22.33",
+      "input_tp": "-6.09",
+      "input_lra": "6.10",
+      "input_thresh": "-32.59",
+      "output_i": "-16.06",
+      "output_tp": "-1.50",
+      "output_lra": "5.60",
+      "output_thresh": "-26.15",
+      "normalization_type": "dynamic",
+      "target_offset": "0.06"
+    }
+  },
+  "listeningStatus": "Not auditioned by script; listen to isolated SFX, final mix and encoded MP4."
+}
