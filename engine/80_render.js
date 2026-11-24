@@ -427,7 +427,7 @@ function* atlasPrepGen(A, cam, a, b, cw, ch) {
   for (let n = a; n < b; n++) {
     const t = n / FPS;
     for (const act of SF.actors) {
-      const tl = act.tile; if (act.cast && tl.rim >= 0 && n < tl.castAt + 12) continue;
+      const tl = act.tile; if (act.cast && (tl.rim >= 0 || tl.unfold) && n < tl.castAt + 12) continue;
       const st = actorState(act, t); if (!st) continue;
       const dl = actorDL(act, st), ss = st.s == null ? 1 : st.s;
       if (!bbHit([st.sx + dl.bb[0] * ss, st.sy + dl.bb[1] * ss, st.sx + dl.bb[2] * ss, st.sy + dl.bb[3] * ss], v.rect)) continue;
@@ -776,7 +776,7 @@ SF.draw = function (ctx, v, t, o) {
   const vr = v.rect;
   for (const a of SF.actors) {
     const tl = a.tile; let grow = 1;
-    if (a.cast && !o.allLive && tl.rim >= 0) { if (n < tl.castAt) continue; if (a.grow !== false) grow = 0.3 + 0.7 * smooth((n - tl.castAt) / 11); }
+    if (a.cast && !o.allLive && (tl.rim >= 0 || tl.unfold)) { if (n < tl.castAt) continue; if (a.grow !== false) grow = 0.3 + 0.7 * smooth((n - tl.castAt) / 11); }
     const st = actorState(a, t); if (!st) continue;
     const dl = actorDL(a, st), s = (st.s == null ? 1 : st.s) * grow;
     const r = [st.sx + dl.bb[0] * s, st.sy + dl.bb[1] * s, st.sx + dl.bb[2] * s, st.sy + dl.bb[3] * s];
