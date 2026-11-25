@@ -91,7 +91,11 @@ const CLOTH = ['#C9584B', '#DD8E4A', '#E6C24F', '#8FBF73', '#5FA58F', '#5F8FC9',
        grass: ['#B5CF8E', ...]            lawns light motes float over (default: the engine's grass colours)
        lit: 0.62                          default share of windows lit
        grade: { y0, y1, gamma, chroma, tint } a different moonlight for this place } */
-const LOOK = SF.look = { night: false, since: -1e9 };
+const LOOK = SF.look = { night: false, since: -1e9, season: null };
+/* the season. SCENE.season names the city's own season (drawn exactly as before seasons existed), SCENE.seasons every
+   season it has. Another season builds the whole city again (90_app.js, SF.setLook): a tile reads LOOK.season while it
+   is built, in its def and in its drawing functions (never at load). A thing only some seasons have is made with
+   { season: ['autumn'] } (30_world.js), so everything the seasons share keeps its seed and does not shift. */
 /* the moonlight: a colour's brightness y (0..1) goes to y0 + y1 * y^gamma, it keeps `chroma` of its own hue (scaled with
    the brightness), and the result is tinted towards blue */
 const NIGHT = { y0: 0.07, y1: 0.335, gamma: 1.12, chroma: 1.35, tint: [0.8, 0.9, 1.28], paper: [27, 31, 51] };
@@ -114,12 +118,34 @@ function nightSet() {
     water: new Set(low(n.water || [C.water, C.waterD, C.waterL])), grass: new Set(low(n.grass || [C.grass, C.grassM, C.grassL])) };
   return NSET;
 }
+/* the scene's day grade (SCENE.grade = { chroma, deep }), applied as colours are painted, so every lookup by colour (night
+   windows, water, palettes) still sees the colour as written: chroma lifts a colour away from its own grey, deep darkens
+   a colour the more saturated it is (a pale lawn turns a richer green, white walls and grey roads stay as they are).
+   No SCENE.grade: every colour as written. */
+const GCOL = new Map();
+let GRADE;
+function gradeCol(c) {
+  if (typeof c !== 'string') return c;
+  let o = GCOL.get(c); if (o) return o;
+  const G = GRADE, p = parseCol(c);
+  if (!p) o = c;
+  else {
+    const r = p[0] / 255, g = p[1] / 255, b = p[2] / 255, y = 0.299 * r + 0.587 * g + 0.114 * b;
+    const sat = Math.max(r, g, b) - Math.min(r, g, b), k = G.chroma || 1, yd = y * (1 - (G.deep || 0) * Math.min(1, sat * 2.2));
+    o = fmtCol((yd + (r - y) * k) * 255, (yd + (g - y) * k) * 255, (yd + (b - y) * k) * 255, p[3]);
+  }
+  GCOL.set(c, o); return o;
+}
+const dayCol = (c) => {
+  if (GRADE === undefined) GRADE = (typeof SCENE !== 'undefined' && SCENE.grade) || null;
+  return GRADE ? gradeCol(c) : c;
+};
 /* a colour under the moon */
 const NCOL = new Map();
 function nightColour(c) {
   if (typeof c !== 'string') return c;                                              // no colour (or a pattern): as by day
   let o = NCOL.get(c); if (o) return o;
-  const S = nightSet(), key = c.toLowerCase(), p = parseCol(c);
+  const S = nightSet(), key = c.toLowerCase(), p = parseCol(dayCol(c));
   if (!p) o = c;
   else if (S.glow.has(key)) o = c;                                                  // a light keeps its own colour
   else {

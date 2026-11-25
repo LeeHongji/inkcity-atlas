@@ -57,16 +57,21 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
     { alongY: true, c: 61.6 }, { alongY: true, c: -38.4 }, { alongY: false, c: 61.6 }, { alongY: false, c: -38.4 },
   ];
   const STOPS = [-128, -104, -80, -27, -2, 23, 74, 98, 122];
-  // each pole carries the wires to the next one, so no long object stands "in front" of a whole tile in the depth sort
+  // Each pole is its own object, and so is each span of wires between two poles: a thin box along the kerb line under the
+  // span that never decides where anyone is drawn (noHide: a pole that drew its wires spread its screen box over the
+  // whole run, and counted as in front of people in the places round it). A pole's box is a thin strip along the kerb
+  // line that runs on 6.4 u past the pole: a car (half-length up to 6 u) that has passed the pole is still beside it
+  // until its tail is clear, so the pole stays in front of the car till then (as a point, it went behind the car once the
+  // car's middle was 2 u past it). Anyone whose drawing overlaps the pole and stands beyond the kerb line is nearer than
+  // the pole, and the box is never in front of them; anyone overlapping it short of the line is behind it.
   const hangAt = (ch, s, h) => { const x = ch.alongY ? ch.c : s, y = ch.alongY ? s : ch.c; return ch.alongY ? [[x - 1.6, y, h - 0.8], [x + 1.6, y, h - 0.8], [x - 1.1, y, h - 2.3], [x + 1.1, y, h - 2.3]] : [[x, y - 1.6, h - 0.8], [x, y + 1.6, h - 0.8], [x, y - 1.1, h - 2.3], [x, y + 1.1, h - 2.3]]; };
+  const along = (ch, s0, s1) => ch.alongY ? [ch.c - 0.3, s0, ch.c + 0.3, s1] : [s0, ch.c - 0.3, s1, ch.c + 0.3];
   for (const ch of chains) {
     const hs = STOPS.map((s, i) => 13.5 + ((i * 7) % 3) * 0.4);
     STOPS.forEach((s, i) => {
       const x = ch.alongY ? ch.c : s, y = ch.alongY ? s : ch.c, h = hs[i];
-      T.obj([x, y], (g) => {
-        TK.upole(g, x, y, { h, across: ch.alongY ? 'x' : 'y', band: i % 3 === 1, can: i % 2 === 0 });
-        if (i + 1 < STOPS.length) TK.wires(g, hangAt(ch, s, h), hangAt(ch, STOPS[i + 1], hs[i + 1]), (STOPS[i + 1] - s) > 40 ? 2.6 : 1.5);
-      }, { name: 'pole' });
+      T.obj(along(ch, s - 0.3, s + 6.4), (g) => TK.upole(g, x, y, { h, across: ch.alongY ? 'x' : 'y', band: i % 3 === 1, can: i % 2 === 0 }), { name: 'pole' });
+      if (i + 1 < STOPS.length) T.obj(along(ch, s, STOPS[i + 1]), (g) => TK.wires(g, hangAt(ch, s, h), hangAt(ch, STOPS[i + 1], hs[i + 1]), (STOPS[i + 1] - s) > 40 ? 2.6 : 1.5), { name: 'wires', noHide: true });
     });
   }
 
@@ -75,18 +80,22 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
   const LANES = [[true, 42, 1], [true, 58, -1], [true, -58, 1], [true, -42, -1], [false, 58, 1], [false, 42, -1], [false, -42, 1], [false, -58, -1]];
   const KIND = [['taxi', 'car'], ['kei', 'taxiY'], ['car', 'van'], ['taxi', 'car'], ['van', 'taxi'], ['car', 'kei'], ['taxiG', 'car'], ['car', 'taxi']];
   const PHASE = [20.6402, 11.1821, 0.3856, 19.6398, 1.9216, 15.5861, 7.1265, 0.2975];      // searched offline, see header
-  const CARS = ['#F1EFE8', '#C9CCCC', '#2F343B', '#F1EFE8', '#8FA3B5', '#B9A27D', '#E7E2D6', '#6C7A89'];
+  const CARS = ['#F1EFE8', '#C9CCCC', '#2F343B', '#F1EFE8', '#5F8FC9', '#C9584B', '#E7E2D6', '#7FB7A0'];   // mostly white, silver and black, as in Tokyo, with a few bright ones
   const draw = (g, ang, kind, col) => {
     if (kind === 'taxi') TK.taxi(g, ang);
     else if (kind === 'taxiY') TK.taxi(g, ang, { col: '#E6C24F', lamp: '#F3F1EA' });
     else if (kind === 'taxiG') TK.taxi(g, ang, { col: '#6FA36B', lamp: '#F3F1EA' });
+    else if (kind === 'imo') TK.kei(g, ang, { cargo: (gg, B) => TK.imo(gg, B, ang) });   // autumn: the yakiimo truck
     else if (kind === 'kei') TK.kei(g, ang, { cargo: (gg, B) => { const p = B.pt(-1, 0, 2.0); K.rbox(gg, p[0], p[1], 1.6, 1.4, ang, 2.0, 3.2, '#C9A26B', { w: 0.5 }); } });
     else if (kind === 'van') K.bus(g, ang, { L: 6.0, W: 2.5, h: 4.8, n: 3, band: col === '#F1EFE8' ? '#3F7F4F' : '#5E8FC9' });
     else K.car(g, ang, { col });
   };
+  // each kind's half-length and half-width on the ground (u), as drawn: people beside a car are ordered by these
+  const HALF = { taxi: [5.0, 2.45], taxiY: [5.0, 2.45], taxiG: [5.0, 2.45], kei: [4.4, 2.1], imo: [4.4, 2.1], van: [6.0, 2.5], car: [5.3, 2.55] };
   LANES.forEach((L, li) => {
     for (let k = 0; k < 2; k++) {
-      const kind = KIND[li][k], col = CARS[(li * 3 + k * 5) % CARS.length];
+      const kind = (TK.autumn() || TK.winter()) && li === 1 && k === 0 ? 'imo' : KIND[li][k], col = CARS[(li * 3 + k * 5) % CARS.length];
+      const hl = HALF[kind], ext = L[0] ? [hl[1], hl[0]] : [hl[0], hl[1]];
       T.actor({
         cast: false, sample: 0.18, period: P,
         at(t) {
@@ -95,7 +104,7 @@ SF.tile('streets', 0, 0, { order: -99 }, function (T) {
           const s = ((((PHASE[li] * V + k * SPAN / 2 - L[2] * V * t) % SPAN) + SPAN) % SPAN) - END, edge = Math.min(1, (END - 2 - Math.abs(s)) / 10);
           if (edge <= 0.02) return null;
           const ang = L[0] ? (L[2] < 0 ? Math.PI / 2 : -Math.PI / 2) : (L[2] < 0 ? 0 : Math.PI);
-          return { x: L[0] ? L[1] : s, y: L[0] ? s : L[1], key: 'l' + li, ang, alpha: edge < 1 ? edge : null };
+          return { x: L[0] ? L[1] : s, y: L[0] ? s : L[1], key: 'l' + li, ang, alpha: edge < 1 ? edge : null, ext };
         },
         draw(g, st) { draw(g, st.ang, kind, col); },
       });

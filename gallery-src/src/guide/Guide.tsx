@@ -208,15 +208,18 @@ function NoteRing({ x, y, label, seed }: { x: number; y: number; label: string; 
     </svg>
   )
 }
-function MarginNotes({ notes, v, show, night }: { notes: MarginNote[]; v: View; show: boolean; night: boolean }) {
+function MarginNotes({ notes, v, show, night, season }: { notes: MarginNote[]; v: View; show: boolean; night: boolean; season: string | null }) {
   const k = v.pz / SF().wide.z                     // 1 at the wide zoom on a 1920 x 1080 screen
   const fs = Math.max(13, Math.min(19, 17 * k)), wk = Math.max(0.66, Math.min(1.35, k))
   const [ink, setInk] = React.useState<{ key: string; ink: Ink | null } | null>(null)
   const [openNote, setOpenNote] = React.useState(-1)
-  const key = `${v.z.toFixed(3)}|${v.cx.toFixed(0)}|${v.cy.toFixed(0)}|${v.w}|${v.h}|${night}`
+  const key = `${v.z.toFixed(3)}|${v.cx.toFixed(0)}|${v.cy.toFixed(0)}|${v.w}|${v.h}|${night}|${season}`
+  const seasonAt = React.useRef({ season, t: -1e9 })
+  if (seasonAt.current.season !== season) seasonAt.current = { season, t: performance.now() }   // when the season last changed (its wipe lasts 1.3 s)
   React.useEffect(() => {
     if (!show || v.gliding) return
-    const t = setTimeout(() => setInk({ key, ink: readInk() }), night ? 1300 : 450)   // after the bakes have sharpened (and a change of look has faded in)
+    const wait = Math.max(night ? 1300 : 450, 1700 - (performance.now() - seasonAt.current.t))
+    const t = setTimeout(() => setInk({ key, ink: readInk() }), wait)   // after the bakes have sharpened (and a change of look has faded or been wiped in)
     return () => clearTimeout(t)
   }, [key, show, v.gliding])
   React.useEffect(() => { setOpenNote(-1) }, [key, show])
@@ -337,7 +340,7 @@ function PlaceStory({ p, seen, active, onLook, onBack, onStep, idx, count }: {
                 <li key={id}>
                   <button onClick={() => onLook(i)} aria-pressed={active === i}
                     className={`flex w-full items-start gap-2.5 rounded-sm px-1 py-1 text-start hover:bg-ink/5 focus-visible:outline-2 focus-visible:outline-ink-you ${active === i ? "bg-sticky-yellow/45" : ""}`}>
-                    <Checkbox checked={seen.has(id)} tabIndex={-1} aria-hidden className="pointer-events-none mt-[3px] shrink-0" seed={id} />
+                    <Checkbox checked={seen.has(`${p.shot}:${l.text}`)} tabIndex={-1} aria-hidden className="pointer-events-none mt-[3px] shrink-0" seed={id} />
                     <span className="font-hand text-[15px] leading-snug text-ink">{l.text}</span>
                   </button>
                 </li>
@@ -376,11 +379,22 @@ function MomentStory({ g, onBack, onGo }: { g: GuideData; onBack: () => void; on
    and carries the controls. The intro is written on the paper only when the screen has room for it; otherwise it
    opens the guidebook. Every camera move centres its target in the part of the screen the guidebook leaves free. */
 type Target = { kind: "home" } | { kind: "cam"; cam: { z: number; cx: number; cy: number } }
-export function Guide({ g }: { g: GuideData }) {
+/* the words for the season on the map: GUIDE.seasons may replace a place's story or "look for" list */
+function inSeason(g: GuideData, season: string | null): GuideData {
+  const s = season ? g.seasons?.[season]?.places : undefined
+  if (!s) return g
+  return { ...g, places: g.places.map((p) => { const o = s[p.shot]; return o ? { ...p, story: o.story || p.story, look: o.look || p.look } : p }) }
+}
+/* storage can be refused (a page framed by another site, some private modes): the notes switch just isn't remembered */
+const stored = { get: (k: string) => { try { return localStorage.getItem(k) } catch { return null } }, set: (k: string, v: string) => { try { localStorage.setItem(k, v) } catch { /* not remembered */ } } }
+export function Guide({ g: words }: { g: GuideData }) {
   const v = useView()
   const [explore, setExplore] = React.useState(() => SF().app.mode === "explore")
-  const [notesOn, setNotesOn] = React.useState(() => localStorage.getItem("inkcity-notes") !== "off")
+  const [notesOn, setNotesOn] = React.useState(() => stored.get("inkcity-notes") !== "off")
   const [night, setNight] = React.useState(() => !!SF().look?.night)
+  const [season, setSeason] = React.useState<string | null>(() => SF().look?.season || null)
+  const seasonNow = React.useRef(season)
+  const g = React.useMemo(() => inSeason(words, season), [words, season])
   const [page, setPage] = React.useState<{ kind: "list" } | { kind: "place"; i: number } | { kind: "moment" }>({ kind: "list" })
   const [look, setLook] = React.useState<{ place: number; i: number; arrived: boolean } | null>(null)
   const [seen, setSeen] = React.useState<Set<string>>(() => new Set())
@@ -393,6 +407,7 @@ export function Guide({ g }: { g: GuideData }) {
 
   const go = React.useCallback((t: Target, ms?: number) => {
     target.current = t
+    const vv = SF().view(); if (!(vv.w > 0 && vv.h > 0 && vv.pz > 0)) return
     const cam = t.kind === "home" ? homeCam() : framed(t.cam)
     if (t.kind === "home") {
       homeZ.current = cam.z
@@ -412,9 +427,13 @@ export function Guide({ g }: { g: GuideData }) {
     })
     SF().on("film", () => { setExplore(false); setLook(null) })
     SF().on("arrive", () => setLook((l) => (l ? { ...l, arrived: true } : l)))
-    SF().on("look", (a) => setNight(!!(a as { night?: boolean })?.night))
+    SF().on("look", (a) => {
+      const l = a as { night?: boolean; season?: string | null }, s = l?.season || null
+      setNight(!!l?.night)
+      if (s !== seasonNow.current) { seasonNow.current = s; setLook(null); setSeason(s) }   // a new season has its own "look for" lists
+    })
   }, [go])
-  React.useEffect(() => { localStorage.setItem("inkcity-notes", notesOn ? "on" : "off") }, [notesOn])
+  React.useEffect(() => { stored.set("inkcity-notes", notesOn ? "on" : "off") }, [notesOn])
 
   React.useEffect(() => { setIntroFits(true) }, [v?.w, v?.h])   // eslint-disable-line react-hooks/exhaustive-deps
   // the layout of this screen; when it changes (rotation, resize, the guidebook opened or folded) re-frame the target
@@ -445,7 +464,7 @@ export function Guide({ g }: { g: GuideData }) {
     if (page.kind !== "place") return
     const l: LookFor = g.places[page.i].look[i], [wx, wy] = SF().prj(l.at[0], l.at[1], l.at[2] || 0)
     setLook({ place: page.i, i, arrived: false })
-    setSeen((s) => new Set(s).add(`${g.places[page.i].shot}:${i}`))
+    setSeen((s) => new Set(s).add(`${g.places[page.i].shot}:${l.text}`))
     go({ kind: "cam", cam: { z: l.z || 6, cx: wx, cy: wy } })
   }
   const goWide = () => { setLook(null); go({ kind: "home" }) }
@@ -453,8 +472,9 @@ export function Guide({ g }: { g: GuideData }) {
 
   // the pen circle round the detail being looked at
   let circle: React.ReactNode = null
-  if (look && look.arrived && page.kind === "place" && page.i === look.place) {
-    const l = g.places[look.place].look[look.i], [wx, wy] = SF().prj(l.at[0], l.at[1], l.at[2] || 0), [sx, sy] = SF().toScreen(wx, wy, v)
+  const lookAt = look && look.arrived && page.kind === "place" && page.i === look.place ? g.places[look.place]?.look[look.i] : undefined   // (none in a list that just changed with the season)
+  if (look && lookAt) {
+    const l = lookAt, [wx, wy] = SF().prj(l.at[0], l.at[1], l.at[2] || 0), [sx, sy] = SF().toScreen(wx, wy, v)
     const r = (l.r || 5) * 3.3 * v.pz
     circle = (
       <svg className="pointer-events-none absolute inset-0 size-full overflow-visible" aria-hidden>
@@ -493,7 +513,7 @@ export function Guide({ g }: { g: GuideData }) {
         style={{ opacity: explore ? 0 : 0.85 }}>the city is drawing itself · {coarse ? "tap" : "click"} anywhere to skip</p>
 
       <div className="transition-opacity duration-700" style={{ opacity: explore ? 1 : 0, visibility: explore ? "visible" : "hidden" }}>
-        <MarginNotes notes={g.notes} v={v} show={notesOn && isWide && !v.gliding} night={night} />
+        <MarginNotes notes={g.notes} v={v} show={notesOn && isWide && !v.gliding} night={night} season={season} />
         {circle}
 
         {/* the title, written on the map's paper; once zoomed in it moves onto a small taped label */}

@@ -28,6 +28,7 @@ function gpuReset() {
   ABMP.list.length = 0; ABMP.px = 0;
   for (const a of SF.actors) a.lastB = null;
   for (const A of ATLS) { A.pages.length = 0; atlasReset(A); }
+  paReset(); POSEPG.pages.length = 0; if (R.lightCv) { R.lightCv = null; }
   for (const t of SF.live) { t.bakes = []; t.wide = null; t.cons = null; t.doneAt = null; }
 }
 
@@ -67,7 +68,7 @@ function mkTextures() {
 function mkView(cam, cw, ch, fit) {
   const s = Math.min(cw / 1920, ch / 1080), pz = cam.z * s;
   const v = { cam, cw, ch, s, z: cam.z, pz, tx: Math.round(cw / 2 - cam.cx * pz), ty: Math.round(ch / 2 - cam.cy * pz) };
-  v.hw = lineW(cam.z) / (2 * cam.z);                         // main contour half-width, wide px
+  v.hw = lineW(cam.z) * ((typeof SCENE !== 'undefined' && SCENE.ink) || 1) / (2 * cam.z);   // main contour half-width, wide px (SCENE.ink: the scene's pen, finer < 1)
   v.amp = 0.9 / cam.z;                                       // boil amplitude, wide px
   if (fit) { const w = Math.round(1920 * s), h = Math.round(1080 * s); v.clip = [Math.round((cw - w) / 2), Math.round((ch - h) / 2), w, h]; }
   const c = v.clip || [0, 0, cw, ch];
@@ -214,10 +215,11 @@ function finishJobs() { while (R.jobs.length) runJobs(1e9); }
 function runJobs(ms, maxPx) {
   const end = performance.now() + ms; R.lastSteps = []; R.warmPx = 0;
   while (R.jobs.length && performance.now() < end && !(maxPx && R.warmPx >= maxPx)) {
+    if (R.jobs[0].low && R.jobs.length > 1) { const k = R.jobs.findIndex((q) => !q.low); if (k > 0) R.jobs.unshift(R.jobs.splice(k, 1)[0]); }   // a low job waits for the bakes
     const j = R.jobs[0], ts = performance.now(), r = j.gen.next(), dt = performance.now() - ts;
     if (window.__slowJobs) R.lastSteps.push(+dt.toFixed(1));
     if (dt > 6 && window.__slowJobs) window.__slowJobs.push([Math.round(SF.app && SF.app.t0 ? (performance.now() - SF.app.t0) / 1000 * 30 : -1), j.key || (j.t ? 'bake:' + j.t.name : '?'), +dt.toFixed(1), r.value == null ? '' : String(r.value)]);
-    if (r.done) { R.jobs.shift(); if (j.fn) { j.fn(r.value); continue; } if (!j.t.bakes) j.t.bakes = []; if (j.pin) r.value.pin = true; j.t.bakes.push(r.value); evict(); }
+    if (r.done) { R.jobs.shift(); if (j.fn) { j.fn(r.value); continue; } if (!j.t.bakes) j.t.bakes = []; if (j.pin) r.value.pin = true; r.value.stamp = ++R.stamp; j.t.bakes.push(r.value); evict(); }   // fresh: a bake just made for the view is never the first to go
   }
   return R.jobs.length;
 }
@@ -306,8 +308,8 @@ function initCons(t, v) {
 }
 function drawMark(ctx, s, hw) {
   const d = s.d, p = d.p, i = s.i;
-  if (d.k === K_SEGS) { ctx.strokeStyle = d.col; ctx.lineWidth = Math.max(0.35 * hw, d.wt * hw * 2); ctx.beginPath(); ctx.moveTo(p[i], p[i + 1]); ctx.lineTo(p[i + 2], p[i + 3]); ctx.stroke(); }
-  else { ctx.fillStyle = d.c; ctx.beginPath(); ctx.moveTo(p[i], p[i + 1]); ctx.lineTo(p[i + 2], p[i + 3]); ctx.lineTo(p[i + 4], p[i + 5]); ctx.closePath(); ctx.fill(); }
+  if (d.k === K_SEGS) { ctx.strokeStyle = dayCol(d.col); ctx.lineWidth = Math.max(0.35 * hw, d.wt * hw * 2); ctx.beginPath(); ctx.moveTo(p[i], p[i + 1]); ctx.lineTo(p[i + 2], p[i + 3]); ctx.stroke(); }
+  else { ctx.fillStyle = dayCol(d.c); ctx.beginPath(); ctx.moveTo(p[i], p[i + 1]); ctx.lineTo(p[i + 2], p[i + 3]); ctx.lineTo(p[i + 4], p[i + 5]); ctx.closePath(); ctx.fill(); }
 }
 /* fresh: rebuild from nothing (seek mode), so a frame never depends on which frames were drawn before it */
 function advanceCons(c, n, fresh) {
@@ -346,7 +348,7 @@ function tileState(t, n, allLive) {
   return 3;
 }
 function compiled(dl, hw, raw) {
-  const night = LOOK.night && !raw, k = Math.round(hw * 4096) + (night ? 0.5 : 0), cl = (d, c) => (night ? nightOf(d, c) : c);
+  const night = LOOK.night && !raw, k = Math.round(hw * 4096) + (night ? 0.5 : 0), cl = (d, c) => (night ? nightOf(d, c) : dayCol(c));
   let c = dl.comp.get(k);
   if (c) return c;
   // group the display list into Path2Ds; keep painter's order
@@ -386,17 +388,49 @@ function actorBitmap(dl, sc, hw, lazy) {
     if (performance.now() > R.bmpUntil) return null;          // the caller finds another stand-in
   }
   if (!b) {
+    const tb = performance.now();
     const bb = dl.bb, ox = Math.floor(bb[0] * sc) - 2, oy = Math.floor(bb[1] * sc) - 2, w = Math.ceil(bb[2] * sc) + 2 - ox, h = Math.ceil(bb[3] * sc) + 2 - oy;
+    const slot = lazy && w <= POSEPG.MAX && h <= POSEPG.MAX && typeof SCENE !== 'undefined' && SCENE.poseAtlas ? paAlloc(w, h) : null;
+    if (slot) {
+      // a small pose (people seen from afar) goes onto a shared page: a frame's hundreds of people blit from a few
+      // textures, not hundreds
+      const cx = slot.pg.cx; cx.save(); cx.setTransform(1, 0, 0, 1, 0, 0); cx.beginPath(); cx.rect(slot.x, slot.y, w, h); cx.clip();
+      cx.setTransform(sc, 0, 0, sc, slot.x - ox, slot.y - oy); cx.lineCap = 'round'; cx.lineJoin = 'round';
+      for (const g of compiled(dl, hw)) { if (g.m === 0) { cx.fillStyle = g.col; cx.fill(g.p); } else { cx.strokeStyle = g.col; cx.lineWidth = g.lw; cx.stroke(g.p); } }
+      cx.restore();
+      b = { cv: slot.pg.cv, ax: slot.x, ay: slot.y, w, h, ox, oy, px: 0, used: ++R.stamp, dl, key, sc, gen: POSEPG.gen }; dl.bmp.set(key, b); POSEPG.list.push(b);
+      R.bmpSpent = (R.bmpSpent || 0) + performance.now() - tb;
+      b.used = ++R.stamp; return b;
+    }
     const cv = mkCanvas(w, h), cx = cv.getContext('2d');
     cx.setTransform(sc, 0, 0, sc, -ox, -oy); cx.lineCap = 'round'; cx.lineJoin = 'round';
     for (const g of compiled(dl, hw)) { if (g.m === 0) { cx.fillStyle = g.col; cx.fill(g.p); } else { cx.strokeStyle = g.col; cx.lineWidth = g.lw; cx.stroke(g.p); } }
     b = { cv, ax: 0, ay: 0, w, h, ox, oy, px: w * h, used: ++R.stamp, dl, key, sc }; dl.bmp.set(key, b); ABMP.list.push(b); ABMP.px += b.px;
-    if (ABMP.px > ABMP.budget) { ABMP.list.sort((p, q) => p.used - q.used); const cut = ABMP.list.splice(0, ABMP.list.length >> 2).filter((c) => c !== b); for (const c of cut) { c.dl.bmp.delete(c.key); ABMP.px -= c.px; c.cv.width = 0; } }
+    if (ABMP.px > ABMP.budget) { ABMP.list.sort((p, q) => p.used - q.used); const cut = ABMP.list.splice(0, ABMP.list.length >> 2).filter((c) => c !== b); for (const c of cut) { c.dl.bmp.delete(c.key); ABMP.px -= c.px; if (lazy) toDead(c.cv); else c.cv.width = 0; } }   // exploring: freed a few at a time (reap), not hundreds in one frame
+    R.bmpSpent = (R.bmpSpent || 0) + performance.now() - tb;
   }
   b.used = ++R.stamp;
   return b;
 }
-const ABMP = { list: [], px: 0, budget: 32e6 };
+const ABMP = { list: [], px: 0, budget: (typeof SCENE !== 'undefined' && SCENE.poseBudget) || 32e6 };
+/* SCENE.poseAtlas (exploring): small pose bitmaps are packed onto a few shared 2048 x 2048 pages, shelf by shelf. When
+   the pages are full they are all cleared and filled again (gen counts the fillings: a bitmap from an earlier filling is
+   gone). */
+const POSEPG = { MAX: 160, S: 2048, NP: 4, pages: [], p: 0, x: 0, y: 0, row: 0, gen: 0, list: [] };
+function paReset() {
+  for (const b of POSEPG.list) if (b.dl.bmp && b.dl.bmp.get(b.key) === b) b.dl.bmp.delete(b.key);
+  POSEPG.list = []; POSEPG.gen++; POSEPG.p = 0; POSEPG.x = 0; POSEPG.y = 0; POSEPG.row = 0;
+  for (const pg of POSEPG.pages) { pg.cx.setTransform(1, 0, 0, 1, 0, 0); pg.cx.clearRect(0, 0, POSEPG.S, POSEPG.S); }
+}
+function paAlloc(w, h) {
+  if (POSEPG.x + w + 1 > POSEPG.S) { POSEPG.y += POSEPG.row; POSEPG.x = 0; POSEPG.row = 0; }
+  if (POSEPG.y + h + 1 > POSEPG.S) { POSEPG.p++; POSEPG.x = 0; POSEPG.y = 0; POSEPG.row = 0; }
+  if (POSEPG.p >= POSEPG.NP) paReset();
+  while (POSEPG.pages.length <= POSEPG.p) { const cv = mkCanvas(POSEPG.S, POSEPG.S); POSEPG.pages.push({ cv, cx: cv.getContext('2d') }); }
+  const slot = { pg: POSEPG.pages[POSEPG.p], x: POSEPG.x, y: POSEPG.y }; POSEPG.x += w + 1; POSEPG.row = Math.max(POSEPG.row, h + 1);
+  return slot;
+}
+const bmpLive = (b) => b && b.cv.width && (b.gen == null || b.gen === POSEPG.gen);   // SCENE.poseBudget: room for more poses (a city of many lively people)
 /* Film playback: two pose atlases take turns. While a shot plays from one, every pose the next shot will show is packed
    into the other, so an atlas is never written while it is being read (that would make the browser copy it) and all the
    actor blits of a frame come from one texture. */
@@ -436,6 +470,55 @@ function* atlasPrepGen(A, cam, a, b, cw, ch) {
     }
   }
 }
+/* Long movers (a bus, a train car) give their half-size on the ground, st.ext = [hx, hy] in u (along x and y). In each run
+   of actors with the same slot, those that overlap on screen are put in footprint order, as standing objects are (one
+   wholly on the far side of the other in x or in y goes first); otherwise by x + y as before. A person beside a bus is
+   then behind it or in front of it by where they stand, not by whose centre is nearer. */
+function footOrder(L) {
+  const box = (A) => { const e = A.st.ext || [0.4, 0.4], x = A.st.wx, y = A.st.wy; return [x - e[0], y - e[1], x + e[0], y + e[1]]; };
+  for (let i0 = 0; i0 < L.length;) {
+    let i1 = i0 + 1; while (i1 < L.length && L[i1].slot === L[i0].slot) i1++;
+    const G = L.slice(i0, i1);
+    if (G.length > 1 && G.some((A) => A.st.ext)) {
+      const n = G.length, bx = G.map(box), after = G.map(() => []), indeg = new Int32Array(n), e = 0.02;
+      for (let i = 0; i < n; i++) for (let j = i + 1; j < n; j++) {
+        if (!G[i].st.ext && !G[j].st.ext) continue;                          // two people keep their x + y order
+        if (!bbHit(G[i].r, G[j].r)) continue;
+        const a = bx[i], b = bx[j], aB = a[2] <= b[0] + e || a[3] <= b[1] + e, bB = b[2] <= a[0] + e || b[3] <= a[1] + e;
+        const first = aB && !bB ? i : bB && !aB ? j : (G[i].key <= G[j].key ? i : j), second = first === i ? j : i;
+        after[first].push(second); indeg[second]++;
+      }
+      const done = new Uint8Array(n), out = [];
+      for (let s = 0; s < n; s++) {
+        let best = -1; for (let i = 0; i < n; i++) if (!done[i] && indeg[i] === 0 && (best < 0 || G[i].key < G[best].key)) best = i;
+        if (best < 0) for (let i = 0; i < n; i++) if (!done[i] && (best < 0 || G[i].key < G[best].key)) best = i;   // a cycle: the farthest
+        done[best] = 1; out.push(G[best]); for (const j of after[best]) indeg[j]--;
+      }
+      for (let k = 0; k < n; k++) L[i0 + k] = out[k];
+    }
+    i0 = i1;
+  }
+}
+/* exploring, at rest: whatever is left of the frame's pose budget draws the poses the people on screen will take in the
+   next second, so the new pose is ready (sharp, at this zoom) when it comes, not a frame or two after it */
+const WARM_DT = [0, 0.12, 0.3, 0.6, 1.0];
+function prewarmPoses(v, t) {
+  const n = ACTS.length; if (!n) return;
+  // everybody's pose now first, then everybody's next ones: one person never takes the whole budget for a second ahead
+  // while the others wait
+  const W = R.warm || (R.warm = { d: 0, i: 0, left: n });
+  let checks = 0;
+  while (performance.now() < R.warmUntil && checks < n * WARM_DT.length) {
+    if (W.left <= 0) { W.d = (W.d + 1) % WARM_DT.length; W.left = n; }
+    const A = ACTS[W.i % n]; W.i = (W.i + 1) % n; W.left--; checks++;
+    if (A.grow !== 1) continue;
+    const st = actorState(A.a, t + WARM_DT[W.d]); if (!st) continue;
+    const dl = actorDL(A.a, st), sc = v.pz * (st.s == null ? 1 : st.s);
+    if (!(dl.bmp && dl.bmp.has(poseKey(sc, v.hw)))) actorBitmap(dl, sc, v.hw, false);
+  }
+}
+/* a new view at rest (a zoom or a cut): start again from everybody's pose now */
+function prewarmReset() { R.warm = null; }
 function drawActor(ctx, v, A) {
   const st = A.st, ss = st.s == null ? 1 : st.s;
   if (st.alpha != null) ctx.globalAlpha = st.alpha;
@@ -448,11 +531,16 @@ function drawActor(ctx, v, A) {
     let b = ab || actorBitmap(A.dl, sc, v.hw, v.lazy);
     if (!b) {
       // exploring, the raster budget spent, and this pose has no bitmap yet: the actor's last bitmap stands in for a
-      // frame or two (a step of a walk), or, the first time we see it, its vector drawing
+      // frame or two (a step of a walk); the first time we see it, its own bitmap is made now (drawing its vectors
+      // would cost about as much, and again on every frame until the budget reached it)
       const lb = A.a.lastB;
-      if (lb && lb.cv.width) b = lb;
-      else { const c = compiled(A.dl, v.hw); ctx.setTransform(sc, 0, 0, sc, v.tx + st.sx * v.pz, v.ty + st.sy * v.pz); for (const g of c) { if (g.m === 0) { ctx.fillStyle = g.col; ctx.fill(g.p); } else { ctx.strokeStyle = g.col; ctx.lineWidth = g.lw; ctx.stroke(g.p); } } if (st.alpha != null) ctx.globalAlpha = 1; return; }
+      b = bmpLive(lb) ? lb : actorBitmap(A.dl, sc, v.hw, false);
     } else if (!ab && b.sc != null && Math.abs(b.sc - sc) < 1e-6) A.a.lastB = b;
+    else if (!ab && v.lazy === 'budget' && b.sc != null) {
+      // at rest, a pose drawn for another zoom would be blown up (blurred): the person's last sharp bitmap at this zoom
+      // (a gesture behind, for a moment) reads far better
+      const lb = A.a.lastB; if (bmpLive(lb) && lb.sc != null && Math.abs(lb.sc - sc) < 1e-6) b = lb;
+    }
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     if (SF.noBlit) {}
     else if (ab || b.sc == null || Math.abs(b.sc - sc) < 1e-6) ctx.drawImage(b.cv, b.ax, b.ay, b.w, b.h, Math.round(v.tx + st.sx * v.pz) + b.ox, Math.round(v.ty + st.sy * v.pz) + b.oy, b.w, b.h);
@@ -638,6 +726,19 @@ function actorLights(dl) {
 }
 /* stage 'ground': pools of lamplight and shop light on the paving. stage 'air': everything else (see above).
    o.lightT: seconds since night fell (the lamps come on in a wave from the middle of the view); none = all on */
+/* SCENE.lightRes = k (< 1): the lights in the air are drawn into a buffer k times the size of the frame and added onto it
+   (they only ever add light, so the sum is the same; soft glows lose nothing, and a city of thousands of lights costs a
+   quarter of the fill). LIGHT_K: the scale drawLight draws at. */
+let LIGHT_K = 1;
+function drawLightAir(ctx, v, t, o) {
+  const k = typeof SCENE !== 'undefined' && SCENE.lightRes;
+  if (!(k > 0 && k < 1)) { drawLight(ctx, v, t, o, 'air'); return; }
+  const w = Math.ceil(v.cw * k), h = Math.ceil(v.ch * k);
+  let c = R.lightCv; if (!c || c.width !== w || c.height !== h) { if (c) c.width = 0; c = R.lightCv = mkCanvas(w, h); }
+  const cx = c.getContext('2d'); cx.setTransform(1, 0, 0, 1, 0, 0); cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over'; cx.clearRect(0, 0, w, h);
+  LIGHT_K = k; try { drawLight(cx, v, t, o, 'air'); } finally { LIGHT_K = 1; }
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(c, 0, 0, w, h, 0, 0, w / k, h / k); ctx.restore();
+}
 function drawLight(ctx, v, t, o, stage) {
   const L = nightPrep(), pz = v.pz, tx = v.tx, ty = v.ty, rc = v.rect, lt = o.lightT;
   const diag = Math.hypot(rc[2] - rc[0], rc[3] - rc[1]) / 2, cx = (rc[0] + rc[2]) / 2, cy = (rc[1] + rc[3]) / 2;
@@ -647,7 +748,7 @@ function drawLight(ctx, v, t, o, stage) {
   const tileOn = (tl) => { if (!tl || o.allLive || tl.rim < 0 || tl._st === -1 || tl._st == null) return 1; if (tl._st < 2) return 0; return smooth((nn - (tl.doneAt == null ? tl.castAt : tl.doneAt)) / 12); };
   const on = (e) => onAt(e.x, e.y) * tileOn(e.t);
   const vis = (x, y, R) => x + R > rc[0] && x - R < rc[2] && y + R > rc[1] && y - R < rc[3];
-  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'lighter';
+  ctx.save(); ctx.setTransform(LIGHT_K, 0, 0, LIGHT_K, 0, 0); ctx.globalCompositeOperation = 'lighter';
   const img = (tex, x, y, R, a, sy) => {
     sy = sy || 1; const RR = R * pz;
     if (a <= 0.004 || RR < 0.7) return;                                   // nothing a pixel wide
@@ -717,8 +818,8 @@ function drawLight(ctx, v, t, o, stage) {
       const ca = Math.cos(st.ang), sa = Math.sin(st.ang), dx = (ca - sa) * AX, dy = (ca + sa) * AY, n = Math.hypot(dx, dy) || 1;
       const ux = dx / n, uy = dy / n, len = 22 * s, wid = 9 * s, fx = st.sx + ux * 9 * s, fy = st.sy + uy * 4 * s;
       if (vis(fx + ux * len / 2, fy + uy * len / 2, len) && !hidden(fx, fy)) {
-        ctx.globalAlpha = 0.5; ctx.setTransform(ux * pz, uy * pz, -uy * pz, ux * pz, tx + fx * pz, ty + fy * pz);
-        ctx.drawImage(beam, 0, -wid / 2, len, wid); ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = 0.5; ctx.setTransform(LIGHT_K * ux * pz, LIGHT_K * uy * pz, -LIGHT_K * uy * pz, LIGHT_K * ux * pz, LIGHT_K * (tx + fx * pz), LIGHT_K * (ty + fy * pz));
+        ctx.drawImage(beam, 0, -wid / 2, len, wid); ctx.setTransform(LIGHT_K, 0, 0, LIGHT_K, 0, 0);
       }
     }
   }
@@ -751,6 +852,83 @@ function drawLight(ctx, v, t, o, stage) {
   }
   ctx.restore();
 }
+/* ---------- the air of a season (SCENE.air[LOOK.season]) ----------
+   fall: the kinds of g.emit record that let things go (petals from a cherry in bloom, leaves from a turned tree): each
+   emitter drops a few in turn, every one swaying and turning on its way from the crown to the ground under it.
+   snow: flakes over the whole view in three depths that drift with the camera (a number: how thick).
+   glint: sparkles of the sun on water, by day. (cover, the snow lying on things, is laid when the city is built: 30_world.)
+   All a pure function of t, drawn over the finished frame. */
+function airPrep() {
+  if (R.air) return R.air;
+  const cfg = (typeof SCENE !== 'undefined' && SCENE.air && SCENE.air[LOOK.season]) || null, A = { cfg, em: [], glints: [] };
+  if (cfg && cfg.fall) { const kinds = new Set(cfg.fall); for (const t of SF.live) for (const ob of t.statics) if (ob.emits) for (const e of ob.emits) if (kinds.has(e.k)) A.em.push(Object.assign({ t }, e)); }
+  if (cfg && cfg.glint) {
+    const S = nightSet();
+    for (const t of SF.live) for (const ob of t.statics) {
+      if (!ob.ground) continue;
+      for (const d of ob.list) {
+        if (d.k !== K_FILL || typeof d.c !== 'string' || !S.water.has(d.c.toLowerCase())) continue;
+        const p = d.p; let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9; for (let i = 0; i < p.length; i += 2) { x0 = Math.min(x0, p[i]); x1 = Math.max(x1, p[i]); y0 = Math.min(y0, p[i + 1]); y1 = Math.max(y1, p[i + 1]); }
+        const n = Math.min(120, Math.floor(Math.abs(polyArea(p)) / 180)), rr = RNG(Math.round(x0 * 7 + y0 * 13));
+        for (let k = 0, tries = 0; k < n && tries < n * 6; tries++) { const x = x0 + (x1 - x0) * rr(), y = y0 + (y1 - y0) * rr(); if (!pointInPoly(x, y, p)) continue; A.glints.push({ x, y, t, ph: rr() * TAU, w: 0.9 + rr() * 1.4, s: 0.7 + rr() * 0.8 }); k++; }
+      }
+    }
+  }
+  return (R.air = A);
+}
+function drawAir(ctx, v, t) {
+  const A = airPrep(), cfg = A.cfg; if (!cfg) return;
+  const pz = v.pz, tx = v.tx, ty = v.ty, vr = v.rect, night = LOOK.night;
+  ctx.save(); ctx.globalCompositeOperation = 'source-over';
+  if (A.em.length) {                                                        // petals, leaves
+    ctx.setTransform(pz, 0, 0, pz, tx, ty);
+    for (let i = 0; i < A.em.length; i++) {
+      const e = A.em[i]; if (e.t._st !== 3 || e.x < vr[0] - 40 || e.x > vr[2] + 40 || e.y < vr[1] - 60 || e.gy > vr[3] + 80) continue;
+      const pet = e.k === 'petal', drift = pet ? 26 : 14;                   // petals ride the wind further than leaves
+      for (let j = 0; j < e.n; j++) {
+        const s0 = h2(i * 31 + j, 601), s1 = h2(i * 31 + j, 602), s2 = h2(i * 31 + j, 603), P = (pet ? 7 : 5.5) + 4 * s0, u = (((t / P + s1) % 1) + 1) % 1;
+        const sx = e.x + (s2 - 0.5) * 1.5 * e.r, sy = e.y + (s0 - 0.5) * 0.7 * e.r, ex = e.gx + (s2 - 0.3) * 2.4 * e.r + drift, ey = e.gy + (s1 - 0.3) * 0.9 * e.r;
+        const x = lerp(sx, ex, u) + Math.sin(t * 1.7 + s0 * 20) * 2.4 * Math.min(1, u * 4), y = lerp(sy, ey, u);
+        const a = smooth(u / 0.08) * (1 - smooth((u - 0.85) / 0.15)); if (a <= 0.01) continue;
+        const col = e.cols[(i + j) % e.cols.length], w = (pet ? 1.2 : 1.5) * (0.25 + 0.75 * Math.abs(Math.cos(t * 2.6 + s1 * 30))), h = pet ? 0.7 : 0.75, an = s2 * Math.PI + t * 0.7, ca = Math.cos(an), sa = Math.sin(an);
+        ctx.globalAlpha = a; ctx.fillStyle = night ? nightColour(col) : col;
+        ctx.beginPath(); ctx.moveTo(x - ca * w, y - sa * w); ctx.lineTo(x - sa * h, y + ca * h); ctx.lineTo(x + ca * w, y + sa * w); ctx.lineTo(x + sa * h, y - ca * h); ctx.fill();
+        if (!night) { ctx.globalAlpha = a * 0.5; ctx.strokeStyle = shade(col, 0.45); ctx.lineWidth = 0.22; ctx.stroke(); }   // a hair of ink round it
+      }
+    }
+  }
+  if (cfg.glint && !night && A.glints.length) {                             // the sun on water
+    ctx.setTransform(pz, 0, 0, pz, tx, ty); ctx.fillStyle = '#FFFFFF';
+    for (const q of A.glints) {
+      if (q.t._st !== 3 || q.x < vr[0] || q.x > vr[2] || q.y < vr[1] || q.y > vr[3]) continue;
+      const b = Math.pow(Math.max(0, Math.sin(t * q.w + q.ph)), 10); if (b < 0.06) continue;
+      const L = q.s * (0.8 + 1.4 * b), T = 0.16; ctx.globalAlpha = Math.min(1, b * 1.2);
+      ctx.fillRect(q.x - L, q.y - T, 2 * L, 2 * T); ctx.fillRect(q.x - T * 0.8, q.y - L * 0.6, T * 1.6, L * 1.2);
+    }
+  }
+  if (cfg.snow) {                                                           // snow over everything, in three depths
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    const W = v.cw, H = v.ch, k = Math.min(W / 1920, H / 1080), dens = cfg.snow;
+    for (const [par, size, n, speed, alpha] of [[0.25, 1.25, 5, 34, 0.55], [0.55, 1.9, 4, 52, 0.75], [1.0, 2.8, 2, 80, 0.92]]) {
+      const cell = 150 * k, ox = tx * par * 0.35, oy = ty * par * 0.35, N = Math.max(1, Math.round(n * dens));
+      const rim = new Path2D(), body = new Path2D();
+      const c0 = Math.floor((-cell - ox) / cell), c1 = Math.ceil((W + cell - ox) / cell);
+      for (let ci = c0; ci <= c1; ci++) for (let q = 0; q < N; q++) {
+        const s0 = h2(ci * 977 + q * 31 + size * 1000, 701), s1 = h2(ci * 977 + q * 31 + size * 1000, 702), fall = speed * k * (0.8 + 0.4 * s0);
+        const y0 = s1 * cell + fall * t + oy, m0 = Math.floor((-cell - y0) / cell), m1 = Math.ceil((H + cell - y0) / cell);
+        for (let m = m0; m <= m1; m++) {
+          const y = y0 + m * cell, s2 = h2(ci * 7919 + m * 104729 + q, 703 + size * 10), x = ci * cell + s2 * cell + ox + Math.sin(t * (0.6 + s0) + s2 * 9 + m) * 6 * k * par;
+          if (x < -10 || x > W + 10 || y < -10 || y > H + 10) continue;
+          const r = size * k * (0.7 + 0.5 * h2(ci + m * 13, 704 + q));
+          rim.moveTo(x + r + 0.6 * k, y); rim.arc(x, y, r + 0.6 * k, 0, TAU); body.moveTo(x + r, y); body.arc(x, y, r, 0, TAU);
+        }
+      }
+      ctx.globalAlpha = alpha * (night ? 0.35 : 0.6); ctx.fillStyle = night ? '#0E1222' : '#8492A6'; ctx.fill(rim);
+      ctx.globalAlpha = alpha * (night ? 0.85 : 1); ctx.fillStyle = night ? '#E2E9F4' : '#FFFFFF'; ctx.fill(body);
+    }
+  }
+  ctx.restore();
+}
 const ACTS = [];
 /* Draw the city at time t (seconds) through view v.
    o.n: film frame (float) that decides which tiles are built; o.allLive: everything is finished;
@@ -778,15 +956,17 @@ SF.draw = function (ctx, v, t, o) {
     const tl = a.tile; let grow = 1;
     if (a.cast && !o.allLive && (tl.rim >= 0 || tl.unfold)) { if (n < tl.castAt) continue; if (a.grow !== false) grow = 0.3 + 0.7 * smooth((n - tl.castAt) / 11); }
     const st = actorState(a, t); if (!st) continue;
+    if (a.pb) { const s0 = (st.s == null ? 1 : st.s) * grow; if (!bbHit([st.sx + a.pb[0] * s0, st.sy + a.pb[1] * s0, st.sx + a.pb[2] * s0, st.sy + a.pb[3] * s0], vr)) continue; }   // off screen whatever its pose
     const dl = actorDL(a, st), s = (st.s == null ? 1 : st.s) * grow;
     const r = [st.sx + dl.bb[0] * s, st.sy + dl.bb[1] * s, st.sx + dl.bb[2] * s, st.sy + dl.bb[3] * s];
     if (!bbHit(r, vr)) continue;
-    let slot = 1e9;
+    let slot = 1e9, floor = -1;                               // floor: the last thing behind it that it overlaps (it must be drawn after)
     if (a.layer !== 'top') {
       for (const ob of a.cand) {
         if (ob.gi >= slot) break;
-        if (ob.tile._st !== 3 || !bbHit(ob.bb, r)) continue;
+        if (ob.noHide || ob.tile._st !== 3 || !bbHit(ob.bb, r)) continue;
         if (objInFrontOfPoint(ob, st.wx, st.wy, st.z)) { slot = ob.gi; break; }
+        floor = ob.gi;
       }
       for (let i = 0; i < tiles.length; i++) {              // tiles still under construction act as one block
         if (sts[i] !== 1 && sts[i] !== 2) continue;
@@ -794,10 +974,24 @@ SF.draw = function (ctx, v, t, o) {
         if (g0 < slot && bbHit(tl2.bbNoCast, r) && st.wx < tl2.fp[2] && st.wy < tl2.fp[3]) slot = g0;
       }
     } else slot = 2e9 + tl.order;
-    ACTS.push({ a, st, dl, slot, key: st.wx + st.wy + (a.bias || 0), grow });
+    ACTS.push({ a, st, dl, slot, floor, key: st.wx + st.wy + (a.bias || 0), grow, r });
+  }
+  // SCENE.slotChain: a person is drawn no later than any nearer person they overlap on screen. Without it a near person
+  // whose slot comes early (something stands in front of them) is drawn before a far one with nothing in front of them,
+  // and the far one lands on top.
+  if (typeof SCENE !== 'undefined' && SCENE.slotChain) {
+    const by = ACTS.slice().sort((p, q) => q.key - p.key);
+    for (let i = 1; i < by.length; i++) {
+      const B = by[i]; if (B.slot >= 2e9) continue;
+      for (let j = 0; j < i; j++) { const A = by[j]; if (A.slot < B.slot && bbHit(A.r, B.r)) B.slot = Math.max(A.slot, B.floor + 0.5); }   // never under what stands behind it
+    }
   }
   ACTS.sort((p, q) => p.slot - q.slot || p.key - q.key);
+  if (ACTS.some((A) => A.st.ext)) footOrder(ACTS);
   let ai = 0;
+  // exploring: the few ms for new pose bitmaps start here, not before the frame's bookkeeping. Half go to poses as they are
+  // drawn (the first in depth order), half to everybody on screen in turn (prewarmPoses), so nobody waits for ever
+  if (v.lazy) { const t0 = performance.now(), ms = v.bmpMs || 4; R.bmpUntil = t0 + (v.lazy === 'budget' ? ms / 2 : ms); R.warmUntil = t0 + ms; }
   const flushActors = (gi) => { while (ai < ACTS.length && ACTS[ai].slot <= gi) { if (!SF.noActors) drawActor(ctx, v, ACTS[ai]); ai++; } };
   const blit = (cv, x, y, exact, k) => {
     if (exact) { ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.drawImage(cv, x + tx, y + ty); }
@@ -845,7 +1039,9 @@ SF.draw = function (ctx, v, t, o) {
     }
   }
   flushActors(3e9);
-  if (night) drawLight(ctx, v, t, o, 'air');
+  if (v.lazy === 'budget') prewarmPoses(v, t);
+  if (night) drawLightAir(ctx, v, t, o);
+  if (typeof SCENE !== 'undefined' && SCENE.air && SCENE.air[LOOK.season]) drawAir(ctx, v, t);   // petals, leaves, snow, glints
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   if (v.clip) ctx.restore();
   // the ending: the whole frame, paper tooth included, goes to a flat warm cream

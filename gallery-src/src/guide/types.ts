@@ -24,6 +24,10 @@ export type Place = {
   look: LookFor[]
 }
 
+/* a season the city has besides its own (SCENE.seasons in the engine): it may replace a place's story or its
+   "look for" list, keyed by the place's shot name; everything else stays as written */
+export type SeasonWords = { places?: Record<string, { story?: string; look?: LookFor[] }> }
+
 export type Guide = {
   city: string
   local?: string
@@ -32,6 +36,7 @@ export type Guide = {
   notes: MarginNote[]
   places: Place[]
   moment: { shot: string; title: string; text: string; when?: string }
+  seasons?: Record<string, SeasonWords>
 }
 
 declare global {
@@ -39,8 +44,8 @@ declare global {
     GUIDE?: Guide
     SF?: {
       on: (k: "explore" | "film" | "arrive" | "look", f: (a: unknown) => void) => void
-      look?: { night: boolean }
-      setLook?: (o: { night?: boolean }) => void
+      look?: { night: boolean; season?: string | null }
+      setLook?: (o: { night?: boolean; season?: string }) => void
       paper?: () => number[]
       view: () => { mode: string; z: number; cx: number; cy: number; pz: number; w: number; h: number; paused: boolean; gliding: boolean }
       toScreen: (wx: number, wy: number, v?: ReturnType<NonNullable<Window["SF"]>["view"]>) => [number, number]

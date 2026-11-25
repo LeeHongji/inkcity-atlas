@@ -160,11 +160,21 @@ K.cone = function (g, cx, cy, r, z0, h, col, o) {
 };
 
 /* ---------- plants ---------- */
-/* round faceted tree. o: {r crown radius u, h trunk height u, col, seed} */
+/* round faceted tree. o: {r crown radius u, h trunk height u, col, ink, seed, glow (colour of the motes over it at night),
+   bare (a deciduous tree in winter: drawn by K.bare instead)} */
+/* the season's snow lying on things (SCENE.air[season].cover), 0 when there is none */
+K.snowy = () => { const a = typeof SCENE !== 'undefined' && SCENE.air && SCENE.air[LOOK.season]; return (a && a.cover) || 0; };
+K.SNOW = '#F3F5F7';
 K.tree = function (g, x, y, o) {
+  if (o && o.bare) { K.bare(g, x, y, o); return; }
   o = o || {}; const r = (o.r || 5) * 3.3, h = o.h == null ? 5.5 : o.h, seed = o.seed == null ? Math.round(x * 31 + y * 17) : o.seed;
   const f = g.p(x, y, o.z || 0), tw = o.tw || 1.25, top = f[1] - h * VZ;
   const col = o.col || C.leaf, R = RNG(seed * 7 + 3);
+  if (o.litter) {                                                          // o.litter: colours of the leaves fallen round its foot
+    const Q = RNG(seed * 7 + 11), by = o.litter.map(() => []);
+    for (let i = 0; i < 20; i++) { const a = Q() * TAU, d = r * (0.2 + Q() * 0.75), px = f[0] + Math.cos(a) * d, py = f[1] + Math.sin(a) * d * 0.45, b = Q() * Math.PI, c = Math.cos(b) * 0.7, sn = Math.sin(b) * 0.4; by[i % by.length].push(px - c, py - sn, px, py - 0.3, px + c, py + sn, px - c, py - sn, px + c, py + sn, px, py + 0.3); }
+    by.forEach((a, i) => g.tris2(a, o.litter[i]));
+  }
   g.fill2([[f[0] - tw, f[1]], [f[0] + tw, f[1]], [f[0] + tw * 0.85, top - r * 0.3], [f[0] - tw * 0.85, top - r * 0.3]], C.trunk);
   g.fill2([[f[0] + tw * 0.15, f[1]], [f[0] + tw, f[1]], [f[0] + tw * 0.85, top - r * 0.3], [f[0] + tw * 0.2, top - r * 0.3]], C.trunkD);
   g.line2([[f[0] - tw, f[1]], [f[0] - tw * 0.85, top]], { w: 0.6, c: '#5A4030' }); g.line2([[f[0] + tw, f[1]], [f[0] + tw * 0.85, top]], { w: 0.6, c: '#5A4030' });
@@ -177,14 +187,41 @@ K.tree = function (g, x, y, o) {
   if (sh.length >= 2) { sh.push([cx + r * 0.05, cy + r * 0.15]); g.fill2(sortAround(sh), shade(col, 0.13)); }
   const hl = pts.filter((p) => (p[0] - cx) * 0.6 + (p[1] - cy) < -r * 0.55);
   if (hl.length >= 2) { hl.push([cx - r * 0.25, cy - r * 0.3]); g.fill2(sortAround(hl), shade(col, -0.2)); }
+  if (K.snowy()) { const cap = pts.filter((p) => p[1] < cy - r * 0.12); if (cap.length >= 2) { const lo = Math.max.apply(null, cap.map((p) => p[1])); g.fill2(sortAround(cap.concat([[cx + r * 0.35, lo + r * 0.12], [cx - r * 0.3, lo + r * 0.06]])), K.SNOW); } }   // snow on the crown
   g.outline2(pts, { c: o.ink || C.leafInk, w: 0.9, ext: 0.5 });
-  g.glow2('tree', [cx, cy], f, { r });
+  g.glow2('tree', [cx, cy], f, { r, col: o.glow });
+  if (o.fall) g.emit('leaf', [cx, cy], f, { r: r * 0.85, cols: o.fall, n: 3 });
   const segs = [];
   for (let i = 0; i < 4; i++) {            // a few C-shaped leaf marks
     const a = R() * TAU, d = r * (0.2 + R() * 0.5), px = cx + Math.cos(a) * d, py = cy + Math.sin(a) * d * 0.9, l = r * (0.12 + R() * 0.12), t = -0.9 + R() * 0.6;
     segs.push(px, py, px + Math.cos(t) * l, py + Math.sin(t) * l, px + Math.cos(t) * l, py + Math.sin(t) * l, px + Math.cos(t + 0.9) * l * 1.6, py + Math.sin(t + 0.9) * l * 1.6);
   }
   g.segs2(segs, o.ink || C.leafInk, 0.55);
+};
+/* a deciduous tree in winter: the trunk, boughs that fork up and out to where the crown would be, a haze of fine twigs at
+   their ends, no leaves. o as K.tree (r the crown radius it has in leaf, h trunk height, seed); o.spread widens it
+   (a cherry's boughs reach out more than up), o.trunk / o.bark colours, o.fruit: [colour, count] left hanging */
+K.bare = function (g, x, y, o) {
+  o = o || {}; const r = (o.r || 5) * 3.3, h = o.h == null ? 5.5 : o.h, seed = o.seed == null ? Math.round(x * 31 + y * 17) : o.seed;
+  const f = g.p(x, y, o.z || 0), tw = (o.tw || 1.25) * 0.9, top = [f[0], f[1] - h * VZ], R = RNG(seed * 13 + 7), sp = o.spread || 1;
+  const BR = o.bark || '#6B4C34', cy = top[1] - r * 0.62;
+  g.fill2([[f[0] - tw, f[1]], [f[0] + tw, f[1]], [top[0] + tw * 0.6, top[1]], [top[0] - tw * 0.6, top[1]]], o.trunk || C.trunk);
+  g.fill2([[f[0] + tw * 0.15, f[1]], [f[0] + tw, f[1]], [top[0] + tw * 0.6, top[1]], [top[0] + tw * 0.1, top[1]]], o.trunk ? shade(o.trunk, 0.15) : C.trunkD);
+  g.line2([[f[0] - tw, f[1]], [top[0] - tw * 0.6, top[1]]], { w: 0.6, c: '#5A4030' }); g.line2([[f[0] + tw, f[1]], [top[0] + tw * 0.6, top[1]]], { w: 0.6, c: '#5A4030' });
+  const tips = [], o0 = [top[0], top[1] + 0.5], n = 5;
+  for (let i = 0; i < n; i++) {
+    const a = -Math.PI / 2 + (i - (n - 1) / 2) * 0.42 * sp + (R() - 0.5) * 0.18, l = r * (0.85 + R() * 0.3), k = 0.9;
+    const m = [o0[0] + Math.cos(a) * l * 0.45, o0[1] + Math.sin(a) * l * 0.45 * k], e = [o0[0] + Math.cos(a) * l, o0[1] + Math.sin(a) * l * k];
+    g.line2([o0, m, e], { w: 0.9, c: BR, boil: false });
+    const lim = [[m, e]];
+    for (const d of [-0.5, 0.45]) { const a2 = a + d + (R() - 0.5) * 0.2, l2 = l * (0.32 + R() * 0.16), e2 = [m[0] + Math.cos(a2) * l2, m[1] + Math.sin(a2) * l2 * k]; g.line2([m, e2], { w: 0.6, c: BR, boil: false }); tips.push(e2); lim.push([m, e2]); }
+    tips.push(e);
+    if (K.snowy()) for (const [p, q] of lim) g.line2([[p[0], p[1] - 0.5], [lerp(p[0], q[0], 0.8), lerp(p[1], q[1], 0.8) - 0.4]], { w: 0.45, c: K.SNOW, boil: false });   // snow along the boughs
+  }
+  const twig = []; for (const e of tips) for (let j = 0; j < 3; j++) { const a = -Math.PI / 2 + (R() - 0.5) * 2.2, l = 1.6 + R() * 2.4; twig.push(e[0], e[1], e[0] + Math.cos(a) * l, e[1] + Math.sin(a) * l); }
+  g.segs2(twig, BR, 0.4);
+  if (o.fruit) { const [col, cnt] = o.fruit; for (let i = 0; i < cnt; i++) { const e = tips[(i * 3 + 1) % tips.length], p = [e[0], e[1] + 1.4]; g.disc2(p, 1.05, col); g.mark({ nc: (c) => mix(nightColour(c), c, 0.3) }); g.ring2(p, 1.05, { c: shade(col, 0.5), w: 0.35 }); } }
+  void cy;
 };
 function sortAround(pts) {
   let cx = 0, cy = 0; for (const p of pts) { cx += p[0]; cy += p[1]; } cx /= pts.length; cy /= pts.length;
@@ -256,7 +293,8 @@ K.blooms = function (g, x0, y0, x1, y1, z, cols, o) {
    for the left: feet on v = 0, hips -10, shoulders -15.6, crown about -21.3, so the head is a fifth of the height.
    The far side of the body (+u) is drawn a little narrower and darker; light comes from the upper left of the screen.
    Options: skin hair top bot shoe | hairStyle short buzz bob long pony bun curly bald | dress (colour) | shorts | bare
-   (short sleeves) | jacket (colour of the shirt seen in an open jacket) | tie | cap | blush | beard | glasses | build 0..1
+   (short sleeves) | jacket (colour of the shirt seen in an open jacket) | coat (true: the top goes down to the knees) |
+   muffler (colour: a scarf round the neck; 'scarf' is the cities' own) | tie | cap | blush | beard | glasses | build 0..1
    | reach [dx,dy] hands to a point (screen offsets / k) | hands [[dx,dy],[dx,dy]] each hand to its own point | pedal [[dx,dy],
    [dx,dy]] feet to points | glove (colour, near hand) | sway (crouch) | noLegs | lean | lie (screen angle of
    the head end: the figure lies down with its hips on the anchor). Feet at (x, y, z) otherwise.
@@ -447,6 +485,11 @@ K.person = function (g, x, y, z, o) {
   const drawHead = () => {
     // neck, in the shadow of the jaw
     tube([[0.18, sv - 0.1, 0.66], [0.26, HC[1] + 1.2, 0.62]], shade(skin, 0.13), LF);
+    if (o.muffler) {                     // wound round the neck, under the chin; one end hangs down the front
+      if (!back) shape([[0.3, sv + 0.2], [1.15, sv + 0.1], [1.25, sv + 3.6], [0.85, sv + 3.95], [0.42, sv + 3.5]], shade(o.muffler, 0.08), LF);
+      const sc = shape(smooth([[-1.35, sv - 1.05], [0.2, sv - 1.45], [1.55, sv - 1.0], [1.7, sv + 0.15], [0.3, sv + 0.75], [-1.45, sv + 0.3]], 2), o.muffler, LF);
+      g.line2(PP([[-1.1, sv - 0.35], [0.3, sv - 0.05], [1.45, sv - 0.4]]), { w: LF * 0.8, c: shade(o.muffler, 0.3), boil: false, wob: 0.3 }); void sc;
+    }
     const sk = shape(skull(), skin);
     const ear = back ? [1.2, 0.3] : [-1.06, 0.22];
     if (!back) {
@@ -540,6 +583,13 @@ K.person = function (g, x, y, z, o) {
     shadeRight(pts, sg > 0 ? 0.9 : -0.5, o.dress);
     for (const [a, c] of [[[-0.6, sv + 5], [-1.2 + sway, hemV - 0.1]], [[0.8, sv + 5.2], [1.25 + sway, hemV + 0.1]]]) g.line2(PP([a, c]), { w: LF * 0.8, c: shade(o.dress, 0.3), boil: false, wob: 0.5 });
   };
+  const drawCoat = () => {              // a long coat: the top carried down over the thighs, open a little at the front
+    const hemV = hipV + 4.9, sway = pose === 'walk' ? Math.sin(s2) * 0.3 : 0;
+    const pts = smooth([[-ww - 0.1, sv + 3.95], [ww * FAR + 0.1, sv + 3.95], [hw * FAR + 0.55 + sway, hemV - 0.5], [0.35, hemV + 0.3], [-hw - 0.6 + sway, hemV - 0.1]], 3);
+    shape(pts, top);
+    shadeRight(pts, sg > 0 ? 0.8 : -0.4, top);
+    if (!back) g.line2(PP([[0.45, sv + 5.4], [0.5 + sway, hemV + 0.2]]), { w: LF * 0.8, c: shade(top, 0.38), boil: false, wob: 0.3 });
+  };
   if (o.dress && sit) {   // a skirt over the lap
     // (the thighs are drawn in the dress colour by drawLeg)
   }
@@ -552,6 +602,7 @@ K.person = function (g, x, y, z, o) {
   if (legs) { drawLeg(1); if (!back) drawShoe(1); drawLeg(0); if (!back) drawShoe(0); }
   drawPelvis();
   if (o.dress && !sit) drawDress();
+  if (o.coat && !o.dress && !sit) drawCoat();
   drawTorso();
   drawArm(0);
   drawHead();
@@ -566,7 +617,7 @@ K.walker = function (T, who, pts, speed, o) {
   o = o || {}; const seg = [], L = [0];
   for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length]; seg.push([a, b]); L.push(L[i] + Math.hypot(b[0] - a[0], b[1] - a[1])); }
   const total = L[L.length - 1], per = total / speed;
-  return T.actor({ sample: o.sample || 0.25, period: per, cast: o.cast,
+  return T.actor({ sample: o.sample || 0.25, period: per, cast: o.cast, season: o.season,
     at(t) {
       let d = (((t * speed + (o.phase || 0) * total) % total) + total) % total, i = 0;
       while (i < seg.length - 1 && d > L[i + 1]) i++;

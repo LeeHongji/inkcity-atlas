@@ -6,31 +6,63 @@
 const TK = {};
 
 /* ---------------- lettering ---------------- */
-/* pseudo-kanji: a few strokes inside a small square, picked from a stroke vocabulary by seed (wide px) */
-TK.glyph2 = function (g, c, s, col, seed, w) {
-  const R = RNG(seed * 131 + 7), segs = [], h = s / 2;
-  const n = 3 + R.int(0, 2);
-  for (let i = 0; i < n; i++) {
-    const t = R.int(0, 5), a = (R() - 0.5) * 0.8 * s, b = (R() - 0.5) * 0.8 * s;
-    if (t <= 1) segs.push(c[0] - h * 0.85, c[1] + a * 0.9, c[0] + h * 0.85, c[1] + a * 0.9);               // a bar across
-    else if (t <= 3) segs.push(c[0] + a * 0.9, c[1] - h * 0.9, c[0] + a * 0.9, c[1] + h * 0.9);            // a stroke down
-    else if (t === 4) segs.push(c[0] + a * 0.5, c[1] - h * 0.3, c[0] + a * 0.5 - h * 0.6, c[1] + h * 0.8); // a sweep left
-    else segs.push(c[0] + b * 0.3, c[1], c[0] + b * 0.3 + h * 0.7, c[1] + h * 0.75);                      // a sweep right
-  }
-  g.segs2(segs, col, w || Math.max(0.28, s * 0.13));
+/* Real Japanese on every sign: the stroke table JP (src/37_kana.js, 10 x 10 grid, y down, strokes in writing order),
+   like Beijing's HZ. Never pseudo-characters: a reader of Japanese or Chinese sees them as miswritten words.
+   TK.WORDS: real shop words by length, for a sign that does not name its own word. */
+TK.WORDS = {
+  1: ['本', '酒', '薬', '湯', '茶', '米', '肉', '花', '魚', '店', '祭', 'ゆ'],
+  2: ['電気', '中古', '寿司', '焼鳥', '喫茶', '甘味', '食堂', '牛丼', '大吉', 'そば', 'パン', '東京'],
+  3: ['カメラ', 'ゲーム', 'テレビ', 'アニメ', '居酒屋', '和菓子', 'セール', 'タバコ', 'ホビー', 'ホテル', 'ビール', 'おでん', 'うどん', 'だんご'],
+  4: ['ラーメン', 'パソコン', 'カラオケ', 'コーヒー', 'タクシー', 'たいやき'],
 };
-/* a sign board on a face, with a column (vertical) or row of glyphs */
+TK.wordFor = function (n, seed) { const L = TK.WORDS[clamp(n | 0, 1, 4)]; return L[Math.floor(h2(seed * 7 + 3, 977) * L.length) % L.length]; };
+/* a word in wide px: centred on c, cell size s (wide px); o.vert: a column read top to bottom (ー turns upright) */
+TK.word2 = function (g, c, s, str, col, o) {
+  o = o || {}; const chars = [...str], n = chars.length, adv = (o.adv || 1.08) * s, u = s / 10, segs = [];
+  const len = (n - 1) * adv + s; let x = o.vert ? c[0] - s / 2 : c[0] - len / 2, y = o.vert ? c[1] - len / 2 : c[1] - s / 2;
+  for (const ch0 of chars) {
+    const ch = o.vert && ch0 === 'ー' ? 'ー|' : ch0, gl = typeof JP !== 'undefined' ? JP[ch] : null;
+    if (!gl) { (window.__jpMissing = window.__jpMissing || []).push(ch); }
+    else for (const st of gl) for (let i = 0; i + 3 < st.length; i += 2) segs.push(x + st[i] * u, y + st[i + 1] * u, x + st[i + 2] * u, y + st[i + 3] * u);
+    if (o.vert) y += adv; else x += adv;
+  }
+  g.segs2(segs, col, o.w || clamp(s * 0.12, 0.2, 1.4));
+};
+/* a word on a plane P(a, z) -> tile point (wide-px glyphs laid on the plane's own axes, so it is sheared with the face):
+   centred on (a, z), cell h (u); o.vert: a column */
+TK.wordP = function (g, P, a, z, h, str, col, o) {
+  o = o || {}; const chars = [...str], n = chars.length, adv = (o.adv || 1.08) * h, u = h / 10, segs = [];
+  const len = (n - 1) * adv + h; let a0 = o.vert ? a - h / 2 : a - len / 2, z0 = o.vert ? z + len / 2 : z + h / 2;
+  for (const ch0 of chars) {
+    const ch = o.vert && ch0 === 'ー' ? 'ー|' : ch0, gl = typeof JP !== 'undefined' ? JP[ch] : null;
+    if (!gl) { (window.__jpMissing = window.__jpMissing || []).push(ch); }
+    else for (const st of gl) for (let i = 0; i + 3 < st.length; i += 2) {
+      const p0 = g.p.apply(g, P(a0 + st[i] * u, z0 - st[i + 1] * u)), p1 = g.p.apply(g, P(a0 + st[i + 2] * u, z0 - st[i + 3] * u));
+      segs.push(p0[0], p0[1], p1[0], p1[1]);
+    }
+    if (o.vert) z0 -= adv; else a0 += adv;
+  }
+  g.segs2(segs, col, o.w || clamp(h * 0.2, 0.2, 1.4));
+};
+/* on a building face, in K.on's coordinates (face 'L': the plane y = p, reading along +x; 'R': the plane x = p, reading
+   along -y) */
+TK.word = function (g, face, p, a, z, h, str, col, o) {
+  const P = face === 'L' ? (s, zz) => [s, p + 0.1, zz] : (s, zz) => [p + 0.1, -s, zz];
+  TK.wordP(g, P, face === 'L' ? a : -a, z, h, str, col, o);
+};
+/* one character in wide px, picked by seed from the one-character shop words (lanterns, noren, small plates) */
+TK.glyph2 = function (g, c, s, col, seed, w) { TK.word2(g, c, s * 0.92, TK.wordFor(1, seed), col, { w: w || Math.max(0.28, s * 0.11) }); };
+/* a sign board on a face, with a real word read down a column (a tall board) or along a row: o.word, or a shop word of
+   about o.n characters picked by o.seed */
 TK.sign = function (g, face, p, a0, a1, z0, z1, col, o) {
   o = o || {}; const q = K.on(face, p + (face === 'L' ? 0.08 : 0.08), a0, a1, z0, z1);
   g.fill(q, col); g.mark({ nc: true }); g.outline(q, { w: o.w || 0.45, c: o.c || shade(col, 0.5), boil: false });   // lit from behind at night
   { const c = g.p.apply(g, K.pt(face, p + 0.1, (a0 + a1) / 2, (z0 + z1) / 2)); g.glow2('neon', c, c, { r: 0.3 * Math.max(Math.abs(a1 - a0) * 2.92, (z1 - z0) * 3.46), col }); }
-  const vert = (z1 - z0) > Math.abs(a1 - a0), n = o.n || Math.max(1, Math.floor((vert ? (z1 - z0) : Math.abs(a1 - a0)) / (vert ? Math.abs(a1 - a0) : (z1 - z0)) * 0.9));
-  const am = (a0 + a1) / 2, zm = (z0 + z1) / 2, cell = vert ? (z1 - z0) / n : (a1 - a0) / n;
-  const s = Math.min(Math.abs(cell), vert ? Math.abs(a1 - a0) : (z1 - z0)) * 0.62 * 3.3;
-  for (let i = 0; i < n; i++) {
-    const c = vert ? g.p.apply(g, K.pt(face, p + 0.1, am, z1 - cell * (i + 0.5))) : g.p.apply(g, K.pt(face, p + 0.1, a0 + cell * (i + 0.5), zm));
-    TK.glyph2(g, c, s, o.ink || (shade(col, 0.05) === col ? '#2A2622' : (hex2rgb(col).reduce((x, y) => x + y) > 420 ? '#3A3128' : '#F6F3EA')), (o.seed || 1) * 17 + i, Math.max(0.3, s * 0.12));
-  }
+  const W = Math.abs(a1 - a0), H = z1 - z0, vert = o.vert != null ? o.vert : H > W;
+  const n0 = o.n || Math.max(1, Math.floor((vert ? H / W : W / H) * 0.9)), word = o.word || TK.wordFor(Math.min(4, n0), (o.seed || 1) * 17), n = [...word].length;
+  const h = vert ? Math.min(W * 0.72, H * 0.86 / (n * 1.08 - 0.08)) : Math.min(H * 0.72, W * 0.88 / (n * 1.08 - 0.08));
+  const ink = o.ink || (shade(col, 0.05) === col ? '#2A2622' : (hex2rgb(col).reduce((x, y) => x + y) > 420 ? '#3A3128' : '#F6F3EA'));
+  TK.word(g, face, p, (a0 + a1) / 2, (z0 + z1) / 2, h, word, ink, { vert });
 };
 
 /* ---------------- roofs ---------------- */
@@ -198,7 +230,13 @@ TK.vend = function (g, x, y, o) {
 };
 /* a sakura in bloom: a dark trunk with a fork, a wide cloud of blossom, white flecks */
 TK.sakura = function (g, x, y, o) {
-  o = o || {}; const r = (o.r || 5.2) * 3.3, h = o.h == null ? 4.6 : o.h, f = g.p(x, y, o.z || 0), top = [f[0], f[1] - h * VZ], R = RNG(o.seed || Math.round(x * 37 + y * 11 + 5));
+  o = o || {}; if (TK.autumn()) { TK.sakuraFall(g, x, y, o); return; }
+  if (TK.summer()) { TK.sakuraLeaf(g, x, y, o); return; }
+  if (TK.winter()) { K.bare(g, x, y, { r: o.r || 5.2, h: o.h == null ? 4.6 : o.h, z: o.z, seed: o.seed, spread: 1.5, trunk: '#5E463E', bark: '#5E463E' }); return; }
+  { const r = (o.r || 5.2) * 3.3, f = g.p(x, y, o.z || 0), Q = RNG((o.seed || Math.round(x * 37 + y * 11 + 5)) + 5003), pl = [[], []];   // petals fallen round its foot
+    for (let i = 0; i < 24; i++) { const a = Q() * TAU, d = r * (0.2 + Q() * 0.8), px = f[0] + Math.cos(a) * d, py = f[1] + Math.sin(a) * d * 0.45, b = Q() * Math.PI, c = Math.cos(b) * 0.6, sn = Math.sin(b) * 0.35; pl[i % 2].push(px - c, py - sn, px, py - 0.25, px + c, py + sn, px - c, py - sn, px + c, py + sn, px, py + 0.25); }
+    pl.forEach((a, i) => g.tris2(a, i ? '#F8DDE4' : '#F2C6D0')); }
+  const r = (o.r || 5.2) * 3.3, h = o.h == null ? 4.6 : o.h, f = g.p(x, y, o.z || 0), top = [f[0], f[1] - h * VZ], R = RNG(o.seed || Math.round(x * 37 + y * 11 + 5));
   const col = o.col || '#F2C6D0', dk = shade(col, 0.16), ink = '#B97F92';
   g.fill2([[f[0] - 1.1, f[1]], [f[0] + 1.1, f[1]], [top[0] + 0.7, top[1]], [top[0] - 0.7, top[1]]], '#5E463E');
   g.line2([[top[0], top[1] + 1], [top[0] - r * 0.45, top[1] - r * 0.35]], { w: 0.9, c: '#5E463E', boil: false }); g.line2([[top[0], top[1] + 1], [top[0] + r * 0.4, top[1] - r * 0.45]], { w: 0.8, c: '#5E463E', boil: false });
@@ -216,6 +254,7 @@ TK.sakura = function (g, x, y, o) {
   const pk = []; for (let i = 0; i < 14; i++) { const a = R() * TAU, d = R() * r * 0.8, px = top[0] + Math.cos(a) * d, py = cy + Math.sin(a) * d * 0.72; pk.push(px, py, px + 0.9, py - 0.5); }
   g.segs2(pk, ink, 0.45);
   g.glow2('tree', [top[0], cy], f, { r, col: '#FFB3D3' });
+  g.emit('petal', [top[0], cy], f, { r: r * 0.9, cols: ['#F2B6C2', '#FBE4E9', '#EBA2B4'], n: 5 });   // hanafubuki: petals on the wind
 };
 /* a blue tarp spread on the ground (world points), with fold lines */
 TK.tarp = function (g, pts, o) {
@@ -226,6 +265,207 @@ TK.tarp = function (g, pts, o) {
   g.fine([[lerp(pts[1][0], pts[2][0], 0.5), lerp(pts[1][1], pts[2][1], 0.5), 0.06], [lerp(pts[3][0], pts[0][0], 0.5), lerp(pts[3][1], pts[0][1], 0.5), 0.06]], { w: 0.35, c: shade(col, -0.25) });
   g.outline(pts, { w: 0.5, c: shade(col, 0.45), boil: false });
   return c;
+};
+
+/* ---------------- seasons ----------------
+   Tokyo's own season is cherry-blossom week. Autumn is the last week of November: the ginkgo at their gold, the cherries'
+   leaves turned rust and half fallen, Shiba Park's maples turning (they peak in early December), 8 to 16 degrees, so
+   coats and scarves. Everything below draws exactly as before in spring. */
+TK.autumn = () => LOOK.season === 'autumn';
+TK.summer = () => LOOK.season === 'summer';
+TK.winter = () => LOOK.season === 'winter';
+/* Summer is the last Saturday of July, the day of the Sumida River fireworks: full leaf, 30 degrees, yukata, tarps laid
+   along the river since noon, Fuji without its snow. Winter is the first week of January (the 5th to the 7th): the
+   deciduous trees bare, the lawns brown, coats and mufflers, kadomatsu at the doors until the 7th, the year's first
+   shrine visits, black-headed gulls on the river; the schools are on holiday in both. */
+const TK_LEAVES = {
+  summer: {
+    ginkgo: [{ col: '#7DA455', ink: '#4B6B36' }],
+    zelkova: [{ col: '#6E9A50', ink: '#4B6B36' }, { col: '#7AA65A', ink: '#4B6B36' }],
+  },
+  autumn: {   // fall: the leaves it lets go (SCENE.air.autumn), litter: the leaves round its foot
+    ginkgo: [{ col: '#E8C445', ink: '#94741F', glow: '#FFD873', fall: ['#E8C445', '#F0D468', '#D9A93A'], litter: ['#E8C445', '#F0D468'] }],
+    zelkova: [{ col: '#C98A4C', ink: '#77502E', glow: '#FFC07A', fall: ['#C98A4C', '#D6A052', '#B9783E'], litter: ['#C98A4C', '#B9783E'] }, { col: '#D6A052', ink: '#7E5A2E', glow: '#FFCB7A', fall: ['#D6A052', '#C98A4C'], litter: ['#D6A052', '#C98A4C'] }],
+    maple: [{ col: '#D2563D', ink: '#7E3426', glow: '#FFAA78', fall: ['#D2563D', '#DE7F3A'], litter: ['#D2563D', '#B9452F'] }, { col: '#DE7F3A', ink: '#84452A', glow: '#FFBF78', fall: ['#DE7F3A', '#D9A043'], litter: ['#DE7F3A', '#C9703A'] }, { col: '#D9A043', ink: '#86602A', glow: '#FFD27A', fall: ['#D9A043', '#E8C445'], litter: ['#D9A043', '#C98A4C'] }, { col: '#86A052', ink: '#4B6B36' }],
+  },
+  winter: { ginkgo: [{ bare: true }], zelkova: [{ bare: true }], maple: [{ bare: true }] },
+};
+/* a tree's colours: in spring o comes back untouched; in the other seasons its kind (ginkgo, zelkova, maple) decides.
+   A kind the season does not list (an evergreen, or a maple in summer leaf) is as in spring */
+TK.leaves = function (o, kind, i) {
+  const S = TK_LEAVES[LOOK.season], l = S && S[kind];
+  if (!l) return o;
+  const n = l.length; return Object.assign({}, o, l[(((i | 0) % n) + n) % n]);
+};
+/* a cherry in full summer leaf: the spring tree's shape in green, no blossom */
+TK.sakuraLeaf = function (g, x, y, o) {
+  const r = (o.r || 5.2) * 3.3, h = o.h == null ? 4.6 : o.h, f = g.p(x, y, o.z || 0), top = [f[0], f[1] - h * VZ], R = RNG((o.seed || Math.round(x * 37 + y * 11 + 5)) + 7001);
+  const col = '#7FAE5E', dk = shade(col, 0.16), ink = '#4B6B36';
+  g.fill2([[f[0] - 1.1, f[1]], [f[0] + 1.1, f[1]], [top[0] + 0.7, top[1]], [top[0] - 0.7, top[1]]], '#5E463E');
+  g.line2([[top[0], top[1] + 1], [top[0] - r * 0.45, top[1] - r * 0.35]], { w: 0.9, c: '#5E463E', boil: false }); g.line2([[top[0], top[1] + 1], [top[0] + r * 0.4, top[1] - r * 0.45]], { w: 0.8, c: '#5E463E', boil: false });
+  const cy = top[1] - r * 0.55, lobes = [[-r * 0.45, r * 0.05, r * 0.62], [r * 0.42, -r * 0.02, r * 0.6], [0, -r * 0.32, r * 0.66], [r * 0.05, r * 0.2, r * 0.55]];
+  lobes.map(([dx, dy, rr]) => { const pts = [], a0 = R() * TAU; for (let k = 0; k < 9; k++) { const a = a0 + TAU * k / 9, q = rr * (0.88 + R() * 0.22); pts.push([top[0] + dx + Math.cos(a) * q, cy + dy + Math.sin(a) * q * 0.82]); } return pts; })
+    .map((b) => ({ b, cy: b.reduce((s2, p) => s2 + p[1], 0) / b.length })).sort((p, q) => p.cy - q.cy).forEach(({ b }) => {
+      const cxx = b.reduce((s2, p) => s2 + p[0], 0) / b.length, cyy = b.reduce((s2, p) => s2 + p[1], 0) / b.length;
+      g.fill2(b, col);
+      const sh = b.filter((p) => (p[0] - cxx) * 0.5 + (p[1] - cyy) > 0); if (sh.length > 2) g.fill2(sortAround(sh.concat([[cxx, cyy + 1]])), dk);
+      g.outline2(b, { c: ink, w: 0.6, ext: 0.2 });
+    });
+  const lf = []; for (let i = 0; i < 6; i++) { const a = R() * TAU, d = r * (0.2 + R() * 0.5), px = top[0] + Math.cos(a) * d, py = cy + Math.sin(a) * d * 0.75, l = r * 0.14; lf.push(px, py, px + l, py - l * 0.6); } g.segs2(lf, ink, 0.5);
+  g.glow2('tree', [top[0], cy], f, { r });
+};
+/* the garden tree in the old lane: a persimmon (leaves in summer, fruit in autumn, bare with a fruit or two left for the
+   birds in winter: kimamori); in spring a plain tree, as it was first drawn */
+TK.garden = function (g, x, y, o) {
+  if (TK.autumn()) { TK.kaki(g, x, y, o); return; }
+  if (TK.winter()) { K.tree(g, x, y, Object.assign({}, o, { bare: true, fruit: ['#E8742A', 2] })); return; }
+  K.tree(g, x, y, TK.summer() ? Object.assign({}, o, { col: '#5E8A4A', ink: '#3C5A30' }) : o);
+};
+/* a cherry in late November: the same trunk and fork, the crown thinned to clumps of rust and orange leaves with the
+   branch tips showing through, a few leaves fallen round its foot */
+TK.sakuraFall = function (g, x, y, o) {
+  const r = (o.r || 5.2) * 3.3, h = o.h == null ? 4.6 : o.h, f = g.p(x, y, o.z || 0), top = [f[0], f[1] - h * VZ], R = RNG((o.seed || Math.round(x * 37 + y * 11 + 5)) + 9001);
+  const BR = '#5E463E', ink = '#7A3F2A', cols = ['#C8663A', '#DB8B45', '#B9502F', '#D9A54C', '#A8603A'];
+  const lf = [[], [], []]; for (let i = 0; i < 18; i++) { const a = R() * TAU, d = r * (0.25 + R() * 0.65), px = f[0] + Math.cos(a) * d, py = f[1] + Math.sin(a) * d * 0.45, b = R() * Math.PI, c = Math.cos(b) * 0.75, sn = Math.sin(b) * 0.4; lf[i % 3].push(px - c, py - sn, px, py - 0.3, px + c, py + sn, px - c, py - sn, px + c, py + sn, px, py + 0.3); }
+  lf.forEach((a, i) => g.tris2(a, cols[i]));
+  g.fill2([[f[0] - 1.1, f[1]], [f[0] + 1.1, f[1]], [top[0] + 0.7, top[1]], [top[0] - 0.7, top[1]]], BR);
+  // five boughs fan up from the fork and fork again: half the leaves are down, so they show
+  const tips = [], o0 = [top[0], top[1] + 1];
+  for (let i = 0; i < 5; i++) {
+    const a = -Math.PI / 2 + (i - 2) * 0.47 + (R() - 0.5) * 0.2, l = r * (0.66 + R() * 0.22), k = 0.82;
+    const m = [o0[0] + Math.cos(a) * l * 0.5, o0[1] + Math.sin(a) * l * 0.5 * k], e = [o0[0] + Math.cos(a) * l, o0[1] + Math.sin(a) * l * k];
+    g.line2([o0, m, e], { w: 0.85, c: BR, boil: false });
+    const a2 = a + (i < 2 ? -0.55 : i > 2 ? 0.55 : (R() < 0.5 ? -0.55 : 0.55)), e2 = [m[0] + Math.cos(a2) * l * 0.42, m[1] + Math.sin(a2) * l * 0.42 * k];
+    g.line2([m, e2], { w: 0.65, c: BR, boil: false });
+    tips.push(e, e2);
+  }
+  // what is left of the leaves: small clumps at the bough ends and one in the middle, with gaps between them
+  const cl = tips.map((e) => ({ x: e[0], y: e[1] + 1.2, rr: r * (0.17 + R() * 0.09), col: cols[Math.floor(R() * cols.length)] }));
+  cl.push({ x: top[0] + (R() - 0.5) * 3, y: top[1] - r * 0.42, rr: r * 0.24, col: cols[Math.floor(R() * cols.length)] });
+  cl.sort((p, q) => p.y - q.y).forEach(({ x: cx, y: cy, rr, col }) => {
+    const b = [], a0 = R() * TAU; for (let k = 0; k < 8; k++) { const a = a0 + TAU * k / 8, q = rr * (0.8 + R() * 0.35); b.push([cx + Math.cos(a) * q, cy + Math.sin(a) * q * 0.82]); }
+    g.fill2(b, col);
+    const sh = b.filter((p) => (p[0] - cx) * 0.5 + (p[1] - cy) > 0); if (sh.length > 2) g.fill2(sortAround(sh.concat([[cx, cy + 0.6]])), shade(col, 0.16));
+    g.outline2(b, { c: ink, w: 0.55, ext: 0.2 });
+  });
+  const tw = []; for (const e of tips) { tw.push(e[0], e[1], e[0] + (R() - 0.5) * 3, e[1] - 2.4 - R() * 1.8, e[0], e[1], e[0] + (R() - 0.5) * 4.4, e[1] - 1.3 - R()); } g.segs2(tw, BR, 0.45);
+  const fl = []; for (const c of cl) for (let i = 0; i < 2; i++) { const px = c.x + (R() - 0.5) * c.rr, py = c.y + (R() - 0.5) * c.rr * 0.7; fl.push(px - 0.4, py, px + 0.4, py - 0.2); } g.segs2(fl, '#F2C27A', 0.7);
+  g.glow2('tree', [top[0], top[1] - r * 0.45], f, { r: r * 0.5, col: '#E8A060' });   // no light-up here: a smaller, dimmer glow than the yozakura's
+  g.emit('leaf', [top[0], top[1] - r * 0.45], f, { r: r * 0.8, cols: ['#C8663A', '#DB8B45', '#D9A54C'], n: 3 });
+};
+/* a persimmon in an old lane's garden, late in the year: a thin crown of the last rust leaves, the orange fruit left on */
+TK.kaki = function (g, x, y, o) {
+  const r0 = (o.r || 5) * 0.86; K.tree(g, x, y, Object.assign({}, o, { r: r0, col: '#B9773E', ink: '#6E4426', glow: '#FFB46A', fall: ['#B9773E', '#C98A4C'], litter: ['#B9773E', '#A8603A'] }));
+  const r = r0 * 3.3, h = o.h == null ? 5.5 : o.h, f = g.p(x, y, 0), cy = f[1] - h * VZ - r * 0.62, R = RNG(Math.round(x * 13 + y * 7) + 4);
+  for (let i = 0; i < 12; i++) { const a = R() * TAU, d = R() * r * 0.8, p = [f[0] + Math.cos(a) * d, cy + Math.sin(a) * d * 0.85]; g.disc2(p, 1.05, '#E8742A'); g.mark({ nc: (c) => mix(nightColour(c), c, 0.3) }); g.ring2(p, 1.05, { c: '#8A3F1A', w: 0.35 }); g.disc2([p[0] - 0.3, p[1] - 0.35], 0.3, '#F6B07A'); }
+};
+/* fallen leaves on the ground: little leaf shapes in a rect (tile-local u), one batch per colour */
+TK.litter = function (g, x0, y0, x1, y1, n, cols, seed) {
+  const R = RNG(seed), by = cols.map(() => []);
+  for (let i = 0; i < n; i++) {
+    const p = g.p(x0 + (x1 - x0) * R(), y0 + (y1 - y0) * R(), 0.02), a = R() * Math.PI, l = 0.55 + R() * 0.35, c = Math.cos(a) * l, sn = Math.sin(a) * l * 0.55;
+    by[i % cols.length].push(p[0] - c, p[1] - sn, p[0], p[1] - 0.32, p[0] + c, p[1] + sn, p[0] - c, p[1] - sn, p[0] + c, p[1] + sn, p[0], p[1] + 0.32);
+  }
+  by.forEach((a, i) => g.tris2(a, cols[i]));
+};
+/* the Sumida fireworks (summer, after dark only: they start at seven): shells burst in turn over the river, each a ring of
+   sparks with short trails that opens, droops and fades. spots: [x, y, z (tile-local u), colour, period s, phase] */
+TK.fireworks = function (T, spots, o) {
+  o = o || {};
+  spots.forEach(([x, y, z, col, P, ph], i) => T.actor({ layer: 'top', sample: 5, period: 10, grow: false, season: 'summer',
+    at(t) {
+      if (!LOOK.night) return null;
+      const u = (((t / P + ph) % 1) + 1) % 1; if (u > 0.5) return null;
+      const f = Math.min(13, Math.floor(u / 0.5 * 14)), a = 1 - smooth((u - 0.32) / 0.18);
+      return { x, y, z, key: f, f, alpha: a < 1 ? a : null };
+    },
+    draw(g, st) {
+      const c = g.p(0, 0, 0), k = st.f / 13, rr = 6 + 44 * Math.sqrt(k), droop = 12 * k * k, n = 36, R = RNG(i * 31 + 7), i0 = g.cmds.length, hot = mix(col, '#FFF6D8', 0.55);
+      for (let j = 0; j < n; j++) {
+        const a = TAU * j / n + (R() - 0.5) * 0.1;
+        for (let q = 0; q < 4; q++) { const m = 1 - q * 0.13; g.disc2([c[0] + Math.cos(a) * rr * m, c[1] + Math.sin(a) * rr * 0.9 * m + droop * m * m], (q ? 0.62 : 1.15) * (1 - 0.4 * k), q ? hot : col); }
+      }
+      if (k > 0.25) for (let j = 0; j < 14; j++) { const a = TAU * j / 14 + 0.2, m = 0.45; g.disc2([c[0] + Math.cos(a) * rr * m, c[1] + Math.sin(a) * rr * 0.9 * m + droop * m * m], 0.8 * (1 - 0.4 * k), hot); }   // an inner ring
+      g.mark({ nc: true }, i0);
+      if (k < 0.5) { g.disc2(c, 1.6 * (1 - 2 * k), '#FFF6D8'); g.mark({ nc: true, light: true }); }
+      // its light broken on the river below (o.water: the height of the water)
+      const wy = c[1] + (z - (o.water || 0)) * VZ, j0 = g.cmds.length;
+      for (let q = 0; q < 7; q++) { const ww = rr * (0.55 - q * 0.06) * (0.7 + 0.3 * Math.sin(q * 2.3 + st.f)), yy = wy + 1 + q * 2.2; g.fill2([[c[0] - ww, yy], [c[0] + ww, yy], [c[0] + ww * 0.9, yy + 0.7], [c[0] - ww * 0.9, yy + 0.7]], q % 2 ? hot : col, true); }
+      g.mark({ nc: true }, j0);
+    } }));
+};
+/* a black-headed gull (yurikamome) in winter plumage, around a wide-px point: white, pale grey back, a dark spot behind
+   the eye, red bill and legs. fly: wings up (f 0) or down (f 1) */
+TK.gull2 = function (g, c, dir, fly, f) {
+  const s = dir * 1.6, P = (u, v) => [c[0] + s * u, c[1] + v * 1.6];
+  if (fly) {
+    const up = f ? 1.6 : -1.8;
+    g.fill2([P(-0.6, -0.2), P(-3.6, up - 0.6), P(-2.4, up + 0.2), P(0.4, 0.2)], '#C9CED4', true); g.fill2([P(0.2, -0.2), P(3.4, up - 0.8), P(2.4, up), P(-0.4, 0.2)], '#DCE0E4', true);
+    g.fill2([P(-3.6, up - 0.6), P(-3.0, up - 0.5), P(-3.2, up - 0.1)], '#2A2622', true);
+  }
+  g.fill2(K.curve([P(-1.8, 0), P(-0.6, -0.8), P(1.0, -0.7), P(1.8, -0.2), P(1.0, 0.5), P(-1.2, 0.4)], 2, true), '#F8F7F2', true);
+  if (!fly) g.fill2([P(-1.6, -0.1), P(-0.2, -0.7), P(1.0, -0.5), P(-0.4, 0.1)], '#C9CED4', true);
+  g.disc2(P(1.6, -0.9), 0.95, '#F8F7F2'); g.disc2(P(1.45, -1.05), 0.26, '#3A3530');
+  g.fill2([P(2.1, -0.95), P(2.9, -0.8), P(2.1, -0.7)], '#C9463E', true);
+  g.line2(K.curve([P(-1.8, 0), P(-0.6, -0.8), P(1.0, -0.7), P(1.8, -0.2), P(1.0, 0.5), P(-1.2, 0.4)], 2, true), { w: 0.3, c: '#8C8576', boil: false });
+};
+/* a snowman (yukidaruma: two balls, in Japan), with coal eyes, twig arms and a red bucket for a hat; s scales it */
+TK.snowman = function (g, x, y, s) {
+  s = s || 1; const b = g.p(x, y, 1.5 * s), hd = g.p(x, y, 3.9 * s), R1 = 1.7 * 3.3 * s, R2 = 1.15 * 3.3 * s;
+  for (const [c, r] of [[b, R1], [hd, R2]]) { g.disc2(c, r, '#F6F7F9'); g.fill2(arcPts(c[0], c[1], r, -0.6, 1.9, 8).concat([[c[0] + r * 0.1, c[1] + r * 0.2]]), '#DCE2EA', true); g.ring2(c, r, { c: '#8C96A4', w: 0.45 }); }
+  g.disc2([hd[0] - R2 * 0.35, hd[1] - R2 * 0.05], 0.45 * s, '#2A2622'); g.disc2([hd[0] + R2 * 0.3, hd[1] - R2 * 0.05], 0.45 * s, '#2A2622');
+  g.fill2([[hd[0] - 1.6 * s, hd[1] - R2 * 0.7], [hd[0] + 1.6 * s, hd[1] - R2 * 0.7], [hd[0] + 2.0 * s, hd[1] - R2 * 1.5], [hd[0] - 1.9 * s, hd[1] - R2 * 1.5]], '#C9463E', true);   // the bucket
+  g.segs2([b[0] - R1 * 0.85, b[1] - R1 * 0.4, b[0] - R1 * 1.6, b[1] - R1 * 0.9, b[0] + R1 * 0.85, b[1] - R1 * 0.4, b[0] + R1 * 1.55, b[1] - R1 * 1.0], '#6B4C34', 0.45);
+};
+/* New Year at a door: a shimekazari (a straw rope with white paper zigzags and a bitter orange) over it, wide-px centre */
+TK.shime2 = function (g, c, s) {
+  s = s || 1; const P = (u, v) => [c[0] + u * s, c[1] + v * s];
+  g.line2(K.curve([P(-2.6, 0), P(0, 1.1), P(2.6, 0)], 4, false), { w: 1.1 * s, c: '#D9C68A', boil: false });
+  g.fill2([P(-0.5, 0.7), P(0.5, 0.7), P(0.4, 3.6), P(-0.4, 3.6)], '#D9C68A', true);
+  for (const u of [-1.4, 1.4]) g.fill2([P(u - 0.4, 0.6), P(u + 0.4, 0.6), P(u - 0.1, 1.5), P(u + 0.4, 1.5), P(u, 2.6), P(u - 0.4, 1.9)], '#FBFAF6', true);
+  g.disc2(P(0, 0.6), 0.75 * s, '#E8742A'); g.disc2(P(0.5, -0.1), 0.35 * s, '#5E8A4A');
+};
+/* a kadomatsu: three green bamboo stems cut on the slant, pine sprigs, a straw-bound base (tile-local x, y) */
+TK.kadomatsu = function (g, x, y) {
+  K.cyl(g, x, y, 0.75, 0, 1.2, { t: '#C9A26B', l: '#B58F58', r: '#A07C4C' }, { w: 0.45, n: 10 });
+  const segs = []; for (let z = 0.4; z < 1.2; z += 0.35) { const a = g.p(x - 0.75, y, z), b = g.p(x + 0.75, y, z); segs.push(a[0], a[1], b[0], b[1]); } g.segs2(segs, '#7A5A3C', 0.35);
+  for (const [dx, h] of [[-0.3, 3.6], [0.3, 3.0], [0, 4.2]]) {
+    const b = g.p(x + dx, y + 0.1, 1.2), t = g.p(x + dx, y + 0.1, h);
+    g.fill2([[b[0] - 0.55, b[1]], [b[0] + 0.55, b[1]], [t[0] + 0.55, t[1] + 0.8], [t[0] - 0.55, t[1]]], '#6FA35A', true);
+    g.fill2([[t[0] - 0.5, t[1] + 0.1], [t[0] + 0.5, t[1] + 0.85], [t[0] + 0.3, t[1] + 1.0], [t[0] - 0.3, t[1] + 0.4]], '#E9E2B8', true);
+    g.line2([[b[0] - 0.55, b[1]], [t[0] - 0.55, t[1]]], { w: 0.3, c: '#3C5A30', boil: false });
+  }
+  for (const [dx, dz] of [[-0.6, 1.6], [0.6, 1.5], [0, 1.9]]) { const p = g.p(x + dx, y + 0.3, dz); g.disc2(p, 0.9, '#3F6B3A'); }
+};
+/* the shaved-ice flag: white cloth, the character 氷 ("ice") in red, blue waves along the foot (wide px, top-left at p) */
+TK.kooriFlag2 = function (g, p, w, h) {
+  const q = [[p[0], p[1]], [p[0] + w, p[1]], [p[0] + w, p[1] + h], [p[0], p[1] + h]];
+  g.fill2(q, '#FBFAF6', true); g.mark({ nc: (c) => mix(nightColour(c), c, 0.45) });
+  const wy = p[1] + h * 0.78, wv = [[p[0], p[1] + h]]; for (let i = 0; i <= 8; i++) wv.push([p[0] + w * i / 8, wy + Math.sin(i * 1.7) * h * 0.04]); wv.push([p[0] + w, p[1] + h]);
+  g.fill2(wv, '#3F7FC0', true);
+  const s = Math.min(w, h * 0.7) * 0.82, o = [p[0] + (w - s) / 2, p[1] + h * 0.06], P = (u, v) => [o[0] + u * s, o[1] + v * s], st = { w: Math.max(0.45, s * 0.11), c: '#C9463E', boil: false, ext: 0 };
+  g.line2([P(0.16, 0.16), P(0.25, 0.28)], st);                                  // the dot
+  g.line2([P(0.52, 0.06), P(0.52, 0.86), P(0.42, 0.79)], st);                   // the stem, hooked at its foot
+  g.line2([P(0.12, 0.42), P(0.40, 0.42), P(0.12, 0.82)], st);                   // left: across, then down and away
+  g.line2([P(0.84, 0.28), P(0.58, 0.50)], st); g.line2([P(0.58, 0.50), P(0.92, 0.86)], st);   // right: up, then the long sweep
+  g.outline2(q, { w: 0.35, boil: false });
+};
+/* a morning glory climbing a little bamboo frame from a pot on the step (summer in the old lanes); wide-px pot top */
+TK.asagao2 = function (g, p, seed) {
+  const R = RNG(seed), top = [p[0], p[1] - 5.2];
+  g.segs2([p[0] - 0.8, p[1], top[0] - 0.8, top[1], p[0] + 0.8, p[1], top[0] + 0.8, top[1], top[0] - 0.8, top[1] + 1.6, top[0] + 0.8, top[1] + 1.6], '#B59A6A', 0.3);
+  for (let i = 0; i < 6; i++) { const q = [p[0] + (R() - 0.5) * 2.2, p[1] - 0.6 - R() * 4.6]; g.disc2(q, 0.65, i % 2 ? '#6E9A50' : '#7FAE5E'); }
+  for (let i = 0; i < 3; i++) { const q = [p[0] + (R() - 0.5) * 2.0, p[1] - 1.4 - R() * 3.8]; g.disc2(q, 0.55, R.pick(['#5E6FC9', '#7A5BB0', '#C95A8A'])); g.disc2(q, 0.18, '#F6F3EA'); }
+};
+/* the yakiimo truck's load: a black stone oven with a chimney, a red lantern, a little fire glowing in its door */
+TK.imo = function (g, B, ang) {
+  const p = B.pt(-0.9, 0, 2.0); K.rbox(g, p[0], p[1], 1.7, 1.35, ang, 2.0, 3.7, { t: '#4A4540', l: '#3A3530', r: '#2E2A26' }, { w: 0.55 });
+  const q = B.pt(-2.2, 0.5, 3.7); K.cyl(g, q[0], q[1], 0.3, 3.7, 6.4, { t: '#6E6A64', l: '#5A564E', r: '#4A4640' }, { w: 0.4, n: 8 });
+  const v = Math.cos(ang) - Math.sin(ang) > 0 ? 1 : -1;                     // the long side we can see
+  const d0 = g.p.apply(g, B.pt(-1.7, v * 1.37, 2.4)), d1 = g.p.apply(g, B.pt(-0.3, v * 1.37, 2.4)), d2 = g.p.apply(g, B.pt(-0.3, v * 1.37, 3.2)), d3 = g.p.apply(g, B.pt(-1.7, v * 1.37, 3.2));
+  g.fill2([d0, d1, d2, d3], '#D9662E', true); g.mark({ nc: '#FFB25A', light: true }); g.outline2([d0, d1, d2, d3], { w: 0.35, c: '#2A2622', boil: false });   // the fire door
+  const s0 = g.p.apply(g, B.pt(-2.2, 0.5, 6.6)), st = []; for (let k = 0; k < 7; k++) st.push([s0[0] + Math.sin(k * 1.3) * 0.9 + k * 0.5, s0[1] - k * 1.3]); g.line2(st, { w: 0.5, c: '#C9C3B6', boil: false });
+  const l = g.p.apply(g, B.pt(1.3, v * 1.2, 5.6)); g.line2([g.p.apply(g, B.pt(1.3, v * 1.2, 2.0)), l], { w: 0.4, c: '#3A3530', boil: false }); TK.lantern2(g, [l[0], l[1] + 1.6], 1.35, '#D0483A');
 };
 
 /* ---------------- people ---------------- */
@@ -243,17 +483,61 @@ TK.who = function (seed, o) {
     w.glasses = R() < 0.2; w.cap = R() < 0.06 ? R.pick(['#3B3F47', '#F0EDE4', '#3F5F8F']) : undefined;
     if (R() < 0.18) w.dress = R.pick(['#E7E2D6', '#3B3F47', '#B9A27D', '#8FB7D9', '#D98AA4']);
   }
-  return Object.assign(w, o || {});
+  Object.assign(w, o || {});
+  return TK.autumn() || TK.winter() ? TK.wrap(w, seed, o || {}) : TK.summer() ? TK.cool(w, seed, o || {}) : w;
+};
+/* the last Saturday of July, about 31 degrees: short sleeves, shorts, a sun parasol or a hand fan, a straw-coloured cap */
+TK.cool = function (w, seed, o) {
+  const Q = RNG(seed * 4111 + 31);
+  if (o.bare == null) w.bare = Q() < 0.8;
+  if (o.top != null || o.dress != null) return w;
+  if (o.shorts == null && !w.dress) w.shorts = Q() < 0.3;
+  const r = Q();
+  if (r < 0.12 && !w.cap) w.higasa = Q.pick(['#2A2622', '#F3F1EA', '#C9B48F', '#8FB7D9']);
+  else if (r < 0.22) w.uchiwa = Q.pick(['#F3F1EA', '#8FB7D9', '#E7A9A0', '#E6C24F']);
+  if (!w.cap && Q() < 0.12) w.cap = '#E3D3A0';
+  return w;
+};
+/* late November: sleeves come down, coats and scarves come out. A given outfit (a uniform, a costume) is kept. */
+const TK_COATS = ['#B08A5E', '#2F3A4F', '#45474D', '#6B6A4A', '#7A3B3B', '#C9B48F', '#2A2622', '#5A6B7A'];
+const TK_KNITS = ['#C9584B', '#E6C24F', '#8E8A84', '#5A6B5A', '#D9C9A8', '#3F5F8F', '#9A6A8A'];
+const TK_SCARVES = ['#B5443A', '#C99A3A', '#8E8A84', '#3F5F8F', '#E7E2D6', '#6B4A6A', '#2F343B'];
+TK.wrap = function (w, seed, o) {
+  const Q = RNG(seed * 4111 + 29), cold = TK.winter();                  // late November, or the first week of January (2 to 10 degrees)
+  if (o.bare == null) w.bare = false;
+  if (o.shorts == null) w.shorts = false;
+  if (o.top != null || o.dress != null) return w;
+  if (w.dress && Q() < (cold ? 0.75 : 0.6)) w.dress = undefined;
+  const r = Q();
+  if (r < (cold ? 0.85 : 0.55)) { w.jacket = w.dress ? undefined : w.top; w.top = Q.pick(TK_COATS); w.coat = !w.dress && Q() < (cold ? 0.75 : 0.65); }
+  else if (r < (cold ? 0.97 : 0.85)) w.top = Q.pick(TK_KNITS);
+  if (Q() < (cold ? 0.6 : 0.4)) w.muffler = Q.pick(TK_SCARVES);
+  if (cold && !w.cap && !('higasa' in o)) { const U = RNG(seed * 4111 + 37); if (U() < 0.5) w.higasa = U.pick(['#DCE5EC', '#DCE5EC', '#2F3A4F', '#2A2622', '#8E2F35', '#3F5F8F']); }   // umbrellas in the snow (clear vinyl, mostly)
+  return w;
+};
+/* a school child: the uniform of a school day (yellow cap, randoseru) in spring and autumn; in the summer and New Year
+   holidays the same child in their own clothes, on an outing with a grown-up */
+TK.pupil = function (seed, o) {
+  if (!TK.summer() && !TK.winter()) return TK.who(seed, o);
+  const h = Object.assign({}, o); delete h.randoseru; delete h.top; delete h.bot; delete h.cap;
+  return TK.who(seed, h);
 };
 /* a salaryman or office worker in a dark suit */
 TK.salary = function (seed, o) {
   const R = RNG(seed * 313 + 9), suit = R.pick(['#2F343B', '#3B3F47', '#2F3A4F', '#4A4F57']);
-  return Object.assign(TK.who(seed), { top: suit, bot: suit, jacket: R() < 0.8 ? '#F3F1EA' : '#CFE0EA', tie: R.pick(['#C9584B', '#3F5F8F', '#7A5BA0', '#5A6B5A', '#B9A27D']), shoe: '#2F2A26', hairStyle: R.pick(['short', 'short', 'buzz', 'short']), dress: undefined, cap: undefined, bare: false, shorts: false }, o || {});
+  const w = Object.assign(TK.who(seed), { top: suit, bot: suit, jacket: R() < 0.8 ? '#F3F1EA' : '#CFE0EA', tie: R.pick(['#C9584B', '#3F5F8F', '#7A5BA0', '#5A6B5A', '#B9A27D']), shoe: '#2F2A26', hairStyle: R.pick(['short', 'short', 'buzz', 'short']), dress: undefined, cap: undefined, bare: false, shorts: false });
+  if (TK.summer()) Object.assign(w, { top: w.jacket, jacket: undefined, tie: undefined, bare: true, higasa: undefined, uchiwa: undefined });   // Cool Biz: no jacket, no tie
+  return Object.assign(w, o || {});
 };
 /* someone in a rental kimono (dress to the ankle, obi drawn by TK.person) */
 TK.kimono = function (seed, o) {
-  const R = RNG(seed * 571 + 1), c = R.pick(['#E79AAE', '#8FB7D9', '#F0E4C0', '#C9A0D9', '#E9C46A', '#9FCFB1', '#E07A6A', '#F3F1EA']);
-  return Object.assign(TK.who(seed), { dress: c, top: c, sleeve: c, obi: R.pick(['#C9584B', '#E6C24F', '#3F5F8F', '#F3F1EA', '#7A5BA0']), hairStyle: R() < 0.8 ? 'bun' : 'short', bare: false, shorts: false, shoe: '#F3F1EA', cap: undefined }, o || {});
+  const R = RNG(seed * 571 + 1);
+  let c = R.pick(['#E79AAE', '#8FB7D9', '#F0E4C0', '#C9A0D9', '#E9C46A', '#9FCFB1', '#E07A6A', '#F3F1EA']);
+  if (TK.autumn()) c = RNG(seed * 577 + 5).pick(['#9E3B3B', '#C98A3A', '#6B4A6A', '#3F4D63', '#7A8A5A', '#B5624B', '#E9D9B0', '#5A3A4A']);   // deeper colours in autumn
+  if (TK.summer()) c = RNG(seed * 577 + 7).pick(['#2F3F6A', '#F3F1EA', '#3F5F8F', '#E7A9A0', '#8FB7D9', '#2E2A26', '#C9A0D9', '#F0E4C0']);   // a cotton yukata
+  if (TK.winter()) c = RNG(seed * 577 + 9).pick(['#9E2B35', '#2F3F6A', '#6B4A6A', '#C98A3A', '#1F4A3A', '#E9D9B0', '#B5443A']);   // a silk kimono for the New Year
+  const fur = TK.winter() && RNG(seed * 577 + 11)() < 0.5 ? '#F6F3EA' : undefined;   // a white shawl
+  return Object.assign(TK.who(seed), { dress: c, top: c, sleeve: c, obi: R.pick(['#C9584B', '#E6C24F', '#3F5F8F', '#F3F1EA', '#7A5BA0']), hairStyle: R() < 0.8 ? 'bun' : 'short', bare: false, shorts: false, shoe: '#F3F1EA', cap: undefined, jacket: undefined, coat: false }, fur ? { muffler: fur } : {}, TK.summer() ? { higasa: undefined, uchiwa: RNG(seed * 577 + 13)() < 0.4 ? '#F3F1EA' : undefined } : {}, o || {});
 };
 /* K.person plus Tokyo extras drawn on the returned points: obi, a bride's white hood, a priest's eboshi, a randoseru */
 TK.person = function (g, x, y, z, w) {
@@ -278,6 +562,13 @@ TK.person = function (g, x, y, z, w) {
   }
   if (w.randoseru && back) { const sp = r.shoulders, mx = (sp[0][0] + sp[1][0]) / 2, y0 = sp[0][1] + 0.4 * k; g.fill2([[mx - 2.1 * k, y0], [mx + 2.0 * k, y0], [mx + 2.0 * k, y0 + 5.0 * k], [mx - 2.1 * k, y0 + 5.0 * k]], w.randoseru, true); g.fill2([[mx - 2.1 * k, y0], [mx + 2.0 * k, y0], [mx + 2.0 * k, y0 + 1.8 * k], [mx - 2.1 * k, y0 + 1.8 * k]], shade(w.randoseru, 0.2), true); g.outline2([[mx - 2.1 * k, y0], [mx + 2.0 * k, y0], [mx + 2.0 * k, y0 + 5.0 * k], [mx - 2.1 * k, y0 + 5.0 * k]], { w: 0.35, c: '#3A3128', boil: false }); }
   if (w.phone) { const hd = r.hands[0]; g.fill2([[hd[0] - 0.45, hd[1] - 1.1], [hd[0] + 0.45, hd[1] - 1.1], [hd[0] + 0.45, hd[1] + 0.3], [hd[0] - 0.45, hd[1] + 0.3]], '#2A2622', true); }
+  if (w.uchiwa) { const hd = r.hands[0], c = [hd[0] + sg * 0.6 * k, hd[1] - 2.0 * k]; g.line2([hd, c], { w: 0.35, c: '#8A6A4A', boil: false }); g.disc2(c, 1.25 * k, w.uchiwa); g.ring2(c, 1.25 * k, { c: '#5A4636', w: 0.3 }); }   // a round paper fan
+  if (w.higasa) {                                                                        // a sun parasol over the head
+    const hd = r.hands[0], c = [r.crown[0] + sg * 0.4 * k, r.crown[1] - 2.6 * k], um = [];
+    for (let i = 0; i <= 12; i++) { const a = Math.PI + Math.PI * i / 12; um.push([c[0] + Math.cos(a) * 4.6 * k, c[1] + 1.4 * k + Math.sin(a) * 1.9 * k]); }
+    g.line2([c, [hd[0], hd[1]]], { w: 0.35, c: '#4A3A2C', boil: false }); g.fill2(um, w.higasa, true); g.line2(um, { w: 0.4, c: shade(w.higasa, 0.5), boil: false });
+    if (K.snowy()) g.line2(um.slice(2, 11).map((p) => [p[0], p[1] - 0.15]), { w: 0.7, c: K.SNOW, boil: false });   // snow settling on it
+  }
   return r;
 };
 /* a crowd member seen as a bust (spectators at the sumō ring) */

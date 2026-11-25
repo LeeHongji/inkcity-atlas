@@ -24,14 +24,17 @@ SF.boot = function () {
   const cv = document.getElementById('sf'), ctx = cv.getContext('2d', { alpha: false, willReadFrequently: q.has('f') });
   APP.cv = cv; APP.ctx = ctx; APP.q = q;
   if (q.has('night')) LOOK.night = true;                     // ?night: the page opens at night (and records at night)
+  LOOK.season = SCENE.season || null;                        // ?season=autumn: the page opens in another of its seasons
+  if (q.get('season') && SF.seasons && SF.seasons.indexOf(q.get('season')) >= 0) LOOK.season = q.get('season');
   APP.rec = q.has('film'); SF.noBoil = q.has('noboil'); SF.noActors = q.has('noactors'); SF.noBlit = q.has('noblit'); SF.noAtlas = q.has('noatlas'); APP.frozen = q.has('f') ? parseFloat(q.get('f')) : null;
   mkTextures();
-  SF.initWorld(q.get('only') ? q.get('only').split(',') : null);
+  APP.only = q.get('only') ? q.get('only').split(',') : null;
+  SF.initWorld(APP.only);
   const size = () => {
     if (APP.rec || APP.frozen != null) { cv.width = 1920; cv.height = 1080; cv.style.width = '1920px'; cv.style.height = '1080px'; }
     else {
       const dpr = Math.min(window.devicePixelRatio || 1, 2), w = window.innerWidth, h = window.innerHeight;
-      const k = Math.min(1, 2880 / (w * dpr));
+      const k = Math.min(1, ((typeof SCENE !== 'undefined' && SCENE.maxCanvas) || 2880) / (w * dpr));   // SCENE.maxCanvas: a wider cap, for a sharper picture on big high-DPI screens
       cv.width = Math.round(w * dpr * k); cv.height = Math.round(h * dpr * k); cv.style.width = w + 'px'; cv.style.height = h + 'px';
     }
     R.paperPat = null; pinWide();
@@ -171,44 +174,93 @@ function tick() {
   // people and cars: while the zoom moves, stand-ins scaled from bitmaps they already have; once it rests, a few ms of
   // exact bitmaps per frame until all are sharp again (rasterising every visible pose at once stalled the zoom)
   v.lazy = settled ? 'budget' : 'moving'; R.bmpUntil = performance.now() + 4; R.bmpPending = false;
+  // new pose bitmaps get what the last frame's drawing left over; for half a second after the view comes to rest they get
+  // a burst, so the people on screen turn sharp at once (a slower frame or two then reads better than seconds of blur)
+  if (!settled) APP.restAt = 0; else if (!APP.restAt) { APP.restAt = performance.now(); prewarmReset(); }
+  v.bmpMs = !settled ? 4 : performance.now() - APP.restAt < 500 ? 14 : clamp(14 - (APP.drawNet || 8), 4, 9);
   // background bakes get the time this frame has left, not a fixed 26 ms
   if (settled) { exploreBakes(v); runJobs(R.jobs.length ? clamp(12 - (APP.drawMs || 5), 3, 9) : 0, 2.5e6); }
   let fade = 0;
   if (APP.fadeUp > 0) { const k = (performance.now() - APP.fadeUp) / 1000; fade = k >= 1 ? 0 : (23 / 24) * (1 - smooth(k)); if (k >= 1) APP.fadeUp = 0; }
-  const d0 = performance.now();
+  const d0 = performance.now(); R.bmpSpent = 0;
   SF.draw(ctx, v, t, { allLive: true, phase: APP.phase | 0, fade, lightT: lightT() });
   if (APP.swap) drawSwap(ctx, APP.cam);
-  APP.drawMs = performance.now() - d0;
+  APP.drawMs = performance.now() - d0; APP.drawNet = APP.drawMs - R.bmpSpent;
   drawUI(ctx, cv);
 }
-/* ---------- day and night ----------
-   SF.setLook({ night }) changes the look of the city. Every cached picture is drawn again in the new look (the wide view
-   at once, the rest as it comes into view, the same path as after a GPU reset); meanwhile the last frame of the old look
-   stays on screen, follows the camera, and fades away over a second. At nightfall the lamps come on in a wave. */
-const lightT = () => (LOOK.since > 0 ? (performance.now() - LOOK.since) / 1000 : null);
+/* ---------- day and night, and the seasons ----------
+   SF.setLook({ night, season }) changes the look of the city. Every cached picture is drawn again in the new look (the
+   wide view at once, the rest as it comes into view, the same path as after a GPU reset); meanwhile the last frame of the
+   old look stays on screen and follows the camera. Night: it fades away over a second, and the lamps come on in a wave.
+   Season: the city is built again for it (SF.initWorld), and the new season is brushed on over the old one, a ragged
+   edge sweeping across from the upper left. */
+const lightT = () => { if (LOOK.since === null) LOOK.since = performance.now(); return LOOK.since > 0 ? (performance.now() - LOOK.since) / 1000 : null; };
+SF.seasons = SCENE.seasons && SCENE.seasons.length > 1 ? SCENE.seasons.slice() : null;
 SF.setLook = function (o) {
   const night = o.night == null ? LOOK.night : !!o.night;
-  if (night === LOOK.night) return;
-  const cv = APP.cv;
-  if (APP.frozen == null && APP.started) {
+  const season = o.season == null || !SF.seasons || SF.seasons.indexOf(o.season) < 0 ? LOOK.season : o.season;
+  if (night === LOOK.night && season === LOOK.season) return;
+  const cv = APP.cv, wipe = season !== LOOK.season;
+  if (APP.frozen == null && APP.started && cv.width && cv.height) {        // (a canvas with no size has no frame to keep)
     const snap = mkCanvas(cv.width, cv.height); snap.getContext('2d').drawImage(cv, 0, 0);
     const cam = APP.mode === 'explore' ? APP.cam : (APP.filmCam || WIDE);
     if (APP.swap) APP.swap.cv.width = 0;
-    APP.swap = { cv: snap, cam: { z: cam.z, cx: cam.cx, cy: cam.cy }, t0: performance.now() };
+    APP.swap = { cv: snap, cam: { z: cam.z, cx: cam.cx, cy: cam.cy }, t0: performance.now(), wipe };
   }
-  LOOK.night = night; LOOK.since = night && APP.frozen == null ? performance.now() : -1e9;
+  const dusk = night && !LOOK.night;                          // the lamps come on in a wave at nightfall only
+  LOOK.night = night; LOOK.since = -1e9;
+  if (wipe) { LOOK.season = season; SF.initWorld(APP.only); R.lights = null; R.air = null; }
   if (APP.frozen != null) gpuReset();                         // a seeked page draws every frame from nothing anyway
   else APP.recover();
-  emit('look', { night });
+  // the rebuild and the re-bake took a moment, and the next frame may cut to a new shot: the fade or the wipe, and the
+  // lamps coming on, start with the first frame drawn in the new look
+  if (dusk && APP.frozen == null) LOOK.since = null;
+  if (APP.swap) APP.swap.t0 = null;
+  emit('look', { night, season });
 };
-/* the old look's last frame over the new one, moved with the camera, fading out */
+/* where the old look's last frame goes on the canvas now: it was taken at its own size and camera, and the camera (or
+   the window) may have moved since */
+function swapTransform(ctx, cam) {
+  const S = APP.swap, cv = APP.cv, W0 = S.cv.width, H0 = S.cv.height;
+  const pz = cam.z * Math.min(cv.width / 1920, cv.height / 1080), pz0 = S.cam.z * Math.min(W0 / 1920, H0 / 1080), f = pz / pz0;
+  ctx.setTransform(f, 0, 0, f, cv.width / 2 - f * W0 / 2 + (S.cam.cx - cam.cx) * pz, cv.height / 2 - f * H0 / 2 + (S.cam.cy - cam.cy) * pz);
+}
+/* the old look's last frame over the new one, moved with the camera, fading out (or wiped away: a new season) */
 function drawSwap(ctx, cam) {
-  const S = APP.swap, k = (performance.now() - S.t0) / 1000, a = 1 - smooth((k - 0.12) / 0.95);
+  const S = APP.swap;
+  if (S.t0 == null) S.t0 = performance.now();
+  if (!APP.cv.width || !APP.cv.height) { S.cv.width = 0; APP.swap = null; return; }
+  if (S.wipe) { drawWipe(ctx, cam); return; }
+  const k = (performance.now() - S.t0) / 1000, a = 1 - smooth((k - 0.12) / 0.95);
   if (a <= 0) { S.cv.width = 0; APP.swap = null; return; }
-  const cv = APP.cv, s = Math.min(cv.width / 1920, cv.height / 1080), pz = cam.z * s, pz0 = S.cam.z * s, f = pz / pz0;
   ctx.save(); ctx.globalAlpha = a; ctx.globalCompositeOperation = 'source-over';
-  ctx.setTransform(f, 0, 0, f, cv.width / 2 * (1 - f) + (S.cam.cx - cam.cx) * pz, cv.height / 2 * (1 - f) + (S.cam.cy - cam.cy) * pz);
+  swapTransform(ctx, cam);
   ctx.drawImage(S.cv, 0, 0); ctx.restore();
+}
+/* the old season's last frame, kept where the brush has not reached yet. The edge runs across the screen at right angles
+   to the sweep, ragged with two octaves of noise, and feathered in three steps */
+const WIPE_S = 1.3;
+function drawWipe(ctx, cam) {
+  const S = APP.swap, k = (performance.now() - S.t0) / 1000;
+  if (k >= WIPE_S) { S.cv.width = 0; APP.swap = null; return; }
+  const cv = APP.cv, W = cv.width, H = cv.height, u = k / WIPE_S, e = u < 0.5 ? 2 * u * u : 1 - 2 * (1 - u) * (1 - u);
+  const nx = 0.83, ny = 0.56, span = W * nx + H * ny, A = 0.045 * span, F = 0.06 * span, sc = W / 1920;
+  const s0 = -W * ny, s1 = H * nx, c = -A - F + (span + 2 * A + 2 * F) * e;
+  const edge = (off) => {
+    const p = new Path2D(), n = 48;
+    for (let i = 0; i <= n; i++) {
+      const t = s0 + (s1 - s0) * i / n, d = c + off + A * (vnoise(t / (150 * sc), 71) + 0.45 * vnoise(t / (40 * sc), 72));
+      const x = d * nx - t * ny, y = d * ny + t * nx; if (i) p.lineTo(x, y); else p.moveTo(x, y);
+    }
+    const far = c + off + span * 2;
+    p.lineTo(far * nx - s1 * ny, far * ny + s1 * nx); p.lineTo(far * nx - s0 * ny, far * ny + s0 * nx); p.closePath();
+    return p;
+  };
+  for (const [off, a] of [[0, 1 / 3], [F / 2, 1 / 2], [F, 1]]) {
+    ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clip(edge(off)); ctx.globalAlpha = a; ctx.globalCompositeOperation = 'source-over';
+    swapTransform(ctx, cam);
+    ctx.drawImage(S.cv, 0, 0); ctx.restore();
+  }
 }
 function exploreBakes(v) {
   // drop bakes queued for views we have left (another zoom, a tile no longer on screen): they only cost time and GPU
@@ -236,6 +288,9 @@ function toExplore(fromEnd) {
   emit('explore', { intro, fromEnd: !!fromEnd });
 }
 function clampCam(c) {
+  // a camera worked out from a view with no size (a page loaded in a hidden 0 x 0 frame) is NaN, and NaN passes every
+  // clamp: refuse it and keep the last good camera, or nothing would ever be drawn again
+  if (!(isFinite(c.z) && isFinite(c.cx) && isFinite(c.cy))) { const k = isFinite(APP.cam.z) && isFinite(APP.cam.cx) && isFinite(APP.cam.cy) ? APP.cam : WIDE; c.z = k.z; c.cx = k.cx; c.cy = k.cy; }
   c.z = clamp(c.z, BOUNDS.z[0], BOUNDS.z[1]);
   c.cx = clamp(c.cx, BOUNDS.cx[0], BOUNDS.cx[1]); c.cy = clamp(c.cy, BOUNDS.cy[0], BOUNDS.cy[1]);
 }
@@ -307,6 +362,7 @@ function bindInput() {
     touch();
     if (k === ' ') { e.preventDefault(); togglePause(); }
     else if (k === 'n' || k === 'N') SF.setLook({ night: !LOOK.night });
+    else if ((k === 's' || k === 'S') && SF.seasons) SF.setLook({ season: SF.seasons[(SF.seasons.indexOf(LOOK.season) + 1) % SF.seasons.length] });
     else if (k === '0' || k === 'Escape') { if (SF.home) SF.glideTo(SF.home()); else cutTo(WIDE); }   // the page's guide may frame the city beside its panel
     else if (k >= '1' && k <= '9' && VISIT[+k - 1]) cutTo(shotByName(VISIT[+k - 1]));
   });

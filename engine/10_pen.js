@@ -174,6 +174,9 @@ class G {
   /* a light at a world point: kind 'lamp' (a halo and a pool of light on the ground), 'lantern' | 'neon' (a halo in its
      colour), 'tree' | 'bloom' (motes float over it). o: r (wide px), col, base (z of the ground under it), pool: false */
   glow(kind, x, y, z, o) { o = o || {}; this.glow2(kind, this.p(x, y, z), this.p(x, y, o.base || 0), o); }
+  /* something this drawing lets fall in some seasons (SCENE.air[season].fall lists the kinds drawn): 'petal' from a cherry,
+     'leaf' from a turned tree. pt where it starts (a crown's centre), gp the ground under it, o: r (wide px), cols, n */
+  emit(kind, pt, gp, o) { o = o || {}; (this.emits || (this.emits = [])).push({ k: kind, x: pt[0], y: pt[1], gx: gp[0], gy: gp[1], r: o.r || 6, cols: o.cols || ['#C8663A'], n: o.n || 2 }); }
   /* the same in wide px: the light at pt, the ground under it at gp */
   glow2(kind, pt, gp, o) {
     o = o || {}; gp = gp || pt;
@@ -186,7 +189,15 @@ class G {
   tris2(arr, col, cons) { if (!arr.length) return; for (let i = 0; i < arr.length; i += 2400) { const a = Float32Array.from(arr.slice(i, i + 2400)); this._bb(a); this.cmds.push({ k: K_TRIS, p: a, c: col, cons: !!cons }); } }
 
   /* ----- world (3-D) versions ----- */
-  fill(pts, col) { this.fill2(this.P(pts), col); }
+  /* a 3-D fill also records how much it faces up (d.up: 1 flat ground or a box top, 0 a wall), for snow lying on it */
+  fill(pts, col) {
+    const n0 = this.cmds.length; this.fill2(this.P(pts), col);
+    if (this.cmds.length > n0 && pts.length >= 3) {
+      let nx = 0, ny = 0, nz = 0;
+      for (let i = 0; i < pts.length; i++) { const a = pts[i], b = pts[(i + 1) % pts.length], az = a[2] || 0, bz = b[2] || 0; nx += (a[1] - b[1]) * (az + bz); ny += (az - bz) * (a[0] + b[0]); nz += (a[0] - b[0]) * (a[1] + b[1]); }
+      const l = Math.hypot(nx, ny, nz); if (l > 1e-9) this.cmds[this.cmds.length - 1].up = Math.abs(nz) / l;
+    }
+  }
   line(pts, o) { this.line2(this.P(pts), o); }
   fine(pts, o) { this.fine2(this.P(pts), o); }
   outline(pts, o) { this.outline2(this.P(pts), o); }
@@ -277,7 +288,7 @@ function ribPath(ctx, r, hw, m, off, amp) {
   ctx.closePath();
 }
 /* the colour a command is drawn in: its own by day, nightOf at night */
-const colOf = (d, c) => (LOOK.night ? nightOf(d, c) : c);
+const colOf = (d, c) => (LOOK.night ? nightOf(d, c) : dayCol(c));
 function replay(ctx, cmds, hw, opt) {
   opt = opt || {};
   const skipBoil = opt.skipBoil, onlyBoil = opt.onlyBoil, variant = opt.variant | 0, amp = opt.boilAmp || 0;
