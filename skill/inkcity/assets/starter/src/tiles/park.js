@@ -47,21 +47,18 @@ SF.tile('park', 50, 0, { rim: 26 }, function (T) {
   T.obj([22, 9], (g) => K.bench(g, 22, 9, { face: 'L', L: 2.8 }), { on: true });
   T.obj([-6, 20], (g) => K.lamp(g, -6, 20, {}), { on: true });
 
-  /* ---- the cast: a picnic on a blanket, a reader on the bench, someone at the end of the jetty ---- */
-  T.cast([12, 18], (g) => {
+  /* ---- the people: a picnic on a blanket, a reader on the bench, someone at the end of the jetty. The blanket is ground
+     (a flat thing lying under people is never a standing object: it would be drawn over them); the people are the life
+     kit's (engine/25_life.js), each an actor at their own feet ---- */
+  T.ground((g) => {
     const b = [[8, 15, 0.05], [16, 14, 0.05], [17, 20, 0.05], [9, 21, 0.05]];
     g.fill(b, '#E07A6A'); g.outline(b, { w: 0.6, c: '#A84A3E', boil: false });
     for (let i = 1; i < 4; i++) g.line([[8 + i * 2, 15 - i * 0.25, 0.06], [9 + i * 2, 21 - i * 0.25, 0.06]], { w: 0.4, c: '#F3E7DA', boil: false });
-    K.person(g, 10.5, 16.5, 0, K.who(31, { dir: 0, pose: 'sit' }));
-    K.person(g, 14.6, 18.6, 0, K.who(32, { dir: 3, pose: 'sit' }));
-    const p = g.p(13, 16.8, 0.6); g.disc2(p, 1.1, '#F3F1EA'); g.ring2(p, 1.1, { w: 0.4 });          // a plate
-  }, { on: true });
-  T.cast([23, 10], (g) => {                     // a reader: sitting, both hands brought to a book in front of the chest
-    K.person(g, 23, 10.2, 1.3, K.who(33, { dir: 1, pose: 'sit', glasses: true, hands: [[-2.0, -8.4], [-3.1, -8.7]] }));
-    const F = g.p(23, 10.2, 1.3), b = [[F[0] - 4.0, F[1] - 10.4], [F[0] - 1.6, F[1] - 9.6], [F[0] - 1.7, F[1] - 7.7], [F[0] - 4.1, F[1] - 8.5]];
-    g.fill2(b, '#F6F1E4'); g.outline2(b, { w: 0.4, boil: false }); g.line2([[F[0] - 2.85, F[1] - 10.0], [F[0] - 2.9, F[1] - 8.1]], { w: 0.3, boil: false });
-  }, { on: true });
-  T.cast([-8.5, -14.5], (g) => K.person(g, -8.5, -14.5, 0.7, K.who(34, { dir: 2, pose: 'wave', ph: 0.3 })), { on: true });
+    const p = g.p(13, 16.8, 0.06); g.disc2(p, 1.1, '#F3F1EA'); g.ring2(p, 1.1, { w: 0.4 });          // a plate
+  });
+  K.group(T, [{ who: K.who(31, { dir: 0, sit: true, food: '#E6C24F' }), x: 10.5, y: 16.5 }, { who: K.who(32, { dir: 3, sit: true }), x: 14.6, y: 18.6 }]);
+  K.idle(T, K.who(33, { dir: 1, sit: true, glasses: true }), 23, 10.2, { z: 1.3, acts: ['read', 'read', 'look', 'read'] });   // a reader on the bench
+  K.idle(T, K.who(34, { dir: 2 }), -8.5, -14.5, { z: 0.7, acts: ['wave', 'look', 'point', 'rest'] });                     // at the end of the jetty
 
   /* ---- the living things ---- */
   // a rowing boat circling the pond; the heading is rounded to 24 steps so there are only 24 drawings

@@ -141,7 +141,24 @@ Each entry: what you see → why → what fixes it. Most were found by `verify.m
   objects in the streets tile short (a pole carries only the wires to the next pole), and long structures split.
 - **A frame around the world (a ring railway, a city wall)** → one tile cannot be both behind the far places and in
   front of the near ones → two tiles: the far half with a low `order` (before every place), the near half with a high
-  one; satellites beyond each half ordered outside it; moving things on the near half `layer: 'top'`.
+  one; satellites beyond each half ordered outside it. Trains on it: one actor per car anchored on the deck's front
+  edge with `ext`, the parapets and wires in two more tiles drawn right after each half (engine.md §3); on
+  `layer: 'top'` the near cars were drawn over everything in front of the viaduct.
+- **A whole group pops in front of (or behind) a bench, a counter or a tree at once** → several people drawn by one
+  actor share one anchor → one actor per person on a shared clock (the life kit does it; depth.md §1).
+- **A stall keeper, a barista, a monk drawn over their own counter or belfry** → anchored inside the object's box,
+  which is then never in front of them → split the object into its back and front parts (depth.md §2).
+- **Station benches painted over their sitters; a row of statues over the visitor in front** → a far utility pole with
+  its wires (a small prop whose screen box spans the whole wire run) counted as in front by x + y and became their
+  slot, from an earlier tile → poles and wire spans as separate objects, the spans `{ noHide: true }`;
+  `SCENE.strictProps`.
+- **A far person drawn over a near one** → the near one's slot came early (something stands in front of them), the far
+  one had none → `SCENE.slotChain` (bounded by each person's floor, so a passing car cannot drag a crowd under the
+  scenery behind it).
+- **A crowd on top of a passing bus; a person over a train car's side** → actors order by their centres' x + y → the
+  mover returns `ext: [hx, hy]`.
+- **Heads through a gate's lantern** → it hung at head height (people are 6.1 u tall) → hang it with its bottom at
+  6.5–7 u.
 - **A thing hidden by something it stands on** → missing `{ on: true }`.
 - **Wrong order around a long building** → one footprint cannot be both behind and beside → split it.
 
@@ -155,6 +172,30 @@ Each entry: what you see → why → what fixes it. Most were found by `verify.m
 - **Moving the mouse kills the film** → only presses, wheel and keys interrupt; pointer moves update the idle timer.
 - **Blurry after zoom for too long** → bake the whole tile when it is small at this zoom, else the visible region
   with a margin; re-bake ~90 ms after the wheel stops, with a bigger job budget than in the film.
+
+- **Every person blurry when zoomed in, for seconds** → while new poses waited for a bitmap at this zoom, people
+  were drawn from bitmaps of another zoom, blown up; with hundreds of lively people the queue never caught up → the
+  engine now shows a person's last sharp pose at rest, draws everybody's pose now first and the next second's ahead,
+  bursts for half a second after the view rests, and skips people off screen before looking their pose up.
+- **Some tiles blurry for good after a zoom** → a bake just finished kept the stamp it was queued with and was the
+  first thing evicted once the bake budget was full → a finished bake is stamped fresh (it is in use).
+- **The wide view slow with hundreds of people (40 ms frames)** → every new pose of every lively person, at every
+  zoom, drawn as vectors while waiting → see above; `poseAtlas` for the many small poses; one actor per person (a row
+  of 10 keepers in one actor with 64 states made 1.7 M px² of drawings).
+- **A 2-second freeze on a season switch** → every pose of ~600 actors drawn to find what can hide them →
+  `SCENE.sampleKeys: 4`.
+- **Night slow in the wide view** → ~3000 additive glows a frame at a 2× screen → `SCENE.lightRes: 0.5`.
+
+## Engine and city code
+
+- **Two cities stopped loading after an engine change** (`mkTextures is not defined`) → a new top-level name in an
+  engine file (`PA`, `LK`) was also a `const` in those cities' own code, so the engine file was a SyntaxError → wrap
+  new engine code in a function or put it on `K` / `SF`; grep every scene's `src/` for a name before adding a global;
+  after any engine edit, load every scene that uses the engine.
+- **Long lines from a person to the top of the paper** → an actor's draw used wide-px offsets from the origin (`[2.6,
+  -1]`), but the drawing is made around `g.p(0, 0, 0)`, not [0, 0] → offsets relative to `g.p(0, 0, 0)` (or use world
+  points with `g.p`).
+- **`st.s is a scale and must be > 0`** → a facing sign was put in `st.s` → name it `fl` / `sd`.
 
 ## Process
 

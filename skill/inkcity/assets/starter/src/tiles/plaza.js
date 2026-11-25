@@ -62,6 +62,19 @@ SF.tile('plaza', -50, 0, { rim: 6 }, function (T) {
       for (let i = 0; i < 3; i++) { const r = 2.0 + ((st.ph + i / 3) % 1) * 3.0; g.line(K.arc(0, 0, -2.95, r, 0, TAU, 20), { w: 0.4, c: '#F3F7F9', close: true, boil: false }); }
     } });
 
+  /* ---- a café on the near corner: a flat roof with its clutter (K.rooftop), a striped awning over the shopfront
+     (K.awning), a sign. The small things are what make a block look lived in (drawing.md §12) ---- */
+  T.obj([22, -24, 34, -14.2], function (g) {
+    K.box(g, 22, -24, 34, -15, 0, 7, { t: '#EFE3CF', l: '#F4ECDD', r: '#DCCDB2' }, { w: 0.9 });
+    K.win(g, 'L', -15, 23, 28.6, 0.4, 3.6, { style: 'glass' }); K.win(g, 'L', -15, 29.6, 31.6, 0, 3.6, { style: 'dark' });   // the window, the door
+    for (const a of [23.4, 27, 30.6]) K.win(g, 'L', -15, a, a + 2.2, 4.4, 6.2, { style: 'glass' });
+    K.win(g, 'R', 34, -22.6, -17, 0.6, 3.6, { style: 'glass' });
+    K.awning(g, 'L', -15, 22.6, 33.4, 4.0, 1.4, '#C9584B', { stripe: '#F6F1E6' });
+    K.sign(g, 'R', 34, -22, -17.5, 4.4, 6.0, '#2F3F63', 'CAFE');
+    K.rooftop(g, 22, -24, 34, -15, 7, { seed: 3 });
+  }, { name: 'cafe' });
+  K.idle(T, K.who(19, { dir: 1, cup: '#F3F1EA' }), 27.5, -12.4, { acts: ['drink', 'look', 'scroll', 'drink', 'talk'] });   // coffee outside
+
   /* ---- trees, lamps, benches, a stall ---- */
   for (const [x, y, r] of [[-31, 6, 4.4], [-30, 24, 4.8], [-14, 31, 4.2], [28, -30, 4.6], [14, -31, 3.8]]) T.obj([x, y], (g) => K.tree(g, x, y, { r, h: 5 }), { on: true });
   for (const [x, y] of [[-18, 16], [21, 17], [20, -12]]) T.obj([x, y], (g) => K.lamp(g, x, y, { n: 3 }), { on: true });
@@ -71,13 +84,17 @@ SF.tile('plaza', -50, 0, { rim: 6 }, function (T) {
     for (let i = 0; i < 6; i++) { const p = g2.p(-D * 0.4 + (i % 2) * D * 0.8, -L * 0.7 + Math.floor(i / 2) * L * 0.7, 2.9); g2.disc2(p, 1.1, ['#E0623F', '#E6C24F', '#8FBF73'][i % 3]); g2.ring2(p, 1.1, { w: 0.35 }); }
   } }), { on: true });
 
-  /* ---- people who stay put: the cast pops in after the paint ---- */
-  const P = (x, y, o, z) => T.cast([x, y], (g) => K.person(g, x, y, z || 0, o), { on: true });
-  P(-2, 15, K.who(11, { dir: 0 })); P(1.5, 17.5, K.who(12, { dir: 1, pose: 'hold' }));            // two chatting by the fountain
-  P(11, 10, K.who(13, { dir: 1, pose: 'wave', ph: 0.25, k: 0.8 }));                               // a child waving at the water
-  P(-23.6, 6, K.who(14, { dir: 0, pose: 'sit' }), 1.3);                                           // on the bench (seat height 1.3)
-  P(26, 22.4, K.who(15, { dir: 1, pose: 'hold' })); P(25, 31.5, K.who(16, { dir: 3 }));          // the seller behind the stall, a customer in front
-  P(-17, -15, K.who(17, { dir: 0 })); P(-14.5, -14, K.who(18, { dir: 1, top: '#2F3F63', jacket: '#F3F1EA', tie: '#7A2E2A' }));   // on the hall steps
+  /* ---- people who stay put are never still: the life kit (engine/25_life.js) gives each a seeded run of small acts,
+     and people in company answer each other. Every person is an actor of their own, at their own feet ---- */
+  K.group(T, [{ who: K.who(11, { dir: 0 }), x: -2, y: 15 }, { who: K.who(12, { dir: 2 }), x: 1.5, y: 15.2 }]);   // two chatting by the fountain
+  K.idle(T, K.who(13, { dir: 1, k: 0.8 }), 11, 10, { acts: ['wave', 'look', 'jump', 'point', 'wave'] });          // a child at the water
+  K.idle(T, K.who(14, { dir: 0, sit: true }), -23.6, 6, { z: 1.3, acts: ['rest', 'look', 'scroll', 'eat', 'read'] });   // on the bench (seat 1.3)
+  K.idle(T, K.who(15, { dir: 1 }), 26, 22.4, { acts: ['talk', 'point', 'rest', 'wave'] });                       // the seller behind the stall
+  K.idle(T, K.who(16, { dir: 3, food: '#E0623F' }), 25, 31.5, { acts: ['point', 'look', 'talk', 'eat'] });       // a customer in front
+  K.group(T, [{ who: K.who(17, { dir: 0 }), x: -17, y: -15 },
+    { who: K.who(18, { dir: 2, top: '#2F3F63', jacket: '#F3F1EA', tie: '#7A2E2A' }), x: -14.5, y: -14.8 }]);  // on the hall steps
+  K.pigeons(T, -7, 2, 5, { seed: 2 });                                                                         // pigeons on the stone ring
+  K.dogWalk(T, K.who(24), [[-33, 35.4], [33, 35.4]], 1.2, '#C98A4A');                                           // a dog walk along the near edge
 
   /* ---- people walking: K.walker loops a route; each (direction, phase) is one cached drawing ---- */
   // routes keep clear of the fountain, the trees and the people standing about

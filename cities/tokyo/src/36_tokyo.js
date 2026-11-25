@@ -16,40 +16,11 @@ TK.WORDS = {
   4: ['ラーメン', 'パソコン', 'カラオケ', 'コーヒー', 'タクシー', 'たいやき'],
 };
 TK.wordFor = function (n, seed) { const L = TK.WORDS[clamp(n | 0, 1, 4)]; return L[Math.floor(h2(seed * 7 + 3, 977) * L.length) % L.length]; };
-/* a word in wide px: centred on c, cell size s (wide px); o.vert: a column read top to bottom (ー turns upright) */
-TK.word2 = function (g, c, s, str, col, o) {
-  o = o || {}; const chars = [...str], n = chars.length, adv = (o.adv || 1.08) * s, u = s / 10, segs = [];
-  const len = (n - 1) * adv + s; let x = o.vert ? c[0] - s / 2 : c[0] - len / 2, y = o.vert ? c[1] - len / 2 : c[1] - s / 2;
-  for (const ch0 of chars) {
-    const ch = o.vert && ch0 === 'ー' ? 'ー|' : ch0, gl = typeof JP !== 'undefined' ? JP[ch] : null;
-    if (!gl) { (window.__jpMissing = window.__jpMissing || []).push(ch); }
-    else for (const st of gl) for (let i = 0; i + 3 < st.length; i += 2) segs.push(x + st[i] * u, y + st[i + 1] * u, x + st[i + 2] * u, y + st[i + 3] * u);
-    if (o.vert) y += adv; else x += adv;
-  }
-  g.segs2(segs, col, o.w || clamp(s * 0.12, 0.2, 1.4));
-};
-/* a word on a plane P(a, z) -> tile point (wide-px glyphs laid on the plane's own axes, so it is sheared with the face):
-   centred on (a, z), cell h (u); o.vert: a column */
-TK.wordP = function (g, P, a, z, h, str, col, o) {
-  o = o || {}; const chars = [...str], n = chars.length, adv = (o.adv || 1.08) * h, u = h / 10, segs = [];
-  const len = (n - 1) * adv + h; let a0 = o.vert ? a - h / 2 : a - len / 2, z0 = o.vert ? z + len / 2 : z + h / 2;
-  for (const ch0 of chars) {
-    const ch = o.vert && ch0 === 'ー' ? 'ー|' : ch0, gl = typeof JP !== 'undefined' ? JP[ch] : null;
-    if (!gl) { (window.__jpMissing = window.__jpMissing || []).push(ch); }
-    else for (const st of gl) for (let i = 0; i + 3 < st.length; i += 2) {
-      const p0 = g.p.apply(g, P(a0 + st[i] * u, z0 - st[i + 1] * u)), p1 = g.p.apply(g, P(a0 + st[i + 2] * u, z0 - st[i + 3] * u));
-      segs.push(p0[0], p0[1], p1[0], p1[1]);
-    }
-    if (o.vert) z0 -= adv; else a0 += adv;
-  }
-  g.segs2(segs, col, o.w || clamp(h * 0.2, 0.2, 1.4));
-};
-/* on a building face, in K.on's coordinates (face 'L': the plane y = p, reading along +x; 'R': the plane x = p, reading
-   along -y) */
-TK.word = function (g, face, p, a, z, h, str, col, o) {
-  const P = face === 'L' ? (s, zz) => [s, p + 0.1, zz] : (s, zz) => [p + 0.1, -s, zz];
-  TK.wordP(g, P, face === 'L' ? a : -a, z, h, str, col, o);
-};
+/* words in the engine's CJK lettering (K.glyphs2 / K.glyphsP / K.glyphs) with Tokyo's table JP (ー turns upright in a
+   column: its key 'ー|'). TK.word2: in wide px, centred on c, cell s; TK.wordP: on a plane P(a, z); TK.word: on a face */
+TK.word2 = (g, c, s, str, col, o) => K.glyphs2(g, c, s, str, typeof JP !== 'undefined' ? JP : {}, col, o);
+TK.wordP = (g, P, a, z, h, str, col, o) => K.glyphsP(g, P, a, z, h, str, typeof JP !== 'undefined' ? JP : {}, col, o);
+TK.word = (g, face, p, a, z, h, str, col, o) => K.glyphs(g, face, p, a, z, h, str, typeof JP !== 'undefined' ? JP : {}, col, o);
 /* one character in wide px, picked by seed from the one-character shop words (lanterns, noren, small plates) */
 TK.glyph2 = function (g, c, s, col, seed, w) { TK.word2(g, c, s * 0.92, TK.wordFor(1, seed), col, { w: w || Math.max(0.28, s * 0.11) }); };
 /* a sign board on a face, with a real word read down a column (a tall board) or along a row: o.word, or a shop word of

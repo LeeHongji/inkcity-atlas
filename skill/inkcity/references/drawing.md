@@ -43,7 +43,8 @@ drawing runs, reads and is ordered correctly, not to match.
   trees round the edges, furniture where people would sit or wait.
 - 3–8 small stories, each a few figures doing one thing: two friends chatting by a fountain, a child waving at the
   water, a reader on a bench, a picnic on a blanket, a busker with listeners, a wedding on the steps, someone fishing at
-  the end of a jetty, a vendor and a customer. Place figures in relation to things (facing what they look at).
+  the end of a jetty, a vendor and a customer. Place figures in relation to things (facing what they look at). Every
+  one of them moves: they are life-kit actors or a scene of your own, never frozen figures (life.md).
 - Movement in layers: a few walkers on routes that keep clear of everything, traffic on the streets, something
   repeating in place (a flag, a fountain, a windmill, a carousel, a swing), something slow across the frame (a boat).
 - Check the place at its shot zoom (~3–4.5) and in the wide view, where an adult is ~20 px tall: silhouettes and colour
@@ -92,7 +93,7 @@ your own):
 - Crowds that move together (a scramble crossing, a procession) are one actor per person on a timetable: positions
   from a seeded plan per cycle (a seeded shuffle decides who goes where, so groups do not move as blocks), standing
   poses while waiting, walk phases while crossing. A few dozen looks shared by many people keep the pose count down.
-  See `assets/examples/tokyo/shibuya.js`.
+  See `assets/examples/tokyo/tiles/shibuya.js`.
 - Draw people on their own with `tools/sheet.html?z=9.3&seeds=3,8&rows=stand,walk:0.25,sit,hold,bike` before trusting
   them in a scene, at the close-up zoom and at film zoom (z ≈ 3.2).
 
@@ -150,3 +151,45 @@ Render the tile at its shot, at a close zoom (`f=N&cam=9,cx,cy`) and in the wide
 under a blanket, a person in front of a roof they stand under), floating things (wheels, feet, boats), paths through
 water or trees, people facing nothing, shapes that are mush at film zoom, outlines that pass through a face. Fix the
 cause, not the symptom (see `pitfalls.md`).
+
+## 12. The quality bar: a finished place
+
+These points come from raising the inkcity Atlas's Tokyo to the standard of a hand-made isometric city film. The owner's
+words were: richer detail, brighter colour, natural people, landmarks tall and recognisable, a finer pen, and every
+activity really happening. Check each place against them before calling it done.
+
+1. **The landmark is the subject.** It is real, recognisable from its silhouette and its features, and clearly bigger
+   than everything round it. Draw it from the real building (`scripts/landmark.py`), not from a generic shape. Tokyo's
+   numbers, with a person 6.1 u tall:
+   - Tokyo Tower is 100 u, with seven bands and a fine lattice;
+   - the station's domes reach 31 u, with a three-storey brick front across the whole tile;
+   - Sensō-ji's pagoda is 45 u;
+   - the Skytree is 124 u, at true scale against the tower.
+
+   Secondary buildings are lower and simpler. The hierarchy should read in the wide view.
+2. **No empty ground.** Every block edge is lived in:
+   - shopfronts with awnings (`K.awning`), signs, banners (`K.nobori`), noren, planters, vending machines, bikes,
+     benches, lamps, bins, bollards;
+   - façades with window frames, sills, balconies, shutters;
+   - flat roofs with a railing, a water tank, AC units and an aerial (`K.rooftop`);
+   - lawns with paths, beds and people on them.
+
+   A bare plaza or a lawn with nothing on it reads as unfinished at any zoom. Group the small fixed things into one
+   object each where nobody passes between them (performance, engine.md §10).
+3. **Colour belongs to the landmarks and the signs.** Use strong local colours: international orange, red brick with
+   white stone, temple vermilion under dark navy roofs, sign reds, yellows, blues and greens, pink blossom. Keep
+   background buildings light and pastel. `SCENE.grade` lifts every colour a little; a colour that looks right in a
+   still is right.
+4. **A fine pen for the inside.** `SCENE.ink` 0.8–0.85. Silhouettes get the main weight; inner lines get `w` 0.25–0.4
+   and there are many of them: brick courses, window bars, roof-tile channels, lattice bracing.
+5. **Real words.** Latin text in the stroke font (`K.sign`, `K.text`); Chinese and Japanese from a stroke table
+   (`K.glyphs*`, `assets/lettering/`). Give each sign the word its shop would have: ラーメン, 電気, 酒, 寿司, 渋谷.
+6. **Everything is happening.** People act and answer each other: a conversation, a photo, a game, a queue that
+   moves, a vendor handing over food, worshippers at the incense, fans clapping on the beat. Each place has its own
+   events (life.md). Each place also has something mechanical that repeats (a flag, a fountain, a bell being struck, a
+   crane game's claw, a train), and something slow that crosses it.
+7. **Depth holds at every zoom and every moment** (depth.md): nobody inside a counter, a bench or a wall; nobody drawn
+   over a nearer person; vehicles ordered by footprint.
+
+Render the place at its shot, at a close zoom where faces read, and in the wide view. Compare it with the best
+reference you have, by these seven points rather than by pixels.

@@ -5,6 +5,12 @@
    wide-px point at the centre of the frame. */
 const SCENE = {
   title: 'Town',
+  // the pen and the paint: a finer line than the engine's default and colours a little richer than written (the look
+  // the inkcity Atlas's Tokyo uses; drop these two for the plainer original)
+  ink: 0.85, grade: { chroma: 1.25, deep: 0.15 },
+  // depth and pace for a busy, lively map (engine.md §3, §10): far small props never stand in front of people, a person
+  // is never drawn over a nearer one, small poses share pages, night glow at half size, a sharp canvas on 2x screens
+  strictProps: true, slotChain: true, poseAtlas: true, lightRes: 0.5, maxCanvas: 3456,
   frames: 600,                         // f0..f599 at 30 fps: a 20 s film
   hold: 598,                           // the clock stops on this frame; later frames repeat it exactly
   fade: [575, 24],                     // the town fades to a pale ghost (1/24 of its ink) from frame a; hold - a = n - 1

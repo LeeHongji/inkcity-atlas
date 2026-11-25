@@ -82,9 +82,17 @@ If a tile throws, the page keeps running and `window.__err` names the tile; `sho
   Shared tiles (`streets`, or `shared: true`) are never the target of a click on a place.
 - A structure round the whole world (a ring railway on a viaduct, a city wall, a coast road) is two shared tiles: the
   far half (`order` below every place) and the near half (above every place), each long side split into pieces of
-  ~35 u (one object each, `under: deck` where things pass beneath). Trains on it are one actor per car; give each car
-  two actors, one for the near half with `layer: 'top'` and one for the far half sorting normally, each returning null
-  outside its half. See `assets/examples/tokyo/loop.js`.
+  ~35 u (one object each, `under: deck` where things pass beneath). Trains on it are one actor per car, anchored on the
+  front edge of the deck (its far end on a straight, a computed point on a corner) with its drawing shifted back to
+  its place, and with `st.ext` (below); the front parapets and overhead wires go in two more shared tiles drawn right
+  after each half (`order` −2.4 and 2.6 in Tokyo), so a car sits on the deck, under its parapet and wires and behind
+  anything in front of the viaduct. See `assets/examples/tokyo/tiles/loop.js`.
+- **A busy place needs more than footprints**: one actor per person (a group in one actor is ordered as one), people
+  never anchored inside a box (split the box into its back and front parts), footprints that match what is drawn, and
+  four engine options that every new scene should use: `SCENE.strictProps` and `SCENE.slotChain` (far props and far
+  people no longer land in front of near ones), `st.ext = [hx, hy]` from a long mover's `at(t)` (a bus or a train car
+  ordered by its footprint, not its centre), and `{ noHide: true }` on overhead wires and strings. All of it, with the
+  survey that finds the errors (`scripts/depth-views.mjs`), is in **`references/depth.md`**.
 - Water or ground shared by several places (a sea along a coast, a river through a town) belongs in one tile of its
   own, or in the `streets` tile, with `order: -99` so it is under the places, `shared: true` so `&only=` keeps it, and
   a `rim` (and `castAt`) if it should build like a place rather than be there from frame 0. Boats on it can then move
@@ -144,7 +152,18 @@ Lettering: `K.sign(g, face, p, a0, a1, z0, z1, col, 'WORD', {ink})` (a board on 
 `K.text(g, face, p, a, z0, h, str, col, {center, w, track})` (cap height h in u, baseline z0) · `K.textP(g, P, a0, z0, h,
 str, col)` along any plane `P(a, z)` (a road marking, a curved front) · `K.textW(str, h)`. A hand-cut stroke font with
 digits, punctuation and Latin accents (French, Spanish, Portuguese, Italian, German, Turkish). Write real words: random
-pseudo-letters read as misspellings once you zoom in. Other scripts draw their own glyphs (Tokyo's `TK.glyph2`).
+pseudo-letters read as misspellings once you zoom in.
+CJK (Chinese, Japanese): `K.glyphs2(g, c, s, str, table, col, {vert})` (a word in wide px, cell s) ·
+`K.glyphsP(g, P, a, z, h, str, table, col, o)` (on any plane) · `K.glyphs(g, face, p, a, z, h, str, table, col, o)` (on a
+face) · `K.glyphSign(g, face, p, a0, a1, z0, z1, col, word, table, o)` (a lit board, a column if it is tall). `table` is a
+stroke table: real characters only, each a list of strokes in writing order on a 10 × 10 grid; four tables (Beijing,
+Hong Kong, Chongqing, Tokyo; ~110 kanji and kana) are in `assets/lettering/` with the characters each has. Never draw
+pseudo-characters: a reader of the language sees them as miswritten. Missing characters are listed in
+`window.__glyphMissing`.
+Detail: `K.awning(g, face, p, a0, a1, z, out, col, {drop, stripe})` (a shopfront awning) · `K.rooftop(g, x0, y0, x1, y1,
+z, {seed, rail, tank})` (a railing, a water tank or stair hut, AC units, an aerial on a flat roof) ·
+`K.nobori(g, x, y, h, col, {word, table, w})` (a banner on a pole, with a CJK word down it). drawing.md §12 says what a
+finished block has.
 Organic: `K.curve(pts, n, closed)` (Catmull-Rom; works on 2-D, 3-D and [u, v, r] points) · `K.blob2(g, widePxPts, col)`
 (brushed unlined blob) · `K.fog(g, w, h, seed)` · `K.shotPx(shotName)` → `(px, py) => [wx, wy]` (a pixel in that shot's
 frame to wide px).
@@ -199,7 +218,13 @@ jet, a turning sail belong to their place: keep them in its cast (the default) s
 
 An actor is depth-sorted by its anchor (x, y): anchor a big moving thing (surf along a beach, a long boat, a crowd)
 at its front-most point (largest x + y), not its middle, or it will be drawn behind things it should cover and pull
-nearby objects into the moving layer.
+nearby objects into the moving layer. A long mover also returns `ext: [hx, hy]`, its half-size on the ground along x
+and y, so it is ordered against other actors by its footprint (depth.md).
+
+**People who stay in one place are actors too**, never `T.cast` figures: the life kit (`25_life.js`) gives a person a
+seeded run of small acts (`K.idle`), a conversation (`K.group`), a photo, a game of catch, a dog walk, pigeons, all one
+actor per person. Its acts drawn by `K.doing` are the parts for a place's own scenes (a stall keeper's beat, a crowd
+cheering a bout). Read **`references/life.md`**.
 
 Moving things follow closed paths or timetables. `K.walker(T, who, points, speed, {phase, z, who})` makes a walker on a
 closed route (facing from each leg, a step pair per 2.4 u so feet do not slide; `z` may be a function for slopes and
@@ -223,10 +248,27 @@ const SCENE = {
   bounds: { z: [1.6, 12], cx: [480, 1440], cy: [330, 860] },   // explore camera limits
 };
 ```
+Options a scene may add (all off by default, so a scene without them draws as before; the starter sets the ones
+marked ✓):
+
+| option | what it does |
+|---|---|
+| `ink: 0.85` ✓ | the pen: line weight × this (finer < 1) |
+| `grade: { chroma: 1.25, deep: 0.15 }` ✓ | richer colour as it is painted: chroma lifts a colour from its grey, deep darkens saturated colours; greys and whites stay |
+| `strictProps: true` ✓, `slotChain: true` ✓ | depth for a busy place (depth.md) |
+| `poseAtlas: true` ✓ | small poses (people seen from afar) packed on shared 2048² pages: hundreds of blits from a few textures |
+| `lightRes: 0.5` ✓ | at night the glow of the lights is drawn at half size and added on (same sum, a quarter of the fill) |
+| `maxCanvas: 3456` ✓ | the canvas may be this many px across (default 2880): a laptop's 2× screen is drawn pixel for pixel |
+| `poseBudget: 48e6` | room for more pose bitmaps (default 32 MP): hundreds of lively people at a 2× screen |
+| `sampleKeys: 4` | building the world draws only the first n poses of each actor to find what can hide it, the rest later in idle time: a city of ~600 people rebuilds for a new season in 0.7 s, not 2 |
+| `season`, `seasons`, `palette`, `air` | the four seasons (§9d) |
+| `unfold: true` (or `?unfold`) | the city arrives as a folded paper map (§9e) |
+| `night: {...}` | night (§9c) |
+
 Give every shot its own zoom (see pitfalls: overlapping shots at one zoom share bakes). Make the clever moment happen
 during its shot: a periodic event (a light cycle, a procession, a train) gets its phase from the shot's frame, e.g.
 `const sh = SCENE.shots.find((s) => s.name === 'shibuya'), OFF = PED0 - sh.a / 30` so the cycle reaches its green light
-as the cut lands (see `assets/examples/tokyo/shibuya.js`).
+as the cut lands (see `assets/examples/tokyo/tiles/shibuya.js`).
 Rhythm that works: the build ~120–200 frames (the last tile's cast in by then), shots of 90–130 frames, one close-up at
 z 8–10, the wide view again for the last ~3–4 s, the fade over the last 24 frames. To frame a place: its centre in wide
 px is `prj(cx, cy, 0)`; nudge cy up a little so tall buildings fit.
@@ -292,14 +334,45 @@ What lights up, and how a scene says so:
   it: create night-only things last, or the day changes.
 Check at night with `PAGE_Q=night node scripts/verify.mjs` and `interact.mjs` as by day.
 
+## 9d. The seasons
+A scene with `season: 'spring', seasons: ['spring', 'summer', 'autumn', 'winter']` gets key S, `?season=`, and
+`SF.setLook({ season })`: the world is built again for the new season (`SF.initWorld`) and brushed on over the old one with
+a ragged wipe. Write what changes as facts about the place in that week (a real date: the cherry week, the river's
+fireworks night, the last week of November, the first week of January), not as a generic filter.
+- Things of one season: `{ season: 'autumn' }` (or a list) on `T.obj`, `T.cast`, `T.ground`, `T.actor`, `K.walker`.
+  Things of the city's own season keep their place in the count when absent and the others count apart, so shared
+  things keep their seeds and the own season draws exactly as before.
+- In drawing code: `LOOK.season`. Kit options: `K.tree` `fall` (leaves drifting from it), `litter` (fallen round it),
+  `glow`, `bare` (`K.bare`, a winter tree), snow on crowns and boughs when `K.snowy()`; `K.person` `coat`, `muffler`.
+- `palette: { autumn: { '#lawn': '#straw' } }`: colour swaps for everything standing still in that season (lawns
+  matter most: they read the season more than the trees).
+- `air: { spring: { fall: ['petal'] }, autumn: { fall: ['leaf'] }, summer: { glint: true }, winter: { snow: 1, cover: 0.9 } }`:
+  petals or leaves from every tree that `fall`s, glints on water, falling snow, and `cover` laying snow on every surface
+  that faces up (roofs, lawns, roads, car roofs), not on walls, water or people.
+- Check with `?season=...&f=N`; the city's own season must stay identical to before (render it before and after).
+
+## 9e. The unfold
+`?unfold` (or `SCENE.unfold: true`) replaces the build: the city lies on the table as a folded paper street map, a cover
+with its title on top, and opens one fold at a time; each panel turns rigidly about its crease with its shadow and the
+print showing through its back; when a panel lies open its buildings stand up like a pop-up book, in a wave from the
+crease; the satellites are folded notes that open last; then the people pop in and the ordinary renderer takes over.
+`85_unfold.js` plans the folds for a 3 × 3 grid of places cut along the street centre lines (another layout needs its
+own fold plan). Without the flag nothing changes.
+
 ## 10. Rendering and performance
 
 - Display lists are recorded once in wide px and **baked** per tile at the current zoom into canvases (sliced into
   small steps); the frame composes bakes + boil + actors. Line weight is computed at replay from the zoom
   (`lineW(z)`: 1.4 px at ×1, 2.25 at ×3, 4.8 at ×9.3).
 - In the film, the next shot's bakes and its actors' poses (packed into two alternating 2048² atlas pages) are prepared
-  while the current shot plays, a few ms per frame; a cut finishes whatever is left. In explore mode actors are cached
-  as separate bitmaps (LRU) and a zoom re-bakes the visible tiles ~90 ms after the wheel stops.
+  while the current shot plays, a few ms per frame; a cut finishes whatever is left. In explore mode a zoom re-bakes
+  the visible tiles ~90 ms after the wheel stops (a bake just made for the view counts as in use, so it is never the
+  first to be evicted), and people are drawn from pose bitmaps made at the current zoom (LRU, `poseBudget`; small ones
+  on shared pages with `poseAtlas`). While the zoom moves, a pose at another zoom stands in, scaled; at rest, a person
+  whose new pose is not made yet shows their last sharp pose, never a blown-up one. The frame's few ms for new poses
+  start after its bookkeeping, half for poses as they are drawn and half for everybody on screen in turn (their pose
+  now, then the next second's), with a burst in the first half-second after the view comes to rest. People off screen
+  are skipped before their pose is even looked up.
 - Costs that matter: rasterising big fills at high zoom (bakes), building many new actor poses (each key is drawn once),
   many ribbons per drawing (pen strokes cost more than fills, `fine2`/`segs2` are cheap), and boiling lines: every
   boiling stroke in the baked region is refilled every frame. Draw very long lines (a canal edge, a coastline, a long

@@ -46,21 +46,30 @@ marks that differ by material (paving scuffs, grass blades, water arcs), tiny pe
    for Playwright). Read `src/35_scene.js`, `src/tiles/plaza.js`, `src/tiles/park.js`, `src/tiles/streets.js`: they are
    short, commented, and show every mechanism.
 3. **Read `references/engine.md`** (space, tile API, depth order, actors, the kit, the scene file) before writing tiles,
-   and **`references/drawing.md`** before drawing people, buildings, vehicles, water or crowds. For bigger examples read
+   **`references/drawing.md`** before drawing people, buildings, vehicles, water or crowds (§12 is the quality bar a
+   finished place must meet), **`references/life.md`** before putting people in, and **`references/depth.md`** before
+   the depth pass. For bigger examples read
    `assets/examples/lombard.js` (a hill street with stepped houses, cars on hairpins, a cable car) and
    `assets/examples/ggpark.js` (a park with a conservatory, pagoda, windmill, bison, a rink, boats); `streets.js` there is
    a street grid with a collision-free traffic timetable; `assets/examples/canal/` is a canal through a town with humped
    bridges boats pass under, gondolas and Venetian houses (helpers in `36_canal.js`); `assets/examples/tokyo/` is a whole
-   city: Japanese roofs, torii, lanterns, poles and wires, vending machines, trains and people of Tokyo in `36_tokyo.js`,
-   a ring railway round the world on a brick viaduct (`loop.js`), a scramble crossing with ~70 people on a timetable
-   (`shibuya.js`), satellites on paint blobs (`satellites.js`). Water shared by several places
-   (a coast, a river) and narrow village lanes are covered in engine.md §1 and §3.
+   city at the full quality bar (drawing.md §12): Japanese roofs, torii, lanterns, poles and wires, vending machines,
+   trains and people of Tokyo in `36_tokyo.js`; real Japanese lettering (`37_kana.js`); the life kit with Tokyo's
+   people (`38_life.js`); in `tiles/`, landmarks rebuilt from the real buildings (`tower.js`, `station.js`,
+   `sensoji.js`), a ring railway round the world on a brick viaduct with bars under its arches (`loop.js`), a
+   scramble crossing with ~70 people on a timetable (`shibuya.js`), Electric Town's signs and an idol stage
+   (`akiba.js`), a market of stall keepers on a beat (`tsukiji.js`), satellites (`satellites.js`); four seasons and
+   night throughout. Read it for patterns; it loads the Atlas's shared engine, so it does not run from the skill
+   folder. Water shared by several places (a coast, a river) and narrow village lanes are covered in engine.md §1 and §3.
 4. **Lay out the world:** places are tiles 74 u square on a 100 u grid, with streets between (a `streets` tile). Decide
    the shot list in `src/35_scene.js`: one establishing build shot, one shot per place at zoom ~3–4.5, at least one
    close-up at ~8–10 where faces and hands read, the wide view again, the fade.
-5. **Draw each tile:** ground (slab, paving, lawns, water, paths) → standing objects (buildings back to front, trees,
-   furniture) → the cast (people placed in situations) → actors (walkers with `K.walker`, traffic, boats, flags, water
-   jets). After each
+5. **Draw each tile:** ground (slab, paving, lawns, water, paths) → standing objects (the landmark first, real and
+   bigger than everything round it; buildings back to front with their awnings, signs and roofs, `K.awning`,
+   `K.rooftop`, `K.nobori`; trees; furniture) → the people, all of them alive (the life kit, `K.idle` / `K.group` /
+   `K.photo` / `K.toss` / `K.dogWalk` / `K.pigeons`, and the place's own scenes; one actor per person) → movers
+   (walkers with `K.walker`, traffic with `ext`, boats, flags, water jets). Write every word for real (Latin stroke font;
+   Chinese and Japanese from a stroke table in `assets/lettering/` via `K.glyphs*`). After each
    tile, render it at its shot and at a close zoom (`&cam=9,cx,cy`) and fix what reads wrong. Use `tools/sheet.html` to
    draw people (or anything) on their own at any zoom.
    **One ground level:** every place, street, square and lawn that meets another stands at z 0, the level the cars
@@ -68,15 +77,19 @@ marks that differ by material (paving scuffs, grass blades, water arcs), tiny pe
    raised plinth with traffic at its top's height. Only the map's outer edge shows its cut section
    (`K.slab(g, H, { cut: 'y' | 'x' | 'xy' })`, with the same depth on the streets' cut edge). Raised ground is an object
    with walls (a hill, a podium); water sits below z 0 inside its banks.
-6. **Check the contract** (all must pass before you hand over):
+6. **Depth pass** on every tile: `node <skill>/scripts/depth-views.mjs dev.html <tile> out/depth` renders it in
+   quarters at three moments; list every impossible overlap (someone inside a counter, a bench, a table; a far person
+   over a near one; a crowd on a bus; a route through a stall) and fix the cause (depth.md). Then compare each place with
+   drawing.md §12 at its shot, close up and in the wide view (`node <skill>/scripts/views.mjs dev.html out/views`).
+7. **Check the contract** (all must pass before you hand over):
    `node <skill>/scripts/verify.mjs dev.html` (seek determinism, hard cuts, cast entrances, fade, hold) ·
    `node <skill>/scripts/perf.mjs dev.html` (real-time pacing: mean ≈ 16.7 ms, p95 ≲ 20 ms, no frame over 34 ms after the
    first few) · `node <skill>/scripts/explore.mjs dev.html out` (every input, time to sharp after zoom, no errors) ·
    `node <skill>/scripts/interact.mjs dev.html` (zoom and drag smoothness at DPR 2: p95 ≲ 20 ms per phase).
-7. **Build the single file:** `python3 <skill>/scripts/build.py dev.html index.html` (inlines every script; fails if any
+8. **Build the single file:** `python3 <skill>/scripts/build.py dev.html index.html` (inlines every script; fails if any
    external reference is left), then run verify / perf / explore on `index.html` as well. Optionally
    `node <skill>/scripts/record.mjs index.html film.mp4` (needs ffmpeg).
-8. **Hand over** `index.html` and say what the controls are, what is in each place, and which checks ran with their
+9. **Hand over** `index.html` and say what the controls are, what is in each place, and which checks ran with their
    numbers. Say plainly what was not checked (for example: never watched on the user's own screen, no sound).
 
 ## Rules that keep the page working (and why)
@@ -88,7 +101,8 @@ marks that differ by material (paving scuffs, grass blades, water arcs), tiny pe
   everything the drawing depends on (direction, walk phase, heading step, wave phase). Quantise: headings to 16–48 steps,
   a walk cycle to 8 phases, a rotation to a few dozen steps. Positions stay continuous.
 - **Depth is decided by footprints on the ground**, not by drawing order across objects. Give every standing thing an
-  honest footprint; mark things that stand on or inside another's footprint `{ on: true }`; split a long building that
+  honest footprint (the ground its drawing covers, awnings included); one actor per person; nobody anchored inside a
+  box; long movers return `ext`; turn on `strictProps` and `slotChain` (depth.md); mark things that stand on or inside another's footprint `{ on: true }`; split a long building that
   things stand both in front of and beside; draw someone inside a structure (a bandstand, a cable car, a boat) inside
   that structure's own drawing, between its far and near parts. Flat things lying on a terrain object (blankets on a
   sloped lawn) must share the terrain's footprint so they come right after it.
@@ -97,7 +111,8 @@ marks that differ by material (paving scuffs, grass blades, water arcs), tiny pe
   pen's hand-registration jitter (±0.15 wide px) would scramble small shapes.
 - **Every shot has its own zoom**: two overlapping shots at the same zoom reuse each other's bakes and a frame can then
   depend on what was drawn before it. And time the clever moment to its shot (derive its phase from the shot's frame).
-- **Budget**: a tile is ~20–60 statics plus 10–30 actors. The engine slices all heavy work across frames (bakes, pose
+- **Budget**: a tile is ~20–80 statics plus 20–90 actors (one per person; Tokyo's busiest tiles have ~100). Each
+  person has a handful of states. The engine slices all heavy work across frames (bakes, pose
   packing); if `perf.mjs` shows a heavy frame, look at what single step got bigger, not at the average.
 - Keep the page self-contained: no fonts, images or scripts from the network. All textures are generated.
 
@@ -112,6 +127,8 @@ skill folder; install with `npm i -D playwright` (and `npx playwright install ch
 |---|---|
 | `scripts/new_scene.py <dir>` | copy the starter town + engine into a new scene folder |
 | `scripts/landmark.py "<name>" [--target u] [--radius m] [--out refs]` | a landmark's data card: OSM parts, Wikidata facts, Commons photos (cached; stdlib only) |
+| `scripts/views.mjs <page> <outDir> [query] [views]` | stills of the wide view and every place's shot, and a contact sheet |
+| `scripts/depth-views.mjs <page> <tile> <outDir> [frames] [query]` | one tile in quarters at three moments, for the depth pass |
 | `scripts/shot.mjs <page> <out.png> "<query>" …` | frozen frames: `f=N`, `f=N&cam=z,cx,cy`, `&live` (all built), `&only=a,b` (just these tiles) |
 | `scripts/verify.mjs <page>` | the film contract; prints PASS/FAIL, exits 1 on failure |
 | `scripts/perf.mjs <page>` | real-time playback in recording mode; frame-time stats and heavy frames |
@@ -123,11 +140,15 @@ skill folder; install with `npm i -D playwright` (and `npx playwright install ch
 
 ## Files
 
-`assets/engine/`: `00_core` projection, seeded noise, colour · `10_pen` the recorder `G` and pen strokes, replay,
-boil · `20_kit` shared drawing kit `K` (solids, roofs, windows, plants, people, vehicles, furniture) · `30_world` tiles,
-objects, depth sort, actors · `80_render` bakes, atlases, jobs, the build animation, frame drawing · `90_app` film clock,
-cuts, recording, explore mode, UI. A scene adds `src/35_scene.js` (the film script) and `src/tiles/*.js` (the places).
+`assets/engine/`: `00_core` projection, seeded noise, colour (night and the day grade) · `10_pen` the recorder `G` and
+pen strokes, replay, boil · `20_kit` shared drawing kit `K` (solids, roofs, windows, plants, people, vehicles,
+furniture, Latin and CJK lettering, awnings, rooftops, banners) · `25_life` the life kit (people who are always doing
+something, groups, photos, games, dogs, pigeons) · `30_world` tiles, objects, depth sort, actors, seasons ·
+`80_render` bakes, atlases, jobs, the build animation, frame drawing, night light · `85_unfold` the folded-map opening
+(`?unfold`) · `90_app` film clock, cuts, recording, explore mode, UI, day/night/season switching.
+`assets/lettering/`: stroke tables of real Chinese and Japanese characters (Beijing, Hong Kong, Chongqing, Tokyo). A scene adds `src/35_scene.js` (the film script) and `src/tiles/*.js` (the places).
 Edit the engine only to fix a real engine problem, and say so in the hand-over; put place-specific helpers in the tile.
 
-`references/engine.md` (read first) · `references/drawing.md` (read before drawing) · `references/pitfalls.md`
-(problems already met and solved: read when something looks wrong or a check fails).
+`references/engine.md` (read first) · `references/drawing.md` (read before drawing; §12 the quality bar) ·
+`references/life.md` (people who are alive) · `references/depth.md` (what stands in front of what, and the depth pass) ·
+`references/pitfalls.md` (problems already met and solved: read when something looks wrong or a check fails).
