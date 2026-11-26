@@ -1,0 +1,26 @@
+{
+  "music": {
+    "source": "code-original",
+    "script": "audio/score.py",
+    "seed": 1126,
+    "duration": 30.0,
+    "bpm": 100,
+    "key": "D major (city pop: maj9, dominant 7 and minor 9 chords)",
+    "instruments": ["electric piano", "soft pad", "round bass", "soft kick", "soft snare", "hi-hat", "soft synth lead", "bell"],
+    "sections": {
+      "scramble and pull-back": [0, 4.8],
+      "groove: dive, landmarks, signs, life, seasons": [4.8, 24.6],
+      "close and end": [24.6, 30.0]
+    },
+    "notes": "Two bars of electric piano alone (Gmaj9, F#7) while the camera pulls back; the groove comes in with the dive on the city-pop turn Gmaj9 | F#7 | Bm9 | Am9 D9; the lead takes the hook at 12.0 (the life) and 19.2 (the seasons); the groove stops on a last hit at 24.6 and the end lands on Em9 - A7sus - Dmaj9 with bells, fading over the last second."
+  },
+  "sfx": [
+    {"files": ["cuckoo.wav"], "role": "the Shibuya scramble's crossing signal when the green man comes on (0.3 s), repeating fainter as the camera pulls back", "source": "code-original, audio/sfx.py: a soft electronic cuckoo (two falling sine notes), after the calls of Tokyo's pedestrian crossings", "license": "original to this project"},
+    {"files": ["stamp.wav"], "role": "words and the 東京 seal stamped on like a hanko", "source": "code-original, audio/sfx.py: a muted thock (low body, a felt pat)", "license": "original to this project"},
+    {"files": ["pullback.wav", "pullback-short.wav"], "role": "the pull-backs: from the scramble to the whole city (3 s), from the Sumida to the whole city in the snow (1.8 s)", "source": "code-original, audio/sfx.py: a soft falling whoosh, band-passed pink noise", "license": "original to this project"},
+    {"files": ["dive.wav"], "role": "the dive from the whole city into Tokyo Tower", "source": "code-original, audio/sfx.py: a soft rising whoosh", "license": "original to this project"},
+    {"files": ["tick-0.wav", "tick-1.wav", "tick-2.wav", "tick-3.wav"], "role": "a hard cut between close-ups (cycling)", "source": "code-original, audio/sfx.py: a short wooden tick pitched to D major", "license": "original to this project"},
+    {"files": ["brush.wav"], "role": "a season brushed on by the page's wipe (three times)", "source": "code-original, audio/sfx.py: a broad, smooth brush swish on the wipe's own ease", "license": "original to this project"}
+  ],
+  "placement": "audio/cues.py writes plan.json audio.cues at the action times from the shot code; syncOffset is each file's onset measured with sfx_landmarks.py; mix_audio.py mixes and ducks the music under the stamps."
+}

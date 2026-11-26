@@ -39,3 +39,15 @@ film-night/evidence/stills/
 film-night/evidence/review/
 film-night/evidence/component-imports.json
 film-night/evidence/environment.json
+
+# the Tokyo film: generated files (its node_modules is a link to film's)
+film-tokyo/node_modules
+film-tokyo/dist/
+film-tokyo/.build/
+film-tokyo/renders/
+film-tokyo/assets/
+film-tokyo/src/product.css
+film-tokyo/evidence/stills/
+film-tokyo/evidence/review/
+film-tokyo/evidence/component-imports.json
+film-tokyo/evidence/environment.json

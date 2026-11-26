@@ -1,0 +1,850 @@
+{
+  "planSha256": "9772b9e2d583b5697b4fe63a9c312ba94fea50fefda955ec1494e6816962d53c",
+  "music": {
+    "file": "assets/music.wav",
+    "gain": 0.7,
+    "sha256": "608ceac478a36671d77c551d25e55fa68b4722b27d75fb41fc3c38287e509a27"
+  },
+  "cues": [
+    {
+      "at": 0.296,
+      "syncOffset": 0.004,
+      "actionId": "crossing-1",
+      "file": "assets/sfx/cuckoo.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "cuckoo",
+      "sha256": "e90a1db56f7fd50d7ac117855e875139225de680b3fecbaca6070db833306e68"
+    },
+    {
+      "at": 0.717,
+      "syncOffset": 0.483,
+      "actionId": "pull-back",
+      "file": "assets/sfx/pullback.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "pullback",
+      "sha256": "b872bc7100bc1eefc85da6187afab487407c364114e4faf53515d0c035567e0f"
+    },
+    {
+      "at": 0.909,
+      "syncOffset": 0.001,
+      "actionId": "title",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.4,
+      "role": "sfx",
+      "kind": "stamp",
+      "duck": {
+        "db": 2,
+        "attack": 0.04,
+        "hold": 0.15,
+        "release": 0.25
+      },
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 1.096,
+      "syncOffset": 0.004,
+      "actionId": "crossing-2",
+      "file": "assets/sfx/cuckoo.wav",
+      "gain": 0.7,
+      "role": "sfx",
+      "kind": "cuckoo",
+      "sha256": "e90a1db56f7fd50d7ac117855e875139225de680b3fecbaca6070db833306e68"
+    },
+    {
+      "at": 1.209,
+      "syncOffset": 0.001,
+      "actionId": "title-seal",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "stamp",
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 1.896,
+      "syncOffset": 0.004,
+      "actionId": "crossing-3",
+      "file": "assets/sfx/cuckoo.wav",
+      "gain": 0.45,
+      "role": "sfx",
+      "kind": "cuckoo",
+      "sha256": "e90a1db56f7fd50d7ac117855e875139225de680b3fecbaca6070db833306e68"
+    },
+    {
+      "at": 2.696,
+      "syncOffset": 0.004,
+      "actionId": "crossing-4",
+      "file": "assets/sfx/cuckoo.wav",
+      "gain": 0.25,
+      "role": "sfx",
+      "kind": "cuckoo",
+      "sha256": "e90a1db56f7fd50d7ac117855e875139225de680b3fecbaca6070db833306e68"
+    },
+    {
+      "at": 4.273,
+      "syncOffset": 0.527,
+      "actionId": "dive",
+      "file": "assets/sfx/dive.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "dive",
+      "sha256": "f1cbe58055aecc26a1e75f096525bd0f0165e6f1e9dd242aa198235b534a2e76"
+    },
+    {
+      "at": 5.809,
+      "syncOffset": 0.001,
+      "actionId": "taller",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.3,
+      "role": "sfx",
+      "kind": "stamp",
+      "duck": {
+        "db": 2,
+        "attack": 0.04,
+        "hold": 0.15,
+        "release": 0.25
+      },
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 7.199,
+      "syncOffset": 0.001,
+      "actionId": "cut-station",
+      "file": "assets/sfx/tick-0.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tick-0",
+      "sha256": "02ea9cb94815150dce4fcffc450e64be95cd0e7313ffd42d71ba3968e398e917"
+    },
+    {
+      "at": 8.399,
+      "syncOffset": 0.001,
+      "actionId": "cut-sensoji",
+      "file": "assets/sfx/tick-1.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tick-1",
+      "sha256": "47a2f94ca9f4ef788b3e1cf9b88d92cb49094c7c6d6ad1ee360619b489f30801"
+    },
+    {
+      "at": 9.759,
+      "syncOffset": 0.001,
+      "actionId": "finer",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.3,
+      "role": "sfx",
+      "kind": "stamp",
+      "duck": {
+        "db": 2,
+        "attack": 0.04,
+        "hold": 0.15,
+        "release": 0.25
+      },
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 10.799,
+      "syncOffset": 0.001,
+      "actionId": "cut-signs",
+      "file": "assets/sfx/tick-2.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tick-2",
+      "sha256": "f01fb8af230044b0095a3546714f106e1a8b5009ddfa3f72bf03fb9a7679702d"
+    },
+    {
+      "at": 12.159,
+      "syncOffset": 0.001,
+      "actionId": "alive",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.3,
+      "role": "sfx",
+      "kind": "stamp",
+      "duck": {
+        "db": 2,
+        "attack": 0.04,
+        "hold": 0.15,
+        "release": 0.25
+      },
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 13.199,
+      "syncOffset": 0.001,
+      "actionId": "cut-incense",
+      "file": "assets/sfx/tick-3.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tick-3",
+      "sha256": "f2a363e7a03b85928db5b67f8b1dcf68d3272d55cd967d37f4cb71bcc89c1a29"
+    },
+    {
+      "at": 14.399,
+      "syncOffset": 0.001,
+      "actionId": "cut-cosplay",
+      "file": "assets/sfx/tick-0.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tick-0",
+      "sha256": "02ea9cb94815150dce4fcffc450e64be95cd0e7313ffd42d71ba3968e398e917"
+    },
+    {
+      "at": 15.599,
+      "syncOffset": 0.001,
+      "actionId": "cut-wedding",
+      "file": "assets/sfx/tick-1.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tick-1",
+      "sha256": "47a2f94ca9f4ef788b3e1cf9b88d92cb49094c7c6d6ad1ee360619b489f30801"
+    },
+    {
+      "at": 16.799,
+      "syncOffset": 0.001,
+      "actionId": "cut-beach",
+      "file": "assets/sfx/tick-2.wav",
+      "gain": 0.9,
+      "role": "sfx",
+      "kind": "tick-2",
+      "sha256": "f01fb8af230044b0095a3546714f106e1a8b5009ddfa3f72bf03fb9a7679702d"
+    },
+    {
+      "at": 18.159,
+      "syncOffset": 0.001,
+      "actionId": "all-year",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.3,
+      "role": "sfx",
+      "kind": "stamp",
+      "duck": {
+        "db": 2,
+        "attack": 0.04,
+        "hold": 0.15,
+        "release": 0.25
+      },
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 18.4,
+      "syncOffset": 0.2,
+      "actionId": "wipe-1",
+      "file": "assets/sfx/brush.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "brush",
+      "sha256": "5dc55bcbcf1062d56175b06b609c35cace90e046dcb3dc7672c8d02b64a0bdf2"
+    },
+    {
+      "at": 18.459,
+      "syncOffset": 0.001,
+      "actionId": "season-spring",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 0.55,
+      "role": "sfx",
+      "kind": "stamp",
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 19.359,
+      "syncOffset": 0.001,
+      "actionId": "season-summer",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 0.55,
+      "role": "sfx",
+      "kind": "stamp",
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 20.2,
+      "syncOffset": 0.2,
+      "actionId": "wipe-2",
+      "file": "assets/sfx/brush.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "brush",
+      "sha256": "5dc55bcbcf1062d56175b06b609c35cace90e046dcb3dc7672c8d02b64a0bdf2"
+    },
+    {
+      "at": 21.159,
+      "syncOffset": 0.001,
+      "actionId": "season-autumn",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 0.55,
+      "role": "sfx",
+      "kind": "stamp",
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 22.0,
+      "syncOffset": 0.2,
+      "actionId": "wipe-3",
+      "file": "assets/sfx/brush.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "brush",
+      "sha256": "5dc55bcbcf1062d56175b06b609c35cace90e046dcb3dc7672c8d02b64a0bdf2"
+    },
+    {
+      "at": 22.959,
+      "syncOffset": 0.001,
+      "actionId": "season-winter",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 0.55,
+      "role": "sfx",
+      "kind": "stamp",
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 24.312,
+      "syncOffset": 0.288,
+      "actionId": "close-out",
+      "file": "assets/sfx/pullback-short.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "pullback-short",
+      "sha256": "d13b34b1e8cd99c154301a9736100781decabd540ac239687e9e138dd7937563"
+    },
+    {
+      "at": 26.609,
+      "syncOffset": 0.001,
+      "actionId": "end-name",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.4,
+      "role": "sfx",
+      "kind": "stamp",
+      "duck": {
+        "db": 2,
+        "attack": 0.04,
+        "hold": 0.3,
+        "release": 0.25
+      },
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    },
+    {
+      "at": 26.909,
+      "syncOffset": 0.001,
+      "actionId": "end-seal",
+      "file": "assets/sfx/stamp.wav",
+      "gain": 1.0,
+      "role": "sfx",
+      "kind": "stamp",
+      "sha256": "6079395b7e9011ffefa0cb2c414ed6341d2c350e0a524bad8e82aa719e24a758"
+    }
+  ],
+  "master": {
+    "file": "assets/master.wav",
+    "sha256": "19aadcf1a49b803ce990a821a0d7b05d664c8762b506d02d56e87f9bde26cdf6"
+  },
+  "sfxStem": {
+    "file": "assets/sfx-stem.wav",
+    "sha256": "9927b462a4f6637e5215dd979f85a3313c708a9615d9ac676fa3b381387267ba"
+  },
+  "musicStem": {
+    "file": "assets/music-ducked.wav",
+    "sha256": "08d8455c5afd48ac3f405caed6921a80f25cf967a993e6119fa35c0627914e4a"
+  },
+  "ducking": {
+    "method": "cue-envelope",
+    "windows": [
+      {
+        "actionId": "crossing-1",
+        "kind": "cuckoo",
+        "start": 0.26,
+        "attackEnd": 0.3,
+        "holdEnd": 0.48,
+        "end": 0.78,
+        "db": 4
+      },
+      {
+        "actionId": "pull-back",
+        "kind": "pullback",
+        "start": 1.16,
+        "attackEnd": 1.2,
+        "holdEnd": 1.38,
+        "end": 1.68,
+        "db": 4
+      },
+      {
+        "actionId": "title",
+        "kind": "stamp",
+        "start": 0.87,
+        "attackEnd": 0.91,
+        "holdEnd": 1.06,
+        "end": 1.31,
+        "db": 2
+      },
+      {
+        "actionId": "crossing-2",
+        "kind": "cuckoo",
+        "start": 1.06,
+        "attackEnd": 1.1,
+        "holdEnd": 1.28,
+        "end": 1.58,
+        "db": 4
+      },
+      {
+        "actionId": "title-seal",
+        "kind": "stamp",
+        "start": 1.17,
+        "attackEnd": 1.21,
+        "holdEnd": 1.39,
+        "end": 1.69,
+        "db": 4
+      },
+      {
+        "actionId": "crossing-3",
+        "kind": "cuckoo",
+        "start": 1.8599999999999999,
+        "attackEnd": 1.9,
+        "holdEnd": 2.08,
+        "end": 2.38,
+        "db": 4
+      },
+      {
+        "actionId": "crossing-4",
+        "kind": "cuckoo",
+        "start": 2.66,
+        "attackEnd": 2.7,
+        "holdEnd": 2.8800000000000003,
+        "end": 3.18,
+        "db": 4
+      },
+      {
+        "actionId": "dive",
+        "kind": "dive",
+        "start": 4.76,
+        "attackEnd": 4.8,
+        "holdEnd": 4.9799999999999995,
+        "end": 5.279999999999999,
+        "db": 4
+      },
+      {
+        "actionId": "taller",
+        "kind": "stamp",
+        "start": 5.7700000000000005,
+        "attackEnd": 5.8100000000000005,
+        "holdEnd": 5.960000000000001,
+        "end": 6.210000000000001,
+        "db": 2
+      },
+      {
+        "actionId": "cut-station",
+        "kind": "tick-0",
+        "start": 7.16,
+        "attackEnd": 7.2,
+        "holdEnd": 7.38,
+        "end": 7.68,
+        "db": 4
+      },
+      {
+        "actionId": "cut-sensoji",
+        "kind": "tick-1",
+        "start": 8.36,
+        "attackEnd": 8.399999999999999,
+        "holdEnd": 8.579999999999998,
+        "end": 8.879999999999999,
+        "db": 4
+      },
+      {
+        "actionId": "finer",
+        "kind": "stamp",
+        "start": 9.72,
+        "attackEnd": 9.76,
+        "holdEnd": 9.91,
+        "end": 10.16,
+        "db": 2
+      },
+      {
+        "actionId": "cut-signs",
+        "kind": "tick-2",
+        "start": 10.76,
+        "attackEnd": 10.799999999999999,
+        "holdEnd": 10.979999999999999,
+        "end": 11.28,
+        "db": 4
+      },
+      {
+        "actionId": "alive",
+        "kind": "stamp",
+        "start": 12.120000000000001,
+        "attackEnd": 12.16,
+        "holdEnd": 12.31,
+        "end": 12.56,
+        "db": 2
+      },
+      {
+        "actionId": "cut-incense",
+        "kind": "tick-3",
+        "start": 13.16,
+        "attackEnd": 13.2,
+        "holdEnd": 13.379999999999999,
+        "end": 13.68,
+        "db": 4
+      },
+      {
+        "actionId": "cut-cosplay",
+        "kind": "tick-0",
+        "start": 14.36,
+        "attackEnd": 14.399999999999999,
+        "holdEnd": 14.579999999999998,
+        "end": 14.879999999999999,
+        "db": 4
+      },
+      {
+        "actionId": "cut-wedding",
+        "kind": "tick-1",
+        "start": 15.56,
+        "attackEnd": 15.6,
+        "holdEnd": 15.78,
+        "end": 16.08,
+        "db": 4
+      },
+      {
+        "actionId": "cut-beach",
+        "kind": "tick-2",
+        "start": 16.76,
+        "attackEnd": 16.8,
+        "holdEnd": 16.98,
+        "end": 17.28,
+        "db": 4
+      },
+      {
+        "actionId": "all-year",
+        "kind": "stamp",
+        "start": 18.12,
+        "attackEnd": 18.16,
+        "holdEnd": 18.31,
+        "end": 18.56,
+        "db": 2
+      },
+      {
+        "actionId": "wipe-1",
+        "kind": "brush",
+        "start": 18.56,
+        "attackEnd": 18.599999999999998,
+        "holdEnd": 18.779999999999998,
+        "end": 19.08,
+        "db": 4
+      },
+      {
+        "actionId": "season-spring",
+        "kind": "stamp",
+        "start": 18.42,
+        "attackEnd": 18.46,
+        "holdEnd": 18.64,
+        "end": 18.94,
+        "db": 4
+      },
+      {
+        "actionId": "season-summer",
+        "kind": "stamp",
+        "start": 19.320000000000004,
+        "attackEnd": 19.360000000000003,
+        "holdEnd": 19.540000000000003,
+        "end": 19.840000000000003,
+        "db": 4
+      },
+      {
+        "actionId": "wipe-2",
+        "kind": "brush",
+        "start": 20.36,
+        "attackEnd": 20.4,
+        "holdEnd": 20.58,
+        "end": 20.88,
+        "db": 4
+      },
+      {
+        "actionId": "season-autumn",
+        "kind": "stamp",
+        "start": 21.12,
+        "attackEnd": 21.16,
+        "holdEnd": 21.34,
+        "end": 21.64,
+        "db": 4
+      },
+      {
+        "actionId": "wipe-3",
+        "kind": "brush",
+        "start": 22.16,
+        "attackEnd": 22.2,
+        "holdEnd": 22.38,
+        "end": 22.68,
+        "db": 4
+      },
+      {
+        "actionId": "season-winter",
+        "kind": "stamp",
+        "start": 22.92,
+        "attackEnd": 22.96,
+        "holdEnd": 23.14,
+        "end": 23.44,
+        "db": 4
+      },
+      {
+        "actionId": "close-out",
+        "kind": "pullback-short",
+        "start": 24.560000000000002,
+        "attackEnd": 24.6,
+        "holdEnd": 24.78,
+        "end": 25.080000000000002,
+        "db": 4
+      },
+      {
+        "actionId": "end-name",
+        "kind": "stamp",
+        "start": 26.570000000000004,
+        "attackEnd": 26.610000000000003,
+        "holdEnd": 26.910000000000004,
+        "end": 27.160000000000004,
+        "db": 2
+      },
+      {
+        "actionId": "end-seal",
+        "kind": "stamp",
+        "start": 26.87,
+        "attackEnd": 26.91,
+        "holdEnd": 27.09,
+        "end": 27.39,
+        "db": 4
+      }
+    ],
+    "overlap": "deepest-envelope-wins"
+  },
+  "timing": [
+    {
+      "actionId": "crossing-1",
+      "fileStart": 0.296,
+      "audibleLandmark": 0.3,
+      "actionTime": 0.3,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "pull-back",
+      "fileStart": 0.717,
+      "audibleLandmark": 1.2,
+      "actionTime": 1.2,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "title",
+      "fileStart": 0.909,
+      "audibleLandmark": 0.91,
+      "actionTime": 0.91,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "crossing-2",
+      "fileStart": 1.096,
+      "audibleLandmark": 1.1,
+      "actionTime": 1.1,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "title-seal",
+      "fileStart": 1.209,
+      "audibleLandmark": 1.21,
+      "actionTime": 1.21,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "crossing-3",
+      "fileStart": 1.896,
+      "audibleLandmark": 1.9,
+      "actionTime": 1.9,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "crossing-4",
+      "fileStart": 2.696,
+      "audibleLandmark": 2.7,
+      "actionTime": 2.7,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "dive",
+      "fileStart": 4.273,
+      "audibleLandmark": 4.8,
+      "actionTime": 4.8,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "taller",
+      "fileStart": 5.809,
+      "audibleLandmark": 5.8100000000000005,
+      "actionTime": 5.81,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "cut-station",
+      "fileStart": 7.199,
+      "audibleLandmark": 7.2,
+      "actionTime": 7.2,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "cut-sensoji",
+      "fileStart": 8.399,
+      "audibleLandmark": 8.399999999999999,
+      "actionTime": 8.4,
+      "errorFrames": -0.0
+    },
+    {
+      "actionId": "finer",
+      "fileStart": 9.759,
+      "audibleLandmark": 9.76,
+      "actionTime": 9.76,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "cut-signs",
+      "fileStart": 10.799,
+      "audibleLandmark": 10.799999999999999,
+      "actionTime": 10.8,
+      "errorFrames": -0.0
+    },
+    {
+      "actionId": "alive",
+      "fileStart": 12.159,
+      "audibleLandmark": 12.16,
+      "actionTime": 12.16,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "cut-incense",
+      "fileStart": 13.199,
+      "audibleLandmark": 13.2,
+      "actionTime": 13.2,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "cut-cosplay",
+      "fileStart": 14.399,
+      "audibleLandmark": 14.399999999999999,
+      "actionTime": 14.4,
+      "errorFrames": -0.0
+    },
+    {
+      "actionId": "cut-wedding",
+      "fileStart": 15.599,
+      "audibleLandmark": 15.6,
+      "actionTime": 15.6,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "cut-beach",
+      "fileStart": 16.799,
+      "audibleLandmark": 16.8,
+      "actionTime": 16.8,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "all-year",
+      "fileStart": 18.159,
+      "audibleLandmark": 18.16,
+      "actionTime": 18.16,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "wipe-1",
+      "fileStart": 18.4,
+      "audibleLandmark": 18.599999999999998,
+      "actionTime": 18.6,
+      "errorFrames": -0.0
+    },
+    {
+      "actionId": "season-spring",
+      "fileStart": 18.459,
+      "audibleLandmark": 18.46,
+      "actionTime": 18.46,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "season-summer",
+      "fileStart": 19.359,
+      "audibleLandmark": 19.360000000000003,
+      "actionTime": 19.36,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "wipe-2",
+      "fileStart": 20.2,
+      "audibleLandmark": 20.4,
+      "actionTime": 20.4,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "season-autumn",
+      "fileStart": 21.159,
+      "audibleLandmark": 21.16,
+      "actionTime": 21.16,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "wipe-3",
+      "fileStart": 22.0,
+      "audibleLandmark": 22.2,
+      "actionTime": 22.2,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "season-winter",
+      "fileStart": 22.959,
+      "audibleLandmark": 22.96,
+      "actionTime": 22.96,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "close-out",
+      "fileStart": 24.312,
+      "audibleLandmark": 24.6,
+      "actionTime": 24.6,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "end-name",
+      "fileStart": 26.609,
+      "audibleLandmark": 26.610000000000003,
+      "actionTime": 26.61,
+      "errorFrames": 0.0
+    },
+    {
+      "actionId": "end-seal",
+      "fileStart": 26.909,
+      "audibleLandmark": 26.91,
+      "actionTime": 26.91,
+      "errorFrames": 0.0
+    }
+  ],
+  "warnings": [],
+  "normalization": {
+    "requested": "linear",
+    "normalization_type": "linear",
+    "measurement": {
+      "input_i": "-20.48",
+      "input_tp": "-6.87",
+      "input_lra": "4.20",
+      "input_thresh": "-30.66",
+      "output_i": "-15.68",
+      "output_tp": "-2.01",
+      "output_lra": "2.70",
+      "output_thresh": "-25.80",
+      "normalization_type": "dynamic",
+      "target_offset": "-0.32"
+    },
+    "output": {
+      "input_i": "-20.30",
+      "input_tp": "-6.87",
+      "input_lra": "3.00",
+      "input_thresh": "-30.40",
+      "output_i": "-15.82",
+      "output_tp": "-2.39",
+      "output_lra": "3.10",
+      "output_thresh": "-25.92",
+      "normalization_type": "linear",
+      "target_offset": "-0.18"
+    }
+  },
+  "listeningStatus": "Not auditioned by script; listen to isolated SFX, final mix and encoded MP4."
+}

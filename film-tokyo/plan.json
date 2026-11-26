@@ -1,0 +1,783 @@
+{
+  "demo": false,
+  "product": "inkcity Atlas",
+  "style": "repo",
+  "width": 1080,
+  "height": 1080,
+  "fps": 30,
+  "duration": 30.0,
+  "repo": "..",
+  "scope": {
+    "versions": "main@42b1a1a (published 2026-11-25)",
+    "platforms": [
+      "web-desktop"
+    ],
+    "feature": "the rebuilt Tokyo: landmarks, real Japanese lettering, a city that lives, four seasons (S)"
+  },
+  "audioRequired": true,
+  "sfxRequired": true,
+  "typography": {
+    "mode": "english",
+    "enFont": "Kevin Sans: Looseleaf Lettering (script, riso offset) for the big words, the hand for the short lines; IBM Plex Mono for the address",
+    "zhFont": null,
+    "zhStyle": null,
+    "exceptionReason": "User, 2026-11-21: \"不需要中文…把那个字体都做成英文的。参考那个 UI 设计库的内容，然后突出它的这个手写手绘风格即可\" (English only, in the UI library's hand-drawn style)."
+  },
+  "audio": {
+    "ducking": {
+      "enabled": true
+    },
+    "beatGrid": {
+      "bpm": 100,
+      "offset": 0
+    },
+    "music": {
+      "file": "assets/music.wav",
+      "gain": 0.7
+    },
+    "cues": [
+      {
+        "at": 0.296,
+        "syncOffset": 0.004,
+        "actionId": "crossing-1",
+        "file": "assets/sfx/cuckoo.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "cuckoo"
+      },
+      {
+        "at": 0.717,
+        "syncOffset": 0.483,
+        "actionId": "pull-back",
+        "file": "assets/sfx/pullback.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "pullback"
+      },
+      {
+        "at": 0.909,
+        "syncOffset": 0.001,
+        "actionId": "title",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.4,
+        "role": "sfx",
+        "kind": "stamp",
+        "duck": {
+          "db": 2,
+          "attack": 0.04,
+          "hold": 0.15,
+          "release": 0.25
+        }
+      },
+      {
+        "at": 1.096,
+        "syncOffset": 0.004,
+        "actionId": "crossing-2",
+        "file": "assets/sfx/cuckoo.wav",
+        "gain": 0.7,
+        "role": "sfx",
+        "kind": "cuckoo"
+      },
+      {
+        "at": 1.209,
+        "syncOffset": 0.001,
+        "actionId": "title-seal",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "stamp"
+      },
+      {
+        "at": 1.896,
+        "syncOffset": 0.004,
+        "actionId": "crossing-3",
+        "file": "assets/sfx/cuckoo.wav",
+        "gain": 0.45,
+        "role": "sfx",
+        "kind": "cuckoo"
+      },
+      {
+        "at": 2.696,
+        "syncOffset": 0.004,
+        "actionId": "crossing-4",
+        "file": "assets/sfx/cuckoo.wav",
+        "gain": 0.25,
+        "role": "sfx",
+        "kind": "cuckoo"
+      },
+      {
+        "at": 4.273,
+        "syncOffset": 0.527,
+        "actionId": "dive",
+        "file": "assets/sfx/dive.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "dive"
+      },
+      {
+        "at": 5.809,
+        "syncOffset": 0.001,
+        "actionId": "taller",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.3,
+        "role": "sfx",
+        "kind": "stamp",
+        "duck": {
+          "db": 2,
+          "attack": 0.04,
+          "hold": 0.15,
+          "release": 0.25
+        }
+      },
+      {
+        "at": 7.199,
+        "syncOffset": 0.001,
+        "actionId": "cut-station",
+        "file": "assets/sfx/tick-0.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tick-0"
+      },
+      {
+        "at": 8.399,
+        "syncOffset": 0.001,
+        "actionId": "cut-sensoji",
+        "file": "assets/sfx/tick-1.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tick-1"
+      },
+      {
+        "at": 9.759,
+        "syncOffset": 0.001,
+        "actionId": "finer",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.3,
+        "role": "sfx",
+        "kind": "stamp",
+        "duck": {
+          "db": 2,
+          "attack": 0.04,
+          "hold": 0.15,
+          "release": 0.25
+        }
+      },
+      {
+        "at": 10.799,
+        "syncOffset": 0.001,
+        "actionId": "cut-signs",
+        "file": "assets/sfx/tick-2.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tick-2"
+      },
+      {
+        "at": 12.159,
+        "syncOffset": 0.001,
+        "actionId": "alive",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.3,
+        "role": "sfx",
+        "kind": "stamp",
+        "duck": {
+          "db": 2,
+          "attack": 0.04,
+          "hold": 0.15,
+          "release": 0.25
+        }
+      },
+      {
+        "at": 13.199,
+        "syncOffset": 0.001,
+        "actionId": "cut-incense",
+        "file": "assets/sfx/tick-3.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tick-3"
+      },
+      {
+        "at": 14.399,
+        "syncOffset": 0.001,
+        "actionId": "cut-cosplay",
+        "file": "assets/sfx/tick-0.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tick-0"
+      },
+      {
+        "at": 15.599,
+        "syncOffset": 0.001,
+        "actionId": "cut-wedding",
+        "file": "assets/sfx/tick-1.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tick-1"
+      },
+      {
+        "at": 16.799,
+        "syncOffset": 0.001,
+        "actionId": "cut-beach",
+        "file": "assets/sfx/tick-2.wav",
+        "gain": 0.9,
+        "role": "sfx",
+        "kind": "tick-2"
+      },
+      {
+        "at": 18.159,
+        "syncOffset": 0.001,
+        "actionId": "all-year",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.3,
+        "role": "sfx",
+        "kind": "stamp",
+        "duck": {
+          "db": 2,
+          "attack": 0.04,
+          "hold": 0.15,
+          "release": 0.25
+        }
+      },
+      {
+        "at": 18.4,
+        "syncOffset": 0.2,
+        "actionId": "wipe-1",
+        "file": "assets/sfx/brush.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "brush"
+      },
+      {
+        "at": 18.459,
+        "syncOffset": 0.001,
+        "actionId": "season-spring",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 0.55,
+        "role": "sfx",
+        "kind": "stamp"
+      },
+      {
+        "at": 19.359,
+        "syncOffset": 0.001,
+        "actionId": "season-summer",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 0.55,
+        "role": "sfx",
+        "kind": "stamp"
+      },
+      {
+        "at": 20.2,
+        "syncOffset": 0.2,
+        "actionId": "wipe-2",
+        "file": "assets/sfx/brush.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "brush"
+      },
+      {
+        "at": 21.159,
+        "syncOffset": 0.001,
+        "actionId": "season-autumn",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 0.55,
+        "role": "sfx",
+        "kind": "stamp"
+      },
+      {
+        "at": 22.0,
+        "syncOffset": 0.2,
+        "actionId": "wipe-3",
+        "file": "assets/sfx/brush.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "brush"
+      },
+      {
+        "at": 22.959,
+        "syncOffset": 0.001,
+        "actionId": "season-winter",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 0.55,
+        "role": "sfx",
+        "kind": "stamp"
+      },
+      {
+        "at": 24.312,
+        "syncOffset": 0.288,
+        "actionId": "close-out",
+        "file": "assets/sfx/pullback-short.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "pullback-short"
+      },
+      {
+        "at": 26.609,
+        "syncOffset": 0.001,
+        "actionId": "end-name",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.4,
+        "role": "sfx",
+        "kind": "stamp",
+        "duck": {
+          "db": 2,
+          "attack": 0.04,
+          "hold": 0.3,
+          "release": 0.25
+        }
+      },
+      {
+        "at": 26.909,
+        "syncOffset": 0.001,
+        "actionId": "end-seal",
+        "file": "assets/sfx/stamp.wav",
+        "gain": 1.0,
+        "role": "sfx",
+        "kind": "stamp"
+      }
+    ]
+  },
+  "shots": [
+    {
+      "id": "open",
+      "start": 0.0,
+      "end": 4.8,
+      "type": "title",
+      "headlineEn": "Tokyo, redrawn.",
+      "headline": "Tokyo, redrawn.",
+      "plainExplanation": "Close on the Shibuya scramble at the middle of the map as the crowds step out, then the camera pulls all the way back to the whole city. The page redraws at every zoom, so every frame is sharp.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/shibuya.js",
+        "repo:engine/90_app.js",
+        "repo:cities/tokyo/index.html"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "crossing-1",
+          "at": 0.3,
+          "action": "The scramble crossing calls (call 1), fainter as the camera pulls back",
+          "soundRequired": true
+        },
+        {
+          "id": "title",
+          "at": 0.91,
+          "action": "\"Tokyo, redrawn.\" is stamped on",
+          "soundRequired": true
+        },
+        {
+          "id": "crossing-2",
+          "at": 1.1,
+          "action": "The scramble crossing calls (call 2), fainter as the camera pulls back",
+          "soundRequired": false
+        },
+        {
+          "id": "pull-back",
+          "at": 1.2,
+          "action": "The camera pulls back from the scramble to the whole city",
+          "soundRequired": true
+        },
+        {
+          "id": "title-seal",
+          "at": 1.21,
+          "action": "The red 東京 seal is stamped beside it",
+          "soundRequired": true
+        },
+        {
+          "id": "crossing-3",
+          "at": 1.9,
+          "action": "The scramble crossing calls (call 3), fainter as the camera pulls back",
+          "soundRequired": false
+        },
+        {
+          "id": "crossing-4",
+          "at": 2.7,
+          "action": "The scramble crossing calls (call 4), fainter as the camera pulls back",
+          "soundRequired": false
+        }
+      ],
+      "description": "Tokyo, redrawn.",
+      "descriptionAt": 0.8
+    },
+    {
+      "id": "dive",
+      "start": 4.8,
+      "end": 7.2,
+      "type": "detail",
+      "headlineEn": "Taller.",
+      "headline": "Taller.",
+      "plainExplanation": "The camera dives from the whole map into Tokyo Tower, rebuilt from the real tower: the tallest thing in the city, seven orange and white bands, a fine lattice. The page redraws at every zoom, so it stays sharp all the way in.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/tower.js",
+        "repo:engine/90_app.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "dive",
+          "at": 0.0,
+          "action": "The camera dives from the whole map into Tokyo Tower",
+          "soundRequired": true
+        },
+        {
+          "id": "taller",
+          "at": 1.01,
+          "action": "\"Taller.\" is stamped on",
+          "soundRequired": true
+        }
+      ],
+      "description": "landmarks drawn from the real buildings",
+      "descriptionAt": 1.2
+    },
+    {
+      "id": "station",
+      "start": 7.2,
+      "end": 8.4,
+      "type": "detail",
+      "headlineEn": "Taller.",
+      "headline": "Taller.",
+      "plainExplanation": "Tokyo Station's Marunouchi building in red brick and white stone, with its two restored domes.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/station.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "cut-station",
+          "at": 0.0,
+          "action": "Hard cut to station",
+          "soundRequired": true
+        }
+      ],
+      "description": "landmarks drawn from the real buildings",
+      "descriptionAt": 0.0
+    },
+    {
+      "id": "sensoji",
+      "start": 8.4,
+      "end": 9.6,
+      "type": "detail",
+      "headlineEn": "Taller.",
+      "headline": "Taller.",
+      "plainExplanation": "Senso-ji: the five-storey pagoda, the main hall and the Thunder Gate, vermilion under dark roofs.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/sensoji.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "cut-sensoji",
+          "at": 0.0,
+          "action": "Hard cut to sensoji",
+          "soundRequired": true
+        }
+      ],
+      "description": "landmarks drawn from the real buildings",
+      "descriptionAt": 0.0
+    },
+    {
+      "id": "tsukiji",
+      "start": 9.6,
+      "end": 10.8,
+      "type": "macro",
+      "headlineEn": "Finer.",
+      "headline": "Finer.",
+      "plainExplanation": "Tsukiji's row of shops under their big signs: 魚, 寿司, 牛丼, 酒, 築地, each one a real word written stroke by stroke, in a finer pen.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/37_kana.js",
+        "repo:cities/tokyo/src/tiles/tsukiji.js",
+        "repo:cities/tokyo/src/35_scene.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "finer",
+          "at": 0.16,
+          "action": "Cut to Tsukiji; \"Finer.\" is stamped on",
+          "soundRequired": true
+        }
+      ],
+      "description": "real Japanese on every sign",
+      "descriptionAt": 0.35
+    },
+    {
+      "id": "signs",
+      "start": 10.8,
+      "end": 12.0,
+      "type": "macro",
+      "headlineEn": "Finer.",
+      "headline": "Finer.",
+      "plainExplanation": "Akihabara's sign towers: ゲーム, アニメ, ホビー, 電気 and the rest, each one a real word.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/37_kana.js",
+        "repo:cities/tokyo/src/tiles/akiba.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "cut-signs",
+          "at": 0.0,
+          "action": "Hard cut to signs",
+          "soundRequired": true
+        }
+      ],
+      "description": "real Japanese on every sign",
+      "descriptionAt": 0.0
+    },
+    {
+      "id": "sumo",
+      "start": 12.0,
+      "end": 13.2,
+      "type": "montage",
+      "headlineEn": "Alive.",
+      "headline": "Alive.",
+      "plainExplanation": "A sumo bout at Ryogoku: the two wrestlers locked in the ring, the crowd round it.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/satellites.js",
+        "repo:cities/tokyo/src/38_life.js",
+        "repo:engine/25_life.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "alive",
+          "at": 0.16,
+          "action": "Cut to the sumo; \"Alive.\" is stamped on",
+          "soundRequired": true
+        }
+      ],
+      "description": "everyone is doing something",
+      "descriptionAt": 0.35
+    },
+    {
+      "id": "incense",
+      "start": 13.2,
+      "end": 14.4,
+      "type": "montage",
+      "headlineEn": "Alive.",
+      "headline": "Alive.",
+      "plainExplanation": "At Senso-ji, visitors waft the incense smoke over themselves and pray.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/sensoji.js",
+        "repo:cities/tokyo/src/38_life.js",
+        "repo:engine/25_life.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "cut-incense",
+          "at": 0.0,
+          "action": "Hard cut to incense",
+          "soundRequired": true
+        }
+      ],
+      "description": "everyone is doing something",
+      "descriptionAt": 0.0
+    },
+    {
+      "id": "cosplay",
+      "start": 14.4,
+      "end": 15.6,
+      "type": "montage",
+      "headlineEn": "Alive.",
+      "headline": "Alive.",
+      "plainExplanation": "Cosplayers pose in the middle of Akihabara's main street for a ring of photographers.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/akiba.js",
+        "repo:cities/tokyo/src/38_life.js",
+        "repo:engine/25_life.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "cut-cosplay",
+          "at": 0.0,
+          "action": "Hard cut to cosplay",
+          "soundRequired": true
+        }
+      ],
+      "description": "everyone is doing something",
+      "descriptionAt": 0.0
+    },
+    {
+      "id": "wedding",
+      "start": 15.6,
+      "end": 16.8,
+      "type": "montage",
+      "headlineEn": "Alive.",
+      "headline": "Alive.",
+      "plainExplanation": "A Shinto wedding walks slowly round Meiji Jingu, the bride under a red parasol, the families behind.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/meiji.js",
+        "repo:cities/tokyo/src/38_life.js",
+        "repo:engine/25_life.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "cut-wedding",
+          "at": 0.0,
+          "action": "Hard cut to wedding",
+          "soundRequired": true
+        }
+      ],
+      "description": "everyone is doing something",
+      "descriptionAt": 0.0
+    },
+    {
+      "id": "beach",
+      "start": 16.8,
+      "end": 18.0,
+      "type": "montage",
+      "headlineEn": "Alive.",
+      "headline": "Alive.",
+      "plainExplanation": "Odaiba's beach: a game of catch, a dog walk, children chasing each other.",
+      "claim": true,
+      "source": [
+        "repo:cities/tokyo/src/tiles/satellites.js",
+        "repo:cities/tokyo/src/38_life.js",
+        "repo:engine/25_life.js"
+      ],
+      "component": "repo:cities/tokyo/index.html (SF.seek at the film's own cameras)",
+      "actions": [
+        {
+          "id": "cut-beach",
+          "at": 0.0,
+          "action": "Hard cut to beach",
+          "soundRequired": true
+        }
+      ],
+      "description": "everyone is doing something",
+      "descriptionAt": 0.0
+    },
+    {
+      "id": "seasons",
+      "start": 18.0,
+      "end": 24.6,
+      "type": "detail",
+      "headlineEn": "All year.",
+      "headline": "All year.",
+      "plainExplanation": "The Sumida bank turns through the year with the page's own season wipe (key S): cherry blossom, the fireworks tarps of late July, the November leaves, a January snow day.",
+      "claim": true,
+      "source": [
+        "repo:engine/90_app.js",
+        "repo:cities/tokyo/src/35_scene.js",
+        "repo:cities/tokyo/src/tiles/sumida.js"
+      ],
+      "component": "repo:cities/tokyo/index.html?season= (SF.seek; the wipe as drawWipe draws it)",
+      "actions": [
+        {
+          "id": "all-year",
+          "at": 0.16,
+          "action": "Cut to the Sumida; \"All year.\" is stamped on",
+          "soundRequired": true
+        },
+        {
+          "id": "season-spring",
+          "at": 0.46,
+          "action": "\"spring\" is stamped under the words",
+          "soundRequired": false
+        },
+        {
+          "id": "wipe-1",
+          "at": 0.6,
+          "action": "The next season is brushed on (summer)",
+          "soundRequired": true
+        },
+        {
+          "id": "season-summer",
+          "at": 1.36,
+          "action": "\"summer\" is stamped under the words",
+          "soundRequired": false
+        },
+        {
+          "id": "wipe-2",
+          "at": 2.4,
+          "action": "The next season is brushed on (autumn)",
+          "soundRequired": true
+        },
+        {
+          "id": "season-autumn",
+          "at": 3.16,
+          "action": "\"autumn\" is stamped under the words",
+          "soundRequired": false
+        },
+        {
+          "id": "wipe-3",
+          "at": 4.2,
+          "action": "The next season is brushed on (winter)",
+          "soundRequired": true
+        },
+        {
+          "id": "season-winter",
+          "at": 4.96,
+          "action": "\"winter\" is stamped under the words",
+          "soundRequired": false
+        }
+      ],
+      "description": "spring · summer · autumn · winter",
+      "descriptionAt": 0.35
+    },
+    {
+      "id": "close",
+      "start": 24.6,
+      "end": 26.4,
+      "type": "detail",
+      "headlineEn": "Back to the whole city",
+      "headline": "Back to the whole city",
+      "claim": false,
+      "plainExplanation": "The camera pulls back from the snowy Sumida to the whole city on its January snow day.",
+      "source": [
+        "repo:cities/tokyo/index.html"
+      ],
+      "component": "repo:cities/tokyo/index.html?season=winter (SF.seek)",
+      "actions": [
+        {
+          "id": "close-out",
+          "at": 0.0,
+          "action": "The camera pulls back to the whole city in the snow",
+          "soundRequired": true
+        }
+      ],
+      "description": "",
+      "descriptionAt": 0.0,
+      "keep": 30.0
+    },
+    {
+      "id": "end",
+      "start": 26.4,
+      "end": 30.0,
+      "type": "end",
+      "headlineEn": "Tokyo",
+      "headline": "Tokyo",
+      "claim": false,
+      "plainExplanation": "The end card over the whole city in the snow: Tokyo, an inkcity Atlas city, and the site's address.",
+      "source": [],
+      "component": "film: src/shots/words.jsx (Looseleaf Lettering, the 東京 seal)",
+      "actions": [
+        {
+          "id": "end-name",
+          "at": 0.21,
+          "action": "\"Tokyo\" is stamped on the end card",
+          "soundRequired": true
+        },
+        {
+          "id": "end-seal",
+          "at": 0.51,
+          "action": "The 東京 seal is stamped beside it",
+          "soundRequired": true
+        }
+      ],
+      "description": "an inkcity Atlas city · leehongji.github.io/inkcity-atlas",
+      "descriptionAt": 0.7
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+/* inkcity Atlas, "Tokyo, redrawn": the frame design system from DIRECTION.md, plus the mechanics every film needs. */
+* { box-sizing:border-box; }
+html,body { margin:0; background:#F0EEE4; }
+#film { position:relative; width:1080px; height:1080px; overflow:hidden; background:#F0EEE4; color:#2C271C;
+  --ink:#2C271C; --paper:#F0EEE4; --halo:rgba(240,238,228,0.96); --seal:#C8352B;
+  --en:"Kevin Sans Hand", "Kevin Sans", sans-serif; --script:"Kevin Sans Script", "Kevin Sans", sans-serif; --mono:"IBM Plex Mono", ui-monospace, monospace;
+  font-family:var(--en); -webkit-font-smoothing:antialiased; }
+/* the film clock owns motion: freeze CSS transitions/animations so any frame renders in isolation */
+#film *, #film *::before, #film *::after { transition:none !important; animation-duration:0s !important; animation-delay:0s !important; }
+.shot { position:absolute; inset:0; overflow:hidden; opacity:0; visibility:hidden; }
+.full { position:absolute; left:0; top:0; width:1080px; height:1080px; display:block; }
+.city { position:absolute; inset:0; background:var(--paper); }
+
+/* the words: ink on a paper halo, top left, inside the 48 px margin and well above X's player bar */
+.words-layer { position:absolute; inset:0; pointer-events:none; }
+.wd { position:absolute; left:54px; top:46px; width:900px; opacity:0; }
+.wd-head { display:flex; align-items:flex-start; gap:22px; }
+.wd-big, .end-name { color:var(--ink) !important; font-size:112px !important; line-height:.98 !important; transform-origin:12% 60%;
+  filter:drop-shadow(0 0 5px var(--halo)) drop-shadow(0 0 12px var(--halo)); }
+.wd-big, .wd-seal, .wd-line, .end-name, .end-seal { opacity:0; }
+.seal { display:block; flex:none; transform-origin:50% 50%; filter:drop-shadow(0 0 4px rgba(240,238,228,0.9)); }
+.wd-seal { margin-top:6px; width:56px; height:101px; }
+.wd-line { margin:14px 0 0 6px; font-size:46px; font-weight:700; line-height:1.15; color:var(--ink);
+  text-wrap:balance; text-shadow:0 0 2px var(--halo), 0 0 4px var(--halo), 0 0 8px var(--halo), 0 0 14px var(--halo), 0 0 22px var(--halo), 0 0 32px var(--halo); }
+.wd-seasons { position:relative; height:60px; }
+.wd-season { position:absolute; left:0; top:0; margin-top:16px; transform-origin:10% 60%; }
+
+/* the end card over the whole city in the snow, top left, the city below it */
+.end { position:absolute; inset:0; }
+.end-card { position:absolute; left:54px; top:40px; }
+.end-head { display:flex; align-items:flex-start; gap:24px; }
+.end-name { font-size:140px !important; transform-origin:12% 60%; }
+.end-seal { margin-top:10px; width:66px; height:119px; }
+.end-atlas { margin:6px 0 0 6px; font-size:46px; font-weight:700; color:var(--ink); opacity:0;
+  text-shadow:0 0 3px var(--halo), 0 0 8px var(--halo), 0 0 16px var(--halo); }
+.end-url { margin:10px 0 0 6px; font-family:var(--mono); font-weight:500; font-size:32px; color:var(--ink); opacity:0; letter-spacing:0.01em;
+  text-shadow:0 0 3px var(--halo), 0 0 8px var(--halo), 0 0 16px var(--halo); }
